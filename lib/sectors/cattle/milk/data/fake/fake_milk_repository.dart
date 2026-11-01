@@ -1,11 +1,13 @@
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/utils/clock.dart';
+import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_models.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 
 /// UI phase: the F01-F10 sample numbers. Recording a cow marks her done.
+/// Withdrawal ("not for sale") comes from the shared treatment records.
 class FakeMilkRepository implements MilkRepository {
-  new(this.clock) {
+  new(this.clock, this.treatments) {
     final today = DateTime(clock.now().year, clock.now().month, clock.now().day);
     _cows = [
       MilkCow(
@@ -19,7 +21,7 @@ class FakeMilkRepository implements MilkRepository {
         recordedLitres: 9.5,
         recordedAt: today.add(const Duration(hours: 6, minutes: 12)),
       ),
-      MilkCow(
+      const MilkCow(
         id: 'animal-FT-022',
         name: 'Kasheshe',
         tag: 'FT-022',
@@ -27,11 +29,6 @@ class FakeMilkRepository implements MilkRepository {
         breed: 'Ankole',
         ageYears: 7,
         lastLitres: 5,
-        treatment: MilkWithdrawal(
-          drug: 'Penicillin',
-          given: today.add(const Duration(days: 1)),
-          until: today.add(const Duration(days: 5)),
-        ),
       ),
       const MilkCow(
         id: 'animal-FT-031',
@@ -61,14 +58,6 @@ class FakeMilkRepository implements MilkRepository {
         breed: 'Ankole cross',
         ageYears: 3,
       ),
-      const MilkCow(
-        id: 'animal-FT-019',
-        name: 'Kaaka',
-        tag: 'FT-019',
-        avatarIndex: 6,
-        breed: 'Friesian cross',
-        ageYears: 8,
-      ),
       MilkCow(
         id: 'animal-FT-027',
         name: 'Nyinamwiza',
@@ -93,67 +82,50 @@ class FakeMilkRepository implements MilkRepository {
   }
 
   final Clock clock;
+  final TreatmentRepository treatments;
   late List<MilkCow> _cows;
-  // The other 33 of the 41 milking cows (31 already recorded this morning).
+  // The other 34 of the 41 milking cows (31 already recorded this morning).
   static const _otherRecorded = 31;
-  static const _otherCows = 33;
+  static const _otherCows = 34;
   static const _otherLitres = 142.8;
+
+  /// The cow with her withdrawal (if any) from the treatment records.
+  Future<MilkCow> _withTreatment(MilkCow c) async {
+    final r = (await treatments.withdrawalFor(c.id, clock.now())).data;
+    return c.copyWith(
+      treatment: r == null ? null : MilkWithdrawal(drug: r.drug.shortName, given: r.given, until: r.safeFrom),
+    );
+  }
+
+  Future<List<MilkCow>> _cowsNow() async => [for (final c in _cows) await _withTreatment(c)];
 
   @override
   Future<Result<MilkSessionSummary>> session(MilkSession session) async {
-    final mine = _cows.fold<double>(0, (s, c) => s + (c.recordedLitres ?? 0));
+    final cows = await _cowsNow();
+    final mine = cows.fold<double>(0, (s, c) => s + (c.recordedLitres ?? 0));
+    final morning = session == MilkSession.morning;
     return Result.success(
       MilkSessionSummary(
         session: session,
-        litres: session == MilkSession.morning ? _otherLitres + mine : 0,
-        recordedCount: session == MilkSession.morning ? _otherRecorded + _cows.where((c) => c.recorded).length : 0,
-        totalCows: _otherCows + _cows.length,
-        cows: session == MilkSession.morning
-            ? _cows
-            : [
-                for (final c in _cows)
-                  MilkCow(
-                    id: c.id,
-                    name: c.name,
-                    tag: c.tag,
-                    avatarIndex: c.avatarIndex,
-                    breed: c.breed,
-                    ageYears: c.ageYears,
-                    lastLitres: c.lastLitres,
-                    treatment: c.treatment,
-                  ),
-              ],
+        litres: morning ? _otherLitres + mine : 0,
+        recordedCount: morning ? _otherRecorded + cows.where((c) => c.recorded).length : 0,
+        totalCows: _otherCows + cows.length,
+        cows: morning ? cows : [for (final c in cows) c.copyWith(treatment: c.treatment, clearRecord: true)],
       ),
     );
   }
 
   @override
   Future<Result<MilkCow?>> cow(String cowId) async {
-    for (final c in _cows) {
-      if (c.id == cowId) return Result.success(c);
-    }
-    return const Result.success(null);
+    final c = _cows.where((c) => c.id == cowId).firstOrNull;
+    return Result.success(c == null ? null : await _withTreatment(c));
   }
 
   @override
   Future<Result<void>> recordCow(String cowId, MilkSession session, double litres, {required bool notForSale}) async {
     _cows = [
       for (final c in _cows)
-        if (c.id == cowId)
-          MilkCow(
-            id: c.id,
-            name: c.name,
-            tag: c.tag,
-            avatarIndex: c.avatarIndex,
-            breed: c.breed,
-            ageYears: c.ageYears,
-            lastLitres: c.lastLitres,
-            recordedLitres: litres,
-            recordedAt: clock.now(),
-            treatment: c.treatment,
-          )
-        else
-          c,
+        if (c.id == cowId) c.copyWith(recordedLitres: litres, recordedAt: clock.now()) else c,
     ];
     return const Result.success(null);
   }
@@ -162,13 +134,19 @@ class FakeMilkRepository implements MilkRepository {
   Future<Result<void>> recordTotal(MilkSession session, double litres) async => const Result.success(null);
 
   @override
-  Future<Result<List<MilkUseLine>>> use() async => const Result.success([
-    MilkUseLine(kind: MilkUseKind.sold, litres: 280, detail: 'Kashari Milk Centre'),
-    MilkUseLine(kind: MilkUseKind.home, litres: 12),
-    MilkUseLine(kind: MilkUseKind.calves, litres: 15),
-    MilkUseLine(kind: MilkUseKind.notForSale, litres: 5, detail: 'Kasheshe'),
-    MilkUseLine(kind: MilkUseKind.spoiled, litres: 0),
-  ]);
+  Future<Result<List<MilkUseLine>>> use() async {
+    final blocked = [
+      for (final c in await _cowsNow())
+        if (c.treatment != null) c.name,
+    ];
+    return Result.success([
+      const MilkUseLine(kind: MilkUseKind.sold, litres: 280, detail: 'Kashari Milk Centre'),
+      const MilkUseLine(kind: MilkUseKind.home, litres: 12),
+      const MilkUseLine(kind: MilkUseKind.calves, litres: 15),
+      MilkUseLine(kind: MilkUseKind.notForSale, litres: blocked.isEmpty ? 0 : 5, detail: blocked.join(', ')),
+      const MilkUseLine(kind: MilkUseKind.spoiled, litres: 0),
+    ]);
+  }
 
   @override
   Future<Result<void>> saveUse(List<MilkUseLine> lines) async => const Result.success(null);

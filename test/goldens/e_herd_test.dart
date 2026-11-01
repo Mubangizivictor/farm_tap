@@ -1,6 +1,7 @@
 // Section E — herd (E01-E10), 8 goldens per screen + small screens.
 // flutter test --update-goldens test/goldens/e_herd_test.dart
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
+import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/animal_detail_page.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/herd_list_page.dart';
@@ -15,7 +16,11 @@ import '../helpers/shell_wrap.dart';
 void main() {
   final clock = FixedClock();
   final today = clock.now();
-  FakeHerdRepository repo() => FakeHerdRepository(clock: clock, tenantProvider: InMemoryTenantProvider());
+  FakeHerdRepository repo() => FakeHerdRepository(
+    clock: clock,
+    tenantProvider: InMemoryTenantProvider(),
+    treatments: FakeTreatmentRepository(clock),
+  );
 
   Widget list() => inShell(
     HerdListPage(repo: repo(), onAnimal: (_) {}, onAdd: () {}, onScan: () {}, today: today),

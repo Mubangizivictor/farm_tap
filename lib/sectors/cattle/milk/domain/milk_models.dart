@@ -36,6 +36,24 @@ class MilkCow extends Equatable {
 
   bool get recorded => recordedLitres != null;
 
+  MilkCow copyWith({
+    double? recordedLitres,
+    DateTime? recordedAt,
+    MilkWithdrawal? treatment,
+    bool clearRecord = false,
+  }) => MilkCow(
+    id: id,
+    name: name,
+    tag: tag,
+    avatarIndex: avatarIndex,
+    breed: breed,
+    ageYears: ageYears,
+    lastLitres: lastLitres,
+    recordedLitres: clearRecord ? null : recordedLitres ?? this.recordedLitres,
+    recordedAt: clearRecord ? null : recordedAt ?? this.recordedAt,
+    treatment: treatment,
+  );
+
   @override
   List<Object?> get props => [
     id,

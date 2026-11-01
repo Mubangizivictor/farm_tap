@@ -26,13 +26,7 @@ void main() {
       inShell(page, current: current, parent: parent, centre: true);
 
   Widget home() => shell(
-    CentreHomePage(
-      repo: repo(),
-      centreName: 'Kashari Milk Centre',
-      onTapCard: () {},
-      onTool: (_) {},
-      onSeeAll: () {},
-    ),
+    CentreHomePage(repo: repo(), centreName: 'Kashari Milk Centre', onTapCard: () {}, onTool: (_) {}, onSeeAll: () {}),
     '/home',
   );
 
@@ -93,7 +87,11 @@ void main() {
 
   screenGoldens(
     'G07_centre_farmer_detail',
-    (_) => shell(CentreFarmerPage(repo: repo(), farmerId: 'farmer-0142'), '/farmers', parent: '/farmers'),
+    (_) => shell(
+      CentreFarmerPage(repo: repo(), farmerId: 'farmer-0142'),
+      '/farmers',
+      parent: '/farmers',
+    ),
   );
 
   screenGoldens(
@@ -104,27 +102,34 @@ void main() {
       if (!context.mounted) return;
       await showDialog<bool>(
         context: context,
-        builder: (_) => DialogFrame(child: CloseSessionDialog(repo: repo(), day: day, initialPin: '1')),
+        builder: (_) => DialogFrame(
+          child: CloseSessionDialog(repo: repo(), day: day, initialPin: '1'),
+        ),
       );
     }),
   );
 
   screenGoldens(
     'G09_centre_statements',
-    (_) => shell(
-      CentrePaymentsPage(repo: repo(), onSendSms: () {}, onPaymentSheet: () {}, onFarmer: (_) {}),
-      '/pay',
-    ),
+    (_) => shell(CentrePaymentsPage(repo: repo(), onSendSms: () {}, onPaymentSheet: () {}, onFarmer: (_) {}), '/pay'),
   );
 
   screenGoldens(
     'G10_centre_payment_sheet',
-    (_) => shell(PayFarmersPage(repo: repo(), onDone: () {}), '/pay', parent: '/pay'),
+    (_) => shell(
+      PayFarmersPage(repo: repo(), onDone: () {}),
+      '/pay',
+      parent: '/pay',
+    ),
   );
 
   screenGoldens(
     'G11_centre_sms_preview',
-    (_) => shell(SmsStatementsPage(repo: repo(), onSent: () {}), '/pay', parent: '/pay'),
+    (_) => shell(
+      SmsStatementsPage(repo: repo(), onSent: () {}),
+      '/pay',
+      parent: '/pay',
+    ),
   );
 
   screenGoldens(
@@ -148,6 +153,10 @@ void main() {
 
   screenGoldens(
     'G13_centre_reconciliation',
-    (_) => shell(ReconcilePage(repo: repo(), onSaved: () {}), '/home', parent: '/home'),
+    (_) => shell(
+      ReconcilePage(repo: repo(), onSaved: () {}),
+      '/home',
+      parent: '/home',
+    ),
   );
 }

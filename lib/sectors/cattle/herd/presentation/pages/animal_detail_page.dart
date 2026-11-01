@@ -127,10 +127,7 @@ class _AnimalDetailPageState extends State<AnimalDetailPage> {
                         tone: FarmTapTone.danger,
                         icon: Symbols.error_rounded,
                         title: l10n.notForSaleUntil(f.day(d.withdrawal!.until)),
-                        message: l10n.withdrawalBody(
-                          d.withdrawal!.drug,
-                          (d.withdrawal!.until.difference(today).inDays - 1).clamp(0, 999),
-                        ),
+                        message: l10n.withdrawalBody(d.withdrawal!.drug, d.withdrawal!.daysLeft(today)),
                       ),
                     ],
                     context.space.gapLg,

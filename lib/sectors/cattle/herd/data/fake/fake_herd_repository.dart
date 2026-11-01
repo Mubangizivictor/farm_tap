@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
+import 'package:farm_tap/sectors/cattle/health/domain/health_models.dart';
+import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
@@ -11,13 +13,16 @@ import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 /// sample cows from the mockups. The Isar repository (HerdRepositoryImpl)
 /// replaces it in the backend phase without touching the UI.
 class FakeHerdRepository implements HerdRepository {
-  new({required this.clock, required this.tenantProvider}) {
+  new({required this.clock, required this.tenantProvider, required this.treatments}) {
     _animals = [for (final s in _seed) _animal(s)];
     _milk = {for (final s in _seed) 'animal-${s.tag}': s.milk};
   }
 
   final Clock clock;
   final TenantProvider tenantProvider;
+
+  /// Withdrawal and the Treated status come from the treatment records.
+  final TreatmentRepository treatments;
   late List<Animal> _animals;
   late Map<String, double?> _milk;
   var _nextTag = 49;
@@ -48,15 +53,27 @@ class FakeHerdRepository implements HerdRepository {
 
   @override
   Future<Result<List<HerdRow>>> rows() async =>
-      Result.success([for (final a in _alive) HerdRow(animal: a, milkToday: _milk[a.id])]);
+      Result.success([for (final a in _alive) HerdRow(animal: await _current(a), milkToday: _milk[a.id])]);
+
+  /// A milking cow under withdrawal shows as Treated; dry cows stay Dry.
+  Future<Animal> _current(Animal a) async {
+    final r = (await treatments.withdrawalFor(a.id, clock.now())).data;
+    if (r != null && a.dairyStatus != DairyStatus.dry) {
+      return _copy(a, deleted: a.isDeleted, dairyStatus: DairyStatus.treated);
+    }
+    if (r == null && a.dairyStatus == DairyStatus.treated) {
+      return _copy(a, deleted: a.isDeleted, dairyStatus: DairyStatus.milking);
+    }
+    return a;
+  }
 
   @override
-  Future<Result<HerdCounts>> counts() async => const Result.success(
+  Future<Result<HerdCounts>> counts() async => Result.success(
     HerdCounts(
       total: 48,
       milking: 41,
       dry: 7,
-      treated: 2,
+      treated: ((await treatments.withdrawals(clock.now())).data ?? const <TreatmentRecord>[]).length,
       pregnant: 9,
       heifers: 6,
       calves: 6,
@@ -71,7 +88,7 @@ class FakeHerdRepository implements HerdRepository {
   @override
   Future<Result<Animal?>> findByTag(String tag) async {
     for (final a in _alive) {
-      if (a.tagNumber == tag) return Result.success(a);
+      if (a.tagNumber == tag) return Result.success(await _current(a));
     }
     return const Result.success(null);
   }
@@ -80,8 +97,9 @@ class FakeHerdRepository implements HerdRepository {
   Future<Result<AnimalDetail?>> detail(String animalId) async {
     final matches = _animals.where((a) => a.id == animalId);
     if (matches.isEmpty) return const Result.success(null);
-    final a = matches.first;
-    final treated = a.dairyStatus == DairyStatus.treated;
+    final a = await _current(matches.first);
+    final record = (await treatments.withdrawalFor(a.id, clock.now())).data;
+    final treated = record != null;
     final day = _today;
     return Result.success(
       AnimalDetail(
@@ -89,15 +107,15 @@ class FakeHerdRepository implements HerdRepository {
         avgMilk: treated ? 11.4 : (_milk[a.id] ?? 0) * 0.62,
         daysInMilk: treated ? 142 : 96,
         pregnancyCheckDue: day.subtract(const Duration(days: 5)),
-        withdrawal: treated ? Withdrawal(drug: 'Penicillin', until: day.add(const Duration(days: 5))) : null,
+        withdrawal: record == null ? null : Withdrawal(drug: record.drug.shortName, until: record.safeFrom),
         timeline: [
-          if (treated)
+          if (record != null)
             TreatmentEvent(
-              at: day.add(const Duration(hours: 9)),
-              drug: 'Penicillin',
-              reason: 'Mastitis',
-              vet: 'Dr. Kamugisha',
-              safeFrom: day.add(const Duration(days: 5)),
+              at: record.given,
+              drug: record.drug.shortName,
+              reason: _conditionName(record.condition),
+              vet: record.givenBy ?? '',
+              safeFrom: record.safeFrom,
             ),
           MilkEvent(at: day.subtract(const Duration(hours: 6)), morning: 6, evening: 5.2),
           ServiceEvent(
@@ -167,7 +185,7 @@ class FakeHerdRepository implements HerdRepository {
     return Result.success(calf);
   }
 
-  Animal _copy(Animal a, {required bool deleted}) => Animal(
+  Animal _copy(Animal a, {required bool deleted, DairyStatus? dairyStatus}) => Animal(
     id: a.id,
     tenantId: a.tenantId,
     tagNumber: a.tagNumber,
@@ -177,17 +195,28 @@ class FakeHerdRepository implements HerdRepository {
     dateOfBirth: a.dateOfBirth,
     status: deleted ? AnimalStatus.deceased : a.status,
     createdAt: a.createdAt,
-    updatedAt: clock.now(),
+    updatedAt: dairyStatus == null ? clock.now() : a.updatedAt,
     createdBy: a.createdBy,
-    updatedBy: 'staff',
+    updatedBy: dairyStatus == null ? 'staff' : a.updatedBy,
     deviceId: a.deviceId,
-    syncStatus: SyncStatus.pending,
+    syncStatus: dairyStatus == null ? SyncStatus.pending : a.syncStatus,
     isDeleted: deleted,
-    dairyStatus: a.dairyStatus,
+    dairyStatus: dairyStatus ?? a.dairyStatus,
     avatarIndex: a.avatarIndex,
     group: a.group,
     motherTag: a.motherTag,
   );
+
+  // The timeline is English sample data in the UI phase.
+  static String _conditionName(Condition c) => switch (c) {
+    Condition.mastitis => 'Mastitis',
+    Condition.lame => 'Lame',
+    Condition.fever => 'Fever',
+    Condition.wound => 'Wound',
+    Condition.eye => 'Eye',
+    Condition.diarrhoea => 'Diarrhoea',
+    Condition.other => 'Other',
+  };
 
   Animal _animal(_SeedCow s) {
     final now = clock.now();
@@ -228,7 +257,7 @@ class _SeedCow {
 
 const _seed = [
   _SeedCow('FT-014', 'Bihogo', 'Friesian cross', 5, DairyStatus.milking, 1, 18.5, 'Paddock 1'),
-  _SeedCow('FT-022', 'Kasheshe', 'Ankole', 7, DairyStatus.treated, 2, null, 'Paddock 1'),
+  _SeedCow('FT-022', 'Kasheshe', 'Ankole', 7, DairyStatus.milking, 2, null, 'Paddock 1'),
   _SeedCow('FT-031', 'Kyasiimire', 'Jersey cross', 4, DairyStatus.pregnant, 3, 9, 'Paddock 2'),
   _SeedCow('FT-008', 'Ngabire', 'Friesian', 6, DairyStatus.milking, 4, 16.2, 'Paddock 1'),
   _SeedCow('FT-045', 'Rwemera', 'Ankole cross', 3, DairyStatus.heifer, 5, null, 'Paddock 3'),

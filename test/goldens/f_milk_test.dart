@@ -1,5 +1,6 @@
 // Section F — milk (F01-F10), 8 goldens per screen + small screens.
 // flutter test --update-goldens test/goldens/f_milk_test.dart
+import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/presentation/pages/milk_pages.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ import '../helpers/shell_wrap.dart';
 void main() {
   final clock = FixedClock();
   final now = clock.now();
-  FakeMilkRepository repo() => FakeMilkRepository(clock);
+  FakeMilkRepository repo() => FakeMilkRepository(clock, FakeTreatmentRepository(clock));
 
   Future<void> settle(WidgetTester tester) async {
     await tester.pump();

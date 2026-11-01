@@ -1,14 +1,21 @@
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/utils/clock.dart';
+import 'package:farm_tap/sectors/cattle/health/domain/health_models.dart';
+import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_models.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
 
 /// UI phase: the numbers and alerts shown in the D01-D03 mockups, dated
 /// relative to the clock.
 class FakeHomeRepository implements HomeRepository {
-  new(this.clock);
+  new(this.clock, this.treatments);
 
   final Clock clock;
+
+  /// Under treatment, not-for-sale counts and alerts come from here.
+  final TreatmentRepository treatments;
+
+  Future<List<TreatmentRecord>> _all() async => (await treatments.treatments()).data ?? const [];
   final _done = <String, bool>{'task-heifers': true};
 
   DateTime get _today {
@@ -18,6 +25,8 @@ class FakeHomeRepository implements HomeRepository {
 
   @override
   Future<Result<HomeSummary>> summary() async {
+    final now = clock.now();
+    final records = await _all();
     const litres = [296.0, 300.0, 293.0, 302.0, 305.0, 301.0, 312.0];
     return Result.success(
       HomeSummary(
@@ -26,8 +35,8 @@ class FakeHomeRepository implements HomeRepository {
         cows: 48,
         milking: 41,
         dry: 7,
-        underTreatment: 3,
-        notForSale: 2,
+        underTreatment: records.where((r) => r.active(now)).length,
+        notForSale: records.where((r) => r.inWithdrawal(now)).length,
         workersIn: 5,
         workersTotal: 6,
         week: [
@@ -40,7 +49,10 @@ class FakeHomeRepository implements HomeRepository {
 
   @override
   Future<Result<List<Attention>>> attention() async => Result.success([
-    MilkNotForSale(animal: 'Kasheshe', drug: 'Penicillin', safeFrom: _today.add(const Duration(days: 5))),
+    // Milked cows under withdrawal (a dry cow's milk is not sold anyway).
+    for (final r in await _all())
+      if (r.inWithdrawal(clock.now()) && !r.animalDry)
+        MilkNotForSale(animal: r.animalName, drug: r.drug.shortName, safeFrom: r.safeFrom),
     const MilkDropped(animal: 'Ngabire', percent: 22, today: 8.1, average: 10.4),
     CalvingDue(animal: 'Kyasiimire', due: _today.add(const Duration(days: 6))),
     const StockLow(item: 'Dairy meal', bagsLeft: 3, daysLeft: 4),

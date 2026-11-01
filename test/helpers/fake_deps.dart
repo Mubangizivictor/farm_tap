@@ -9,6 +9,7 @@ import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/data/fake/fake_centre_repository.dart';
+import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
@@ -30,15 +31,16 @@ Future<AppDependencies> fakeDependencies({bool signedIn = false, bool farm = fal
     );
   }
   final clock = SystemClock();
+  final treatments = FakeTreatmentRepository(clock);
   return AppDependencies(
     session: session,
     places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
     onboarding: FakeOnboardingRepository(clock),
     staffAccess: FakeStaffAccessRepository(),
     sync: FakeSyncService(),
-    home: FakeHomeRepository(clock),
-    herd: FakeHerdRepository(clock: clock, tenantProvider: InMemoryTenantProvider()),
-    milk: FakeMilkRepository(clock),
+    home: FakeHomeRepository(clock, treatments),
+    herd: FakeHerdRepository(clock: clock, tenantProvider: InMemoryTenantProvider(), treatments: treatments),
+    milk: FakeMilkRepository(clock, treatments),
     centre: FakeCentreRepository(clock),
   );
 }

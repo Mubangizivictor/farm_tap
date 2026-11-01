@@ -17,6 +17,8 @@ import 'package:farm_tap/core/utils/id_generator.dart';
 import 'package:farm_tap/core/utils/logger.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/data/fake/fake_centre_repository.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_repository.dart';
+import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
+import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/herd_repository_impl.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
@@ -53,10 +55,17 @@ Future<void> configureDependencies(Flavor flavor) async {
       ..registerLazySingleton<FarmMembershipRepository>(() => FakeFarmMembershipRepository(tenants))
       ..registerLazySingleton<OnboardingRepository>(() => FakeOnboardingRepository(getIt<Clock>()))
       ..registerLazySingleton<StaffAccessRepository>(FakeStaffAccessRepository.new)
-      ..registerLazySingleton<HomeRepository>(() => FakeHomeRepository(getIt<Clock>()))
-      ..registerLazySingleton<MilkRepository>(() => FakeMilkRepository(getIt<Clock>()))
+      ..registerLazySingleton<TreatmentRepository>(() => FakeTreatmentRepository(getIt<Clock>()))
+      ..registerLazySingleton<HomeRepository>(() => FakeHomeRepository(getIt<Clock>(), getIt<TreatmentRepository>()))
+      ..registerLazySingleton<MilkRepository>(() => FakeMilkRepository(getIt<Clock>(), getIt<TreatmentRepository>()))
       ..registerLazySingleton<CentreRepository>(() => FakeCentreRepository(getIt<Clock>()))
-      ..registerLazySingleton<HerdRepository>(() => FakeHerdRepository(clock: getIt<Clock>(), tenantProvider: tenants));
+      ..registerLazySingleton<HerdRepository>(
+        () => FakeHerdRepository(
+          clock: getIt<Clock>(),
+          tenantProvider: tenants,
+          treatments: getIt<TreatmentRepository>(),
+        ),
+      );
   } else {
     // Backend phase: real Firebase auth / membership repositories go here.
     final isarService = IsarService();

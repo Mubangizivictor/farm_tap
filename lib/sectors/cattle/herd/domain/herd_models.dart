@@ -107,7 +107,15 @@ class Withdrawal extends Equatable {
   const new({required this.drug, required this.until});
 
   final String drug;
+
+  /// First day the milk is safe again.
   final DateTime until;
+
+  /// Whole days until [until] (0 once safe).
+  int daysLeft(DateTime now) {
+    final left = until.difference(DateTime(now.year, now.month, now.day)).inDays;
+    return left < 0 ? 0 : left;
+  }
 
   @override
   List<Object?> get props => [drug, until];
