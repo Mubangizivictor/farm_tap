@@ -75,6 +75,7 @@ class PersonAvatar extends StatelessWidget {
     super.key,
     this.size,
     this.ring = false,
+    this.ringColor,
     this.tone = FarmTapTone.primary,
     this.initials,
     this.onTap,
@@ -87,6 +88,9 @@ class PersonAvatar extends StatelessWidget {
 
   /// 3 dp primary ring (staff avatar in the top bar).
   final bool ring;
+
+  /// Ring colour instead of primary (danger on a wrong PIN, C04).
+  final Color? ringColor;
   final FarmTapTone tone;
 
   /// Overrides the initials derived from [name].
@@ -115,7 +119,7 @@ class PersonAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: colors.container,
-        border: ring ? Border.all(color: context.colors.primary, width: context.sizes.avatarRing) : null,
+        border: ring ? Border.all(color: ringColor ?? context.colors.primary, width: context.sizes.avatarRing) : null,
       ),
       alignment: Alignment.center,
       child: Text(

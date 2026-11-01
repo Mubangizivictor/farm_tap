@@ -9,6 +9,7 @@ import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
+import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
 import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/theme/theme.dart';
@@ -31,6 +32,8 @@ const _routes = <(String, String, bool, bool)>[
   (AppRoutes.setupContacts, AppRoutes.setupFarm, true, false),
   (AppRoutes.setupRole, AppRoutes.setupContacts, true, false),
   (AppRoutes.setupStaff, AppRoutes.setupRole, true, false),
+  (AppRoutes.unlockNumber, AppRoutes.unlock, true, true),
+  ('${AppRoutes.unlockPin}?card=0142', AppRoutes.unlock, true, true),
 ];
 
 class _Harness {
@@ -58,6 +61,7 @@ class _Harness {
       session: session,
       places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
       onboarding: FakeOnboardingRepository(SystemClock()),
+      staffAccess: FakeStaffAccessRepository(),
       initialLocation: start,
     );
     addTearDown(router.dispose);
@@ -108,7 +112,7 @@ void main() {
         expect(h.location, parent);
         unawaited(h.router.push(route));
         await _settle(tester);
-        expect(h.location, route);
+        expect(h.location, Uri.parse(route).path);
         await _tapBack(tester);
         expect(h.location, parent);
       });
@@ -119,7 +123,7 @@ void main() {
     for (final (route, parent, signedIn, farm) in _routes) {
       testWidgets(route, (tester) async {
         final h = await _Harness.pump(tester, start: route, signedIn: signedIn, farm: farm);
-        expect(h.location, route);
+        expect(h.location, Uri.parse(route).path);
         await _tapBack(tester);
         expect(h.location, parent);
       });

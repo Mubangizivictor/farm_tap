@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
+import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:flutter/foundation.dart';
 
@@ -18,6 +19,7 @@ class SessionController extends ChangeNotifier {
   late final StreamSubscription<Object?> _sub;
   FarmMembership? _farm;
   bool _locked = false;
+  StaffMember? _staff;
 
   bool get signedIn => auth.currentUser != null;
   FarmMembership? get farm => _farm;
@@ -29,6 +31,9 @@ class SessionController extends ChangeNotifier {
   /// Farm phone needs a staff card + PIN (C01) before records can be made.
   bool get locked => _locked;
 
+  /// Worker who unlocked the phone (null = the account owner / manager).
+  StaffMember? get staff => _staff;
+
   /// Trial ended and not paid: screens show the read-only state (M05).
   bool get readOnly => _farm?.subscription == SubscriptionState.readOnly;
 
@@ -39,17 +44,21 @@ class SessionController extends ChangeNotifier {
 
   void lock() {
     _locked = true;
+    _staff = null;
     notifyListeners();
   }
 
-  void unlock() {
+  /// [staff] null = unlocked by the signed-in owner.
+  void unlock([StaffMember? staff]) {
     _locked = false;
+    _staff = staff;
     notifyListeners();
   }
 
   Future<void> signOut() async {
     _farm = null;
     _locked = false;
+    _staff = null;
     await auth.signOut();
   }
 

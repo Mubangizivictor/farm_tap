@@ -154,6 +154,7 @@ class FarmTapDialog extends StatelessWidget {
     this.onPrimary,
     this.onSecondary,
     this.primaryKind = ButtonKind.filled,
+    this.secondaryKind = ButtonKind.outlined,
     this.child,
   });
 
@@ -172,6 +173,9 @@ class FarmTapDialog extends StatelessWidget {
 
   /// danger for death / close session / sign out.
   final ButtonKind primaryKind;
+
+  /// outlined (default) or text for a quieter second choice.
+  final ButtonKind secondaryKind;
 
   /// Optional extra content between message and buttons.
   final Widget? child;
@@ -212,7 +216,7 @@ class FarmTapDialog extends StatelessWidget {
             SizedBox(height: context.space.keyGap),
             FarmTapButton(
               label: secondaryLabel!,
-              kind: ButtonKind.outlined,
+              kind: secondaryKind,
               onPressed: onSecondary ?? () => Navigator.of(context).pop(false),
             ),
           ],
@@ -250,6 +254,7 @@ Future<bool> showFarmTapDialog(
   IconData? primaryIcon,
   FarmTapTone tone = FarmTapTone.warning,
   ButtonKind primaryKind = ButtonKind.filled,
+  ButtonKind secondaryKind = ButtonKind.outlined,
   bool dismissible = true,
 }) async {
   final result = await showDialog<bool>(
@@ -266,6 +271,7 @@ Future<bool> showFarmTapDialog(
         primaryIcon: primaryIcon,
         secondaryLabel: secondaryLabel,
         primaryKind: primaryKind,
+        secondaryKind: secondaryKind,
       ),
     ),
   );

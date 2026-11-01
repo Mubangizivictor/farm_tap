@@ -5,6 +5,7 @@ import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/l10n/nyn_delegates.dart';
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
+import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
 import 'package:farm_tap/core/theme/farmtap_theme.dart';
@@ -27,6 +28,7 @@ class _FarmTapAppState extends State<FarmTapApp> {
     session: getIt<SessionController>(),
     places: getIt<FarmMembershipRepository>(),
     onboarding: getIt<OnboardingRepository>(),
+    staffAccess: getIt<StaffAccessRepository>(),
   );
 
   @override

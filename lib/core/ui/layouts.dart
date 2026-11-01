@@ -241,7 +241,7 @@ class CenteredLayout extends StatelessWidget {
                 ),
               ),
             ),
-            if (top != null) Align(alignment: Alignment.topCenter, child: top),
+            if (top != null) Positioned(top: 0, left: 0, right: 0, child: top!),
             if (bottom != null)
               Align(
                 alignment: Alignment.bottomCenter,

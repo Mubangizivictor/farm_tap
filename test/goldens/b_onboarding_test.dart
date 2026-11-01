@@ -97,8 +97,5 @@ void main() {
     },
   );
 
-  screenGoldens(
-    'B10_onboard_trial_started',
-    (_) => FarmReadyPage(setup: _sample, repo: repo, onStart: (_) {}),
-  );
+  screenGoldens('B10_onboard_trial_started', (_) => FarmReadyPage(setup: _sample, repo: repo, onStart: (_) {}));
 }

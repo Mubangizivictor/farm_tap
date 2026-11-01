@@ -294,5 +294,46 @@
   "herdOver100": "100+",
   "phonePrefix": "+256 ",
   "pinChosen": "PIN chosen",
-  "roleMilkClerk": "Milk clerk"
+  "roleMilkClerk": "Milk clerk",
+  "tapYourCard": "Tap your card",
+  "tapYourCardBody": "Hold your FarmTap card on the back of the phone.",
+  "enterCardInstead": "Enter card number instead",
+  "ownerSignIn": "Owner sign-in",
+  "switchFarm2": "Switch farm",
+  "simulateTap": "Simulate tap (debug)",
+  "cardNumberTitle": "Enter your card number",
+  "cardNumberSubtitle": "It's printed on the front of your card.",
+  "next": "Next",
+  "cardNotFound": "No worker has this card. Check the number.",
+  "helloName": "Hello, {name}",
+  "@helloName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "enterPin": "Enter your 4-digit PIN",
+  "wrongPinTries": "Wrong PIN. {count} tries left.",
+  "@wrongPinTries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cardLocked": "Too many tries. This card is locked for 5 minutes.",
+  "notYou": "Not {name}? Tap a different card",
+  "@notYou": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "forgotPin": "Forgot PIN? Ask the farm manager to reset it.",
+  "nfcOffTitle": "NFC is turned off",
+  "nfcOffBody": "Turn on NFC in your phone settings to use cards, or type the card number.",
+  "openSettings": "Open settings",
+  "typeCardNumber": "Type card number"
 }

@@ -62,8 +62,7 @@ import 'app_localizations_nyn.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -71,8 +70,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -84,19 +82,15 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
-        delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[
-    Locale('en'),
-    Locale('nyn'),
-  ];
+  static const List<Locale> supportedLocales = <Locale>[Locale('en'), Locale('nyn')];
 
   /// No description provided for @appName.
   ///
@@ -1309,10 +1303,129 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Milk clerk'**
   String get roleMilkClerk;
+
+  /// No description provided for @tapYourCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap your card'**
+  String get tapYourCard;
+
+  /// No description provided for @tapYourCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold your FarmTap card on the back of the phone.'**
+  String get tapYourCardBody;
+
+  /// No description provided for @enterCardInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter card number instead'**
+  String get enterCardInstead;
+
+  /// No description provided for @ownerSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner sign-in'**
+  String get ownerSignIn;
+
+  /// No description provided for @switchFarm2.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch farm'**
+  String get switchFarm2;
+
+  /// No description provided for @simulateTap.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulate tap (debug)'**
+  String get simulateTap;
+
+  /// No description provided for @cardNumberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your card number'**
+  String get cardNumberTitle;
+
+  /// No description provided for @cardNumberSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s printed on the front of your card.'**
+  String get cardNumberSubtitle;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @cardNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No worker has this card. Check the number.'**
+  String get cardNotFound;
+
+  /// No description provided for @helloName.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, {name}'**
+  String helloName(String name);
+
+  /// No description provided for @enterPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your 4-digit PIN'**
+  String get enterPin;
+
+  /// No description provided for @wrongPinTries.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong PIN. {count} tries left.'**
+  String wrongPinTries(int count);
+
+  /// No description provided for @cardLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many tries. This card is locked for 5 minutes.'**
+  String get cardLocked;
+
+  /// No description provided for @notYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Not {name}? Tap a different card'**
+  String notYou(String name);
+
+  /// No description provided for @forgotPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot PIN? Ask the farm manager to reset it.'**
+  String get forgotPin;
+
+  /// No description provided for @nfcOffTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NFC is turned off'**
+  String get nfcOffTitle;
+
+  /// No description provided for @nfcOffBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on NFC in your phone settings to use cards, or type the card number.'**
+  String get nfcOffBody;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get openSettings;
+
+  /// No description provided for @typeCardNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Type card number'**
+  String get typeCardNumber;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -1321,8 +1434,7 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'nyn'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'nyn'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;

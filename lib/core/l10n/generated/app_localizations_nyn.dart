@@ -118,8 +118,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   }
 
   @override
-  String get trialThenPrice =>
-      '[nyn] Then UGX 70,000 a month. Pay anytime with Mobile Money.';
+  String get trialThenPrice => '[nyn] Then UGX 70,000 a month. Pay anytime with Mobile Money.';
 
   @override
   String get trialUpgradeLine => '[nyn] Upgrade · UGX 70,000/mo';
@@ -128,8 +127,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get offlineBannerTitle => '[nyn] You are offline';
 
   @override
-  String get offlineBannerBody =>
-      '[nyn] Records are saved on this phone and will sync when you are online.';
+  String get offlineBannerBody => '[nyn] Records are saved on this phone and will sync when you are online.';
 
   @override
   String get emptyDefaultTitle => '[nyn] Nothing here yet';
@@ -235,8 +233,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get welcomeTitle => '[nyn] Welcome to FarmTap';
 
   @override
-  String get welcomeBody =>
-      '[nyn] Records for your farm and milk centre — even without network.';
+  String get welcomeBody => '[nyn] Records for your farm and milk centre — even without network.';
 
   @override
   String get continueGoogle => '[nyn] Continue with Google';
@@ -297,8 +294,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get signUpTitle => '[nyn] Create your account';
 
   @override
-  String get signUpSubtitle =>
-      '[nyn] You\'ll set up your farm next. 14 days free.';
+  String get signUpSubtitle => '[nyn] You\'ll set up your farm next. 14 days free.';
 
   @override
   String get fullNameLabel => '[nyn] Full name';
@@ -328,8 +324,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get resetTitle => '[nyn] Reset your password';
 
   @override
-  String get resetSubtitle =>
-      '[nyn] We\'ll email you a link to set a new password.';
+  String get resetSubtitle => '[nyn] We\'ll email you a link to set a new password.';
 
   @override
   String get sendResetLink => '[nyn] Send reset link';
@@ -412,8 +407,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get chooseLanguageTitle => '[nyn] Choose your language';
 
   @override
-  String get chooseLanguageSubtitle =>
-      '[nyn] Hitamu orurimi. You can change it later.';
+  String get chooseLanguageSubtitle => '[nyn] Hitamu orurimi. You can change it later.';
 
   @override
   String get runyankoreSubtitle => '[nyn] Orurimi rw\'Ankole';
@@ -463,8 +457,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   }
 
   @override
-  String get waitlistBody =>
-      '[nyn] Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
+  String get waitlistBody => '[nyn] Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
 
   @override
   String get yourNameLabel => '[nyn] Your name';
@@ -490,15 +483,13 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get dairyTypeTitle => '[nyn] What kind of dairy?';
 
   @override
-  String get dairyTypeSubtitle =>
-      '[nyn] This decides your home screen. You can add the other later.';
+  String get dairyTypeSubtitle => '[nyn] This decides your home screen. You can add the other later.';
 
   @override
   String get dairyFarm => '[nyn] Dairy farm';
 
   @override
-  String get dairyFarmSub =>
-      '[nyn] I keep cows and record milk, health, feeding';
+  String get dairyFarmSub => '[nyn] I keep cows and record milk, health, feeding';
 
   @override
   String get centreOption => '[nyn] Milk collection centre';
@@ -534,8 +525,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get contactsTitle => '[nyn] Where should we send reports?';
 
   @override
-  String get contactsSubtitle =>
-      '[nyn] Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
+  String get contactsSubtitle => '[nyn] Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
 
   @override
   String get dailyReportTime => '[nyn] Daily report at 7:00 pm';
@@ -550,8 +540,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get sendDailyWhatsapp => '[nyn] Send me the daily report on WhatsApp';
 
   @override
-  String get sendSmsAlerts =>
-      '[nyn] Send me SMS alerts (sick cows, low stock, trial)';
+  String get sendSmsAlerts => '[nyn] Send me SMS alerts (sick cows, low stock, trial)';
 
   @override
   String get roleTitle => '[nyn] What is your role?';
@@ -566,8 +555,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get firstStaffTitle => '[nyn] Add your first worker';
 
   @override
-  String get firstStaffSubtitle =>
-      '[nyn] Workers use a card and a 4-digit PIN — no email needed.';
+  String get firstStaffSubtitle => '[nyn] Workers use a card and a 4-digit PIN — no email needed.';
 
   @override
   String get nameLabel => '[nyn] Name';
@@ -591,8 +579,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get nfcLaterTitle => '[nyn] Add an NFC card later';
 
   @override
-  String get nfcLaterBody =>
-      '[nyn] Tap \'Assign card\' on the worker\'s page when cards arrive.';
+  String get nfcLaterBody => '[nyn] Tap \'Assign card\' on the worker\'s page when cards arrive.';
 
   @override
   String get saveWorker => '[nyn] Save worker';
@@ -624,8 +611,7 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get choose => '[nyn] Choose';
 
   @override
-  String get phoneIncomplete =>
-      '[nyn] Check the number — it needs 9 digits after +256.';
+  String get phoneIncomplete => '[nyn] Check the number — it needs 9 digits after +256.';
 
   @override
   String get farmNameRequired => '[nyn] Enter the farm name.';
@@ -653,4 +639,70 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String get roleMilkClerk => '[nyn] Milk clerk';
+
+  @override
+  String get tapYourCard => '[nyn] Tap your card';
+
+  @override
+  String get tapYourCardBody => '[nyn] Hold your FarmTap card on the back of the phone.';
+
+  @override
+  String get enterCardInstead => '[nyn] Enter card number instead';
+
+  @override
+  String get ownerSignIn => '[nyn] Owner sign-in';
+
+  @override
+  String get switchFarm2 => '[nyn] Switch farm';
+
+  @override
+  String get simulateTap => '[nyn] Simulate tap (debug)';
+
+  @override
+  String get cardNumberTitle => '[nyn] Enter your card number';
+
+  @override
+  String get cardNumberSubtitle => '[nyn] It\'s printed on the front of your card.';
+
+  @override
+  String get next => '[nyn] Next';
+
+  @override
+  String get cardNotFound => '[nyn] No worker has this card. Check the number.';
+
+  @override
+  String helloName(String name) {
+    return '[nyn] Hello, $name';
+  }
+
+  @override
+  String get enterPin => '[nyn] Enter your 4-digit PIN';
+
+  @override
+  String wrongPinTries(int count) {
+    return '[nyn] Wrong PIN. $count tries left.';
+  }
+
+  @override
+  String get cardLocked => '[nyn] Too many tries. This card is locked for 5 minutes.';
+
+  @override
+  String notYou(String name) {
+    return '[nyn] Not $name? Tap a different card';
+  }
+
+  @override
+  String get forgotPin => '[nyn] Forgot PIN? Ask the farm manager to reset it.';
+
+  @override
+  String get nfcOffTitle => '[nyn] NFC is turned off';
+
+  @override
+  String get nfcOffBody => '[nyn] Turn on NFC in your phone settings to use cards, or type the card number.';
+
+  @override
+  String get openSettings => '[nyn] Open settings';
+
+  @override
+  String get typeCardNumber => '[nyn] Type card number';
 }

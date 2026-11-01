@@ -6,6 +6,7 @@ import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
+import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
 import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/theme/theme.dart';
@@ -41,6 +42,7 @@ void main() {
       session: session,
       places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
       onboarding: FakeOnboardingRepository(SystemClock()),
+      staffAccess: FakeStaffAccessRepository(),
       initialLocation: AppRoutes.setupLanguage,
     );
     addTearDown(router.dispose);

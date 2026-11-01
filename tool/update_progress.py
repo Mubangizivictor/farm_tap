@@ -3,7 +3,7 @@
 
     python3 tool/update_progress.py B01 B02 ... [--done] [--note ID "text"]...
 
---done ticks Nav, Device, Small and A11y for the given screens (only after
+--done ticks Nav, Device, Small and A11y (--no-device leaves Device open) for the given screens (only after
 they passed: route tests, tool/device_qa.py light + dark, small-screen
 goldens). Notes replace the screen's note text.
 """
@@ -20,6 +20,7 @@ ORDER = [(f, m) for f in ("phone", "tablet", "web_desktop", "web_mobile") for m 
 
 def main(argv):
     done = "--done" in argv
+    no_device = "--no-device" in argv
     notes = {}
     ids = []
     i = 0
@@ -50,7 +51,10 @@ def main(argv):
         note = notes.get(sid, parts[16] if len(parts) > 16 else "")
         if done and not note.startswith("done"):
             note = ("done. " + note).strip()
-        row = parts[:3] + cells + ["min %.1f" % min(got) if got else "—"] + [tick] * 4 + [note]
+        ticks = [tick] * 4
+        if no_device:
+            ticks[1] = "—"
+        row = parts[:3] + cells + ["min %.1f" % min(got) if got else "—"] + ticks + [note]
         text = text.replace(m.group(0), "| " + " | ".join(row) + " |")
     PROGRESS.write_text(text)
     print(f"updated {len(ids)} rows")

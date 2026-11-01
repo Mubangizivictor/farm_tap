@@ -118,8 +118,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get trialThenPrice =>
-      'Then UGX 70,000 a month. Pay anytime with Mobile Money.';
+  String get trialThenPrice => 'Then UGX 70,000 a month. Pay anytime with Mobile Money.';
 
   @override
   String get trialUpgradeLine => 'Upgrade · UGX 70,000/mo';
@@ -128,8 +127,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get offlineBannerTitle => 'You are offline';
 
   @override
-  String get offlineBannerBody =>
-      'Records are saved on this phone and will sync when you are online.';
+  String get offlineBannerBody => 'Records are saved on this phone and will sync when you are online.';
 
   @override
   String get emptyDefaultTitle => 'Nothing here yet';
@@ -235,8 +233,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeTitle => 'Welcome to FarmTap';
 
   @override
-  String get welcomeBody =>
-      'Records for your farm and milk centre — even without network.';
+  String get welcomeBody => 'Records for your farm and milk centre — even without network.';
 
   @override
   String get continueGoogle => 'Continue with Google';
@@ -263,8 +260,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get brandTagline => 'Tap the card, record the work.';
 
   @override
-  String get brandBody =>
-      'Records for farms and milk centres in Western Uganda — offline, in Runyankore and English.';
+  String get brandBody => 'Records for farms and milk centres in Western Uganda — offline, in Runyankore and English.';
 
   @override
   String get emailSignInTitle => 'Sign in with email';
@@ -410,8 +406,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chooseLanguageTitle => 'Choose your language';
 
   @override
-  String get chooseLanguageSubtitle =>
-      'Hitamu orurimi. You can change it later.';
+  String get chooseLanguageSubtitle => 'Hitamu orurimi. You can change it later.';
 
   @override
   String get runyankoreSubtitle => 'Orurimi rw\'Ankole';
@@ -461,8 +456,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get waitlistBody =>
-      'Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
+  String get waitlistBody => 'Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
 
   @override
   String get yourNameLabel => 'Your name';
@@ -488,8 +482,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dairyTypeTitle => 'What kind of dairy?';
 
   @override
-  String get dairyTypeSubtitle =>
-      'This decides your home screen. You can add the other later.';
+  String get dairyTypeSubtitle => 'This decides your home screen. You can add the other later.';
 
   @override
   String get dairyFarm => 'Dairy farm';
@@ -531,8 +524,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contactsTitle => 'Where should we send reports?';
 
   @override
-  String get contactsSubtitle =>
-      'Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
+  String get contactsSubtitle => 'Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
 
   @override
   String get dailyReportTime => 'Daily report at 7:00 pm';
@@ -547,8 +539,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendDailyWhatsapp => 'Send me the daily report on WhatsApp';
 
   @override
-  String get sendSmsAlerts =>
-      'Send me SMS alerts (sick cows, low stock, trial)';
+  String get sendSmsAlerts => 'Send me SMS alerts (sick cows, low stock, trial)';
 
   @override
   String get roleTitle => 'What is your role?';
@@ -563,8 +554,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get firstStaffTitle => 'Add your first worker';
 
   @override
-  String get firstStaffSubtitle =>
-      'Workers use a card and a 4-digit PIN — no email needed.';
+  String get firstStaffSubtitle => 'Workers use a card and a 4-digit PIN — no email needed.';
 
   @override
   String get nameLabel => 'Name';
@@ -588,8 +578,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nfcLaterTitle => 'Add an NFC card later';
 
   @override
-  String get nfcLaterBody =>
-      'Tap \'Assign card\' on the worker\'s page when cards arrive.';
+  String get nfcLaterBody => 'Tap \'Assign card\' on the worker\'s page when cards arrive.';
 
   @override
   String get saveWorker => 'Save worker';
@@ -621,8 +610,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get choose => 'Choose';
 
   @override
-  String get phoneIncomplete =>
-      'Check the number — it needs 9 digits after +256.';
+  String get phoneIncomplete => 'Check the number — it needs 9 digits after +256.';
 
   @override
   String get farmNameRequired => 'Enter the farm name.';
@@ -650,4 +638,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roleMilkClerk => 'Milk clerk';
+
+  @override
+  String get tapYourCard => 'Tap your card';
+
+  @override
+  String get tapYourCardBody => 'Hold your FarmTap card on the back of the phone.';
+
+  @override
+  String get enterCardInstead => 'Enter card number instead';
+
+  @override
+  String get ownerSignIn => 'Owner sign-in';
+
+  @override
+  String get switchFarm2 => 'Switch farm';
+
+  @override
+  String get simulateTap => 'Simulate tap (debug)';
+
+  @override
+  String get cardNumberTitle => 'Enter your card number';
+
+  @override
+  String get cardNumberSubtitle => 'It\'s printed on the front of your card.';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get cardNotFound => 'No worker has this card. Check the number.';
+
+  @override
+  String helloName(String name) {
+    return 'Hello, $name';
+  }
+
+  @override
+  String get enterPin => 'Enter your 4-digit PIN';
+
+  @override
+  String wrongPinTries(int count) {
+    return 'Wrong PIN. $count tries left.';
+  }
+
+  @override
+  String get cardLocked => 'Too many tries. This card is locked for 5 minutes.';
+
+  @override
+  String notYou(String name) {
+    return 'Not $name? Tap a different card';
+  }
+
+  @override
+  String get forgotPin => 'Forgot PIN? Ask the farm manager to reset it.';
+
+  @override
+  String get nfcOffTitle => 'NFC is turned off';
+
+  @override
+  String get nfcOffBody => 'Turn on NFC in your phone settings to use cards, or type the card number.';
+
+  @override
+  String get openSettings => 'Open settings';
+
+  @override
+  String get typeCardNumber => 'Type card number';
 }

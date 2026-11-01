@@ -24,11 +24,11 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | B08 | B08_onboard_role | Onboarding | 97.9 | 98.1 | 97.6 | 98.3 | 98.0 | 98.6 | 97.9 | 98.1 | min 97.6 | ✓ | ✓ | ✓ | ✓ | done. |
 | B09 | B09_onboard_first_staff | Onboarding | 96.5 | 96.5 | 97.1 | 97.6 | 97.7 | 98.1 | 96.5 | 96.5 | min 96.5 | ✓ | ✓ | ✓ | ✓ | done. |
 | B10 | B10_onboard_trial_started | Onboarding | 94.0 | 94.5 | 98.1 | 98.2 | 98.5 | 98.7 | 92.7 | 93.5 | min 92.7 | ✓ | ✓ | ✓ | ✓ | done. Uses the real date; mockup date is Sat 7 Nov (trial ends 21 Nov). |
-| C01 | C01_staff_tap_card | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| C02 | C02_staff_card_number | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| C03 | C03_staff_pin | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| C04 | C04_staff_pin_wrong | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| C05 | C05_nfc_unavailable | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| C01 | C01_staff_tap_card | Staff unlock | 96.0 | 96.2 | 98.7 | 98.8 | 99.0 | 99.1 | 96.0 | 96.2 | min 96.0 | ✓ | — | ✓ | ✓ | done. Debug builds show 'Simulate tap (debug)' (no NFC in the UI phase). Device QA after section D. |
+| C02 | C02_staff_card_number | Staff unlock | 88.4 | 89.8 | 94.5 | 95.6 | 95.6 | 96.5 | 88.4 | 89.8 | min 88.4 | ✓ | — | ✓ | ✓ | done. No decimal key on the card-number keypad (mockup shows '.', meaningless for a card number). Back arrow added (navigation rule). Device QA after section D (needs the lock action). |
+| C03 | C03_staff_pin | Staff unlock | 97.3 | 97.5 | 99.1 | 99.2 | 99.3 | 99.4 | 97.3 | 97.5 | min 97.3 | ✓ | — | ✓ | ✓ | done. |
+| C04 | C04_staff_pin_wrong | Staff unlock | 97.3 | 97.1 | 99.1 | 99.1 | 99.3 | 99.3 | 97.2 | 96.9 | min 96.9 | ✓ | — | ✓ | ✓ | done. |
+| C05 | C05_nfc_unavailable | Staff unlock | 95.2 | 96.6 | 98.9 | 99.2 | 99.2 | 99.4 | 96.8 | 97.7 | min 95.2 | ✓ | — | ✓ | ✓ | done. |
 | D01 | D01_home_owner | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | D02 | D02_home_worker | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | D03 | D03_alerts | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |

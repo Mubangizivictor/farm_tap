@@ -23,6 +23,8 @@ abstract final class AppRoutes {
 
   // C — staff unlock
   static const unlock = '/unlock';
+  static const unlockNumber = '/unlock/number';
+  static const unlockPin = '/unlock/pin';
 
   // Shell branches (tabs / rail / sidebar sections)
   static const home = '/home';

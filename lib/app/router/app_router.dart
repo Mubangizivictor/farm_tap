@@ -21,6 +21,8 @@ import 'package:farm_tap/core/onboarding/presentation/cubit/onboarding_cubit.dar
 import 'package:farm_tap/core/onboarding/presentation/pages/choice_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/form_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/waitlist_and_done.dart';
+import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
+import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
@@ -63,6 +65,7 @@ GoRouter buildRouter({
   required SessionController session,
   required FarmMembershipRepository places,
   required OnboardingRepository onboarding,
+  required StaffAccessRepository staffAccess,
   String? initialLocation,
 }) {
   final rootKey = GlobalKey<NavigatorState>();
@@ -247,6 +250,54 @@ GoRouter buildRouter({
         ),
       ),
 
+      // ---- C: staff unlock on the farm phone ----
+      page(
+        AppRoutes.unlock,
+        parent: null,
+        builder: (context, state) => TapCardPage(
+          farmName: session.farm?.name ?? '',
+          access: staffAccess,
+          onCard: (card) => context.push(Uri(path: AppRoutes.unlockPin, queryParameters: {'card': card}).toString()),
+          onTypeNumber: () => context.push(AppRoutes.unlockNumber),
+          onOwnerSignIn: () {
+            session.unlock();
+            context.go(AppRoutes.home);
+          },
+          onSwitchFarm: () => context.go(AppRoutes.farmPicker),
+        ),
+        routes: [
+          page(
+            'number',
+            parent: AppRoutes.unlock,
+            builder: (context, state) => CardNumberPage(
+              access: staffAccess,
+              onFound: (staff) =>
+                  context.push(Uri(path: AppRoutes.unlockPin, queryParameters: {'card': staff.cardNumber}).toString()),
+            ),
+          ),
+          page(
+            'pin',
+            parent: AppRoutes.unlock,
+            builder: (context, state) => FutureBuilder(
+              future: staffAccess.findByCard(state.uri.queryParameters['card'] ?? ''),
+              builder: (context, snapshot) {
+                final staff = snapshot.data?.data;
+                if (staff == null) return const SizedBox.shrink();
+                return StaffPinPage(
+                  staff: staff,
+                  access: staffAccess,
+                  onUnlocked: (s) {
+                    session.unlock(s);
+                    context.go(AppRoutes.home);
+                  },
+                  onNotMe: () => popOrGo(context, AppRoutes.unlock),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+
       // ---- Main shell: one branch per section ----
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(shell: shell, session: session),
@@ -271,6 +322,7 @@ String? _guard(SessionController session, String location) {
       location.startsWith(AppRoutes.setup) ||
       location.startsWith(AppRoutes.checkEmail);
   if (!session.hasFarm) return settingUp ? null : AppRoutes.farmPicker;
-  if (session.locked && !location.startsWith(AppRoutes.unlock)) return AppRoutes.unlock;
+  final unlocking = location.startsWith(AppRoutes.unlock) || location.startsWith(AppRoutes.farmPicker);
+  if (session.locked && !unlocking) return AppRoutes.unlock;
   return null;
 }
