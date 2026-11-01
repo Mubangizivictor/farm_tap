@@ -1,4 +1,5 @@
 import 'package:farm_tap/app/flavor.dart';
+import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/audit/audit_logger.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
@@ -56,6 +57,8 @@ Future<void> configureDependencies(Flavor flavor) async {
         ),
       );
   }
+
+  getIt.registerLazySingleton(() => SessionController(auth: getIt<AuthRepository>()));
 
   // Herd use cases and bloc
   getIt

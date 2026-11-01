@@ -1,6 +1,7 @@
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/theme/theme.dart';
+import 'package:farm_tap/core/ui/navigation_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -91,9 +92,12 @@ class AuthHeading extends StatelessWidget {
 
 /// Back arrow row above a form (phone: in the header slot).
 class AuthBackButton extends StatelessWidget {
-  const new({super.key, this.onBack});
+  const new({super.key, this.onBack, this.fallback});
 
   final VoidCallback? onBack;
+
+  /// Parent route when there is nothing to pop (deep link, web refresh).
+  final String? fallback;
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +106,7 @@ class AuthBackButton extends StatelessWidget {
       alignment: AlignmentDirectional.centerStart,
       child: IconButton(
         tooltip: l10n.back,
-        onPressed: onBack ?? () => Navigator.maybePop(context),
+        onPressed: onBack ?? () => popOrGo(context, fallback ?? RouteInfo.maybeOf(context)?.parent),
         icon: Icon(Symbols.arrow_back_rounded, size: context.sizes.iconLg),
       ),
     );

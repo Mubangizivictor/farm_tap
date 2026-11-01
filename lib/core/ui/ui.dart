@@ -15,6 +15,7 @@ export 'farmtap_toast.dart';
 export 'icon_bubble.dart';
 export 'inputs.dart';
 export 'layouts.dart';
+export 'navigation_scope.dart';
 export 'number_entry.dart';
 export 'pin_pad.dart';
 export 'previews.dart';

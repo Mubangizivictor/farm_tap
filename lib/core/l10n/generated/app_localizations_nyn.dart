@@ -390,4 +390,16 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String get somethingWentWrongShort => '[nyn] That did not work. Try again.';
+
+  @override
+  String get discardTitle => '[nyn] Discard changes?';
+
+  @override
+  String get discardBody => '[nyn] What you typed on this screen will be lost.';
+
+  @override
+  String get discardConfirm => '[nyn] Discard';
+
+  @override
+  String get keepEditing => '[nyn] Keep editing';
 }

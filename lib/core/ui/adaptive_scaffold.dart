@@ -7,6 +7,7 @@ import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/avatars.dart';
 import 'package:farm_tap/core/ui/controls.dart';
+import 'package:farm_tap/core/ui/navigation_scope.dart';
 import 'package:farm_tap/core/ui/status_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -74,6 +75,7 @@ class AdaptiveScaffold extends StatelessWidget {
     this.navigation,
     this.showBack = false,
     this.onBack,
+    this.backFallback,
     this.showLogo = false,
     this.showMenu = false,
     this.floatingActionButton,
@@ -108,6 +110,9 @@ class AdaptiveScaffold extends StatelessWidget {
   final bool showBack;
   final VoidCallback? onBack;
 
+  /// Parent route used by the back arrow when there is nothing to pop.
+  final String? backFallback;
+
   /// Logo instead of the title in the compact app bar (Home).
   final bool showLogo;
 
@@ -141,7 +146,11 @@ class AdaptiveScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final form = context.formFactor;
-    final nav = navigation;
+    final nav = navigation ?? NavigationScope.maybeOf(context);
+    final route = RouteInfo.maybeOf(context);
+    final parent = backFallback ?? route?.parent;
+    final hasBack = showBack || route?.parent != null;
+    final back = onBack ?? () => popOrGo(context, parent);
     final sidebar = nav == null
         ? null
         : _Sidebar(
@@ -162,8 +171,8 @@ class AdaptiveScaffold extends StatelessWidget {
         ? _WideTopBar(
             title: title,
             subtitle: subtitle,
-            showBack: showBack,
-            onBack: onBack,
+            showBack: hasBack,
+            onBack: back,
             actions: actions,
             profileName: profileName,
             onProfileTap: onProfileTap,
@@ -174,8 +183,8 @@ class AdaptiveScaffold extends StatelessWidget {
         : _AppBar(
             title: title,
             subtitle: subtitle,
-            showBack: showBack,
-            onBack: onBack,
+            showBack: hasBack,
+            onBack: back,
             showLogo: showLogo,
             showMenu: useDrawer,
             actions: actions,

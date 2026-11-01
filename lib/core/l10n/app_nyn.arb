@@ -120,5 +120,9 @@
   "statusReadOnly": "[nyn] Read-only",
   "trialDaysShort": "[nyn] Trial {days} days",
   "addAnotherFarm": "[nyn] Add another farm",
-  "somethingWentWrongShort": "[nyn] That did not work. Try again."
+  "somethingWentWrongShort": "[nyn] That did not work. Try again.",
+  "discardTitle": "[nyn] Discard changes?",
+  "discardBody": "[nyn] What you typed on this screen will be lost.",
+  "discardConfirm": "[nyn] Discard",
+  "keepEditing": "[nyn] Keep editing"
 }

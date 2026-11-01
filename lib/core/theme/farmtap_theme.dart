@@ -19,6 +19,7 @@ import 'package:farm_tap/core/theme/tokens/farmtap_radii.dart';
 import 'package:farm_tap/core/theme/tokens/farmtap_sizes.dart';
 import 'package:farm_tap/core/theme/tokens/farmtap_spacing.dart';
 import 'package:farm_tap/core/theme/typography/farmtap_typography.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 abstract final class FarmTapTheme {
@@ -57,6 +58,14 @@ abstract final class FarmTapTheme {
       canvasColor: colors.surface,
       visualDensity: VisualDensity.standard,
       materialTapTargetSize: MaterialTapTargetSize.padded,
+      // iOS / macOS: Cupertino slide with the edge swipe-back gesture.
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+        },
+      ),
       extensions: <ThemeExtension<dynamic>>[status, textStyles, space, radii, sizes, motion],
       // Components
       appBarTheme: FarmTapComponentThemes.appBar(t),

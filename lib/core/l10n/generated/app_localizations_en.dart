@@ -389,4 +389,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get somethingWentWrongShort => 'That did not work. Try again.';
+
+  @override
+  String get discardTitle => 'Discard changes?';
+
+  @override
+  String get discardBody => 'What you typed on this screen will be lost.';
+
+  @override
+  String get discardConfirm => 'Discard';
+
+  @override
+  String get keepEditing => 'Keep editing';
 }

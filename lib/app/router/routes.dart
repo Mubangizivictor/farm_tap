@@ -1,15 +1,41 @@
+// Every route path (docs/design/ROUTES.md is the table of all 102 screens).
 abstract final class AppRoutes {
   // A — launch and account
   static const splash = '/splash';
   static const signIn = '/sign-in';
   static const emailSignIn = '/sign-in/email';
-  static const signUp = '/sign-up';
-  static const forgotPassword = '/forgot-password';
+  static const signUp = '/sign-in/email/sign-up';
+  static const forgotPassword = '/sign-in/email/forgot';
   static const checkEmail = '/verify';
   static const farmPicker = '/farms';
 
-  // Temporary landing page until Section D rebuilds Home.
+  // B — onboarding
+  static const setup = '/setup';
+  static const setupLanguage = '/setup/language';
+
+  // C — staff unlock
+  static const unlock = '/unlock';
+
+  // Shell branches (tabs / rail / sidebar sections)
   static const home = '/home';
-  static const addAnimal = '/add-animal';
+  static const herd = '/herd';
+  static const milk = '/milk';
+  static const health = '/health';
+  static const more = '/more';
+  static const collect = '/collect';
+  static const farmers = '/farmers';
+  static const pay = '/pay';
+  static const feeding = '/feeding';
+  static const breeding = '/breeding';
+  static const workers = '/workers';
+  static const money = '/money';
+  static const reports = '/reports';
+  static const settings = '/settings';
+
+  // Dev
   static const uiGallery = '/dev/gallery';
+
+  /// Routes reachable without signing in.
+  static bool isPublic(String location) =>
+      location == splash || location.startsWith(signIn) || location.startsWith('/dev');
 }

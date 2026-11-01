@@ -59,6 +59,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         animation: FarmTapAnimations.welcome,
         tagline: l10n.brandTagline,
         description: l10n.brandBody,
+        header: const AuthBackButton(),
         bottom: FarmTapButton(label: l10n.sendResetLink, onPressed: state.busy ? null : _send),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
