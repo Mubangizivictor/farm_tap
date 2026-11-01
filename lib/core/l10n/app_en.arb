@@ -335,5 +335,275 @@
   "nfcOffTitle": "NFC is turned off",
   "nfcOffBody": "Turn on NFC in your phone settings to use cards, or type the card number.",
   "openSettings": "Open settings",
-  "typeCardNumber": "Type card number"
+  "typeCardNumber": "Type card number",
+  "goodMorning": "Good morning, {name}",
+  "@goodMorning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "goodAfternoon": "Good afternoon, {name}",
+  "@goodAfternoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "goodEvening": "Good evening, {name}",
+  "@goodEvening": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "farmAndDate": "{farm} · {date}",
+  "@farmAndDate": {
+    "placeholders": {
+      "farm": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "milkToday": "Milk today",
+  "cows": "Cows",
+  "milkingDry": "{milking} milking · {dry} dry",
+  "@milkingDry": {
+    "placeholders": {
+      "milking": {
+        "type": "int"
+      },
+      "dry": {
+        "type": "int"
+      }
+    }
+  },
+  "underTreatment": "Under treatment",
+  "notForSaleCount": "{count} not for sale",
+  "@notForSaleCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workersIn": "Workers in",
+  "quickActions": "Quick actions",
+  "recordMilk": "Record milk",
+  "treatment": "Treatment",
+  "needsAttention": "Needs attention",
+  "milkThisWeek": "Milk this week",
+  "litreUnit": "L",
+  "helloStaff": "Hello, {name}",
+  "@helloStaff": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "clockedIn": "Clocked in at {time} · {role}",
+  "@clockedIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "lock": "Lock",
+  "whatAreYouDoing": "What are you doing?",
+  "morningSession": "Morning session",
+  "eveningSession": "Evening session",
+  "groupsLeft": "{count} groups left",
+  "@groupsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "giveTreatment": "Give treatment",
+  "dueNow": "{count} due now",
+  "@dueNow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dipping": "Dipping",
+  "dueOn": "Due {day}",
+  "@dueOn": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "heatService": "Heat / service",
+  "reportProblem": "Report a problem",
+  "photoNote": "Photo + note",
+  "myTasksToday": "My tasks today",
+  "alerts": "Alerts",
+  "markAllRead": "Mark all read",
+  "filterAll": "All",
+  "filterHealth": "Health",
+  "filterMilk": "Milk",
+  "filterStock": "Stock",
+  "filterMoney": "Money",
+  "urgent": "Urgent",
+  "syncStatusTitle": "Sync status",
+  "syncStatusBody": "Records are saved on this phone first, then sent to the cloud.",
+  "syncedLabel": "Synced",
+  "recordsCount": "{count} records",
+  "@recordsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "waitingToSend": "Waiting to send",
+  "milkRecordsCount": "{count} milk records",
+  "@milkRecordsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "failedLabel": "Failed",
+  "now": "Now",
+  "syncNow": "Sync now",
+  "youreOffline": "You're offline",
+  "offlineKeepRecording": "Keep recording — everything is saved on this phone and will sync when network returns.",
+  "getReminders": "Get reminders?",
+  "getRemindersBody": "FarmTap reminds you about calvings, vaccinations and when treated milk is safe again.",
+  "allowReminders": "Allow reminders",
+  "notNow": "Not now",
+  "syncStatusOpen": "Sync status",
+  "attnNotForSale": "{name} — milk not for sale",
+  "@attnNotForSale": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "attnSafeFrom": "{drug} · safe from {date}",
+  "@attnSafeFrom": {
+    "placeholders": {
+      "drug": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "attnMilkDrop": "Milk dropped {percent}% — {name}",
+  "@attnMilkDrop": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "attnMilkDropSub": "{today} L today vs {average} L average",
+  "@attnMilkDropSub": {
+    "placeholders": {
+      "today": {
+        "type": "String"
+      },
+      "average": {
+        "type": "String"
+      }
+    }
+  },
+  "attnCalving": "Calving due: {name}",
+  "@attnCalving": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "attnInDays": "In {days} days · {date}",
+  "@attnInDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "attnStockLow": "{item} is running low",
+  "@attnStockLow": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "attnBagsLeft": "{bags} bags left · about {days} days",
+  "@attnBagsLeft": {
+    "placeholders": {
+      "bags": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "attnEdited": "Record edited after closing",
+  "attnEditedSub": "{person} · {session} session · {time}",
+  "@attnEditedSub": {
+    "placeholders": {
+      "person": {
+        "type": "String"
+      },
+      "session": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "attnTrialEnds": "Trial ends in {days} days",
+  "@attnTrialEnds": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "attnTrialPay": "Pay UGX 70,000 to keep recording",
+  "sessionAm": "AM",
+  "sessionPm": "PM",
+  "taskBefore": "Before {time}",
+  "@taskBefore": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "taskAfterEveningMilking": "After evening milking",
+  "dairyMeal": "Dairy meal"
 }

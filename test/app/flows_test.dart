@@ -2,20 +2,15 @@
 // back to the previous step; finishing opens Home with the new farm.
 import 'package:farm_tap/app/router/app_router.dart';
 import 'package:farm_tap/app/router/routes.dart';
-import 'package:farm_tap/app/session/session_controller.dart';
-import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
-import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
-import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
-import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
-import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
-import 'package:farm_tap/core/utils/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+
+import '../helpers/fake_deps.dart';
 
 Future<void> _settle(WidgetTester tester) async {
   for (var i = 0; i < 6; i++) {
@@ -35,16 +30,9 @@ void main() {
       ..physicalSize = const Size(390, 1200)
       ..devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    final auth = FakeAuthRepository();
-    await auth.signInWithGoogle();
-    final session = SessionController(auth: auth);
-    final router = buildRouter(
-      session: session,
-      places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
-      onboarding: FakeOnboardingRepository(SystemClock()),
-      staffAccess: FakeStaffAccessRepository(),
-      initialLocation: AppRoutes.setupLanguage,
-    );
+    final deps = await fakeDependencies(signedIn: true);
+    final session = deps.session;
+    final router = buildRouter(deps, initialLocation: AppRoutes.setupLanguage);
     addTearDown(router.dispose);
     await tester.pumpWidget(
       MaterialApp.router(

@@ -83,9 +83,9 @@ class AdaptiveScaffold extends StatelessWidget {
     this.farm,
     this.trialDaysLeft,
     this.onUpgrade,
-    this.syncState = SyncState.synced,
+    this.syncState,
     this.showSync = true,
-    this.pendingCount = 0,
+    this.pendingCount,
     this.onSyncTap,
     this.profileName,
     this.onProfileTap,
@@ -94,6 +94,7 @@ class AdaptiveScaffold extends StatelessWidget {
     this.onSearchChanged,
     this.padBody = true,
     this.scrollable = true,
+    this.onRefresh,
   });
 
   /// Keys of the three navigation forms (for tests).
@@ -125,9 +126,9 @@ class AdaptiveScaffold extends StatelessWidget {
   final FarmSwitcherInfo? farm;
   final int? trialDaysLeft;
   final VoidCallback? onUpgrade;
-  final SyncState syncState;
+  final SyncState? syncState;
   final bool showSync;
-  final int pendingCount;
+  final int? pendingCount;
   final VoidCallback? onSyncTap;
 
   /// Staff avatar (initials) at the right of the app bar.
@@ -143,10 +144,26 @@ class AdaptiveScaffold extends StatelessWidget {
   /// Wrap [body] in a scroll view (set false for lists that scroll themselves).
   final bool scrollable;
 
+  /// Pull to refresh (Home: syncs).
+  final RefreshCallback? onRefresh;
+
   @override
   Widget build(BuildContext context) {
     final form = context.formFactor;
     final nav = navigation ?? NavigationScope.maybeOf(context);
+    final shell = ShellStatus.maybeOf(context);
+    final syncState = this.syncState ?? shell?.syncState ?? SyncState.synced;
+    final pendingCount = this.pendingCount ?? shell?.pending ?? 0;
+    final onSyncTap = this.onSyncTap ?? shell?.onSyncTap;
+    final profileName = this.profileName ?? shell?.profileName;
+    final onProfileTap = this.onProfileTap ?? shell?.onProfileTap;
+    final farm = this.farm ?? shell?.farm;
+    final trialDaysLeft = this.trialDaysLeft ?? shell?.trialDaysLeft;
+    final onUpgrade = this.onUpgrade ?? shell?.onUpgrade;
+    final hasNotifications = this.hasNotifications || (shell?.hasNotifications ?? false);
+    final onNotificationsTap = this.onNotificationsTap ?? shell?.onNotificationsTap;
+    // Offline: no cloud icon in the bar; the page shows the offline banner.
+    final showSync = this.showSync && (shell?.online ?? true);
     final route = RouteInfo.maybeOf(context);
     final parent = backFallback ?? route?.parent;
     final hasBack = showBack || route?.parent != null;
@@ -195,7 +212,7 @@ class AdaptiveScaffold extends StatelessWidget {
             profileName: form == FormFactor.compact ? profileName : null,
             onProfileTap: onProfileTap,
           );
-    final content = _Content(padBody: padBody, scrollable: scrollable, form: form, child: body);
+    final content = _Content(padBody: padBody, scrollable: scrollable, form: form, onRefresh: onRefresh, child: body);
     final main = Scaffold(
       drawer: useDrawer ? Drawer(width: context.sizes.sidebarWidth, child: sidebar) : null,
       floatingActionButton: floatingActionButton,
@@ -256,12 +273,13 @@ class _InsetFabLocation extends FloatingActionButtonLocation {
 }
 
 class _Content extends StatelessWidget {
-  const new({required this.child, required this.padBody, required this.scrollable, required this.form});
+  const new({required this.child, required this.padBody, required this.scrollable, required this.form, this.onRefresh});
 
   final Widget child;
   final bool padBody;
   final bool scrollable;
   final FormFactor form;
+  final RefreshCallback? onRefresh;
 
   @override
   Widget build(BuildContext context) {
@@ -279,7 +297,13 @@ class _Content extends StatelessWidget {
         ),
       ),
     );
-    return scrollable ? SingleChildScrollView(child: framed) : framed;
+    if (!scrollable) return framed;
+    final refresh = onRefresh;
+    if (refresh == null) return SingleChildScrollView(child: framed);
+    return RefreshIndicator(
+      onRefresh: refresh,
+      child: SingleChildScrollView(physics: const AlwaysScrollableScrollPhysics(), child: framed),
+    );
   }
 }
 

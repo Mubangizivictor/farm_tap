@@ -6,19 +6,15 @@ import 'dart:async';
 import 'package:farm_tap/app/router/app_router.dart';
 import 'package:farm_tap/app/router/routes.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
-import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
-import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
-import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
-import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
-import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/theme/theme.dart';
-import 'package:farm_tap/core/utils/clock.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+
+import '../helpers/fake_deps.dart';
 
 /// (route, parent, signed in?, farm open?) for every implemented non-root route.
 const _routes = <(String, String, bool, bool)>[
@@ -34,6 +30,7 @@ const _routes = <(String, String, bool, bool)>[
   (AppRoutes.setupStaff, AppRoutes.setupRole, true, false),
   (AppRoutes.unlockNumber, AppRoutes.unlock, true, true),
   ('${AppRoutes.unlockPin}?card=0142', AppRoutes.unlock, true, true),
+  (AppRoutes.homeAlerts, AppRoutes.home, true, true),
 ];
 
 class _Harness {
@@ -53,17 +50,9 @@ class _Harness {
       ..physicalSize = size
       ..devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    final auth = FakeAuthRepository();
-    if (signedIn) await auth.signInWithGoogle();
-    final session = SessionController(auth: auth);
-    if (farm) session.openFarm(FakeFarmMembershipRepository.places.first);
-    final router = buildRouter(
-      session: session,
-      places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
-      onboarding: FakeOnboardingRepository(SystemClock()),
-      staffAccess: FakeStaffAccessRepository(),
-      initialLocation: start,
-    );
+    final deps = await fakeDependencies(signedIn: signedIn, farm: farm);
+    final session = deps.session;
+    final router = buildRouter(deps, initialLocation: start);
     addTearDown(router.dispose);
     await tester.pumpWidget(
       MaterialApp.router(

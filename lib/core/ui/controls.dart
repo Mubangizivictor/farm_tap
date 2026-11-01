@@ -365,9 +365,12 @@ class SearchField extends StatelessWidget {
 /// Checkbox + label; the whole row is the 48 dp target and the 24 dp box
 /// lines up with the fields above it.
 class CheckRow extends StatelessWidget {
-  const new({required this.label, required this.value, required this.onChanged, super.key});
+  const new({required this.label, required this.value, required this.onChanged, super.key, this.subtitle});
 
   final String label;
+
+  /// Second line (bodySmall), e.g. "Before 10:00".
+  final String? subtitle;
   final bool value;
   final ValueChanged<bool> onChanged;
 
@@ -375,7 +378,7 @@ class CheckRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       checked: value,
-      label: label,
+      label: subtitle == null ? label : '$label, $subtitle',
       excludeSemantics: true,
       child: InkWell(
         onTap: () => onChanged(!value),
@@ -395,7 +398,18 @@ class CheckRow extends StatelessWidget {
                 ),
               ),
               context.space.gapMd,
-              Expanded(child: Text(label, style: context.text.bodyMedium)),
+              Expanded(
+                child: subtitle == null
+                    ? Text(label, style: context.text.bodyMedium)
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(label, style: context.text.titleSmall),
+                          Text(subtitle!, style: context.text.bodySmall),
+                        ],
+                      ),
+              ),
             ],
           ),
         ),

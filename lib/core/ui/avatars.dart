@@ -137,13 +137,15 @@ class PersonAvatar extends StatelessWidget {
         child: ExcludeSemantics(child: avatar),
       );
     }
+    // At least a 48 dp tap area around small avatars.
+    final target = dimension < context.sizes.touchTarget ? context.sizes.touchTarget : dimension;
     return Semantics(
       label: name,
       button: true,
       child: InkResponse(
         onTap: onTap,
-        radius: dimension,
-        child: ExcludeSemantics(child: avatar),
+        radius: target / 2,
+        child: SizedBox.square(dimension: target, child: Center(child: ExcludeSemantics(child: avatar))),
       ),
     );
   }

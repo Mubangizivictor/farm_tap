@@ -28,6 +28,7 @@ abstract final class AppRoutes {
 
   // Shell branches (tabs / rail / sidebar sections)
   static const home = '/home';
+  static const homeAlerts = '/home/alerts';
   static const herd = '/herd';
   static const milk = '/milk';
   static const health = '/health';

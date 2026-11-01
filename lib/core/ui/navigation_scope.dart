@@ -3,6 +3,7 @@ import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/ui/adaptive_scaffold.dart';
 import 'package:farm_tap/core/ui/adaptive_sheet.dart';
 import 'package:farm_tap/core/ui/buttons.dart';
+import 'package:farm_tap/core/ui/status_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -23,6 +24,51 @@ class NavigationScope extends InheritedWidget {
       navigation.items != oldWidget.navigation.items ||
       navigation.railItems != oldWidget.navigation.railItems ||
       navigation.sidebarItems != oldWidget.navigation.sidebarItems;
+}
+
+/// Shell-wide status the app shell provides once (sync icon, staff avatar,
+/// farm switcher, trial card, notifications); AdaptiveScaffold falls back to
+/// it for anything a page does not set itself.
+class ShellStatus extends InheritedWidget {
+  const new({
+    required super.child,
+    super.key,
+    this.syncState = SyncState.synced,
+    this.pending = 0,
+    this.online = true,
+    this.onSyncTap,
+    this.profileName,
+    this.onProfileTap,
+    this.farm,
+    this.trialDaysLeft,
+    this.onUpgrade,
+    this.hasNotifications = false,
+    this.onNotificationsTap,
+  });
+
+  final SyncState syncState;
+  final int pending;
+  final bool online;
+  final VoidCallback? onSyncTap;
+  final String? profileName;
+  final VoidCallback? onProfileTap;
+  final FarmSwitcherInfo? farm;
+  final int? trialDaysLeft;
+  final VoidCallback? onUpgrade;
+  final bool hasNotifications;
+  final VoidCallback? onNotificationsTap;
+
+  static ShellStatus? maybeOf(BuildContext context) => context.dependOnInheritedWidgetOfExactType<ShellStatus>();
+
+  @override
+  bool updateShouldNotify(ShellStatus old) =>
+      syncState != old.syncState ||
+      pending != old.pending ||
+      online != old.online ||
+      profileName != old.profileName ||
+      farm?.name != old.farm?.name ||
+      trialDaysLeft != old.trialDaysLeft ||
+      hasNotifications != old.hasNotifications;
 }
 
 /// Set by the router around every page: the parent route (null = a root

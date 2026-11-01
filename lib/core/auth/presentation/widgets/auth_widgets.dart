@@ -47,7 +47,7 @@ class AuthFooter extends StatelessWidget {
         onTap: onTap,
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: context.sizes.touchTarget, minWidth: context.sizes.touchTarget),
-          child: Align(widthFactor: 1, child: Text(label, style: style)),
+          child: Align(widthFactor: 1, heightFactor: 1, child: Text(label, style: style)),
         ),
       ),
     );

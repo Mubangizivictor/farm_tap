@@ -331,7 +331,8 @@ class RecordTile extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: dense ? context.sizes.listTileDense : context.sizes.listTile),
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: context.space.sm),
+          // Rows in lists sit about 76 apart (D03, D04); dense rows 8.
+          padding: EdgeInsets.symmetric(vertical: dense ? context.space.sm : context.space.lg),
           child: Row(
             children: [
               if (leading != null)
@@ -416,7 +417,7 @@ class ActionTile extends StatelessWidget {
             constraints: BoxConstraints(
               minHeight: subtitle == null ? context.sizes.actionTile : context.sizes.actionTileWithSubtitle,
             ),
-            padding: context.space.card,
+            padding: EdgeInsets.fromLTRB(context.space.lg, context.space.lg, context.space.lg, context.space.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,

@@ -89,6 +89,7 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
 
   // ---- Animations ----
   double get animationSm => 120 * scale;
+  double get animationSheet => 136 * scale;
   double get animationMd => 180 * scale;
   double get animationCelebration => 230 * scale;
   double get animationLg => 240 * scale;

@@ -158,6 +158,7 @@ class TextAction extends StatelessWidget {
           constraints: BoxConstraints(minHeight: context.sizes.touchTarget, minWidth: context.sizes.touchTarget),
           child: Align(
             widthFactor: 1,
+            heightFactor: 1,
             child: icon == null
                 ? Text(label, style: style)
                 : Row(

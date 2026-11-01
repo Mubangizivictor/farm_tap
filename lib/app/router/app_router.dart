@@ -4,6 +4,7 @@
 // even after a deep link or a web refresh.
 import 'dart:async';
 
+import 'package:farm_tap/app/router/app_dependencies.dart';
 import 'package:farm_tap/app/router/routes.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/app/shell/app_shell.dart';
@@ -16,17 +17,17 @@ import 'package:farm_tap/core/auth/presentation/pages/forgot_password_page.dart'
 import 'package:farm_tap/core/auth/presentation/pages/sign_in_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/splash_page.dart';
 import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
-import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/onboarding/presentation/cubit/onboarding_cubit.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/choice_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/form_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/waitlist_and_done.dart';
-import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
-import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
+import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/sectors/cattle/home/presentation/pages/alerts_page.dart';
+import 'package:farm_tap/sectors/cattle/home/presentation/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -61,20 +62,40 @@ GoRoute page(
 Page<void> _material(GoRouterState state, Widget child) =>
     MaterialPage<void>(key: state.pageKey, name: state.name, restorationId: state.pageKey.value, child: child);
 
-GoRouter buildRouter({
-  required SessionController session,
-  required FarmMembershipRepository places,
-  required OnboardingRepository onboarding,
-  required StaffAccessRepository staffAccess,
-  String? initialLocation,
-}) {
+GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
+  final session = deps.session;
+  final places = deps.places;
+  final onboarding = deps.onboarding;
+  final staffAccess = deps.staffAccess;
   final rootKey = GlobalKey<NavigatorState>();
   final auth = session.auth;
   final setup = OnboardingCubit();
 
   // Roots of the shell branches; filled in section by section.
-  final sectionRoots = <String, PageBuilder>{};
-  final sectionChildren = <String, List<RouteBase>>{};
+  final sectionRoots = <String, PageBuilder>{
+    AppRoutes.home: (context, state) => HomePage(
+      repo: deps.home,
+      farmName: session.farm?.name ?? '',
+      ownerName: session.auth.currentUser?.name ?? '',
+      staff: session.staff,
+      trialDaysLeft: session.farm?.subscription == SubscriptionState.trial ? session.farm?.trialDaysLeft : null,
+      onRefresh: deps.sync.sync,
+      onLock: () {
+        session.lock();
+        context.go(AppRoutes.unlock);
+      },
+      onOpen: (target) => _openFromHome(context, target),
+    ),
+  };
+  final sectionChildren = <String, List<RouteBase>>{
+    AppRoutes.home: [
+      page(
+        'alerts',
+        parent: AppRoutes.home,
+        builder: (context, state) => AlertsPage(repo: deps.home),
+      ),
+    ],
+  };
 
   GoRoute section(String path) => GoRoute(
     path: path,
@@ -300,7 +321,7 @@ GoRouter buildRouter({
 
       // ---- Main shell: one branch per section ----
       StatefulShellRoute.indexedStack(
-        builder: (context, state, shell) => AppShell(shell: shell, session: session),
+        builder: (context, state, shell) => AppShell(shell: shell, session: session, sync: deps.sync),
         branches: [
           for (final path in shellBranches) StatefulShellBranch(routes: [section(path)]),
         ],
@@ -310,6 +331,29 @@ GoRouter buildRouter({
       GoRoute(path: AppRoutes.uiGallery, pageBuilder: (context, state) => _material(state, const UiGalleryPage())),
     ],
   );
+}
+
+/// Home tiles and cards: push within a tab, or switch to another section.
+void _openFromHome(BuildContext context, HomeTarget target) {
+  final path = switch (target) {
+    HomeTarget.milk => AppRoutes.milk,
+    HomeTarget.recordMilk => AppRoutes.milk,
+    HomeTarget.herd => AppRoutes.herd,
+    HomeTarget.health => AppRoutes.health,
+    HomeTarget.treatment => AppRoutes.health,
+    HomeTarget.workers => AppRoutes.workers,
+    HomeTarget.tapCard => AppRoutes.collect,
+    HomeTarget.feeding => AppRoutes.feeding,
+    HomeTarget.breeding => AppRoutes.breeding,
+    HomeTarget.report => AppRoutes.health,
+    HomeTarget.pay => AppRoutes.settings,
+    HomeTarget.alerts => AppRoutes.homeAlerts,
+  };
+  if (target == HomeTarget.alerts) {
+    unawaited(context.push(path));
+  } else {
+    context.go(path);
+  }
 }
 
 /// Redirect guards (ROUTES.md "Guards").

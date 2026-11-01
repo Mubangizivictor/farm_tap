@@ -125,6 +125,10 @@ def run(steps, mode):
             with open(os.environ.get("FLUTTER_IN", str(FIFO)), "a") as keys:
                 keys.write("R\n")
             time.sleep(6)
+        elif cmd == "scroll":
+            # Swipe up in the middle of the screen (arg: "down" is default).
+            idb("ui", "swipe", "220", "760", "220", "300", "--duration", "0.4")
+            time.sleep(1.0)
         elif cmd == "wait":
             time.sleep(float(arg))
         elif cmd == "expect":
@@ -207,6 +211,54 @@ SCRIPTS = {
         "expect Your farm is ready!",
         "shot B10",
         "tap Start using FarmTap",
+    ],
+    "CD": [
+        "restart",
+        "tap Continue with Google",
+        "tap Rwemera Dairy Farm",
+        "expect Rwemera Dairy Farm",
+        "shot D01",
+        "tap All records synced",
+        "expect Sync status",
+        "shot D04",
+        "tapxy 220 120",
+        "scroll",
+        "tap See all",
+        "expect Alerts",
+        "shot D03",
+        "swipeback",
+        "expect Quick actions",
+        "tap Tap card",
+        "wait 1",
+        "tap Home",
+        "tap Muhwezi Robert",
+        "wait 1",
+    ],
+    "C": [
+        "expect Tap your card",
+        "shot C01",
+        "tap Enter card number instead",
+        "expect Enter your card number",
+        "tap 0",
+        "tap 1",
+        "tap 4",
+        "tap 2",
+        "shot C02",
+        "tap Next",
+        "expect Hello, Amos",
+        "tap 1",
+        "tap 2",
+        "shot C03",
+        "tap 1",
+        "tap 1",
+        "expect Wrong PIN",
+        "shot C04",
+        "tap 1",
+        "tap 2",
+        "tap 3",
+        "tap 4",
+        "expect Hello, Amos",
+        "shot D02",
     ],
 }
 

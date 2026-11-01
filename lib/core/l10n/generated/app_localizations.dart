@@ -62,7 +62,8 @@ import 'app_localizations_nyn.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,15 +84,19 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('en'), Locale('nyn')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('nyn'),
+  ];
 
   /// No description provided for @appName.
   ///
@@ -1423,9 +1429,442 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Type card number'**
   String get typeCardNumber;
+
+  /// No description provided for @goodMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning, {name}'**
+  String goodMorning(String name);
+
+  /// No description provided for @goodAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon, {name}'**
+  String goodAfternoon(String name);
+
+  /// No description provided for @goodEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening, {name}'**
+  String goodEvening(String name);
+
+  /// No description provided for @farmAndDate.
+  ///
+  /// In en, this message translates to:
+  /// **'{farm} · {date}'**
+  String farmAndDate(String farm, String date);
+
+  /// No description provided for @milkToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk today'**
+  String get milkToday;
+
+  /// No description provided for @cows.
+  ///
+  /// In en, this message translates to:
+  /// **'Cows'**
+  String get cows;
+
+  /// No description provided for @milkingDry.
+  ///
+  /// In en, this message translates to:
+  /// **'{milking} milking · {dry} dry'**
+  String milkingDry(int milking, int dry);
+
+  /// No description provided for @underTreatment.
+  ///
+  /// In en, this message translates to:
+  /// **'Under treatment'**
+  String get underTreatment;
+
+  /// No description provided for @notForSaleCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} not for sale'**
+  String notForSaleCount(int count);
+
+  /// No description provided for @workersIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Workers in'**
+  String get workersIn;
+
+  /// No description provided for @quickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions'**
+  String get quickActions;
+
+  /// No description provided for @recordMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Record milk'**
+  String get recordMilk;
+
+  /// No description provided for @treatment.
+  ///
+  /// In en, this message translates to:
+  /// **'Treatment'**
+  String get treatment;
+
+  /// No description provided for @needsAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get needsAttention;
+
+  /// No description provided for @milkThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk this week'**
+  String get milkThisWeek;
+
+  /// No description provided for @litreUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'L'**
+  String get litreUnit;
+
+  /// No description provided for @helloStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, {name}'**
+  String helloStaff(String name);
+
+  /// No description provided for @clockedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Clocked in at {time} · {role}'**
+  String clockedIn(String time, String role);
+
+  /// No description provided for @lock.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock'**
+  String get lock;
+
+  /// No description provided for @whatAreYouDoing.
+  ///
+  /// In en, this message translates to:
+  /// **'What are you doing?'**
+  String get whatAreYouDoing;
+
+  /// No description provided for @morningSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning session'**
+  String get morningSession;
+
+  /// No description provided for @eveningSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening session'**
+  String get eveningSession;
+
+  /// No description provided for @groupsLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} groups left'**
+  String groupsLeft(int count);
+
+  /// No description provided for @giveTreatment.
+  ///
+  /// In en, this message translates to:
+  /// **'Give treatment'**
+  String get giveTreatment;
+
+  /// No description provided for @dueNow.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} due now'**
+  String dueNow(int count);
+
+  /// No description provided for @dipping.
+  ///
+  /// In en, this message translates to:
+  /// **'Dipping'**
+  String get dipping;
+
+  /// No description provided for @dueOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {day}'**
+  String dueOn(String day);
+
+  /// No description provided for @heatService.
+  ///
+  /// In en, this message translates to:
+  /// **'Heat / service'**
+  String get heatService;
+
+  /// No description provided for @reportProblem.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a problem'**
+  String get reportProblem;
+
+  /// No description provided for @photoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo + note'**
+  String get photoNote;
+
+  /// No description provided for @myTasksToday.
+  ///
+  /// In en, this message translates to:
+  /// **'My tasks today'**
+  String get myTasksToday;
+
+  /// No description provided for @alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get alerts;
+
+  /// No description provided for @markAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all read'**
+  String get markAllRead;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @filterHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get filterHealth;
+
+  /// No description provided for @filterMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk'**
+  String get filterMilk;
+
+  /// No description provided for @filterStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock'**
+  String get filterStock;
+
+  /// No description provided for @filterMoney.
+  ///
+  /// In en, this message translates to:
+  /// **'Money'**
+  String get filterMoney;
+
+  /// No description provided for @urgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent'**
+  String get urgent;
+
+  /// No description provided for @syncStatusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync status'**
+  String get syncStatusTitle;
+
+  /// No description provided for @syncStatusBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Records are saved on this phone first, then sent to the cloud.'**
+  String get syncStatusBody;
+
+  /// No description provided for @syncedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced'**
+  String get syncedLabel;
+
+  /// No description provided for @recordsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} records'**
+  String recordsCount(String count);
+
+  /// No description provided for @waitingToSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting to send'**
+  String get waitingToSend;
+
+  /// No description provided for @milkRecordsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} milk records'**
+  String milkRecordsCount(int count);
+
+  /// No description provided for @failedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get failedLabel;
+
+  /// No description provided for @now.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get now;
+
+  /// No description provided for @syncNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync now'**
+  String get syncNow;
+
+  /// No description provided for @youreOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re offline'**
+  String get youreOffline;
+
+  /// No description provided for @offlineKeepRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep recording — everything is saved on this phone and will sync when network returns.'**
+  String get offlineKeepRecording;
+
+  /// No description provided for @getReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Get reminders?'**
+  String get getReminders;
+
+  /// No description provided for @getRemindersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap reminds you about calvings, vaccinations and when treated milk is safe again.'**
+  String get getRemindersBody;
+
+  /// No description provided for @allowReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow reminders'**
+  String get allowReminders;
+
+  /// No description provided for @notNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get notNow;
+
+  /// No description provided for @syncStatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync status'**
+  String get syncStatusOpen;
+
+  /// No description provided for @attnNotForSale.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} — milk not for sale'**
+  String attnNotForSale(String name);
+
+  /// No description provided for @attnSafeFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'{drug} · safe from {date}'**
+  String attnSafeFrom(String drug, String date);
+
+  /// No description provided for @attnMilkDrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk dropped {percent}% — {name}'**
+  String attnMilkDrop(int percent, String name);
+
+  /// No description provided for @attnMilkDropSub.
+  ///
+  /// In en, this message translates to:
+  /// **'{today} L today vs {average} L average'**
+  String attnMilkDropSub(String today, String average);
+
+  /// No description provided for @attnCalving.
+  ///
+  /// In en, this message translates to:
+  /// **'Calving due: {name}'**
+  String attnCalving(String name);
+
+  /// No description provided for @attnInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'In {days} days · {date}'**
+  String attnInDays(int days, String date);
+
+  /// No description provided for @attnStockLow.
+  ///
+  /// In en, this message translates to:
+  /// **'{item} is running low'**
+  String attnStockLow(String item);
+
+  /// No description provided for @attnBagsLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{bags} bags left · about {days} days'**
+  String attnBagsLeft(int bags, int days);
+
+  /// No description provided for @attnEdited.
+  ///
+  /// In en, this message translates to:
+  /// **'Record edited after closing'**
+  String get attnEdited;
+
+  /// No description provided for @attnEditedSub.
+  ///
+  /// In en, this message translates to:
+  /// **'{person} · {session} session · {time}'**
+  String attnEditedSub(String person, String session, String time);
+
+  /// No description provided for @attnTrialEnds.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial ends in {days} days'**
+  String attnTrialEnds(int days);
+
+  /// No description provided for @attnTrialPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay UGX 70,000 to keep recording'**
+  String get attnTrialPay;
+
+  /// No description provided for @sessionAm.
+  ///
+  /// In en, this message translates to:
+  /// **'AM'**
+  String get sessionAm;
+
+  /// No description provided for @sessionPm.
+  ///
+  /// In en, this message translates to:
+  /// **'PM'**
+  String get sessionPm;
+
+  /// No description provided for @taskBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Before {time}'**
+  String taskBefore(String time);
+
+  /// No description provided for @taskAfterEveningMilking.
+  ///
+  /// In en, this message translates to:
+  /// **'After evening milking'**
+  String get taskAfterEveningMilking;
+
+  /// No description provided for @dairyMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy meal'**
+  String get dairyMeal;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -1434,7 +1873,8 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'nyn'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'nyn'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;

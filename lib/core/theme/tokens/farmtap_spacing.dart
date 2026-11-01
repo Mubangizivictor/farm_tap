@@ -63,8 +63,8 @@ class FarmTapSpacing extends ThemeExtension<FarmTapSpacing> {
   /// Padding inside dialogs and bottom sheets.
   EdgeInsets get sheet => EdgeInsets.all(xl);
 
-  /// Padding inside a list card.
-  EdgeInsets get listCard => EdgeInsets.all(md);
+  /// Padding inside a list card (rows bring their own 16 top and bottom).
+  EdgeInsets get listCard => EdgeInsets.symmetric(horizontal: md, vertical: xs);
 
   /// Content padding by form factor: compact 16 (top 8), medium 24, wide 32 (top 28).
   EdgeInsets content(FormFactor form) => switch (form) {

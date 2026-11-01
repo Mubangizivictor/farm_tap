@@ -24,17 +24,17 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | B08 | B08_onboard_role | Onboarding | 97.9 | 98.1 | 97.6 | 98.3 | 98.0 | 98.6 | 97.9 | 98.1 | min 97.6 | ✓ | ✓ | ✓ | ✓ | done. |
 | B09 | B09_onboard_first_staff | Onboarding | 96.5 | 96.5 | 97.1 | 97.6 | 97.7 | 98.1 | 96.5 | 96.5 | min 96.5 | ✓ | ✓ | ✓ | ✓ | done. |
 | B10 | B10_onboard_trial_started | Onboarding | 94.0 | 94.5 | 98.1 | 98.2 | 98.5 | 98.7 | 92.7 | 93.5 | min 92.7 | ✓ | ✓ | ✓ | ✓ | done. Uses the real date; mockup date is Sat 7 Nov (trial ends 21 Nov). |
-| C01 | C01_staff_tap_card | Staff unlock | 96.0 | 96.2 | 98.7 | 98.8 | 99.0 | 99.1 | 96.0 | 96.2 | min 96.0 | ✓ | — | ✓ | ✓ | done. Debug builds show 'Simulate tap (debug)' (no NFC in the UI phase). Device QA after section D. |
-| C02 | C02_staff_card_number | Staff unlock | 88.4 | 89.8 | 94.5 | 95.6 | 95.6 | 96.5 | 88.4 | 89.8 | min 88.4 | ✓ | — | ✓ | ✓ | done. No decimal key on the card-number keypad (mockup shows '.', meaningless for a card number). Back arrow added (navigation rule). Device QA after section D (needs the lock action). |
-| C03 | C03_staff_pin | Staff unlock | 97.3 | 97.5 | 99.1 | 99.2 | 99.3 | 99.4 | 97.3 | 97.5 | min 97.3 | ✓ | — | ✓ | ✓ | done. |
-| C04 | C04_staff_pin_wrong | Staff unlock | 97.3 | 97.1 | 99.1 | 99.1 | 99.3 | 99.3 | 97.2 | 96.9 | min 96.9 | ✓ | — | ✓ | ✓ | done. |
-| C05 | C05_nfc_unavailable | Staff unlock | 95.2 | 96.6 | 98.9 | 99.2 | 99.2 | 99.4 | 96.8 | 97.7 | min 95.2 | ✓ | — | ✓ | ✓ | done. |
-| D01 | D01_home_owner | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| D02 | D02_home_worker | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| D03 | D03_alerts | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| D04 | D04_sync_status_sheet | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| D05 | D05_home_offline | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| D06 | D06_notification_permission | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| C01 | C01_staff_tap_card | Staff unlock | 96.0 | 96.2 | 98.7 | 98.8 | 99.0 | 99.1 | 96.0 | 96.2 | min 96.0 | ✓ | ✓ | ✓ | ✓ | done. Debug builds show 'Simulate tap (debug)' (no NFC in the UI phase). Device QA after section D. |
+| C02 | C02_staff_card_number | Staff unlock | 88.4 | 89.8 | 94.5 | 95.6 | 95.6 | 96.5 | 88.4 | 89.8 | min 88.4 | ✓ | ✓ | ✓ | ✓ | done. No decimal key on the card-number keypad (mockup shows '.', meaningless for a card number). Back arrow added (navigation rule). Device QA after section D (needs the lock action). |
+| C03 | C03_staff_pin | Staff unlock | 97.2 | 97.4 | 99.1 | 99.2 | 99.3 | 99.4 | 97.3 | 97.4 | min 97.2 | ✓ | ✓ | ✓ | ✓ | done. |
+| C04 | C04_staff_pin_wrong | Staff unlock | 97.3 | 97.1 | 99.1 | 99.1 | 99.3 | 99.3 | 97.2 | 96.9 | min 96.9 | ✓ | ✓ | ✓ | ✓ | done. |
+| C05 | C05_nfc_unavailable | Staff unlock | 95.2 | 96.6 | 98.9 | 99.2 | 99.2 | 99.4 | 96.8 | 97.7 | min 95.2 | ✓ | ✓ | ✓ | ✓ | done. |
+| D01 | D01_home_owner | Home | 96.0 | 96.0 | 96.3 | 96.0 | 96.3 | 96.3 | 96.0 | 96.0 | min 96.0 | ✓ | ✓ | ✓ | ✓ | done. Greeting follows the clock; staff avatar tap locks the phone (goes to C01). |
+| D02 | D02_home_worker | Home | 95.6 | 95.6 | 96.6 | 96.2 | 97.2 | 97.1 | 95.6 | 95.6 | min 95.6 | ✓ | ✓ | ✓ | ✓ | done. |
+| D03 | D03_alerts | Home | 93.4 | 93.4 | 97.0 | 97.0 | 97.2 | 97.2 | 93.4 | 93.4 | min 93.4 | ✓ | ✓ | ✓ | ✓ | done. |
+| D04 | D04_sync_status_sheet | Home | 87.5 | 90.4 | 92.9 | 95.5 | 91.5 | 95.3 | 87.5 | 90.4 | min 87.5 | ✓ | ✓ | ✓ | ✓ | done. Background home shows the trial banner (mockup sample omits it); sheet rows 76 apart. |
+| D05 | D05_home_offline | Home | 95.9 | 95.9 | 96.4 | 96.1 | 96.3 | 96.3 | 95.9 | 95.9 | min 95.9 | ✓ | ✓ | ✓ | ✓ | done. |
+| D06 | D06_notification_permission | Home | 95.2 | 96.0 | 93.6 | 95.8 | 93.2 | 95.8 | 95.2 | 96.0 | min 93.2 | ✓ | ✓ | ✓ | ✓ | done. Shown after the first saved record (wired with section F). |
 | E01 | E01_herd_list | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | E02 | E02_herd_filter_sheet | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | E03 | E03_animal_detail | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |

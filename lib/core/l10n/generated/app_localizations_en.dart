@@ -118,7 +118,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get trialThenPrice => 'Then UGX 70,000 a month. Pay anytime with Mobile Money.';
+  String get trialThenPrice =>
+      'Then UGX 70,000 a month. Pay anytime with Mobile Money.';
 
   @override
   String get trialUpgradeLine => 'Upgrade · UGX 70,000/mo';
@@ -127,7 +128,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get offlineBannerTitle => 'You are offline';
 
   @override
-  String get offlineBannerBody => 'Records are saved on this phone and will sync when you are online.';
+  String get offlineBannerBody =>
+      'Records are saved on this phone and will sync when you are online.';
 
   @override
   String get emptyDefaultTitle => 'Nothing here yet';
@@ -233,7 +235,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeTitle => 'Welcome to FarmTap';
 
   @override
-  String get welcomeBody => 'Records for your farm and milk centre — even without network.';
+  String get welcomeBody =>
+      'Records for your farm and milk centre — even without network.';
 
   @override
   String get continueGoogle => 'Continue with Google';
@@ -260,7 +263,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get brandTagline => 'Tap the card, record the work.';
 
   @override
-  String get brandBody => 'Records for farms and milk centres in Western Uganda — offline, in Runyankore and English.';
+  String get brandBody =>
+      'Records for farms and milk centres in Western Uganda — offline, in Runyankore and English.';
 
   @override
   String get emailSignInTitle => 'Sign in with email';
@@ -406,7 +410,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chooseLanguageTitle => 'Choose your language';
 
   @override
-  String get chooseLanguageSubtitle => 'Hitamu orurimi. You can change it later.';
+  String get chooseLanguageSubtitle =>
+      'Hitamu orurimi. You can change it later.';
 
   @override
   String get runyankoreSubtitle => 'Orurimi rw\'Ankole';
@@ -456,7 +461,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get waitlistBody => 'Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
+  String get waitlistBody =>
+      'Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
 
   @override
   String get yourNameLabel => 'Your name';
@@ -482,7 +488,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dairyTypeTitle => 'What kind of dairy?';
 
   @override
-  String get dairyTypeSubtitle => 'This decides your home screen. You can add the other later.';
+  String get dairyTypeSubtitle =>
+      'This decides your home screen. You can add the other later.';
 
   @override
   String get dairyFarm => 'Dairy farm';
@@ -524,7 +531,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contactsTitle => 'Where should we send reports?';
 
   @override
-  String get contactsSubtitle => 'Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
+  String get contactsSubtitle =>
+      'Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
 
   @override
   String get dailyReportTime => 'Daily report at 7:00 pm';
@@ -539,7 +547,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendDailyWhatsapp => 'Send me the daily report on WhatsApp';
 
   @override
-  String get sendSmsAlerts => 'Send me SMS alerts (sick cows, low stock, trial)';
+  String get sendSmsAlerts =>
+      'Send me SMS alerts (sick cows, low stock, trial)';
 
   @override
   String get roleTitle => 'What is your role?';
@@ -554,7 +563,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get firstStaffTitle => 'Add your first worker';
 
   @override
-  String get firstStaffSubtitle => 'Workers use a card and a 4-digit PIN — no email needed.';
+  String get firstStaffSubtitle =>
+      'Workers use a card and a 4-digit PIN — no email needed.';
 
   @override
   String get nameLabel => 'Name';
@@ -578,7 +588,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nfcLaterTitle => 'Add an NFC card later';
 
   @override
-  String get nfcLaterBody => 'Tap \'Assign card\' on the worker\'s page when cards arrive.';
+  String get nfcLaterBody =>
+      'Tap \'Assign card\' on the worker\'s page when cards arrive.';
 
   @override
   String get saveWorker => 'Save worker';
@@ -610,7 +621,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get choose => 'Choose';
 
   @override
-  String get phoneIncomplete => 'Check the number — it needs 9 digits after +256.';
+  String get phoneIncomplete =>
+      'Check the number — it needs 9 digits after +256.';
 
   @override
   String get farmNameRequired => 'Enter the farm name.';
@@ -643,7 +655,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tapYourCard => 'Tap your card';
 
   @override
-  String get tapYourCardBody => 'Hold your FarmTap card on the back of the phone.';
+  String get tapYourCardBody =>
+      'Hold your FarmTap card on the back of the phone.';
 
   @override
   String get enterCardInstead => 'Enter card number instead';
@@ -697,11 +710,279 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nfcOffTitle => 'NFC is turned off';
 
   @override
-  String get nfcOffBody => 'Turn on NFC in your phone settings to use cards, or type the card number.';
+  String get nfcOffBody =>
+      'Turn on NFC in your phone settings to use cards, or type the card number.';
 
   @override
   String get openSettings => 'Open settings';
 
   @override
   String get typeCardNumber => 'Type card number';
+
+  @override
+  String goodMorning(String name) {
+    return 'Good morning, $name';
+  }
+
+  @override
+  String goodAfternoon(String name) {
+    return 'Good afternoon, $name';
+  }
+
+  @override
+  String goodEvening(String name) {
+    return 'Good evening, $name';
+  }
+
+  @override
+  String farmAndDate(String farm, String date) {
+    return '$farm · $date';
+  }
+
+  @override
+  String get milkToday => 'Milk today';
+
+  @override
+  String get cows => 'Cows';
+
+  @override
+  String milkingDry(int milking, int dry) {
+    return '$milking milking · $dry dry';
+  }
+
+  @override
+  String get underTreatment => 'Under treatment';
+
+  @override
+  String notForSaleCount(int count) {
+    return '$count not for sale';
+  }
+
+  @override
+  String get workersIn => 'Workers in';
+
+  @override
+  String get quickActions => 'Quick actions';
+
+  @override
+  String get recordMilk => 'Record milk';
+
+  @override
+  String get treatment => 'Treatment';
+
+  @override
+  String get needsAttention => 'Needs attention';
+
+  @override
+  String get milkThisWeek => 'Milk this week';
+
+  @override
+  String get litreUnit => 'L';
+
+  @override
+  String helloStaff(String name) {
+    return 'Hello, $name';
+  }
+
+  @override
+  String clockedIn(String time, String role) {
+    return 'Clocked in at $time · $role';
+  }
+
+  @override
+  String get lock => 'Lock';
+
+  @override
+  String get whatAreYouDoing => 'What are you doing?';
+
+  @override
+  String get morningSession => 'Morning session';
+
+  @override
+  String get eveningSession => 'Evening session';
+
+  @override
+  String groupsLeft(int count) {
+    return '$count groups left';
+  }
+
+  @override
+  String get giveTreatment => 'Give treatment';
+
+  @override
+  String dueNow(int count) {
+    return '$count due now';
+  }
+
+  @override
+  String get dipping => 'Dipping';
+
+  @override
+  String dueOn(String day) {
+    return 'Due $day';
+  }
+
+  @override
+  String get heatService => 'Heat / service';
+
+  @override
+  String get reportProblem => 'Report a problem';
+
+  @override
+  String get photoNote => 'Photo + note';
+
+  @override
+  String get myTasksToday => 'My tasks today';
+
+  @override
+  String get alerts => 'Alerts';
+
+  @override
+  String get markAllRead => 'Mark all read';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterHealth => 'Health';
+
+  @override
+  String get filterMilk => 'Milk';
+
+  @override
+  String get filterStock => 'Stock';
+
+  @override
+  String get filterMoney => 'Money';
+
+  @override
+  String get urgent => 'Urgent';
+
+  @override
+  String get syncStatusTitle => 'Sync status';
+
+  @override
+  String get syncStatusBody =>
+      'Records are saved on this phone first, then sent to the cloud.';
+
+  @override
+  String get syncedLabel => 'Synced';
+
+  @override
+  String recordsCount(String count) {
+    return '$count records';
+  }
+
+  @override
+  String get waitingToSend => 'Waiting to send';
+
+  @override
+  String milkRecordsCount(int count) {
+    return '$count milk records';
+  }
+
+  @override
+  String get failedLabel => 'Failed';
+
+  @override
+  String get now => 'Now';
+
+  @override
+  String get syncNow => 'Sync now';
+
+  @override
+  String get youreOffline => 'You\'re offline';
+
+  @override
+  String get offlineKeepRecording =>
+      'Keep recording — everything is saved on this phone and will sync when network returns.';
+
+  @override
+  String get getReminders => 'Get reminders?';
+
+  @override
+  String get getRemindersBody =>
+      'FarmTap reminds you about calvings, vaccinations and when treated milk is safe again.';
+
+  @override
+  String get allowReminders => 'Allow reminders';
+
+  @override
+  String get notNow => 'Not now';
+
+  @override
+  String get syncStatusOpen => 'Sync status';
+
+  @override
+  String attnNotForSale(String name) {
+    return '$name — milk not for sale';
+  }
+
+  @override
+  String attnSafeFrom(String drug, String date) {
+    return '$drug · safe from $date';
+  }
+
+  @override
+  String attnMilkDrop(int percent, String name) {
+    return 'Milk dropped $percent% — $name';
+  }
+
+  @override
+  String attnMilkDropSub(String today, String average) {
+    return '$today L today vs $average L average';
+  }
+
+  @override
+  String attnCalving(String name) {
+    return 'Calving due: $name';
+  }
+
+  @override
+  String attnInDays(int days, String date) {
+    return 'In $days days · $date';
+  }
+
+  @override
+  String attnStockLow(String item) {
+    return '$item is running low';
+  }
+
+  @override
+  String attnBagsLeft(int bags, int days) {
+    return '$bags bags left · about $days days';
+  }
+
+  @override
+  String get attnEdited => 'Record edited after closing';
+
+  @override
+  String attnEditedSub(String person, String session, String time) {
+    return '$person · $session session · $time';
+  }
+
+  @override
+  String attnTrialEnds(int days) {
+    return 'Trial ends in $days days';
+  }
+
+  @override
+  String get attnTrialPay => 'Pay UGX 70,000 to keep recording';
+
+  @override
+  String get sessionAm => 'AM';
+
+  @override
+  String get sessionPm => 'PM';
+
+  @override
+  String taskBefore(String time) {
+    return 'Before $time';
+  }
+
+  @override
+  String get taskAfterEveningMilking => 'After evening milking';
+
+  @override
+  String get dairyMeal => 'Dairy meal';
 }

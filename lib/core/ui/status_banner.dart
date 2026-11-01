@@ -96,8 +96,10 @@ class OfflineBanner extends StatelessWidget {
     return FarmTapBanner(
       tone: FarmTapTone.warning,
       icon: Symbols.cloud_off_rounded,
-      title: l10n.offlineBannerTitle,
-      message: pending > 0 ? '${l10n.offlineBannerBody} (${l10n.recordsWaiting(pending)})' : l10n.offlineBannerBody,
+      title: l10n.youreOffline,
+      message: pending > 0
+          ? '${l10n.offlineKeepRecording} (${l10n.recordsWaiting(pending)})'
+          : l10n.offlineKeepRecording,
     );
   }
 }
