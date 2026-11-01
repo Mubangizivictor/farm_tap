@@ -34,6 +34,8 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     required this.syncFailed,
     required this.withdrawal,
     required this.nfcActive,
+    required this.card,
+    required this.scrim,
   });
 
   /// Saved, paid, healthy, synced.
@@ -93,6 +95,12 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
   /// NFC reader is listening.
   final Color nfcActive;
 
+  /// Card background (white in light mode, night200 in dark).
+  final Color card;
+
+  /// Modal scrim behind dialogs and sheets (black 42% light / 60% dark).
+  final Color scrim;
+
   static const light = FarmTapSemanticColors(
     success: FarmTapPalette.success600,
     onSuccess: FarmTapPalette.white,
@@ -121,6 +129,8 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     syncFailed: FarmTapPalette.danger600,
     withdrawal: FarmTapPalette.danger600,
     nfcActive: FarmTapPalette.green700,
+    card: FarmTapPalette.white,
+    scrim: FarmTapPalette.scrimLight,
   );
 
   static const dark = FarmTapSemanticColors(
@@ -151,6 +161,8 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     syncFailed: FarmTapPalette.danger300,
     withdrawal: FarmTapPalette.danger300,
     nfcActive: FarmTapPalette.green400,
+    card: FarmTapPalette.night200,
+    scrim: FarmTapPalette.scrimDark,
   );
 
   @override
@@ -182,6 +194,8 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     Color? syncFailed,
     Color? withdrawal,
     Color? nfcActive,
+    Color? card,
+    Color? scrim,
   }) => FarmTapSemanticColors(
     success: success ?? this.success,
     onSuccess: onSuccess ?? this.onSuccess,
@@ -210,6 +224,8 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     syncFailed: syncFailed ?? this.syncFailed,
     withdrawal: withdrawal ?? this.withdrawal,
     nfcActive: nfcActive ?? this.nfcActive,
+    card: card ?? this.card,
+    scrim: scrim ?? this.scrim,
   );
 
   @override
@@ -243,6 +259,8 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
       syncFailed: Color.lerp(syncFailed, other.syncFailed, t)!,
       withdrawal: Color.lerp(withdrawal, other.withdrawal, t)!,
       nfcActive: Color.lerp(nfcActive, other.nfcActive, t)!,
+      card: Color.lerp(card, other.card, t)!,
+      scrim: Color.lerp(scrim, other.scrim, t)!,
     );
   }
 }

@@ -3,6 +3,7 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:farm_tap/core/theme/farmtap_design.dart';
+import 'package:farm_tap/core/theme/tokens/farmtap_breakpoints.dart';
 import 'package:flutter/material.dart';
 
 @immutable
@@ -23,6 +24,15 @@ class FarmTapSpacing extends ThemeExtension<FarmTapSpacing> {
   double get xl => unit * 6; // 24
   double get xxl => unit * 8; // 32
   double get xxxl => unit * 12; // 48
+
+  // ---- Named in-between steps from the mockups ----
+  double get keyGap => unit * 2.5; // 10: keypad keys, dialog buttons
+  double get banner => unit * 3.5; // 14: banner padding
+  double get pinGap => unit * 4.5; // 18: between PIN dots
+  double get fabIcon => unit * 5; // 20: FAB icon inset
+  double get wideTop => unit * 7; // 28: content top on desktop
+  double get authTop => unit * 14; // 56: auth column top on wide screens
+  double get chipRun => unit * 2; // 8: gap between chips (rows 48 apart)
 
   // ---- Ready-made gaps (work in Row and Column) ----
   SizedBox get gapXxs => SizedBox.square(dimension: xxs);
@@ -51,7 +61,24 @@ class FarmTapSpacing extends ThemeExtension<FarmTapSpacing> {
   EdgeInsets get button => EdgeInsets.symmetric(horizontal: xl, vertical: md);
 
   /// Padding inside dialogs and bottom sheets.
-  EdgeInsets get sheet => EdgeInsets.fromLTRB(xl, lg, xl, xl);
+  EdgeInsets get sheet => EdgeInsets.all(xl);
+
+  /// Padding inside a list card.
+  EdgeInsets get listCard => EdgeInsets.all(md);
+
+  /// Content padding by form factor: compact 16 (top 8), medium 24, wide 32 (top 28).
+  EdgeInsets content(FormFactor form) => switch (form) {
+    FormFactor.compact => EdgeInsets.fromLTRB(lg, sm, lg, lg),
+    FormFactor.medium => EdgeInsets.all(xl),
+    FormFactor.expanded => EdgeInsets.fromLTRB(xxl, wideTop, xxl, xxl),
+  };
+
+  /// Side padding by form factor (16 / 24 / 32).
+  double side(FormFactor form) => switch (form) {
+    FormFactor.compact => lg,
+    FormFactor.medium => xl,
+    FormFactor.expanded => xxl,
+  };
 
   /// Gap between items in a vertical list of cards.
   double get listGap => md;

@@ -158,3 +158,21 @@ Theme roles, colour schemes and spacing scale are sound and kept. Components bel
 | Buttons | no helpers for tonal / danger / gold / neutral / large; side-by-side ≥420 rule. |
 | Input | 60 tall, border 1.2, floating label labelSmall. |
 | Missing | SearchField, ListCard, SectionLabel, HeroCard (tinted), OptionRow, LabeledProgress, PageDots, Timeline, split auth layout, centred layout, QR labels (E10). |
+
+## UI kit rebuild (Step 1 result)
+
+All components in the audit table were fixed or rewritten to section 4. Icons are Material Symbols Rounded (`fill: 1` for filled).
+New: `buttons.dart` (FarmTapButton kinds, ButtonPair, TextAction), `layouts.dart` (SplitAuthLayout, CenteredLayout),
+FarmTapCard, CardHeader, SectionLabel, HeroCard, ListCard, OptionRow, Timeline, FarmTapChip, FarmTapProgress, PageDots,
+SearchField, SheetFrame / SheetDialogFrame / DialogFrame / SheetTitle, ToastContent, BarAction, FarmTapLogo / FarmTapLogoMark,
+FarmTapFab, FarmTapPlatform. Still to build with their screens: QR labels (E10).
+
+`/dev/gallery` goldens: `test/goldens/UI_kit_gallery_<phone|tablet|desktop>_<mode>.png` (full catalogue) and
+`test/goldens/gallery/<ff>/<mode>/D01_home_owner.png` (first screenful = D01 replica), compared with the D01 mockup:
+
+| Form factor | Light | Dark | Notes |
+|---|---|---|---|
+| phone | 96.5 | 96.5 | Trial message wraps one word earlier (font metrics). |
+| tablet | 93.5 | 92.6 | Sidebar shown: 1194 dp is "expanded" in UX_SPEC; the tablet mockups show the rail. **Open question.** |
+| web_desktop | 96.2 | 96.2 | |
+| web_mobile | 96.5 | 96.5 | Same as phone (mockup keeps the bottom bar). |

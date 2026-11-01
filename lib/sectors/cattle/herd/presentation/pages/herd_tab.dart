@@ -14,19 +14,15 @@ class HerdTab extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.herd),
-      ),
+      appBar: AppBar(title: Text(l10n.herd)),
       body: BlocBuilder<HerdBloc, HerdState>(
         builder: (context, state) {
           if (state.status == HerdBlocStatus.loading) {
             return const Center(child: CircularProgressIndicator());
           }
-          
+
           if (state.animals.isEmpty) {
-            return const Center(
-              child: Text('No animals in the herd yet.'),
-            );
+            return const Center(child: Text('No animals in the herd yet.'));
           }
 
           return ListView.builder(

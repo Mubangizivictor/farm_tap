@@ -1,6 +1,8 @@
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
+import 'package:farm_tap/core/ui/avatars.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// How an SMS looks on the farmer's phone: grey bubble, sender and time.
 /// Used for delivery receipts and statements (G11) and WhatsApp-style
@@ -38,52 +40,87 @@ class SmsPreviewBubble extends StatelessWidget {
   }
 }
 
-/// The printed NFC card as it will look: brand green, gold ring, name and
-/// number. Shown before printing and when assigning a card (K03).
+/// The printed NFC card as it will look (K03): white card, green header strip
+/// with "FarmTap" and a gold contactless icon, avatar 64, name, role line and
+/// the card number (tagNumber, primary), soft shadow. Always drawn with the
+/// light theme because the printed card never goes dark.
 class PrintedCardPreview extends StatelessWidget {
   const new({required this.name, required this.cardNumber, super.key, this.subtitle});
 
   final String name;
+
+  /// "Card 0207".
   final String cardNumber;
+
+  /// "Worker · Rwemera Dairy Farm".
   final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final on = context.colors.onPrimary;
     return Semantics(
       label: '$name $cardNumber',
       image: true,
-      child: Container(
-        width: context.sizes.cardPreviewWidth,
-        padding: context.space.card,
-        decoration: BoxDecoration(color: context.status.brandGreen, borderRadius: context.radii.card),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
+      child: Theme(
+        data: FarmTapTheme.light,
+        child: Builder(builder: _card),
+      ),
+    );
+  }
+
+  Widget _card(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: context.status.card,
+        borderRadius: context.radii.card,
+        border: Border.all(color: context.colors.outlineVariant, width: context.sizes.borderThin),
+        boxShadow: [
+          BoxShadow(
+            color: context.colors.shadow.withValues(alpha: 0.12),
+            offset: Offset(0, context.space.xs),
+            blurRadius: context.space.md,
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            color: context.colors.primary,
+            padding: EdgeInsets.symmetric(horizontal: context.space.lg, vertical: context.space.md),
+            child: Row(
               children: [
-                Icon(Icons.wb_sunny_rounded, color: context.status.brandGold, size: context.sizes.iconLg),
-                context.space.gapSm,
-                Text(
-                  l10n.appName,
-                  style: context.text.titleMedium?.copyWith(color: on, fontWeight: FarmTapWeights.bold),
+                Expanded(
+                  child: Text(l10n.appName, style: context.text.titleMedium?.copyWith(color: context.colors.onPrimary)),
                 ),
-                const Spacer(),
-                Icon(Icons.contactless_rounded, color: context.status.brandGold, size: context.sizes.iconLg),
+                Icon(Symbols.contactless_rounded, color: context.status.brandGold, size: context.sizes.iconLg),
               ],
             ),
-            context.space.gapXl,
-            Text(
-              name,
-              style: context.text.titleLarge?.copyWith(color: on, fontWeight: FarmTapWeights.bold),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(context.space.lg, context.space.lg, context.space.lg, context.space.xxxl),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                PersonAvatar(name: name, size: context.sizes.avatarLg),
+                context.space.gapLg,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(name, style: context.text.titleMedium),
+                      if (subtitle != null) Text(subtitle!, style: context.text.bodySmall),
+                      context.space.gapSm,
+                      Text(cardNumber, style: context.textStyles.tagNumber.copyWith(color: context.colors.primary)),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            if (subtitle != null) Text(subtitle!, style: context.text.bodyMedium?.copyWith(color: on)),
-            context.space.gapSm,
-            Text(cardNumber, style: context.textStyles.tagNumber.copyWith(color: context.status.brandGold)),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

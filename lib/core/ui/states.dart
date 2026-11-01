@@ -1,7 +1,9 @@
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/animation_view.dart';
+import 'package:farm_tap/core/ui/buttons.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// Animation + title + one action. Every empty list uses this (P01).
 class EmptyState extends StatelessWidget {
@@ -49,7 +51,7 @@ class ErrorState extends StatelessWidget {
       title: title ?? l10n.errorDefaultTitle,
       message: message ?? l10n.errorDefaultBody,
       actionLabel: onRetry == null ? null : l10n.tryAgain,
-      actionIcon: Icons.refresh_rounded,
+      actionIcon: Symbols.refresh_rounded,
       onAction: onRetry,
     );
   }
@@ -78,32 +80,24 @@ class _StateBody extends StatelessWidget {
       child: SingleChildScrollView(
         padding: context.space.screen,
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: context.sizes.maxContentWidth),
+          constraints: BoxConstraints(maxWidth: context.sizes.centeredMaxWidth),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               FarmTapAnimationView(animation: animation),
               context.space.gapLg,
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: context.text.headlineSmall?.copyWith(fontWeight: FarmTapWeights.bold),
-              ),
+              Text(title, textAlign: TextAlign.center, style: context.text.headlineSmall),
               if (message != null) ...[
                 context.space.gapSm,
                 Text(
                   message!,
                   textAlign: TextAlign.center,
-                  style: context.text.bodyLarge?.copyWith(color: context.colors.onSurfaceVariant),
+                  style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                 ),
               ],
               if (actionLabel != null) ...[
                 context.space.gapXl,
-                FilledButton.icon(
-                  onPressed: onAction,
-                  icon: actionIcon == null ? null : Icon(actionIcon),
-                  label: Text(actionLabel!),
-                ),
+                FarmTapButton(label: actionLabel!, icon: actionIcon, onPressed: onAction, expand: false),
               ],
             ],
           ),

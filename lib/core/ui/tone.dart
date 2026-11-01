@@ -4,7 +4,7 @@
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 
-enum FarmTapTone { success, warning, danger, info, gold, neutral }
+enum FarmTapTone { primary, success, warning, danger, info, gold, neutral }
 
 @immutable
 class ToneColors {
@@ -24,6 +24,12 @@ extension FarmTapToneColors on FarmTapTone {
     final s = context.status;
     final c = context.colors;
     return switch (this) {
+      FarmTapTone.primary => ToneColors(
+        container: c.primaryContainer,
+        onContainer: c.onPrimaryContainer,
+        accent: c.primary,
+        onAccent: c.onPrimary,
+      ),
       FarmTapTone.success => ToneColors(
         container: s.successContainer,
         onContainer: s.onSuccessContainer,

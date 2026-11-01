@@ -7,10 +7,7 @@ import 'package:farm_tap/sectors/cattle/herd/presentation/bloc/herd_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HerdBloc extends Bloc<HerdEvent, HerdState> {
-  new({
-    required this.watchAnimals,
-    required this.addAnimal,
-  })  : super(const HerdState()) {
+  new({required this.watchAnimals, required this.addAnimal}) : super(const HerdState()) {
     on<WatchAnimalsRequested>(_onWatchAnimalsRequested);
     on<AnimalsUpdated>(_onAnimalsUpdated);
     on<AddAnimalRequested>(_onAddAnimalRequested);
@@ -20,10 +17,7 @@ class HerdBloc extends Bloc<HerdEvent, HerdState> {
   final AddAnimal addAnimal;
   StreamSubscription<dynamic>? _animalsSubscription;
 
-  Future<void> _onWatchAnimalsRequested(
-    WatchAnimalsRequested event,
-    Emitter<HerdState> emit,
-  ) async {
+  Future<void> _onWatchAnimalsRequested(WatchAnimalsRequested event, Emitter<HerdState> emit) async {
     emit(state.copyWith(status: HerdBlocStatus.loading));
     await _animalsSubscription?.cancel();
     _animalsSubscription = watchAnimals().listen((result) {
@@ -31,28 +25,14 @@ class HerdBloc extends Bloc<HerdEvent, HerdState> {
     });
   }
 
-  void _onAnimalsUpdated(
-    AnimalsUpdated event,
-    Emitter<HerdState> emit,
-  ) {
-    emit(state.copyWith(
-      status: HerdBlocStatus.success,
-      animals: event.animals,
-    ));
+  void _onAnimalsUpdated(AnimalsUpdated event, Emitter<HerdState> emit) {
+    emit(state.copyWith(status: HerdBlocStatus.success, animals: event.animals));
   }
 
-  Future<void> _onAddAnimalRequested(
-    AddAnimalRequested event,
-    Emitter<HerdState> emit,
-  ) async {
+  Future<void> _onAddAnimalRequested(AddAnimalRequested event, Emitter<HerdState> emit) async {
     final result = await addAnimal(event.animal);
     if (result.isFailure) {
-      emit(
-        state.copyWith(
-          status: HerdBlocStatus.failure,
-          errorMessage: result.failure?.message,
-        ),
-      );
+      emit(state.copyWith(status: HerdBlocStatus.failure, errorMessage: result.failure?.message));
     }
   }
 

@@ -10,7 +10,8 @@ For every golden  test/goldens/<ff>/<mode>/<ID>_<name>.png  this script
   * prints a similarity score (100 - mean absolute pixel difference %)
   * and writes test/goldens/compare/report.csv.
 
-Usage:  python3 tool/compare_mockups.py [ID ...]   (no IDs = all goldens)
+Usage:  python3 tool/compare_mockups.py [--dir gallery] [ID ...]   (no IDs = all goldens)
+        --dir compares test/goldens/<dir>/<ff>/<mode>/ into compare/<dir>/.
 Needs Python 3 and Pillow.
 """
 import csv
@@ -94,11 +95,14 @@ def compare(ff, mode, golden_path):
     return screen_id, stem, s
 
 
-def main(ids):
+def main(ids, sub=""):
+    global OUT
+    base = GOLDENS / sub if sub else GOLDENS
+    OUT = GOLDENS / "compare" / sub if sub else GOLDENS / "compare"
     rows = []
     for ff in FORM_FACTORS:
         for mode in MODES:
-            folder = GOLDENS / ff / mode
+            folder = base / ff / mode
             if not folder.is_dir():
                 continue
             for golden in sorted(folder.glob("*.png")):
@@ -133,4 +137,8 @@ def main(ids):
 
 
 if __name__ == "__main__":
-    main(set(sys.argv[1:]))
+    args = sys.argv[1:]
+    sub = ""
+    if args[:1] == ["--dir"]:
+        sub, args = args[1], args[2:]
+    main(set(args), sub)

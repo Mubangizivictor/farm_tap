@@ -28,35 +28,17 @@ class _HomePageState extends State<HomePage> {
     final l10n = AppLocalizations.of(context);
 
     return BlocProvider(
-      create: (context) => HerdBloc(
-        watchAnimals: getIt(),
-        addAnimal: getIt(),
-      )..add(const WatchAnimalsRequested()),
+      create: (context) => HerdBloc(watchAnimals: getIt(), addAnimal: getIt())..add(const WatchAnimalsRequested()),
       child: Scaffold(
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _tabs,
-        ),
+        body: IndexedStack(index: _currentIndex, children: _tabs),
         bottomNavigationBar: NavigationBar(
           selectedIndex: _currentIndex,
           onDestinationSelected: (index) => setState(() => _currentIndex = index),
           destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.pets),
-              label: l10n.herd,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.water_drop),
-              label: l10n.milk,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.health_and_safety),
-              label: l10n.health,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.more_horiz),
-              label: l10n.more,
-            ),
+            NavigationDestination(icon: const Icon(Icons.pets), label: l10n.herd),
+            NavigationDestination(icon: const Icon(Icons.water_drop), label: l10n.milk),
+            NavigationDestination(icon: const Icon(Icons.health_and_safety), label: l10n.health),
+            NavigationDestination(icon: const Icon(Icons.more_horiz), label: l10n.more),
           ],
         ),
       ),

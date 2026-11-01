@@ -4,6 +4,7 @@ import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../helpers/pump_app.dart';
 
@@ -60,42 +61,43 @@ void main() {
   group('AdaptiveScaffold', () {
     final nav = AdaptiveNavigation(
       items: const [
-        NavItem(id: 'home', icon: Icons.home_outlined, selectedIcon: Icons.home_rounded, label: 'Home'),
-        NavItem(id: 'herd', icon: Icons.pets_outlined, selectedIcon: Icons.pets_rounded, label: 'Herd'),
+        NavItem(id: 'home', icon: Symbols.home_rounded, label: 'Home'),
+        NavItem(id: 'herd', icon: Symbols.pets_rounded, label: 'Herd'),
       ],
       sidebarItems: const [
-        NavItem(id: 'home', icon: Icons.home_outlined, selectedIcon: Icons.home_rounded, label: 'Home'),
-        NavItem(id: 'herd', icon: Icons.pets_outlined, selectedIcon: Icons.pets_rounded, label: 'Herd'),
-        NavItem(id: 'feeding', icon: Icons.grass_outlined, selectedIcon: Icons.grass_rounded, label: 'Feeding'),
+        NavItem(id: 'home', icon: Symbols.home_rounded, label: 'Home'),
+        NavItem(id: 'herd', icon: Symbols.pets_rounded, label: 'Herd'),
+        NavItem(id: 'feeding', icon: Symbols.grass_rounded, label: 'Feeding'),
       ],
       selectedId: 'home',
       onSelect: (_) {},
     );
     Widget scaffold() => AdaptiveScaffold(
-          title: 'Home',
-          body: const Text('content'),
-          navigation: nav,
-          trialDaysLeft: 9,
-          farm: const FarmSwitcherInfo(name: 'Rwemera Dairy', subtitle: 'Mbarara · Owner'),
-        );
+      title: 'Home',
+      body: const Text('content'),
+      navigation: nav,
+      trialDaysLeft: 9,
+      farm: const FarmSwitcherInfo(name: 'Rwemera Dairy', subtitle: 'Mbarara · Owner'),
+    );
 
     testWidgets('phone: bottom bar only', (tester) async {
       await pumpFarmTap(tester, scaffold());
-      expect(find.byType(NavigationBar), findsOneWidget);
-      expect(find.byType(NavigationRail), findsNothing);
+      expect(find.byKey(AdaptiveScaffold.bottomBarKey), findsOneWidget);
+      expect(find.byKey(AdaptiveScaffold.railKey), findsNothing);
       expect(find.text('Feeding'), findsNothing);
     });
 
     testWidgets('tablet: rail', (tester) async {
       await pumpFarmTap(tester, scaffold(), size: tabletSize.shortestSide < 1024 ? const Size(800, 900) : tabletSize);
-      expect(find.byType(NavigationRail), findsOneWidget);
-      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byKey(AdaptiveScaffold.railKey), findsOneWidget);
+      expect(find.byKey(AdaptiveScaffold.bottomBarKey), findsNothing);
     });
 
     testWidgets('desktop: sidebar with all sections, farm switcher, trial card, search', (tester) async {
       await pumpFarmTap(tester, scaffold(), size: desktopSize);
-      expect(find.byType(NavigationBar), findsNothing);
-      expect(find.byType(NavigationRail), findsNothing);
+      expect(find.byKey(AdaptiveScaffold.sidebarKey), findsOneWidget);
+      expect(find.byKey(AdaptiveScaffold.bottomBarKey), findsNothing);
+      expect(find.byKey(AdaptiveScaffold.railKey), findsNothing);
       expect(find.text('Feeding'), findsOneWidget);
       expect(find.text('Rwemera Dairy'), findsOneWidget);
       expect(find.byType(TrialCard), findsOneWidget);
@@ -105,11 +107,11 @@ void main() {
 
   group('showAdaptiveSheet', () {
     Widget opener() => Builder(
-          builder: (context) => TextButton(
-            onPressed: () => showAdaptiveSheet<void>(context, builder: (_) => const Text('sheet body')),
-            child: const Text('open'),
-          ),
-        );
+      builder: (context) => TextButton(
+        onPressed: () => showAdaptiveSheet<void>(context, builder: (_) => const Text('sheet body')),
+        child: const Text('open'),
+      ),
+    );
 
     testWidgets('phone: bottom sheet', (tester) async {
       await pumpFarmTap(tester, Scaffold(body: opener()));
@@ -130,14 +132,14 @@ void main() {
 
   group('RecordCollection', () {
     Widget collection() => Scaffold(
-          body: SingleChildScrollView(
-            child: RecordCollection<String>(
-              items: const ['Bihogo', 'Kasheshe'],
-              tileBuilder: (_, s) => RecordTile(title: s),
-              columns: [RecordColumn(label: 'Animal', sortKey: (s) => s, cell: (_, s) => Text(s))],
-            ),
-          ),
-        );
+      body: SingleChildScrollView(
+        child: RecordCollection<String>(
+          items: const ['Bihogo', 'Kasheshe'],
+          tileBuilder: (_, s) => RecordTile(title: s),
+          columns: [RecordColumn(label: 'Animal', sortKey: (s) => s, cell: (_, s) => Text(s))],
+        ),
+      ),
+    );
 
     testWidgets('phone: tiles', (tester) async {
       await pumpFarmTap(tester, collection());
@@ -194,11 +196,13 @@ void main() {
     var back = 0;
     await pumpFarmTap(
       tester,
-      Scaffold(body: BigNumberKeypad(showDecimal: true, onDigit: keys.add, onBackspace: () => back++)),
+      Scaffold(
+        body: BigNumberKeypad(showDecimal: true, onDigit: keys.add, onBackspace: () => back++),
+      ),
     );
     await tester.tap(find.text('9'));
     await tester.tap(find.text('.'));
-    await tester.tap(find.byIcon(Icons.backspace_outlined));
+    await tester.tap(find.byIcon(Symbols.backspace_rounded));
     expect(keys, ['9', '.']);
     expect(back, 1);
   });
@@ -268,7 +272,12 @@ void main() {
         Scaffold(
           body: Builder(
             builder: (context) => TextButton(
-              onPressed: () => FarmTapToast.show(context, message: 'Saved 42.5 L', actionLabel: 'Undo', onAction: () => undone = true),
+              onPressed: () => FarmTapToast.show(
+                context,
+                message: 'Saved 42.5 L',
+                actionLabel: 'Undo',
+                onAction: () => undone = true,
+              ),
               child: const Text('toast'),
             ),
           ),
@@ -290,7 +299,8 @@ void main() {
       Scaffold(
         body: Builder(
           builder: (context) => TextButton(
-            onPressed: () async => result = await showReadBack(context, subject: 'Bihogo · FT-014', valueText: '9.5 litres'),
+            onPressed: () async =>
+                result = await showReadBack(context, subject: 'Bihogo · FT-014', valueText: '9.5 litres'),
             child: const Text('open'),
           ),
         ),
@@ -311,7 +321,9 @@ void main() {
   testWidgets('FarmTapAnimationView shows a still when reduce-motion is on', (tester) async {
     await pumpFarmTap(
       tester,
-      const Scaffold(body: Center(child: FarmTapAnimationView(animation: FarmTapAnimations.emptyHerd))),
+      const Scaffold(
+        body: Center(child: FarmTapAnimationView(animation: FarmTapAnimations.emptyHerd)),
+      ),
       disableAnimations: true,
     );
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 300)));
@@ -359,7 +371,12 @@ void soundAndAvatarTests() {
     tearDown(() => SoundService.instance = NoOpSoundService());
 
     testWidgets('keypad key plays tap; muted plays nothing', (tester) async {
-      await pumpFarmTap(tester, Scaffold(body: BigNumberKeypad(onDigit: (_) {}, onBackspace: () {})));
+      await pumpFarmTap(
+        tester,
+        Scaffold(
+          body: BigNumberKeypad(onDigit: (_) {}, onBackspace: () {}),
+        ),
+      );
       await tester.tap(find.text('5'));
       expect(sounds.played, [FarmTapSound.tap]);
       AppSettingsCubit().setSounds(enabled: false);

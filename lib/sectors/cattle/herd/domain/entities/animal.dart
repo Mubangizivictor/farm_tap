@@ -45,21 +45,21 @@ class Animal extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        tenantId,
-        tagNumber,
-        name,
-        sex,
-        breed,
-        dateOfBirth,
-        status,
-        govIdTag,
-        createdAt,
-        updatedAt,
-        createdBy,
-        updatedBy,
-        deviceId,
-        syncStatus,
-        isDeleted,
-      ];
+    id,
+    tenantId,
+    tagNumber,
+    name,
+    sex,
+    breed,
+    dateOfBirth,
+    status,
+    govIdTag,
+    createdAt,
+    updatedAt,
+    createdBy,
+    updatedBy,
+    deviceId,
+    syncStatus,
+    isDeleted,
+  ];
 }

@@ -33,6 +33,7 @@ enum GoldenFormFactor {
 
 /// Registers 8 golden tests for [name] (e.g. "A01_splash").
 /// [build] gets the form factor so a test can pick web-only variants.
+/// [dir] (e.g. 'gallery/') puts the goldens in a sub-folder.
 /// [act] runs after the first frame, e.g. to open the overlay the mockup shows.
 void screenGoldens(
   String name,
@@ -40,6 +41,7 @@ void screenGoldens(
   Future<void> Function(WidgetTester tester, GoldenFormFactor ff)? act,
   Set<GoldenFormFactor> only = const {...GoldenFormFactor.values},
   Duration settle = const Duration(milliseconds: 400),
+  String dir = '',
 }) {
   for (final ff in only) {
     for (final brightness in Brightness.values) {
@@ -50,10 +52,7 @@ void screenGoldens(
           await act(tester, ff);
           await tester.pump(settle);
         }
-        await expectLater(
-          find.byType(MaterialApp),
-          matchesGoldenFile('${ff.folder}/${brightness.name}/$name.png'),
-        );
+        await expectLater(find.byType(MaterialApp), matchesGoldenFile('$dir${ff.folder}/${brightness.name}/$name.png'));
         // Dispose the tree so no timers are left pending.
         await tester.pumpWidget(const SizedBox());
       });

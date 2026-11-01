@@ -65,6 +65,8 @@ abstract final class FarmTapPalette {
   static const mist = Color(0xFFE3EAE6); // text on dark
   static const black = Color(0xFF000000);
   static const transparent = Color(0x00000000);
+  static const scrimLight = Color(0x6B000000); // black 42%
+  static const scrimDark = Color(0x99000000); // black 60%
 
   // ---- Blue (information / tertiary) ----
   static const blue50 = Color(0xFFD3E4FF);

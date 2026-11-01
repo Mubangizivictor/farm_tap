@@ -59,6 +59,8 @@ class FarmTapTextStyles extends ThemeExtension<FarmTapTextStyles> {
     required this.tagNumber,
     required this.button,
     required this.buttonLarge,
+    required this.hero,
+    required this.micro,
   });
 
   factory from(FarmTapDesign d, ColorScheme cs) {
@@ -81,8 +83,15 @@ class FarmTapTextStyles extends ThemeExtension<FarmTapTextStyles> {
       tagNumber: s(20, FarmTapWeights.bold, ls: 0.5),
       button: s(17, FarmTapWeights.semiBold),
       buttonLarge: s(20, FarmTapWeights.semiBold),
+      hero: s(44, FarmTapWeights.bold, h: 1.1),
+      micro: s(12, FarmTapWeights.medium, c: cs.onSurfaceVariant),
     );
   }
+
+  /// Initials inside a person avatar: [base] (titleSmall) at 36% of [avatarSize].
+  /// Kept here because it is the one proportional text size in the app.
+  static TextStyle initials(TextStyle base, double avatarSize, double fraction) =>
+      base.copyWith(fontSize: avatarSize * fraction, height: 1);
 
   /// Digits on the number keypad.
   final TextStyle keypadDigit;
@@ -114,6 +123,12 @@ class FarmTapTextStyles extends ThemeExtension<FarmTapTextStyles> {
   /// Large primary action text.
   final TextStyle buttonLarge;
 
+  /// Big number in a tinted hero card ("1,284 L").
+  final TextStyle hero;
+
+  /// Chart axis labels.
+  final TextStyle micro;
+
   @override
   FarmTapTextStyles copyWith({
     TextStyle? keypadDigit,
@@ -126,6 +141,8 @@ class FarmTapTextStyles extends ThemeExtension<FarmTapTextStyles> {
     TextStyle? tagNumber,
     TextStyle? button,
     TextStyle? buttonLarge,
+    TextStyle? hero,
+    TextStyle? micro,
   }) => FarmTapTextStyles(
     keypadDigit: keypadDigit ?? this.keypadDigit,
     keypadDisplay: keypadDisplay ?? this.keypadDisplay,
@@ -137,6 +154,8 @@ class FarmTapTextStyles extends ThemeExtension<FarmTapTextStyles> {
     tagNumber: tagNumber ?? this.tagNumber,
     button: button ?? this.button,
     buttonLarge: buttonLarge ?? this.buttonLarge,
+    hero: hero ?? this.hero,
+    micro: micro ?? this.micro,
   );
 
   @override
@@ -153,6 +172,8 @@ class FarmTapTextStyles extends ThemeExtension<FarmTapTextStyles> {
       tagNumber: TextStyle.lerp(tagNumber, other.tagNumber, t)!,
       button: TextStyle.lerp(button, other.button, t)!,
       buttonLarge: TextStyle.lerp(buttonLarge, other.buttonLarge, t)!,
+      hero: TextStyle.lerp(hero, other.hero, t)!,
+      micro: TextStyle.lerp(micro, other.micro, t)!,
     );
   }
 }

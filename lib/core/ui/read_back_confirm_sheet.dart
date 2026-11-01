@@ -1,7 +1,9 @@
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/adaptive_sheet.dart';
+import 'package:farm_tap/core/ui/buttons.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// "Bihogo · FT-014 — 9.5 litres — Is this correct?" Shown before any save
 /// that affects money or milk. Nothing is saved until "Yes".
@@ -19,7 +21,7 @@ class ReadBackSheet extends StatelessWidget {
     this.changeLabel,
   });
 
-  /// Avatar (CowAvatar / PersonAvatar) shown above.
+  /// Avatar 88 with ring (CowAvatar / PersonAvatar) shown above.
   final Widget? leading;
 
   /// "Bihogo · FT-014".
@@ -59,26 +61,24 @@ class ReadBackSheet extends StatelessWidget {
             Text(
               detail!,
               textAlign: TextAlign.center,
-              style: context.text.bodyLarge?.copyWith(color: context.colors.onSurfaceVariant),
+              style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
             ),
           ],
+          context.space.gapXl,
+          Text(l10n.isThisCorrect, textAlign: TextAlign.center, style: context.text.titleMedium),
           context.space.gapLg,
-          Text(
-            l10n.isThisCorrect,
-            textAlign: TextAlign.center,
-            style: context.text.titleMedium?.copyWith(fontWeight: FarmTapWeights.bold),
-          ),
-          context.space.gapLg,
-          FilledButton.icon(
+          FarmTapButton(
+            label: confirmLabel ?? l10n.yesSave,
+            icon: Symbols.check_rounded,
+            large: true,
             onPressed: onConfirm,
-            icon: const Icon(Icons.check_rounded),
-            label: Text(confirmLabel ?? l10n.yesSave),
           ),
-          context.space.gapSm,
-          OutlinedButton.icon(
+          SizedBox(height: context.space.keyGap),
+          FarmTapButton(
+            label: changeLabel ?? l10n.noChangeIt,
+            icon: Symbols.edit_rounded,
+            kind: ButtonKind.outlined,
             onPressed: onChange,
-            icon: const Icon(Icons.edit_rounded),
-            label: Text(changeLabel ?? l10n.noChangeIt),
           ),
         ],
       ),

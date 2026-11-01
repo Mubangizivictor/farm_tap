@@ -6,7 +6,15 @@ import 'package:flutter/material.dart';
 /// Line + soft area chart ("Milk this week"). [labels] is one per value.
 /// The last point (or [highlightIndex]) gets a dot and a value tooltip.
 class MilkLineChart extends StatelessWidget {
-  const new({required this.values, required this.labels, super.key, this.highlightIndex, this.unit = 'L', this.height});
+  const new({
+    required this.values,
+    required this.labels,
+    super.key,
+    this.highlightIndex,
+    this.unit = 'L',
+    this.height,
+    this.target,
+  });
 
   final List<double> values;
   final List<String> labels;
@@ -14,13 +22,33 @@ class MilkLineChart extends StatelessWidget {
   final String unit;
   final double? height;
 
+  /// Optional dashed gold target line.
+  final double? target;
+
   @override
   Widget build(BuildContext context) {
     final line = context.colors.primary;
     final grid = context.colors.outlineVariant;
-    final label = context.text.labelMedium?.copyWith(color: context.colors.onSurfaceVariant);
-    final maxY = _niceMax(values);
+    final label = context.textStyles.micro;
+    final maxY = _niceMax([...values, ?target]);
     final hi = highlightIndex ?? values.length - 1;
+    final bar = LineChartBarData(
+      spots: [for (var i = 0; i < values.length; i++) FlSpot(i.toDouble(), values[i])],
+      color: line,
+      barWidth: context.sizes.chartLine,
+      isCurved: true,
+      curveSmoothness: 0.2,
+      dotData: FlDotData(
+        checkToShowDot: (spot, _) => spot.x.round() == hi,
+        getDotPainter: (spot, _, _, _) => FlDotCirclePainter(
+          radius: context.sizes.chartDot,
+          color: context.status.card,
+          strokeColor: line,
+          strokeWidth: context.sizes.chartLine,
+        ),
+      ),
+      belowBarData: BarAreaData(show: true, color: line.withValues(alpha: context.sizes.chartAreaOpacity)),
+    );
     return Padding(
       padding: EdgeInsets.only(right: context.space.xl),
       child: SizedBox(
@@ -32,6 +60,18 @@ class MilkLineChart extends StatelessWidget {
             minX: 0,
             maxX: (values.length - 1).toDouble(),
             borderData: FlBorderData(show: false),
+            extraLinesData: target == null
+                ? null
+                : ExtraLinesData(
+                    horizontalLines: [
+                      HorizontalLine(
+                        y: target!,
+                        color: context.status.brandGold,
+                        strokeWidth: context.sizes.borderThick,
+                        dashArray: [6, 4],
+                      ),
+                    ],
+                  ),
             gridData: FlGridData(
               drawVerticalLine: false,
               horizontalInterval: maxY / 3,
@@ -66,48 +106,27 @@ class MilkLineChart extends StatelessWidget {
               ),
             ),
             lineTouchData: LineTouchData(
+              handleBuiltInTouches: false,
               touchTooltipData: LineTouchTooltipData(
                 getTooltipColor: (_) => context.colors.inverseSurface,
+                tooltipBorderRadius: context.radii.tooltip,
+                tooltipPadding: EdgeInsets.symmetric(horizontal: context.space.sm, vertical: context.space.xs),
                 getTooltipItems: (spots) => [
                   for (final s in spots)
                     LineTooltipItem(
                       '${s.y.round()} $unit',
-                      context.text.labelLarge!.copyWith(
+                      context.text.labelSmall!.copyWith(
                         color: context.colors.onInverseSurface,
-                        fontWeight: FarmTapWeights.bold,
+                        fontWeight: FarmTapWeights.semiBold,
                       ),
                     ),
                 ],
               ),
             ),
             showingTooltipIndicators: [
-              ShowingTooltipIndicators([
-                LineBarSpot(
-                  LineChartBarData(spots: [for (var i = 0; i < values.length; i++) FlSpot(i.toDouble(), values[i])]),
-                  0,
-                  FlSpot(hi.toDouble(), values[hi]),
-                ),
-              ]),
+              ShowingTooltipIndicators([LineBarSpot(bar, 0, bar.spots[hi])]),
             ],
-            lineBarsData: [
-              LineChartBarData(
-                spots: [for (var i = 0; i < values.length; i++) FlSpot(i.toDouble(), values[i])],
-                color: line,
-                barWidth: context.sizes.borderThick * 1.5,
-                isCurved: true,
-                curveSmoothness: 0.2,
-                dotData: FlDotData(
-                  checkToShowDot: (spot, _) => spot.x.round() == hi,
-                  getDotPainter: (spot, _, _, _) => FlDotCirclePainter(
-                    radius: context.sizes.iconXs / 2,
-                    color: context.colors.surface,
-                    strokeColor: line,
-                    strokeWidth: context.sizes.borderThick,
-                  ),
-                ),
-                belowBarData: BarAreaData(show: true, color: line.withValues(alpha: 0.12)),
-              ),
-            ],
+            lineBarsData: [bar],
           ),
         ),
       ),
@@ -118,7 +137,10 @@ class MilkLineChart extends StatelessWidget {
 /// Bars for sales / expenses / litres per day. [highlightIndex] bar is
 /// drawn in the primary colour, the rest softer.
 class FarmTapBarChart extends StatelessWidget {
-  const new({required this.values, required this.labels, super.key, this.highlightIndex, this.height});
+  const new({required this.values, required this.labels, super.key, this.highlightIndex, this.height, this.barWidth});
+
+  /// At most `context.sizes.chartBarMaxWidth` (36); defaults to 24.
+  final double? barWidth;
 
   final List<double> values;
   final List<String> labels;
@@ -127,7 +149,7 @@ class FarmTapBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = context.text.labelMedium?.copyWith(color: context.colors.onSurfaceVariant);
+    final label = context.textStyles.micro;
     final maxY = _niceMax(values);
     final hi = highlightIndex ?? values.length - 1;
     return Padding(
@@ -183,7 +205,7 @@ class FarmTapBarChart extends StatelessWidget {
                   barRods: [
                     BarChartRodData(
                       toY: values[i],
-                      width: context.space.xl,
+                      width: barWidth ?? context.space.xl,
                       color: i == hi ? context.colors.primary : context.colors.primary.withValues(alpha: 0.35),
                       borderRadius: BorderRadius.vertical(top: Radius.circular(context.radii.xs)),
                     ),
@@ -197,9 +219,12 @@ class FarmTapBarChart extends StatelessWidget {
   }
 }
 
-/// Top of the y axis: three equal steps, rounded up to whole litres.
+/// Top of the y axis: about 15% above the highest value, in three equal
+/// whole-number steps (312 -> 0 / 120 / 240 / 360 style).
 double _niceMax(List<double> values) {
   final top = values.isEmpty ? 1.0 : values.reduce((a, b) => a > b ? a : b);
-  final step = (top / 3).ceilToDouble().clamp(1, double.infinity);
+  final step = (top * _headroom / 3).ceilToDouble().clamp(1, double.infinity);
   return step * 3;
 }
+
+const _headroom = 1.15;

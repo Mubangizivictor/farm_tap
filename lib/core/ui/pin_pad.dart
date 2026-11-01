@@ -7,14 +7,18 @@ import 'package:farm_tap/core/ui/big_number_keypad.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Row of PIN dots. Bump [errorTick] to shake them (300 ms) and vibrate
+/// Row of PIN dots: 22 dp, 18 apart; primary filled, outline ring, danger
+/// on error. Bump [errorTick] to shake them (300 ms) and vibrate
 /// twice, as for a wrong PIN (UX_SPEC section 5).
 class PinDots extends StatefulWidget {
-  const new({required this.filled, super.key, this.length = 4, this.errorTick = 0});
+  const new({required this.filled, super.key, this.length = 4, this.errorTick = 0, this.error = false});
 
   final int filled;
   final int length;
   final int errorTick;
+
+  /// Show the dots in the danger colour (wrong PIN state, C04).
+  final bool error;
 
   @override
   State<PinDots> createState() => _PinDotsState();
@@ -52,10 +56,11 @@ class _PinDotsState extends State<PinDots> with SingleTickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _shake,
       builder: (context, _) {
-        final failed = _shake.isAnimating;
+        final failed = _shake.isAnimating || widget.error;
         final fill = failed ? context.status.danger : context.colors.primary;
         // Three full swings over the shake duration, fading out.
         final t = _shake.value;
+        final halfGap = context.space.pinGap / 2;
         final dx = context.sizes.shakeDistance * (1 - t) * math.sin(t * 6 * math.pi);
         return Transform.translate(
           offset: Offset(dx, 0),
@@ -64,14 +69,14 @@ class _PinDotsState extends State<PinDots> with SingleTickerProviderStateMixin {
             children: [
               for (var i = 0; i < widget.length; i++)
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: context.space.md),
+                  padding: EdgeInsets.symmetric(horizontal: halfGap),
                   child: AnimatedContainer(
                     duration: context.motion.fast,
                     width: context.sizes.pinDot,
                     height: context.sizes.pinDot,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: i < widget.filled ? fill : Colors.transparent,
+                      color: i < widget.filled || failed ? fill : Colors.transparent,
                       border: Border.all(
                         color: i < widget.filled || failed ? fill : context.colors.outline,
                         width: context.sizes.borderThick,

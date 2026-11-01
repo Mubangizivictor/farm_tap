@@ -5,10 +5,11 @@ import 'package:farm_tap/core/sound/sound_service.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// Big number keypad (milk litres, delivery litres, card number, PIN).
-/// Every key press gives a light haptic tick. [pill] gives the rounder PIN
-/// shape. Keys are at least `context.sizes.keypadKey` tall.
+/// 3 columns, gap 10, keys 64 tall radius 16 (PIN: [pill], 60 tall, max 340).
+/// Every key press gives a light haptic tick.
 class BigNumberKeypad extends StatelessWidget {
   const new({required this.onDigit, required this.onBackspace, super.key, this.showDecimal = false, this.pill = false});
 
@@ -28,7 +29,7 @@ class BigNumberKeypad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final gap = context.space.sm;
+    final gap = context.space.keyGap;
     Widget row(List<Widget> cells) => Padding(
       padding: EdgeInsets.only(bottom: gap),
       child: Row(
@@ -39,7 +40,7 @@ class BigNumberKeypad extends StatelessWidget {
     );
     Widget digit(String d) => _Key(label: d, pill: pill, onTap: () => _tap(() => onDigit(d)));
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: context.sizes.keypadMaxWidth),
+      constraints: BoxConstraints(maxWidth: pill ? context.sizes.pinPadMaxWidth : context.sizes.keypadMaxWidth),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -53,7 +54,7 @@ class BigNumberKeypad extends StatelessWidget {
               const SizedBox.shrink(),
             digit('0'),
             _Key(
-              icon: Icons.backspace_outlined,
+              icon: Symbols.backspace_rounded,
               semanticLabel: l10n.keypadBackspace,
               pill: pill,
               onTap: () => _tap(onBackspace),
@@ -90,10 +91,10 @@ class _Key extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: SizedBox(
-            height: context.sizes.keypadKey,
+            height: pill ? context.sizes.pinKey : context.sizes.keypadKey,
             child: Center(
               child: icon != null
-                  ? Icon(icon, size: context.sizes.iconLg, color: context.status.onKeypadKey)
+                  ? Icon(icon, size: context.sizes.iconBackspace, color: context.status.onKeypadKey)
                   : Text(label!, style: context.textStyles.keypadDigit.copyWith(color: context.status.onKeypadKey)),
             ),
           ),
@@ -103,9 +104,11 @@ class _Key extends StatelessWidget {
   }
 }
 
-/// Large outlined number display above the keypad: "9.5|L".
+/// Display above the keypad: 96 tall, radius 18, c0, 2 dp primary border,
+/// keypadDisplay value + caret 3x46 + unit (titleLarge); optional caption
+/// (bodySmall) 8 below.
 class KeypadDisplay extends StatelessWidget {
-  const new({required this.text, super.key, this.unit, this.placeholder = '0', this.active = true});
+  const new({required this.text, super.key, this.unit, this.placeholder = '0', this.active = true, this.caption});
 
   final String text;
   final String? unit;
@@ -114,10 +117,13 @@ class KeypadDisplay extends StatelessWidget {
   /// Draws the green frame and the blinking-style caret.
   final bool active;
 
+  /// "Yesterday evening: 9.0 L".
+  final String? caption;
+
   @override
   Widget build(BuildContext context) {
     final empty = text.isEmpty;
-    return Semantics(
+    final display = Semantics(
       liveRegion: true,
       label: '${empty ? placeholder : text} ${unit ?? ''}',
       excludeSemantics: true,
@@ -126,7 +132,7 @@ class KeypadDisplay extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           color: context.colors.surfaceContainerLowest,
-          borderRadius: context.radii.card,
+          borderRadius: context.radii.keypadDisplay,
           border: Border.all(
             color: active ? context.colors.primary : context.colors.outlineVariant,
             width: context.sizes.borderThick,
@@ -135,8 +141,6 @@ class KeypadDisplay extends StatelessWidget {
         alignment: Alignment.center,
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
               empty ? placeholder : text,
@@ -146,16 +150,25 @@ class KeypadDisplay extends StatelessWidget {
             ),
             if (active)
               Container(
-                width: context.sizes.borderThick,
-                height: context.sizes.iconXl,
+                width: context.sizes.keypadCaretWidth,
+                height: context.sizes.keypadCaretHeight,
                 margin: EdgeInsets.symmetric(horizontal: context.space.xs),
                 color: context.colors.primary,
               ),
             if (unit != null)
-              Text(unit!, style: context.text.headlineSmall?.copyWith(color: context.colors.onSurfaceVariant)),
+              Text(unit!, style: context.text.titleLarge?.copyWith(color: context.colors.onSurfaceVariant)),
           ],
         ),
       ),
+    );
+    if (caption == null) return display;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        display,
+        context.space.gapSm,
+        Text(caption!, textAlign: TextAlign.center, style: context.text.bodySmall),
+      ],
     );
   }
 }

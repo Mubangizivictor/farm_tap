@@ -1,5 +1,6 @@
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class RecordColumn<T> {
   const new({required this.label, required this.cell, this.flex = 1, this.sortKey});
@@ -12,7 +13,9 @@ class RecordColumn<T> {
   final Comparable<Object?> Function(T item)? sortKey;
 }
 
-/// A list of records: tiles on phones (width < 700), a sortable table above.
+/// A list of records: tiles in a card on phones (width < 700), a sortable
+/// table above (header 44 c1 sectionLabel, rows 60, first column titleSmall,
+/// others bodyMedium).
 /// Not scrollable itself: put it inside a scroll view.
 class RecordCollection<T> extends StatefulWidget {
   const new({required this.items, required this.tileBuilder, required this.columns, super.key, this.onTap, this.empty});
@@ -55,20 +58,23 @@ class _RecordCollectionState<T> extends State<RecordCollection<T>> {
     final items = widget.items;
     return Card(
       clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var i = 0; i < items.length; i++) ...[
-            if (i > 0) Divider(height: context.sizes.divider),
-            Semantics(
-              button: widget.onTap != null,
-              child: InkWell(
-                onTap: widget.onTap == null ? null : () => widget.onTap!(items[i]),
-                child: widget.tileBuilder(context, items[i]),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: context.space.md),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var i = 0; i < items.length; i++) ...[
+              if (i > 0) Divider(height: context.sizes.divider, indent: context.sizes.listTile),
+              Semantics(
+                button: widget.onTap != null,
+                child: InkWell(
+                  onTap: widget.onTap == null ? null : () => widget.onTap!(items[i]),
+                  child: widget.tileBuilder(context, items[i]),
+                ),
               ),
-            ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -82,8 +88,12 @@ class _RecordCollectionState<T> extends State<RecordCollection<T>> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            color: context.colors.surfaceContainer,
-            padding: context.space.listItem,
+            height: context.sizes.tableHeader,
+            decoration: BoxDecoration(
+              color: context.colors.surfaceContainerLow,
+              borderRadius: BorderRadius.vertical(top: context.radii.tableHeader.topLeft),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: context.space.lg),
             child: Row(
               children: [
                 for (var c = 0; c < widget.columns.length; c++)
@@ -107,7 +117,7 @@ class _RecordCollectionState<T> extends State<RecordCollection<T>> {
                           ),
                           if (_sortColumn == c)
                             Icon(
-                              _ascending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+                              _ascending ? Symbols.arrow_upward_rounded : Symbols.arrow_downward_rounded,
                               size: context.sizes.iconXs,
                               color: context.colors.onSurfaceVariant,
                             ),
@@ -123,15 +133,21 @@ class _RecordCollectionState<T> extends State<RecordCollection<T>> {
             InkWell(
               onTap: widget.onTap == null ? null : () => widget.onTap!(items[i]),
               child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: context.sizes.actionTile),
+                constraints: BoxConstraints(minHeight: context.sizes.tableRow),
                 child: Padding(
-                  padding: context.space.listItem,
+                  padding: EdgeInsets.symmetric(horizontal: context.space.lg, vertical: context.space.sm),
                   child: Row(
                     children: [
-                      for (final col in widget.columns)
+                      for (var c = 0; c < widget.columns.length; c++)
                         Expanded(
-                          flex: col.flex,
-                          child: Align(alignment: Alignment.centerLeft, child: col.cell(context, items[i])),
+                          flex: widget.columns[c].flex,
+                          child: DefaultTextStyle.merge(
+                            style: c == 0 ? context.text.titleSmall : context.text.bodyMedium,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: widget.columns[c].cell(context, items[i]),
+                            ),
+                          ),
                         ),
                     ],
                   ),

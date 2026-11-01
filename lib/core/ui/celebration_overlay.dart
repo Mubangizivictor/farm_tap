@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:farm_tap/core/sound/sound_service.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/animation_view.dart';
+import 'package:farm_tap/core/ui/buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -21,6 +22,7 @@ Future<CelebrationAction?> showCelebration(
   String? message,
   IconData? primaryIcon,
   String? secondaryLabel,
+  Widget? summary,
   bool autoAdvance = false,
   FarmTapSound sound = FarmTapSound.celebrate,
 }) {
@@ -31,6 +33,7 @@ Future<CelebrationAction?> showCelebration(
     primaryLabel: primaryLabel,
     primaryIcon: primaryIcon,
     secondaryLabel: secondaryLabel,
+    summary: summary,
     autoAdvance: autoAdvance,
     sound: sound,
     onResult: (a) => Navigator.of(ctx).pop(a),
@@ -68,8 +71,10 @@ class CelebrationOverlay extends StatefulWidget {
     this.message,
     this.primaryIcon,
     this.secondaryLabel,
+    this.summary,
     this.autoAdvance = false,
     this.sound = FarmTapSound.celebrate,
+    this.revealButtons = false,
   });
 
   final FarmTapAnimation animation;
@@ -78,7 +83,13 @@ class CelebrationOverlay extends StatefulWidget {
   final String primaryLabel;
   final IconData? primaryIcon;
   final String? secondaryLabel;
+
+  /// Optional summary card under the message (e.g. totals).
+  final Widget? summary;
   final bool autoAdvance;
+
+  /// Show the buttons at once (goldens, tests).
+  final bool revealButtons;
 
   /// celebrate by default; pop for milk saved, coin for payment received.
   final FarmTapSound sound;
@@ -91,7 +102,7 @@ class CelebrationOverlay extends StatefulWidget {
 class _CelebrationOverlayState extends State<CelebrationOverlay> {
   Timer? _reveal;
   Timer? _advance;
-  late bool _buttons = widget.autoAdvance;
+  late bool _buttons = widget.autoAdvance || widget.revealButtons;
   bool _done = false;
 
   @override
@@ -139,25 +150,22 @@ class _CelebrationOverlayState extends State<CelebrationOverlay> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Center(
-            child: FarmTapAnimationView(animation: widget.animation, size: context.sizes.animationLg),
+            child: FarmTapAnimationView(animation: widget.animation, size: context.sizes.animationCelebration),
           ),
           context.space.gapXl,
           Semantics(
             liveRegion: true,
-            child: Text(
-              widget.title,
-              textAlign: TextAlign.center,
-              style: context.text.headlineMedium?.copyWith(fontWeight: FarmTapWeights.bold),
-            ),
+            child: Text(widget.title, textAlign: TextAlign.center, style: context.text.headlineSmall),
           ),
           if (widget.message != null) ...[
             context.space.gapSm,
             Text(
               widget.message!,
               textAlign: TextAlign.center,
-              style: context.text.titleMedium?.copyWith(color: context.colors.onSurfaceVariant),
+              style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
             ),
           ],
+          if (widget.summary != null) ...[context.space.gapLg, widget.summary!],
           context.space.gapXl,
           AnimatedOpacity(
             opacity: _buttons ? 1 : 0,
@@ -167,16 +175,20 @@ class _CelebrationOverlayState extends State<CelebrationOverlay> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  FilledButton.icon(
+                  FarmTapButton(
+                    label: widget.primaryLabel,
+                    icon: widget.primaryIcon,
+                    large: compact,
                     onPressed: () => _finish(CelebrationAction.primary),
-                    icon: widget.primaryIcon == null ? null : Icon(widget.primaryIcon),
-                    label: Text(widget.primaryLabel),
                   ),
-                  if (widget.secondaryLabel != null)
-                    TextButton(
+                  if (widget.secondaryLabel != null) ...[
+                    SizedBox(height: context.space.keyGap),
+                    FarmTapButton(
+                      label: widget.secondaryLabel!,
+                      kind: ButtonKind.outlined,
                       onPressed: () => _finish(CelebrationAction.secondary),
-                      child: Text(widget.secondaryLabel!),
                     ),
+                  ],
                 ],
               ),
             ),

@@ -16,9 +16,9 @@ void main() {
     final logger = MockAppLogger();
     final isarService = MockIsarService();
     final isar = MockIsar();
-    
+
     when(() => isarService.isar).thenReturn(isar);
-    
+
     getIt
       ..registerSingleton<AppLogger>(logger)
       ..registerSingleton<IsarService>(isarService);
@@ -27,7 +27,7 @@ void main() {
 
   testWidgets('App boots to splash screen', (tester) async {
     final config = AppConfig.forFlavor(Flavor.dev);
-    
+
     await tester.pumpWidget(FarmTapApp(config: config));
 
     expect(find.byType(FarmTapApp), findsOneWidget);

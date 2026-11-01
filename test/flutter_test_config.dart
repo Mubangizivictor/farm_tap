@@ -45,16 +45,12 @@ String _flutterRootFromDart() {
 
 /// Resolves a file inside a dependency's `lib/` via package_config.json.
 String _packageFile(String package, String relative) {
-  final config =
-      jsonDecode(File('.dart_tool/package_config.json').readAsStringSync())
-          as Map<String, dynamic>;
-  final entry = (config['packages'] as List<dynamic>)
-      .cast<Map<String, dynamic>>()
-      .firstWhere((p) => p['name'] == package);
+  final config = jsonDecode(File('.dart_tool/package_config.json').readAsStringSync()) as Map<String, dynamic>;
+  final entry = (config['packages'] as List<dynamic>).cast<Map<String, dynamic>>().firstWhere(
+    (p) => p['name'] == package,
+  );
   final rootUri = entry['rootUri'] as String;
   final root = Uri.parse(rootUri.endsWith('/') ? rootUri : '$rootUri/');
-  final base = root.isAbsolute
-      ? root
-      : Uri.directory('${Directory.current.path}/.dart_tool/').resolveUri(root);
+  final base = root.isAbsolute ? root : Uri.directory('${Directory.current.path}/.dart_tool/').resolveUri(root);
   return base.resolve('lib/$relative').toFilePath();
 }

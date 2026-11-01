@@ -39,10 +39,12 @@ void main() {
             theme: FarmTapTheme.light,
             darkTheme: FarmTapTheme.dark,
             themeMode: mode,
-            home: Builder(builder: (c) {
-              captured = c;
-              return const SizedBox.shrink();
-            }),
+            home: Builder(
+              builder: (c) {
+                captured = c;
+                return const SizedBox.shrink();
+              },
+            ),
           ),
         );
         await tester.pumpAndSettle();

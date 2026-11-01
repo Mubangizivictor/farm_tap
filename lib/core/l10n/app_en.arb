@@ -92,5 +92,21 @@
   "settings": "Settings",
   "isThisCorrect": "Is this correct?",
   "yesSave": "Yes, save",
-  "noChangeIt": "No, change it"
+  "noChangeIt": "No, change it",
+  "skip": "Skip",
+  "menu": "Menu",
+  "seeAll": "See all",
+  "profile": "Profile",
+  "comingSoon": "Coming soon",
+  "farmRoleLine": "{place} · {role}",
+  "@farmRoleLine": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "role": {
+        "type": "String"
+      }
+    }
+  }
 }

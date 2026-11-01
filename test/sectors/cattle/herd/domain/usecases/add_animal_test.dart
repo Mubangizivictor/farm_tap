@@ -36,8 +36,7 @@ void main() {
   setUpAll(() => registerFallbackValue(tAnimal));
 
   test('should call addAnimal on the repository', () async {
-    when(() => mockRepository.addAnimal(any()))
-        .thenAnswer((_) async => const Result.success(null));
+    when(() => mockRepository.addAnimal(any())).thenAnswer((_) async => const Result.success(null));
 
     final result = await usecase(tAnimal);
 

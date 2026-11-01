@@ -16,8 +16,12 @@ void main() {
       'fontFamily – set only in FarmTapDesign': RegExp(r'\bfontFamily\s*:'),
       'FontWeight.wNNN – use FarmTapWeights': RegExp(r'FontWeight\.w\d00'),
       'BorderRadius number – use context.radii': RegExp(r'BorderRadius\.circular\(\s*\d'),
-      'EdgeInsets number – use context.space': RegExp(r'EdgeInsets\.(all|symmetric|only|fromLTRB)\([^)]*\b[1-9]\d*(\.\d+)?\b'),
-      'SizedBox number – use context.space.gapX / context.sizes': RegExp(r'SizedBox\([^)]*\b(height|width)\s*:\s*[1-9]'),
+      'EdgeInsets number – use context.space': RegExp(
+        r'EdgeInsets\.(all|symmetric|only|fromLTRB)\([^)]*\b[1-9]\d*(\.\d+)?\b',
+      ),
+      'SizedBox number – use context.space.gapX / context.sizes': RegExp(
+        r'SizedBox\([^)]*\b(height|width)\s*:\s*[1-9]',
+      ),
       'Duration literal – use context.motion': RegExp(r'Duration\(\s*(milliseconds|seconds)\s*:'),
     };
 
@@ -27,12 +31,12 @@ void main() {
         .whereType<File>()
         .where((f) => f.path.endsWith('.dart'))
         .where((f) {
-      final p = f.path.replaceAll(r'\', '/');
-      return !p.startsWith('lib/core/theme/') &&
-          !p.endsWith('.g.dart') &&
-          !p.endsWith('.freezed.dart') &&
-          !p.contains('/l10n/generated/');
-    });
+          final p = f.path.replaceAll(r'\', '/');
+          return !p.startsWith('lib/core/theme/') &&
+              !p.endsWith('.g.dart') &&
+              !p.endsWith('.freezed.dart') &&
+              !p.contains('/l10n/generated/');
+        });
 
     for (final file in files) {
       final lines = file.readAsLinesSync();

@@ -1,11 +1,14 @@
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
-import 'package:farm_tap/core/ui/icon_bubble.dart';
+import 'package:farm_tap/core/ui/buttons.dart';
+import 'package:farm_tap/core/ui/controls.dart';
 import 'package:farm_tap/core/ui/tone.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
-/// Inline banner at the top of content. Not dismissible while its condition
-/// is true (trial, offline, withdrawal, read-only). UX_SPEC section 4.
+/// Inline banner: tinted, radius 14, padding 14, filled icon 26, title
+/// titleSmall, message bodySmall, action labelLarge (right when wider than
+/// 480, else below). Not dismissible while its condition is true.
 class FarmTapBanner extends StatelessWidget {
   const new({
     required this.tone,
@@ -27,62 +30,47 @@ class FarmTapBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = tone.of(context);
+    final on = colors.onContainer;
+    final action = actionLabel == null
+        ? null
+        : TextAction(label: actionLabel!, onPressed: onAction, color: on, dense: true);
     return Semantics(
       container: true,
       liveRegion: true,
-      child: Container(
-        width: double.infinity,
-        padding: context.space.card,
-        decoration: BoxDecoration(color: colors.container, borderRadius: context.radii.card),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: colors.onContainer, size: context.sizes.iconLg),
-            context.space.gapMd,
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: context.text.titleMedium?.copyWith(
-                      color: colors.onContainer,
-                      fontWeight: FarmTapWeights.bold,
-                    ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final actionRight = constraints.maxWidth > context.sizes.centeredMaxWidth;
+          return Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(context.space.banner),
+            decoration: BoxDecoration(color: colors.container, borderRadius: context.radii.banner),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(icon, fill: 1, color: on, size: context.sizes.iconBanner),
+                context.space.gapMd,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(title, style: context.text.titleSmall?.copyWith(color: on)),
+                      if (message != null) Text(message!, style: context.text.bodySmall?.copyWith(color: on)),
+                      if (action != null && !actionRight) action,
+                    ],
                   ),
-                  if (message != null)
-                    Text(message!, style: context.text.bodyMedium?.copyWith(color: colors.onContainer)),
-                  if (actionLabel != null) ...[
-                    context.space.gapSm,
-                    InkWell(
-                      onTap: onAction,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(minHeight: context.sizes.touchTarget),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          widthFactor: 1,
-                          child: Text(
-                            actionLabel!,
-                            style: context.text.titleMedium?.copyWith(
-                              color: colors.onContainer,
-                              fontWeight: FarmTapWeights.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+                ),
+                if (action != null && actionRight) ...[context.space.gapMd, action],
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 }
 
-/// Yellow "you are offline" banner. Records still save on the phone.
+/// Amber "you are offline" banner. Records still save on the phone.
 class OfflineBanner extends StatelessWidget {
   const new({super.key, this.pending = 0});
 
@@ -94,7 +82,7 @@ class OfflineBanner extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return FarmTapBanner(
       tone: FarmTapTone.warning,
-      icon: Icons.cloud_off_rounded,
+      icon: Symbols.cloud_off_rounded,
       title: l10n.offlineBannerTitle,
       message: pending > 0 ? '${l10n.offlineBannerBody} (${l10n.recordsWaiting(pending)})' : l10n.offlineBannerBody,
     );
@@ -113,7 +101,7 @@ class TrialBanner extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return FarmTapBanner(
       tone: FarmTapTone.gold,
-      icon: Icons.savings_rounded,
+      icon: Symbols.savings_rounded,
       title: l10n.trialDaysLeft(daysLeft),
       message: l10n.trialThenPrice,
       actionLabel: l10n.payNow,
@@ -122,7 +110,8 @@ class TrialBanner extends StatelessWidget {
   }
 }
 
-/// Compact trial card with progress, at the bottom of the sidebar.
+/// Sidebar trial card: 232 x 82, radius 14, secondaryContainer, savings icon,
+/// "Free trial · 9 days left", 6 dp gold progress, "Upgrade · UGX 70,000/mo".
 class TrialCard extends StatelessWidget {
   const new({required this.daysLeft, super.key, this.totalDays = 14, this.onUpgrade});
 
@@ -136,43 +125,41 @@ class TrialCard extends StatelessWidget {
     final colors = FarmTapTone.gold.of(context);
     return Material(
       color: colors.container,
-      borderRadius: context.radii.card,
+      borderRadius: context.radii.banner,
       child: InkWell(
         onTap: onUpgrade,
-        borderRadius: context.radii.card,
-        child: Padding(
-          padding: context.space.card,
+        borderRadius: context.radii.banner,
+        child: Container(
+          height: context.sizes.trialCardHeight,
+          padding: EdgeInsets.symmetric(horizontal: context.space.banner),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Row(
                 children: [
-                  Icon(Icons.savings_rounded, size: context.sizes.iconSm, color: colors.onContainer),
+                  Icon(Symbols.savings_rounded, fill: 1, size: context.sizes.iconSm, color: colors.onContainer),
                   context.space.gapSm,
                   Expanded(
                     child: Text(
                       l10n.trialDaysLeftShort(daysLeft),
-                      style: context.text.titleSmall?.copyWith(
-                        color: colors.onContainer,
-                        fontWeight: FarmTapWeights.bold,
-                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.text.labelMedium?.copyWith(color: colors.onContainer),
                     ),
                   ),
                 ],
               ),
               context.space.gapSm,
-              ClipRRect(
-                borderRadius: context.radii.badge,
-                child: LinearProgressIndicator(
-                  value: ((totalDays - daysLeft) / totalDays).clamp(0, 1),
-                  minHeight: context.sizes.progressBar,
-                  color: colors.accent,
-                  backgroundColor: context.colors.surfaceContainerHigh,
+              FarmTapProgress(value: (totalDays - daysLeft) / totalDays, thin: true, color: colors.accent),
+              context.space.gapSm,
+              Text(
+                l10n.trialUpgradeLine,
+                style: context.text.labelSmall?.copyWith(
+                  color: colors.onContainer,
+                  fontWeight: FarmTapWeights.semiBold,
                 ),
               ),
-              context.space.gapSm,
-              Text(l10n.trialUpgradeLine, style: context.text.labelMedium?.copyWith(color: colors.onContainer)),
             ],
           ),
         ),
@@ -183,8 +170,8 @@ class TrialCard extends StatelessWidget {
 
 enum SyncState { synced, pending, failed }
 
-/// Cloud icon in the top bar: green tick = synced, amber = waiting (with
-/// count), red = failed. Tap opens the sync sheet (D04).
+/// Cloud icon in the top bar (28, filled): success = synced, amber = waiting
+/// (with count), red = failed. Tap opens the sync sheet (D04).
 class SyncBadge extends StatelessWidget {
   const new({required this.state, super.key, this.pending = 0, this.onTap, this.showLabel = false});
 
@@ -197,10 +184,11 @@ class SyncBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final (icon, color, label) = switch (state) {
-      SyncState.synced => (Icons.cloud_done_rounded, context.status.synced, l10n.allRecordsSynced),
-      SyncState.pending => (Icons.cloud_upload_rounded, context.status.syncPending, l10n.recordsWaiting(pending)),
-      SyncState.failed => (Icons.cloud_off_rounded, context.status.syncFailed, l10n.syncFailedShort),
+      SyncState.synced => (Symbols.cloud_done_rounded, context.status.synced, l10n.allRecordsSynced),
+      SyncState.pending => (Symbols.cloud_upload_rounded, context.status.syncPending, l10n.recordsWaiting(pending)),
+      SyncState.failed => (Symbols.cloud_off_rounded, context.status.syncFailed, l10n.syncFailedShort),
     };
+    final iconSize = showLabel ? context.sizes.iconMd : context.sizes.iconLg;
     return Semantics(
       button: onTap != null,
       label: label,
@@ -214,59 +202,22 @@ class SyncBadge extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ExcludeSemantics(
-                child: Icon(icon, color: color, size: context.sizes.iconLg),
+                child: Icon(icon, fill: 1, color: color, size: iconSize),
               ),
               if (state == SyncState.pending && pending > 0 && !showLabel) ...[
                 context.space.gapXs,
-                Text(
-                  '$pending',
-                  style: context.text.labelLarge?.copyWith(color: color, fontWeight: FarmTapWeights.bold),
-                ),
+                Text('$pending', style: context.text.labelLarge?.copyWith(color: color)),
               ],
               if (showLabel) ...[
                 context.space.gapSm,
                 Flexible(
-                  child: Text(label, style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant)),
+                  child: Text(label, style: context.text.labelMedium?.copyWith(color: context.colors.onSurfaceVariant)),
                 ),
               ],
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-/// Icon + title + message row used inside dialogs and sheets.
-class IconHeading extends StatelessWidget {
-  const new({required this.icon, required this.title, super.key, this.message, this.tone = FarmTapTone.success});
-
-  final IconData icon;
-  final String title;
-  final String? message;
-  final FarmTapTone tone;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconBubble(icon: icon, tone: tone, size: context.sizes.avatarLg, iconSize: context.sizes.iconXl),
-        context.space.gapLg,
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: context.text.headlineSmall?.copyWith(fontWeight: FarmTapWeights.bold),
-        ),
-        if (message != null) ...[
-          context.space.gapSm,
-          Text(
-            message!,
-            textAlign: TextAlign.center,
-            style: context.text.bodyLarge?.copyWith(color: context.colors.onSurfaceVariant),
-          ),
-        ],
-      ],
     );
   }
 }

@@ -39,10 +39,8 @@ Future<void> pumpFarmTap(
       builder: (context, child) => FarmTapPlatform(
         isWeb: web,
         child: MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(textScale),
-            disableAnimations: disableAnimations,
-          ),
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: TextScaler.linear(textScale), disableAnimations: disableAnimations),
           child: child!,
         ),
       ),

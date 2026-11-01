@@ -10,7 +10,7 @@ Read this first, then `docs/ROADMAP.md`, `docs/THEME.md`, `docs/design/UX_SPEC.m
 4. **Low-literacy design.** Numbers, icons, photos, read-back confirmation, voice prompts; no long sentences.
 5. **Free trial, then pay.** 14 days free, then UGX 70,000/month. Read-only after the trial.
 6. **Theme tokens only** (section 3 below). Enforced by `test/core/theme/theme_guard_test.dart`.
-7. **No phone-number OTP.** Sign-in is Google, Apple or email only.
+7. **No phone-number sign-in or OTP.** Sign-in is Google, Apple or email only (ROADMAP binding rule 12). Staff unlock with NFC card + PIN (C01-C04).
 8. **No personal data to AI services** (names, phone numbers, exact locations).
 9. AI-generated code is reviewed line by line. Do not ship code you do not understand.
 
@@ -25,7 +25,7 @@ Read this first, then `docs/ROADMAP.md`, `docs/THEME.md`, `docs/design/UX_SPEC.m
 - DI: `get_it`, manual registration in `lib/app/di/injection.dart`. While `useFakeData` is true, register the fake repositories; real Isar/Firebase repositories replace them later without touching the UI.
 - Every record has base fields: `id` (UUID v4), `tenantId`, `createdAt`, `updatedAt`, `createdBy`, `updatedBy`, `deviceId`, `syncStatus`, `isDeleted`.
 - All user-facing strings go in `lib/core/l10n/app_en.arb` (English) and `app_nyn.arb` (Runyankore; for now `"[nyn] "` + the English text). `tool/add_arb.py strings.json` adds a key to both. Then `flutter gen-l10n`.
-- Do not add packages that are not in ROADMAP section 4 without asking.
+- Do not add packages that are not in ROADMAP section 4 without asking. Exception: `material_symbols_icons` (approved in `docs/UI_REBUILD_PROMPT.md` section 2).
 
 ## 3. Theme rules (ROADMAP section 6, `docs/AGENT_THEME_RULES.md`)
 - Import styling only via `package:farm_tap/core/theme/theme.dart`.
@@ -52,18 +52,27 @@ Every screen has an ID (A01 ... P06), listed with notes in `docs/design/README.m
 
 `docs/design/screens/<phone|tablet|web_desktop|web_mobile>/<light|dark>/<ID>_<name>.png`
 
-Example: `docs/design/screens/phone/light/F03_milk_keypad.png`. Section contact sheets are in `docs/design/overview/`. Mockups define layout, order, icons (Material Symbols Rounded -> `Icons.<name>_rounded`), copy and sample data; colours, sizes, spacing and fonts come from tokens, never from measuring pixels. Overlays (sheets, dialogs, toasts, celebrations) are states of a screen. Google/Apple sign-in buttons are placeholders (normal outlined buttons, TODO for official branding).
+Example: `docs/design/screens/phone/light/F03_milk_keypad.png`. Section contact sheets are in `docs/design/overview/`. Mockups define layout, order, icons (Material Symbols Rounded -> `Symbols.<name>` from `material_symbols_icons`, `fill: 1` where the mockup shows a filled icon), copy and sample data; colours, sizes, spacing and fonts come from tokens, never from measuring pixels. Overlays (sheets, dialogs, toasts, celebrations) are states of a screen. Google/Apple sign-in buttons are placeholders (normal outlined buttons, TODO for official branding).
 
 ## 6. Golden-test workflow (visual check)
-- `test/flutter_test_config.dart` loads Outfit and MaterialIcons so goldens show real text. `test/helpers/pump_app.dart` has `pumpFarmTap(tester, widget, size:, brightness:)`.
-- For each screen write goldens at 390x844 (phone) and 1440x900 (desktop), light and dark: `test/goldens/<ID>_<name>_<phone|desktop>_<light|dark>.png`.
-- `flutter test --update-goldens test/goldens`, then OPEN each golden next to its mockup, list the differences, fix, repeat until layout and content match.
+Full procedure: `docs/UI_REBUILD_PROMPT.md` (sections 1, 2 and 6).
+- `test/flutter_test_config.dart` loads Outfit, MaterialIcons and Material Symbols Rounded. `pumpFarmTap(tester, widget, size:, brightness:, web:)` is in `test/helpers/pump_app.dart`.
+- Every screen gets 8 goldens via `screenGoldens('<ID>_<name>', ...)` (`test/helpers/screen_golden.dart`): `test/goldens/<phone|tablet|web_desktop|web_mobile>/<light|dark>/<ID>_<name>.png`, sized as the mockup minus device chrome.
+- `flutter test --update-goldens test/goldens`, then `python3 tool/compare_mockups.py [IDs]` and OPEN `test/goldens/compare/<ff>/<mode>/<ID>.png`. Fix differences, repeat. Record scores and notes in `docs/design/PROGRESS.md`. Never mark a screen done without looking at its compare image.
 
-## 7. Definition of done for each section
-1. `flutter analyze`: 0 errors, 0 warnings (keep infos at 0 too).
+## 7. Definition of done and checkpoints
+For each section:
+1. `flutter analyze`: 0 errors, 0 warnings, 0 infos.
 2. `flutter test` passes, including the theme guard and goldens.
-3. Commit `feat(ui): <section> screens <IDs>`.
-4. **STOP and report:** screens done, golden paths, differences you could not match and why, any token you added. **Wait for the user's "continue"** before the next section.
+3. Commit `feat(ui): <section> <IDs> match mockups`, update PROGRESS.md, post a short report (screens done, anything not matched and why, tokens added).
+
+Checkpoints (STOP and wait for the user's "continue"):
+- After the UI kit rebuild and `/dev/gallery` goldens: show gallery compare images (phone light, desktop dark) and list every token added or changed.
+- After Section A (A01-A07).
+- After Section D (D01-D06).
+- From Section E to P: do not wait; report after each section and continue.
+
+Stop early only if blocked, if a mockup conflicts with the roadmap, or if a screen cannot get close to its mockup after 3 fix attempts.
 
 ## 8. Do not
 - Connect Firebase (do not initialise it), Isar writes, SMS, payments or NFC hardware in the UI phase (NFC: a "Simulate tap" button in debug builds).

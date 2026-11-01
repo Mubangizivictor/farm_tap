@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
@@ -38,9 +39,7 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.addAnimal),
-      ),
+      appBar: AppBar(title: Text(l10n.addAnimal)),
       body: SingleChildScrollView(
         padding: context.space.sheet,
         child: Column(
@@ -65,10 +64,7 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
               decoration: InputDecoration(labelText: l10n.sex),
               items: [
                 DropdownMenuItem(value: AnimalSex.male, child: Text(l10n.male)),
-                DropdownMenuItem(
-                  value: AnimalSex.female,
-                  child: Text(l10n.female),
-                ),
+                DropdownMenuItem(value: AnimalSex.female, child: Text(l10n.female)),
               ],
               onChanged: (val) => setState(() => _sex = val!),
             ),

@@ -61,5 +61,11 @@
   "settings": "[nyn] Settings",
   "isThisCorrect": "[nyn] Is this correct?",
   "yesSave": "[nyn] Yes, save",
-  "noChangeIt": "[nyn] No, change it"
+  "noChangeIt": "[nyn] No, change it",
+  "skip": "[nyn] Skip",
+  "menu": "[nyn] Menu",
+  "seeAll": "[nyn] See all",
+  "profile": "[nyn] Profile",
+  "comingSoon": "[nyn] Coming soon",
+  "farmRoleLine": "[nyn] {place} · {role}"
 }

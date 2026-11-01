@@ -5,7 +5,6 @@ part 'animal_model.g.dart';
 
 @collection
 class AnimalModel {
-
   new();
 
   new fromEntity(Animal animal) {

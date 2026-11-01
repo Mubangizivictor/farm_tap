@@ -9,12 +9,7 @@ import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 import 'package:isar_community/isar.dart';
 
 class HerdRepositoryImpl implements HerdRepository {
-  new({
-    required this.isar,
-    required this.idGenerator,
-    required this.clock,
-    required this.tenantProvider,
-  });
+  new({required this.isar, required this.idGenerator, required this.clock, required this.tenantProvider});
 
   final Isar isar;
   final IdGenerator idGenerator;
@@ -36,12 +31,7 @@ class HerdRepositoryImpl implements HerdRepository {
 
   @override
   Stream<Result<List<Animal>>> watchAnimals() {
-    return isar.animalModels
-        .where()
-        .filter()
-        .isDeletedEqualTo(false)
-        .watch(fireImmediately: true)
-        .map((models) {
+    return isar.animalModels.where().filter().isDeletedEqualTo(false).watch(fireImmediately: true).map((models) {
       try {
         final entities = models.map((m) => m.toEntity()).toList();
         return Result.success(entities);

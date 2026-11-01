@@ -21,36 +21,23 @@ class SignInPage extends StatelessWidget {
               const Spacer(),
               Center(
                 child: Image.asset(
-                  FarmTapAssets.byBrightness(
-                    context,
-                    FarmTapAssets.signInLogoLight,
-                    FarmTapAssets.signInLogoDark,
-                  ),
+                  FarmTapAssets.byBrightness(context, FarmTapAssets.signInLogoLight, FarmTapAssets.signInLogoDark),
                   width: 200,
                 ),
               ),
               const Spacer(),
               TextField(
-                decoration: InputDecoration(
-                  labelText: l10n.phone,
-                  prefixIcon: const Icon(Icons.phone),
-                ),
+                decoration: InputDecoration(labelText: l10n.phone, prefixIcon: const Icon(Icons.phone)),
                 keyboardType: TextInputType.phone,
               ),
               context.space.gapLg,
               TextField(
-                decoration: InputDecoration(
-                  labelText: l10n.pin,
-                  prefixIcon: const Icon(Icons.lock),
-                ),
+                decoration: InputDecoration(labelText: l10n.pin, prefixIcon: const Icon(Icons.lock)),
                 keyboardType: TextInputType.number,
                 obscureText: true,
               ),
               context.space.gapXxl,
-              FilledButton(
-                onPressed: () => context.go(AppRoutes.home),
-                child: Text(l10n.signIn),
-              ),
+              FilledButton(onPressed: () => context.go(AppRoutes.home), child: Text(l10n.signIn)),
               context.space.gapLg,
               OutlinedButton.icon(
                 onPressed: () => context.go(AppRoutes.home),

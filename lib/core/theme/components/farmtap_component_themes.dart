@@ -50,9 +50,9 @@ abstract final class FarmTapComponentThemes {
     backgroundColor: t.colors.surfaceContainer,
     indicatorColor: t.colors.primaryContainer,
     labelTextStyle: WidgetStateProperty.resolveWith(
-      (states) => t.text.labelMedium?.copyWith(
-        color: states.contains(WidgetState.selected) ? t.colors.onSurface : t.colors.onSurfaceVariant,
-      ),
+      (states) => states.contains(WidgetState.selected)
+          ? t.text.labelSmall?.copyWith(color: t.colors.onSurface, fontWeight: FarmTapWeights.semiBold)
+          : t.text.labelSmall?.copyWith(color: t.colors.onSurfaceVariant),
     ),
     iconTheme: WidgetStateProperty.resolveWith(
       (states) => IconThemeData(
@@ -107,8 +107,11 @@ abstract final class FarmTapComponentThemes {
     foregroundColor: t.colors.onPrimary,
     iconSize: t.sizes.iconLg,
     sizeConstraints: BoxConstraints.tightFor(width: t.sizes.fab, height: t.sizes.fab),
-    extendedSizeConstraints: BoxConstraints(minHeight: t.sizes.fab),
+    extendedSizeConstraints: BoxConstraints.tightFor(height: t.sizes.fab),
     extendedTextStyle: t.textStyles.button,
+    extendedIconLabelSpacing: t.space.md,
+    extendedPadding: EdgeInsetsDirectional.only(start: t.space.fabIcon, end: t.space.xl),
+    elevation: 2,
     shape: RoundedRectangleBorder(borderRadius: t.radii.fab),
   );
 
@@ -122,26 +125,35 @@ abstract final class FarmTapComponentThemes {
       filled: true,
       fillColor: t.colors.surfaceContainerLowest,
       contentPadding: t.space.input,
+      constraints: BoxConstraints(minHeight: t.sizes.inputHeight),
       labelStyle: t.text.bodyLarge?.copyWith(color: t.colors.onSurfaceVariant),
-      floatingLabelStyle: t.text.bodyMedium?.copyWith(color: t.colors.primary),
+      floatingLabelStyle: WidgetStateTextStyle.resolveWith(
+        (states) => t.text.labelSmall!.copyWith(
+          color: states.contains(WidgetState.error)
+              ? t.colors.error
+              : states.contains(WidgetState.focused)
+              ? t.colors.primary
+              : t.colors.onSurfaceVariant,
+        ),
+      ),
       hintStyle: t.text.bodyLarge?.copyWith(color: t.colors.onSurfaceVariant),
       helperStyle: t.text.bodySmall,
       errorStyle: t.text.bodySmall?.copyWith(color: t.colors.error),
       prefixIconColor: t.colors.onSurfaceVariant,
       suffixIconColor: t.colors.onSurfaceVariant,
-      border: border(t.colors.outline, t.sizes.borderThin),
-      enabledBorder: border(t.colors.outline, t.sizes.borderThin),
-      disabledBorder: border(t.colors.outlineVariant, t.sizes.borderThin),
+      border: border(t.colors.outline, t.sizes.borderInput),
+      enabledBorder: border(t.colors.outline, t.sizes.borderInput),
+      disabledBorder: border(t.colors.outlineVariant, t.sizes.borderInput),
       focusedBorder: border(t.colors.primary, t.sizes.focusRing),
-      errorBorder: border(t.colors.error, t.sizes.borderMedium),
+      errorBorder: border(t.colors.error, t.sizes.focusRing),
       focusedErrorBorder: border(t.colors.error, t.sizes.focusRing),
     );
   }
 
   // ---------------- Containers ----------------
   static CardThemeData card(FarmTapTokens t) => CardThemeData(
-    color: t.colors.surfaceContainerLowest,
-    surfaceTintColor: t.colors.surfaceTint,
+    color: t.status.card,
+    surfaceTintColor: Colors.transparent,
     elevation: 0,
     margin: EdgeInsets.zero,
     shape: RoundedRectangleBorder(
@@ -152,38 +164,42 @@ abstract final class FarmTapComponentThemes {
 
   static ListTileThemeData listTile(FarmTapTokens t) => ListTileThemeData(
     contentPadding: t.space.listItem,
-    minVerticalPadding: t.space.md,
-    minTileHeight: t.sizes.actionTile,
+    minVerticalPadding: t.space.sm,
+    minTileHeight: t.sizes.listTile,
     horizontalTitleGap: t.space.md,
-    titleTextStyle: t.text.titleMedium,
-    subtitleTextStyle: t.text.bodyMedium?.copyWith(color: t.colors.onSurfaceVariant),
-    leadingAndTrailingTextStyle: t.text.labelLarge,
+    titleTextStyle: t.text.titleSmall,
+    subtitleTextStyle: t.text.bodySmall?.copyWith(color: t.colors.onSurfaceVariant),
+    leadingAndTrailingTextStyle: t.text.titleSmall,
     iconColor: t.colors.primary,
     shape: RoundedRectangleBorder(borderRadius: t.radii.card),
   );
 
   static DialogThemeData dialog(FarmTapTokens t) => DialogThemeData(
-    backgroundColor: t.colors.surfaceContainerHigh,
-    surfaceTintColor: t.colors.surfaceTint,
+    backgroundColor: t.colors.surfaceContainerLow,
+    surfaceTintColor: Colors.transparent,
+    barrierColor: t.status.scrim,
+    insetPadding: EdgeInsets.all(t.space.lg),
     shape: t.radii.dialogShape,
-    titleTextStyle: t.text.headlineSmall,
-    contentTextStyle: t.text.bodyLarge,
+    titleTextStyle: t.text.titleLarge,
+    contentTextStyle: t.text.bodyMedium,
     actionsPadding: EdgeInsets.fromLTRB(t.space.xl, 0, t.space.xl, t.space.xl),
   );
 
   static BottomSheetThemeData bottomSheet(FarmTapTokens t) => BottomSheetThemeData(
     backgroundColor: t.colors.surfaceContainerLow,
-    surfaceTintColor: t.colors.surfaceTint,
+    surfaceTintColor: Colors.transparent,
     modalBackgroundColor: t.colors.surfaceContainerLow,
+    modalBarrierColor: t.status.scrim,
     shape: t.radii.sheetShape,
     showDragHandle: true,
     dragHandleColor: t.colors.outline,
+    dragHandleSize: Size(t.sizes.sheetHandleWidth, t.sizes.sheetHandleHeight),
   );
 
   static SnackBarThemeData snackBar(FarmTapTokens t) => SnackBarThemeData(
     behavior: SnackBarBehavior.floating,
     backgroundColor: t.colors.inverseSurface,
-    contentTextStyle: t.text.bodyLarge?.copyWith(color: t.colors.onInverseSurface),
+    contentTextStyle: t.text.bodyMedium?.copyWith(color: t.colors.onInverseSurface),
     actionTextColor: t.colors.inversePrimary,
     shape: RoundedRectangleBorder(borderRadius: t.radii.snackBar),
     insetPadding: t.space.screen,
@@ -191,7 +207,10 @@ abstract final class FarmTapComponentThemes {
 
   static ChipThemeData chip(FarmTapTokens t) => ChipThemeData(
     labelStyle: t.text.labelMedium,
-    padding: EdgeInsets.symmetric(horizontal: t.space.sm, vertical: t.space.xs),
+    padding: EdgeInsets.symmetric(horizontal: t.space.sm),
+    backgroundColor: t.colors.surfaceContainerLowest,
+    selectedColor: t.colors.secondaryContainer,
+    checkmarkColor: t.colors.onSecondaryContainer,
     shape: RoundedRectangleBorder(borderRadius: t.radii.chip),
     side: BorderSide(color: t.colors.outlineVariant, width: t.sizes.borderThin),
     iconTheme: IconThemeData(size: t.sizes.iconSm, color: t.colors.onSurfaceVariant),
@@ -199,7 +218,7 @@ abstract final class FarmTapComponentThemes {
 
   static TooltipThemeData tooltip(FarmTapTokens t) => TooltipThemeData(
     textStyle: t.text.bodyMedium?.copyWith(color: t.colors.onInverseSurface),
-    decoration: BoxDecoration(color: t.colors.inverseSurface, borderRadius: t.radii.chip),
+    decoration: BoxDecoration(color: t.colors.inverseSurface, borderRadius: t.radii.tooltip),
     padding: EdgeInsets.symmetric(horizontal: t.space.md, vertical: t.space.sm),
   );
 
@@ -208,8 +227,8 @@ abstract final class FarmTapComponentThemes {
 
   static ProgressIndicatorThemeData progress(FarmTapTokens t) => ProgressIndicatorThemeData(
     color: t.colors.primary,
-    linearTrackColor: t.colors.primaryContainer,
-    circularTrackColor: t.colors.primaryContainer,
+    linearTrackColor: t.colors.surfaceContainerHigh,
+    circularTrackColor: t.colors.surfaceContainerHigh,
   );
 
   static IconThemeData icon(FarmTapTokens t) => IconThemeData(color: t.colors.onSurface, size: t.sizes.iconMd);
