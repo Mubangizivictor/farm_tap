@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="FarmTap mark">
+<title>FarmTap mark</title>
+
+<circle cx="60.00" cy="16.00" r="5.00" fill="#FFFFFF"/>
+<circle cx="82.00" cy="21.89" r="5.00" fill="#FFFFFF"/>
+<circle cx="98.11" cy="38.00" r="5.00" fill="#FFFFFF"/>
+<circle cx="104.00" cy="60.00" r="5.00" fill="#FFFFFF"/>
+<circle cx="98.11" cy="82.00" r="5.00" fill="#FFFFFF"/>
+<circle cx="82.00" cy="98.11" r="5.00" fill="#FFFFFF"/>
+<circle cx="60.00" cy="104.00" r="5.00" fill="#FFFFFF"/>
+<circle cx="38.00" cy="98.11" r="5.00" fill="#FFFFFF"/>
+<circle cx="21.89" cy="82.00" r="5.00" fill="#FFFFFF"/>
+<circle cx="16.00" cy="60.00" r="5.00" fill="#FFFFFF"/>
+<circle cx="21.89" cy="38.00" r="5.00" fill="#FFFFFF"/>
+<circle cx="38.00" cy="21.89" r="5.00" fill="#FFFFFF"/>
+<circle cx="60.00" cy="60.00" r="26.00" fill="none" stroke="#FFFFFF" stroke-width="4.00"/>
+<circle cx="60.00" cy="60.00" r="13.00" fill="#FFFFFF"/>
+</svg>

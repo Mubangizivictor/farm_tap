@@ -1,0 +1,11 @@
+<!-- Add inside <application> in android/app/src/main/AndroidManifest.xml -->
+<!-- Launcher icons (already default in Flutter projects): -->
+<!--   android:icon="@mipmap/ic_launcher"  android:roundIcon="@mipmap/ic_launcher_round" -->
+
+<!-- Firebase Cloud Messaging: FarmTap notification icon and colour -->
+<meta-data
+    android:name="com.google.firebase.messaging.default_notification_icon"
+    android:resource="@drawable/ic_stat_farmtap" />
+<meta-data
+    android:name="com.google.firebase.messaging.default_notification_color"
+    android:resource="@color/farmtap_notification_accent" />

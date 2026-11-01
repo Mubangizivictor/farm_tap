@@ -1,0 +1,71 @@
+name: farm_tap
+description: "FarmTap — farm and produce-collection records for Western Uganda."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  flutter_bloc: ^8.1.6
+  bloc: ^8.1.2
+  equatable: ^2.0.5
+  go_router: ^14.0.0
+  get_it: ^7.7.0
+
+  freezed_annotation: any
+  json_annotation: any
+
+  isar_community: ^3.4.1
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.1.2
+
+  uuid: ^4.3.3
+  intl: any
+  logger: ^2.3.0
+  flutter_svg: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: any
+  build_runner: any
+  freezed: any
+  json_serializable: any
+  isar_community_generator: ^3.4.1
+  bloc_test: any
+  mocktail: any
+  flutter_native_splash: ^2.4.8
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/branding/
+    - assets/branding/svg/
+    - assets/animations/
+    - assets/icon/
+    - assets/splash/
+
+  fonts:
+    - family: Outfit
+      fonts:
+        - asset: assets/fonts/Outfit/Outfit-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Outfit/Outfit-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Outfit/Outfit-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Outfit/Outfit-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Outfit/Outfit-ExtraBold.ttf
+          weight: 800
