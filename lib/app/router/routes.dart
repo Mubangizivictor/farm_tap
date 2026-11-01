@@ -30,6 +30,11 @@ abstract final class AppRoutes {
   static const home = '/home';
   static const homeAlerts = '/home/alerts';
   static const herd = '/herd';
+  static const herdAdd = '/herd/add';
+  static const herdScan = '/herd/scan';
+  static const herdCount = '/herd/count';
+  static const herdLabels = '/herd/labels';
+  static String herdAnimal(String id) => '/herd/$id';
   static const milk = '/milk';
   static const health = '/health';
   static const more = '/more';

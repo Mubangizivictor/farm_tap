@@ -990,4 +990,404 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String get dairyMeal => '[nyn] Dairy meal';
+
+  @override
+  String animalsCount(int count) {
+    return '[nyn] $count animals';
+  }
+
+  @override
+  String get scanTag => '[nyn] Scan ear tag';
+
+  @override
+  String get filter => '[nyn] Filter';
+
+  @override
+  String get searchAnimals => '[nyn] Search by name or tag number';
+
+  @override
+  String get statusMilking => '[nyn] Milking';
+
+  @override
+  String get statusDry => '[nyn] Dry';
+
+  @override
+  String get statusTreated => '[nyn] Treated';
+
+  @override
+  String get statusPregnant => '[nyn] Pregnant';
+
+  @override
+  String get statusHeifer => '[nyn] Heifer';
+
+  @override
+  String get statusCalf => '[nyn] Calf';
+
+  @override
+  String get statusBull => '[nyn] Bull';
+
+  @override
+  String get filterCalves => '[nyn] Calves';
+
+  @override
+  String tagAndBreedAge(String tag, String breed, int age) {
+    return '[nyn] $tag · $breed · $age yrs';
+  }
+
+  @override
+  String breedAge(String breed, int age) {
+    return '[nyn] $breed · $age yrs';
+  }
+
+  @override
+  String get colAnimal => '[nyn] Animal';
+
+  @override
+  String get colTag => '[nyn] Tag';
+
+  @override
+  String get colBreedAge => '[nyn] Breed & age';
+
+  @override
+  String get colStatus => '[nyn] Status';
+
+  @override
+  String get colMilkToday => '[nyn] Milk today';
+
+  @override
+  String get notForSale => '[nyn] Not for sale';
+
+  @override
+  String get addAnimal2 => '[nyn] Add animal';
+
+  @override
+  String get filterAnimals => '[nyn] Filter animals';
+
+  @override
+  String get statusLabel => '[nyn] Status';
+
+  @override
+  String get groupLabel => '[nyn] Group';
+
+  @override
+  String get sortBy => '[nyn] Sort by';
+
+  @override
+  String get sortName => '[nyn] Name';
+
+  @override
+  String get sortTag => '[nyn] Tag';
+
+  @override
+  String get sortMilk => '[nyn] Milk';
+
+  @override
+  String get clear => '[nyn] Clear';
+
+  @override
+  String showAnimals(int count) {
+    return '[nyn] Show $count animals';
+  }
+
+  @override
+  String get calfPen => '[nyn] Calf pen';
+
+  @override
+  String get animalTitle => '[nyn] Animal';
+
+  @override
+  String get printLabels => '[nyn] Print ear-tag labels';
+
+  @override
+  String get edit => '[nyn] Edit';
+
+  @override
+  String animalHeaderLine(String tag, String breed, String kind, int age) {
+    return '[nyn] $tag · $breed · $kind · $age yrs';
+  }
+
+  @override
+  String get kindCow => '[nyn] Cow';
+
+  @override
+  String get kindHeifer => '[nyn] Heifer';
+
+  @override
+  String get kindBull => '[nyn] Bull';
+
+  @override
+  String get kindCalf => '[nyn] Calf';
+
+  @override
+  String get treatedNotForSale => '[nyn] Treated — milk not for sale';
+
+  @override
+  String notForSaleUntil(String date) {
+    return '[nyn] Milk not for sale until $date';
+  }
+
+  @override
+  String withdrawalBody(String drug, int days) {
+    return '[nyn] $drug withdrawal: $days days left. Milk is recorded as \'not for sale\'.';
+  }
+
+  @override
+  String get avgMilkDay => '[nyn] Avg milk / day';
+
+  @override
+  String get daysInMilk => '[nyn] Days in milk';
+
+  @override
+  String get pregnancy => '[nyn] Pregnancy';
+
+  @override
+  String get pregnancyCheck => '[nyn] Check';
+
+  @override
+  String dueDate(String date) {
+    return '[nyn] Due $date';
+  }
+
+  @override
+  String get tabTimeline => '[nyn] Timeline';
+
+  @override
+  String get tabMilk => '[nyn] Milk';
+
+  @override
+  String get tabHealth => '[nyn] Health';
+
+  @override
+  String get tabBreeding => '[nyn] Breeding';
+
+  @override
+  String get record => '[nyn] Record';
+
+  @override
+  String evTreatment(String drug) {
+    return '[nyn] $drug treatment';
+  }
+
+  @override
+  String evTreatmentSub(String reason, String vet, String date) {
+    return '[nyn] $reason · $vet · safe from $date';
+  }
+
+  @override
+  String evMilk(String litres) {
+    return '[nyn] Milk $litres L';
+  }
+
+  @override
+  String evMilkSub(String am, String pm) {
+    return '[nyn] AM $am · PM $pm';
+  }
+
+  @override
+  String evServed(String method) {
+    return '[nyn] Served — $method';
+  }
+
+  @override
+  String evServedSub(String straw, String by) {
+    return '[nyn] Straw: $straw · $by';
+  }
+
+  @override
+  String evVaccination(String name) {
+    return '[nyn] $name vaccination';
+  }
+
+  @override
+  String evBatch(String batch) {
+    return '[nyn] Batch $batch';
+  }
+
+  @override
+  String get today => '[nyn] Today';
+
+  @override
+  String get yesterday => '[nyn] Yesterday';
+
+  @override
+  String get noEventsYet => '[nyn] Nothing recorded here yet';
+
+  @override
+  String get addPhoto => '[nyn] Add photo';
+
+  @override
+  String get tagNumberLabel => '[nyn] Tag number';
+
+  @override
+  String get breedLabel => '[nyn] Breed';
+
+  @override
+  String get dobLabel => '[nyn] Date of birth';
+
+  @override
+  String get sexLabel => '[nyn] Sex';
+
+  @override
+  String get sexCowHeifer => '[nyn] Cow / heifer';
+
+  @override
+  String get nationalTagLabel => '[nyn] National livestock tag number';
+
+  @override
+  String get motherOptional => '[nyn] Mother (optional)';
+
+  @override
+  String get saveAnimal => '[nyn] Save animal';
+
+  @override
+  String animalSaved(String name) {
+    return '[nyn] $name added to the herd';
+  }
+
+  @override
+  String get tagRequired => '[nyn] Enter the tag number.';
+
+  @override
+  String get pointAtQr => '[nyn] Point at the QR code on the ear tag';
+
+  @override
+  String get torch => '[nyn] Torch';
+
+  @override
+  String get typeTagInstead => '[nyn] Type tag number instead';
+
+  @override
+  String recordFor(String name) {
+    return '[nyn] Record for $name';
+  }
+
+  @override
+  String get whatHappened => '[nyn] What happened?';
+
+  @override
+  String get evKindMilk => '[nyn] Milk';
+
+  @override
+  String get evKindTreatment => '[nyn] Treatment';
+
+  @override
+  String get evKindHeat => '[nyn] Heat / service';
+
+  @override
+  String get evKindCalving => '[nyn] Calving';
+
+  @override
+  String get evKindSold => '[nyn] Sold';
+
+  @override
+  String get evKindDied => '[nyn] Died';
+
+  @override
+  String get welcomeLittleOne => '[nyn] Welcome, little one!';
+
+  @override
+  String calfBornBody(String mother, String tag) {
+    return '[nyn] $mother had a heifer calf. We added her to your herd as $tag.';
+  }
+
+  @override
+  String get mother => '[nyn] Mother';
+
+  @override
+  String get born => '[nyn] Born';
+
+  @override
+  String get calf => '[nyn] Calf';
+
+  @override
+  String todayAt(String time) {
+    return '[nyn] Today $time';
+  }
+
+  @override
+  String heiferTag(String tag) {
+    return '[nyn] Heifer · $tag';
+  }
+
+  @override
+  String get nameTheCalf => '[nyn] Name the calf';
+
+  @override
+  String recordDeathTitle(String name) {
+    return '[nyn] Record $name as dead?';
+  }
+
+  @override
+  String get recordDeathBody =>
+      '[nyn] She will move to \'Past animals\'. Her records are kept. This is sent to the owner\'s daily report.';
+
+  @override
+  String get causeHint => '[nyn] e.g. East Coast Fever';
+
+  @override
+  String get causeLabel => '[nyn] Cause (optional)';
+
+  @override
+  String get yesRecordDeath => '[nyn] Yes, record death';
+
+  @override
+  String get headCount => '[nyn] Head count';
+
+  @override
+  String get totalAnimals => '[nyn] Total animals';
+
+  @override
+  String get milkingCows => '[nyn] Milking cows';
+
+  @override
+  String get dryCows => '[nyn] Dry cows';
+
+  @override
+  String get heifers => '[nyn] Heifers';
+
+  @override
+  String get calves => '[nyn] Calves';
+
+  @override
+  String get bulls => '[nyn] Bulls';
+
+  @override
+  String get thisMonth => '[nyn] This month';
+
+  @override
+  String get bornCount => '[nyn] Born';
+
+  @override
+  String get bought => '[nyn] Bought';
+
+  @override
+  String get sold => '[nyn] Sold';
+
+  @override
+  String get died => '[nyn] Died';
+
+  @override
+  String labelsSelected(int count) {
+    return '[nyn] $count labels selected';
+  }
+
+  @override
+  String get labelsHint =>
+      '[nyn] Print on sticker paper and fix to the ear tags.';
+
+  @override
+  String get sharePdf => '[nyn] Share PDF';
+
+  @override
+  String get print => '[nyn] Print';
+
+  @override
+  String get emptyHerdTitle => '[nyn] No cows yet';
+
+  @override
+  String get emptyHerdBody =>
+      '[nyn] Add your first cow to start recording milk.';
+
+  @override
+  String get noMatches => '[nyn] No animals match this filter.';
 }

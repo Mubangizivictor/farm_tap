@@ -5,6 +5,7 @@ import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/id_generator.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/models/animal_model.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
+import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 import 'package:isar_community/isar.dart';
 
@@ -40,4 +41,35 @@ class HerdRepositoryImpl implements HerdRepository {
       }
     });
   }
+
+  // Herd views and records beyond add/watch come with the backend phase
+  // (useFakeData = true until then).
+  static const _later = UnexpectedFailure('Not available until the backend phase');
+
+  @override
+  Future<Result<List<HerdRow>>> rows() async => const Result.failure(_later);
+
+  @override
+  Future<Result<HerdCounts>> counts() async => const Result.failure(_later);
+
+  @override
+  Future<Result<AnimalDetail?>> detail(String animalId) async => const Result.failure(_later);
+
+  @override
+  Future<Result<Animal?>> findByTag(String tag) async => const Result.failure(_later);
+
+  @override
+  List<String> get groups => const [];
+
+  @override
+  List<String> get breeds => const [];
+
+  @override
+  Future<Result<String>> nextTag() async => const Result.failure(_later);
+
+  @override
+  Future<Result<void>> recordDeath(String animalId, {String? cause}) async => const Result.failure(_later);
+
+  @override
+  Future<Result<Animal>> recordCalving(String motherId, {required DateTime at}) async => const Result.failure(_later);
 }

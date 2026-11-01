@@ -105,16 +105,19 @@ class FarmTapButton extends StatelessWidget {
 /// Two buttons: side by side when the width is at least 420, else stacked
 /// with a 12 gap ([first] on top).
 class ButtonPair extends StatelessWidget {
-  const new({required this.first, required this.second, super.key});
+  const new({required this.first, required this.second, super.key, this.forceRow = false});
 
   final Widget first;
   final Widget second;
+
+  /// Side by side even on narrow widths (short labels: Clear / Show).
+  final bool forceRow;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth >= context.sizes.buttonPairMinWidth) {
+        if (forceRow || constraints.maxWidth >= context.sizes.buttonPairMinWidth) {
           return Row(
             children: [
               Expanded(child: first),

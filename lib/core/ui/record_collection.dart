@@ -65,8 +65,8 @@ class _RecordCollectionState<T> extends State<RecordCollection<T>> {
           children: [
             for (var i = 0; i < items.length; i++) ...[
               if (i > 0) Divider(height: context.sizes.divider, indent: context.sizes.listTile),
-              Semantics(
-                button: widget.onTap != null,
+              // One labelled button per row: the tile's text merges into it.
+              MergeSemantics(
                 child: InkWell(
                   onTap: widget.onTap == null ? null : () => widget.onTap!(items[i]),
                   child: widget.tileBuilder(context, items[i]),

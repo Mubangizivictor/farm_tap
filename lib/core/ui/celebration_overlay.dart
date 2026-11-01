@@ -22,6 +22,7 @@ Future<CelebrationAction?> showCelebration(
   String? message,
   IconData? primaryIcon,
   String? secondaryLabel,
+  ButtonKind secondaryKind = ButtonKind.outlined,
   Widget? summary,
   bool autoAdvance = false,
   FarmTapSound sound = FarmTapSound.celebrate,
@@ -33,6 +34,7 @@ Future<CelebrationAction?> showCelebration(
     primaryLabel: primaryLabel,
     primaryIcon: primaryIcon,
     secondaryLabel: secondaryLabel,
+    secondaryKind: secondaryKind,
     summary: summary,
     autoAdvance: autoAdvance,
     sound: sound,
@@ -71,6 +73,7 @@ class CelebrationOverlay extends StatefulWidget {
     this.message,
     this.primaryIcon,
     this.secondaryLabel,
+    this.secondaryKind = ButtonKind.outlined,
     this.summary,
     this.autoAdvance = false,
     this.sound = FarmTapSound.celebrate,
@@ -83,6 +86,9 @@ class CelebrationOverlay extends StatefulWidget {
   final String primaryLabel;
   final IconData? primaryIcon;
   final String? secondaryLabel;
+
+  /// outlined (default) or text for a quiet "Done".
+  final ButtonKind secondaryKind;
 
   /// Optional summary card under the message (e.g. totals).
   final Widget? summary;
@@ -185,7 +191,7 @@ class _CelebrationOverlayState extends State<CelebrationOverlay> {
                     SizedBox(height: context.space.keyGap),
                     FarmTapButton(
                       label: widget.secondaryLabel!,
-                      kind: ButtonKind.outlined,
+                      kind: widget.secondaryKind,
                       onPressed: () => _finish(CelebrationAction.secondary),
                     ),
                   ],

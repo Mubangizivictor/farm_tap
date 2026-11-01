@@ -1861,6 +1861,708 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dairy meal'**
   String get dairyMeal;
+
+  /// No description provided for @animalsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} animals'**
+  String animalsCount(int count);
+
+  /// No description provided for @scanTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan ear tag'**
+  String get scanTag;
+
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// No description provided for @searchAnimals.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name or tag number'**
+  String get searchAnimals;
+
+  /// No description provided for @statusMilking.
+  ///
+  /// In en, this message translates to:
+  /// **'Milking'**
+  String get statusMilking;
+
+  /// No description provided for @statusDry.
+  ///
+  /// In en, this message translates to:
+  /// **'Dry'**
+  String get statusDry;
+
+  /// No description provided for @statusTreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Treated'**
+  String get statusTreated;
+
+  /// No description provided for @statusPregnant.
+  ///
+  /// In en, this message translates to:
+  /// **'Pregnant'**
+  String get statusPregnant;
+
+  /// No description provided for @statusHeifer.
+  ///
+  /// In en, this message translates to:
+  /// **'Heifer'**
+  String get statusHeifer;
+
+  /// No description provided for @statusCalf.
+  ///
+  /// In en, this message translates to:
+  /// **'Calf'**
+  String get statusCalf;
+
+  /// No description provided for @statusBull.
+  ///
+  /// In en, this message translates to:
+  /// **'Bull'**
+  String get statusBull;
+
+  /// No description provided for @filterCalves.
+  ///
+  /// In en, this message translates to:
+  /// **'Calves'**
+  String get filterCalves;
+
+  /// No description provided for @tagAndBreedAge.
+  ///
+  /// In en, this message translates to:
+  /// **'{tag} · {breed} · {age} yrs'**
+  String tagAndBreedAge(String tag, String breed, int age);
+
+  /// No description provided for @breedAge.
+  ///
+  /// In en, this message translates to:
+  /// **'{breed} · {age} yrs'**
+  String breedAge(String breed, int age);
+
+  /// No description provided for @colAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal'**
+  String get colAnimal;
+
+  /// No description provided for @colTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get colTag;
+
+  /// No description provided for @colBreedAge.
+  ///
+  /// In en, this message translates to:
+  /// **'Breed & age'**
+  String get colBreedAge;
+
+  /// No description provided for @colStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get colStatus;
+
+  /// No description provided for @colMilkToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk today'**
+  String get colMilkToday;
+
+  /// No description provided for @notForSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Not for sale'**
+  String get notForSale;
+
+  /// No description provided for @addAnimal2.
+  ///
+  /// In en, this message translates to:
+  /// **'Add animal'**
+  String get addAnimal2;
+
+  /// No description provided for @filterAnimals.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter animals'**
+  String get filterAnimals;
+
+  /// No description provided for @statusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get statusLabel;
+
+  /// No description provided for @groupLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get groupLabel;
+
+  /// No description provided for @sortBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get sortBy;
+
+  /// No description provided for @sortName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get sortName;
+
+  /// No description provided for @sortTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get sortTag;
+
+  /// No description provided for @sortMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk'**
+  String get sortMilk;
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// No description provided for @showAnimals.
+  ///
+  /// In en, this message translates to:
+  /// **'Show {count} animals'**
+  String showAnimals(int count);
+
+  /// No description provided for @calfPen.
+  ///
+  /// In en, this message translates to:
+  /// **'Calf pen'**
+  String get calfPen;
+
+  /// No description provided for @animalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal'**
+  String get animalTitle;
+
+  /// No description provided for @printLabels.
+  ///
+  /// In en, this message translates to:
+  /// **'Print ear-tag labels'**
+  String get printLabels;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @animalHeaderLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{tag} · {breed} · {kind} · {age} yrs'**
+  String animalHeaderLine(String tag, String breed, String kind, int age);
+
+  /// No description provided for @kindCow.
+  ///
+  /// In en, this message translates to:
+  /// **'Cow'**
+  String get kindCow;
+
+  /// No description provided for @kindHeifer.
+  ///
+  /// In en, this message translates to:
+  /// **'Heifer'**
+  String get kindHeifer;
+
+  /// No description provided for @kindBull.
+  ///
+  /// In en, this message translates to:
+  /// **'Bull'**
+  String get kindBull;
+
+  /// No description provided for @kindCalf.
+  ///
+  /// In en, this message translates to:
+  /// **'Calf'**
+  String get kindCalf;
+
+  /// No description provided for @treatedNotForSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Treated — milk not for sale'**
+  String get treatedNotForSale;
+
+  /// No description provided for @notForSaleUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk not for sale until {date}'**
+  String notForSaleUntil(String date);
+
+  /// No description provided for @withdrawalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{drug} withdrawal: {days} days left. Milk is recorded as \'not for sale\'.'**
+  String withdrawalBody(String drug, int days);
+
+  /// No description provided for @avgMilkDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg milk / day'**
+  String get avgMilkDay;
+
+  /// No description provided for @daysInMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Days in milk'**
+  String get daysInMilk;
+
+  /// No description provided for @pregnancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Pregnancy'**
+  String get pregnancy;
+
+  /// No description provided for @pregnancyCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check'**
+  String get pregnancyCheck;
+
+  /// No description provided for @dueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {date}'**
+  String dueDate(String date);
+
+  /// No description provided for @tabTimeline.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeline'**
+  String get tabTimeline;
+
+  /// No description provided for @tabMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk'**
+  String get tabMilk;
+
+  /// No description provided for @tabHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get tabHealth;
+
+  /// No description provided for @tabBreeding.
+  ///
+  /// In en, this message translates to:
+  /// **'Breeding'**
+  String get tabBreeding;
+
+  /// No description provided for @record.
+  ///
+  /// In en, this message translates to:
+  /// **'Record'**
+  String get record;
+
+  /// No description provided for @evTreatment.
+  ///
+  /// In en, this message translates to:
+  /// **'{drug} treatment'**
+  String evTreatment(String drug);
+
+  /// No description provided for @evTreatmentSub.
+  ///
+  /// In en, this message translates to:
+  /// **'{reason} · {vet} · safe from {date}'**
+  String evTreatmentSub(String reason, String vet, String date);
+
+  /// No description provided for @evMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk {litres} L'**
+  String evMilk(String litres);
+
+  /// No description provided for @evMilkSub.
+  ///
+  /// In en, this message translates to:
+  /// **'AM {am} · PM {pm}'**
+  String evMilkSub(String am, String pm);
+
+  /// No description provided for @evServed.
+  ///
+  /// In en, this message translates to:
+  /// **'Served — {method}'**
+  String evServed(String method);
+
+  /// No description provided for @evServedSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Straw: {straw} · {by}'**
+  String evServedSub(String straw, String by);
+
+  /// No description provided for @evVaccination.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} vaccination'**
+  String evVaccination(String name);
+
+  /// No description provided for @evBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch {batch}'**
+  String evBatch(String batch);
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// No description provided for @noEventsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing recorded here yet'**
+  String get noEventsYet;
+
+  /// No description provided for @addPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get addPhoto;
+
+  /// No description provided for @tagNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag number'**
+  String get tagNumberLabel;
+
+  /// No description provided for @breedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Breed'**
+  String get breedLabel;
+
+  /// No description provided for @dobLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of birth'**
+  String get dobLabel;
+
+  /// No description provided for @sexLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sex'**
+  String get sexLabel;
+
+  /// No description provided for @sexCowHeifer.
+  ///
+  /// In en, this message translates to:
+  /// **'Cow / heifer'**
+  String get sexCowHeifer;
+
+  /// No description provided for @nationalTagLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'National livestock tag number'**
+  String get nationalTagLabel;
+
+  /// No description provided for @motherOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Mother (optional)'**
+  String get motherOptional;
+
+  /// No description provided for @saveAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Save animal'**
+  String get saveAnimal;
+
+  /// No description provided for @animalSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} added to the herd'**
+  String animalSaved(String name);
+
+  /// No description provided for @tagRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the tag number.'**
+  String get tagRequired;
+
+  /// No description provided for @pointAtQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Point at the QR code on the ear tag'**
+  String get pointAtQr;
+
+  /// No description provided for @torch.
+  ///
+  /// In en, this message translates to:
+  /// **'Torch'**
+  String get torch;
+
+  /// No description provided for @typeTagInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Type tag number instead'**
+  String get typeTagInstead;
+
+  /// No description provided for @recordFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Record for {name}'**
+  String recordFor(String name);
+
+  /// No description provided for @whatHappened.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened?'**
+  String get whatHappened;
+
+  /// No description provided for @evKindMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk'**
+  String get evKindMilk;
+
+  /// No description provided for @evKindTreatment.
+  ///
+  /// In en, this message translates to:
+  /// **'Treatment'**
+  String get evKindTreatment;
+
+  /// No description provided for @evKindHeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Heat / service'**
+  String get evKindHeat;
+
+  /// No description provided for @evKindCalving.
+  ///
+  /// In en, this message translates to:
+  /// **'Calving'**
+  String get evKindCalving;
+
+  /// No description provided for @evKindSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get evKindSold;
+
+  /// No description provided for @evKindDied.
+  ///
+  /// In en, this message translates to:
+  /// **'Died'**
+  String get evKindDied;
+
+  /// No description provided for @welcomeLittleOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome, little one!'**
+  String get welcomeLittleOne;
+
+  /// No description provided for @calfBornBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{mother} had a heifer calf. We added her to your herd as {tag}.'**
+  String calfBornBody(String mother, String tag);
+
+  /// No description provided for @mother.
+  ///
+  /// In en, this message translates to:
+  /// **'Mother'**
+  String get mother;
+
+  /// No description provided for @born.
+  ///
+  /// In en, this message translates to:
+  /// **'Born'**
+  String get born;
+
+  /// No description provided for @calf.
+  ///
+  /// In en, this message translates to:
+  /// **'Calf'**
+  String get calf;
+
+  /// No description provided for @todayAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Today {time}'**
+  String todayAt(String time);
+
+  /// No description provided for @heiferTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Heifer · {tag}'**
+  String heiferTag(String tag);
+
+  /// No description provided for @nameTheCalf.
+  ///
+  /// In en, this message translates to:
+  /// **'Name the calf'**
+  String get nameTheCalf;
+
+  /// No description provided for @recordDeathTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Record {name} as dead?'**
+  String recordDeathTitle(String name);
+
+  /// No description provided for @recordDeathBody.
+  ///
+  /// In en, this message translates to:
+  /// **'She will move to \'Past animals\'. Her records are kept. This is sent to the owner\'s daily report.'**
+  String get recordDeathBody;
+
+  /// No description provided for @causeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. East Coast Fever'**
+  String get causeHint;
+
+  /// No description provided for @causeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cause (optional)'**
+  String get causeLabel;
+
+  /// No description provided for @yesRecordDeath.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, record death'**
+  String get yesRecordDeath;
+
+  /// No description provided for @headCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Head count'**
+  String get headCount;
+
+  /// No description provided for @totalAnimals.
+  ///
+  /// In en, this message translates to:
+  /// **'Total animals'**
+  String get totalAnimals;
+
+  /// No description provided for @milkingCows.
+  ///
+  /// In en, this message translates to:
+  /// **'Milking cows'**
+  String get milkingCows;
+
+  /// No description provided for @dryCows.
+  ///
+  /// In en, this message translates to:
+  /// **'Dry cows'**
+  String get dryCows;
+
+  /// No description provided for @heifers.
+  ///
+  /// In en, this message translates to:
+  /// **'Heifers'**
+  String get heifers;
+
+  /// No description provided for @calves.
+  ///
+  /// In en, this message translates to:
+  /// **'Calves'**
+  String get calves;
+
+  /// No description provided for @bulls.
+  ///
+  /// In en, this message translates to:
+  /// **'Bulls'**
+  String get bulls;
+
+  /// No description provided for @thisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get thisMonth;
+
+  /// No description provided for @bornCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Born'**
+  String get bornCount;
+
+  /// No description provided for @bought.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought'**
+  String get bought;
+
+  /// No description provided for @sold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get sold;
+
+  /// No description provided for @died.
+  ///
+  /// In en, this message translates to:
+  /// **'Died'**
+  String get died;
+
+  /// No description provided for @labelsSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} labels selected'**
+  String labelsSelected(int count);
+
+  /// No description provided for @labelsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Print on sticker paper and fix to the ear tags.'**
+  String get labelsHint;
+
+  /// No description provided for @sharePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Share PDF'**
+  String get sharePdf;
+
+  /// No description provided for @print.
+  ///
+  /// In en, this message translates to:
+  /// **'Print'**
+  String get print;
+
+  /// No description provided for @emptyHerdTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No cows yet'**
+  String get emptyHerdTitle;
+
+  /// No description provided for @emptyHerdBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first cow to start recording milk.'**
+  String get emptyHerdBody;
+
+  /// No description provided for @noMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No animals match this filter.'**
+  String get noMatches;
 }
 
 class _AppLocalizationsDelegate

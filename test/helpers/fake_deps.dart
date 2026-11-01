@@ -7,6 +7,7 @@ import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
+import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
 
 /// The mockups' "today": Saturday 7 Nov 2026, 6:52 am.
@@ -29,5 +30,6 @@ Future<AppDependencies> fakeDependencies({bool signedIn = false, bool farm = fal
     staffAccess: FakeStaffAccessRepository(),
     sync: FakeSyncService(),
     home: FakeHomeRepository(clock),
+    herd: FakeHerdRepository(clock: clock, tenantProvider: InMemoryTenantProvider()),
   );
 }

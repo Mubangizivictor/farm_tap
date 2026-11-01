@@ -36,6 +36,9 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     required this.nfcActive,
     required this.card,
     required this.scrim,
+    required this.viewfinder,
+    required this.onViewfinder,
+    required this.viewfinderAccent,
   });
 
   /// Saved, paid, healthy, synced.
@@ -101,6 +104,13 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
   /// Modal scrim behind dialogs and sheets (black 42% light / 60% dark).
   final Color scrim;
 
+  /// Camera / scanner viewfinder background (dark in both modes) and its icons.
+  final Color viewfinder;
+  final Color onViewfinder;
+
+  /// Scan-frame corners on the viewfinder.
+  final Color viewfinderAccent;
+
   static const light = FarmTapSemanticColors(
     success: FarmTapPalette.success600,
     onSuccess: FarmTapPalette.white,
@@ -131,6 +141,9 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     nfcActive: FarmTapPalette.green700,
     card: FarmTapPalette.white,
     scrim: FarmTapPalette.scrimLight,
+    viewfinder: FarmTapPalette.night100,
+    onViewfinder: FarmTapPalette.mistSoft,
+    viewfinderAccent: FarmTapPalette.green400,
   );
 
   static const dark = FarmTapSemanticColors(
@@ -163,6 +176,9 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     nfcActive: FarmTapPalette.green400,
     card: FarmTapPalette.night200,
     scrim: FarmTapPalette.scrimDark,
+    viewfinder: FarmTapPalette.night0,
+    onViewfinder: FarmTapPalette.mist,
+    viewfinderAccent: FarmTapPalette.green400,
   );
 
   @override
@@ -196,6 +212,9 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     Color? nfcActive,
     Color? card,
     Color? scrim,
+    Color? viewfinder,
+    Color? onViewfinder,
+    Color? viewfinderAccent,
   }) => FarmTapSemanticColors(
     success: success ?? this.success,
     onSuccess: onSuccess ?? this.onSuccess,
@@ -226,6 +245,9 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     nfcActive: nfcActive ?? this.nfcActive,
     card: card ?? this.card,
     scrim: scrim ?? this.scrim,
+    viewfinder: viewfinder ?? this.viewfinder,
+    onViewfinder: onViewfinder ?? this.onViewfinder,
+    viewfinderAccent: viewfinderAccent ?? this.viewfinderAccent,
   );
 
   @override
@@ -261,6 +283,9 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
       nfcActive: Color.lerp(nfcActive, other.nfcActive, t)!,
       card: Color.lerp(card, other.card, t)!,
       scrim: Color.lerp(scrim, other.scrim, t)!,
+      viewfinder: Color.lerp(viewfinder, other.viewfinder, t)!,
+      onViewfinder: Color.lerp(onViewfinder, other.onViewfinder, t)!,
+      viewfinderAccent: Color.lerp(viewfinderAccent, other.viewfinderAccent, t)!,
     );
   }
 }

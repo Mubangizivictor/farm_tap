@@ -35,16 +35,16 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | D04 | D04_sync_status_sheet | Home | 87.5 | 90.4 | 92.9 | 95.5 | 91.5 | 95.3 | 87.5 | 90.4 | min 87.5 | ✓ | ✓ | ✓ | ✓ | done. Background home shows the trial banner (mockup sample omits it); sheet rows 76 apart. |
 | D05 | D05_home_offline | Home | 95.9 | 95.9 | 96.4 | 96.1 | 96.3 | 96.3 | 95.9 | 95.9 | min 95.9 | ✓ | ✓ | ✓ | ✓ | done. |
 | D06 | D06_notification_permission | Home | 95.2 | 96.0 | 93.6 | 95.8 | 93.2 | 95.8 | 95.2 | 96.0 | min 93.2 | ✓ | ✓ | ✓ | ✓ | done. Shown after the first saved record (wired with section F). |
-| E01 | E01_herd_list | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| E02 | E02_herd_filter_sheet | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| E03 | E03_animal_detail | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| E04 | E04_add_animal | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| E05 | E05_scan_qr | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| E06 | E06_record_event_sheet | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| E07 | E07_calf_born | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| E08 | E08_confirm_death | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| E09 | E09_head_count | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| E10 | E10_print_qr_labels | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| E01 | E01_herd_list | Herd | 93.9 | 94.6 | 95.7 | 96.0 | 96.8 | 96.8 | 93.8 | 94.4 | min 93.8 | ✓ | ✓ | ✓ | ✓ | done. |
+| E02 | E02_herd_filter_sheet | Herd | 90.7 | 92.6 | 93.2 | 96.1 | 92.0 | 96.1 | 90.6 | 92.6 | min 90.6 | ✓ | ✓ | ✓ | ✓ | done. Filter count comes from the 8 sample rows (mockup: 18 of 48). |
+| E03 | E03_animal_detail | Herd | 93.1 | 93.3 | 97.5 | 97.7 | 96.2 | 96.0 | 93.1 | 93.3 | min 93.1 | ✓ | ✓ | ✓ | ✓ | done. |
+| E04 | E04_add_animal | Herd | 94.3 | 94.7 | 96.0 | 96.4 | 96.8 | 96.9 | 94.3 | 94.7 | min 94.3 | ✓ | ✓ | ✓ | ✓ | done. |
+| E05 | E05_scan_qr | Herd | 95.8 | 95.4 | 95.9 | 97.2 | 96.7 | 96.8 | 95.8 | 95.4 | min 95.4 | ✓ | ✓ | ✓ | ✓ | done. Viewfinder without live camera in the UI phase (mobile_scanner wiring with functionality). |
+| E06 | E06_record_event_sheet | Herd | 91.6 | 94.3 | 94.9 | 96.8 | 93.7 | 96.7 | 91.6 | 94.3 | min 91.6 | ✓ | ✓ | ✓ | ✓ | done. |
+| E07 | E07_calf_born | Herd | 91.3 | 92.5 | 91.7 | 95.1 | 89.9 | 95.2 | 91.3 | 92.5 | min 89.9 | ✓ | ✓ | ✓ | ✓ | done. |
+| E08 | E08_confirm_death | Herd | 92.5 | 94.2 | 94.1 | 96.1 | 93.1 | 95.8 | 92.5 | 94.2 | min 92.5 | ✓ | ✓ | ✓ | ✓ | done. |
+| E09 | E09_head_count | Herd | 96.9 | 97.0 | 97.4 | 97.2 | 98.0 | 97.9 | 96.9 | 97.0 | min 96.9 | ✓ | ✓ | ✓ | ✓ | done. |
+| E10 | E10_print_qr_labels | Herd | 87.5 | 79.3 | 94.9 | 90.2 | 95.8 | 95.6 | 87.5 | 79.3 | min 79.3 | ✓ | ✓ | ✓ | ✓ | done. Real scannable QR codes (farmtap:animal:<tag>); Print / Share PDF via printing. |
 | F01 | F01_milk_today | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | F02 | F02_milk_pick_cow | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | F03 | F03_milk_keypad | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |

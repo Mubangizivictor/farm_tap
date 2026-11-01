@@ -167,7 +167,11 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
 
   // ---- Previews ----
   double get cardPreviewWidth => 320 * scale;
-  double get qrLabel => 120 * scale;
+  double get qrLabel => 72 * scale;
+  double get scanFrameStroke => 5 * scale;
+  double get scanFrameArm => 46 * scale;
+  double get viewfinderAspect => 0.69;
+  double get viewfinderAspectWide => 2.1;
 
   // ---- Branding ----
   /// Logo image (mark + wordmark) height: app bar 38, sidebar 40.

@@ -145,7 +145,10 @@ class PersonAvatar extends StatelessWidget {
       child: InkResponse(
         onTap: onTap,
         radius: target / 2,
-        child: SizedBox.square(dimension: target, child: Center(child: ExcludeSemantics(child: avatar))),
+        child: SizedBox.square(
+          dimension: target,
+          child: Center(child: ExcludeSemantics(child: avatar)),
+        ),
       ),
     );
   }

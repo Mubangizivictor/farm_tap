@@ -95,6 +95,7 @@ class AdaptiveScaffold extends StatelessWidget {
     this.padBody = true,
     this.scrollable = true,
     this.onRefresh,
+    this.showNavigation = true,
   });
 
   /// Keys of the three navigation forms (for tests).
@@ -147,6 +148,10 @@ class AdaptiveScaffold extends StatelessWidget {
   /// Pull to refresh (Home: syncs).
   final RefreshCallback? onRefresh;
 
+  /// False hides the phone bottom bar (full-screen tasks: add animal, scan).
+  /// The rail and sidebar stay on wider screens.
+  final bool showNavigation;
+
   @override
   Widget build(BuildContext context) {
     final form = context.formFactor;
@@ -183,7 +188,7 @@ class AdaptiveScaffold extends StatelessWidget {
             onSyncTap: onSyncTap,
           );
     final useDrawer = form == FormFactor.compact && showMenu && sidebar != null;
-    final showBottomBar = form == FormFactor.compact && nav != null && !useDrawer;
+    final showBottomBar = form == FormFactor.compact && nav != null && !useDrawer && showNavigation;
     final topBar = form == FormFactor.expanded
         ? _WideTopBar(
             title: title,

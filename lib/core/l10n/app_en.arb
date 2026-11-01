@@ -605,5 +605,319 @@
     }
   },
   "taskAfterEveningMilking": "After evening milking",
-  "dairyMeal": "Dairy meal"
+  "dairyMeal": "Dairy meal",
+  "animalsCount": "{count} animals",
+  "@animalsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanTag": "Scan ear tag",
+  "filter": "Filter",
+  "searchAnimals": "Search by name or tag number",
+  "statusMilking": "Milking",
+  "statusDry": "Dry",
+  "statusTreated": "Treated",
+  "statusPregnant": "Pregnant",
+  "statusHeifer": "Heifer",
+  "statusCalf": "Calf",
+  "statusBull": "Bull",
+  "filterCalves": "Calves",
+  "tagAndBreedAge": "{tag} · {breed} · {age} yrs",
+  "@tagAndBreedAge": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "breed": {
+        "type": "String"
+      },
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "breedAge": "{breed} · {age} yrs",
+  "@breedAge": {
+    "placeholders": {
+      "breed": {
+        "type": "String"
+      },
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "colAnimal": "Animal",
+  "colTag": "Tag",
+  "colBreedAge": "Breed & age",
+  "colStatus": "Status",
+  "colMilkToday": "Milk today",
+  "notForSale": "Not for sale",
+  "addAnimal2": "Add animal",
+  "filterAnimals": "Filter animals",
+  "statusLabel": "Status",
+  "groupLabel": "Group",
+  "sortBy": "Sort by",
+  "sortName": "Name",
+  "sortTag": "Tag",
+  "sortMilk": "Milk",
+  "clear": "Clear",
+  "showAnimals": "Show {count} animals",
+  "@showAnimals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "calfPen": "Calf pen",
+  "animalTitle": "Animal",
+  "printLabels": "Print ear-tag labels",
+  "edit": "Edit",
+  "animalHeaderLine": "{tag} · {breed} · {kind} · {age} yrs",
+  "@animalHeaderLine": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "breed": {
+        "type": "String"
+      },
+      "kind": {
+        "type": "String"
+      },
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "kindCow": "Cow",
+  "kindHeifer": "Heifer",
+  "kindBull": "Bull",
+  "kindCalf": "Calf",
+  "treatedNotForSale": "Treated — milk not for sale",
+  "notForSaleUntil": "Milk not for sale until {date}",
+  "@notForSaleUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "withdrawalBody": "{drug} withdrawal: {days} days left. Milk is recorded as 'not for sale'.",
+  "@withdrawalBody": {
+    "placeholders": {
+      "drug": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "avgMilkDay": "Avg milk / day",
+  "daysInMilk": "Days in milk",
+  "pregnancy": "Pregnancy",
+  "pregnancyCheck": "Check",
+  "dueDate": "Due {date}",
+  "@dueDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "tabTimeline": "Timeline",
+  "tabMilk": "Milk",
+  "tabHealth": "Health",
+  "tabBreeding": "Breeding",
+  "record": "Record",
+  "evTreatment": "{drug} treatment",
+  "@evTreatment": {
+    "placeholders": {
+      "drug": {
+        "type": "String"
+      }
+    }
+  },
+  "evTreatmentSub": "{reason} · {vet} · safe from {date}",
+  "@evTreatmentSub": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      },
+      "vet": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "evMilk": "Milk {litres} L",
+  "@evMilk": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "evMilkSub": "AM {am} · PM {pm}",
+  "@evMilkSub": {
+    "placeholders": {
+      "am": {
+        "type": "String"
+      },
+      "pm": {
+        "type": "String"
+      }
+    }
+  },
+  "evServed": "Served — {method}",
+  "@evServed": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "evServedSub": "Straw: {straw} · {by}",
+  "@evServedSub": {
+    "placeholders": {
+      "straw": {
+        "type": "String"
+      },
+      "by": {
+        "type": "String"
+      }
+    }
+  },
+  "evVaccination": "{name} vaccination",
+  "@evVaccination": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "evBatch": "Batch {batch}",
+  "@evBatch": {
+    "placeholders": {
+      "batch": {
+        "type": "String"
+      }
+    }
+  },
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "noEventsYet": "Nothing recorded here yet",
+  "addPhoto": "Add photo",
+  "tagNumberLabel": "Tag number",
+  "breedLabel": "Breed",
+  "dobLabel": "Date of birth",
+  "sexLabel": "Sex",
+  "sexCowHeifer": "Cow / heifer",
+  "nationalTagLabel": "National livestock tag number",
+  "motherOptional": "Mother (optional)",
+  "saveAnimal": "Save animal",
+  "animalSaved": "{name} added to the herd",
+  "@animalSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tagRequired": "Enter the tag number.",
+  "pointAtQr": "Point at the QR code on the ear tag",
+  "torch": "Torch",
+  "typeTagInstead": "Type tag number instead",
+  "recordFor": "Record for {name}",
+  "@recordFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "whatHappened": "What happened?",
+  "evKindMilk": "Milk",
+  "evKindTreatment": "Treatment",
+  "evKindHeat": "Heat / service",
+  "evKindCalving": "Calving",
+  "evKindSold": "Sold",
+  "evKindDied": "Died",
+  "welcomeLittleOne": "Welcome, little one!",
+  "calfBornBody": "{mother} had a heifer calf. We added her to your herd as {tag}.",
+  "@calfBornBody": {
+    "placeholders": {
+      "mother": {
+        "type": "String"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "mother": "Mother",
+  "born": "Born",
+  "calf": "Calf",
+  "todayAt": "Today {time}",
+  "@todayAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "heiferTag": "Heifer · {tag}",
+  "@heiferTag": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "nameTheCalf": "Name the calf",
+  "recordDeathTitle": "Record {name} as dead?",
+  "@recordDeathTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "recordDeathBody": "She will move to 'Past animals'. Her records are kept. This is sent to the owner's daily report.",
+  "causeHint": "e.g. East Coast Fever",
+  "causeLabel": "Cause (optional)",
+  "yesRecordDeath": "Yes, record death",
+  "headCount": "Head count",
+  "totalAnimals": "Total animals",
+  "milkingCows": "Milking cows",
+  "dryCows": "Dry cows",
+  "heifers": "Heifers",
+  "calves": "Calves",
+  "bulls": "Bulls",
+  "thisMonth": "This month",
+  "bornCount": "Born",
+  "bought": "Bought",
+  "sold": "Sold",
+  "died": "Died",
+  "labelsSelected": "{count} labels selected",
+  "@labelsSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labelsHint": "Print on sticker paper and fix to the ear tags.",
+  "sharePdf": "Share PDF",
+  "print": "Print",
+  "emptyHerdTitle": "No cows yet",
+  "emptyHerdBody": "Add your first cow to start recording milk.",
+  "noMatches": "No animals match this filter."
 }

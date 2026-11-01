@@ -353,7 +353,9 @@ class _HomePageState extends State<HomePage> {
                         value: day.tasks[i].done,
                         onChanged: (v) async {
                           await widget.repo.setTaskDone(day.tasks[i].id, done: v);
-                          setState(() => _worker = _loadWorker());
+                          setState(() {
+                            _worker = _loadWorker();
+                          });
                         },
                       ),
                     ],

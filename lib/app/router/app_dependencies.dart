@@ -4,6 +4,7 @@ import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
+import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
 
 /// Everything the router hands to pages (repositories behind domain
@@ -16,6 +17,7 @@ class AppDependencies {
     required this.staffAccess,
     required this.sync,
     required this.home,
+    required this.herd,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -25,6 +27,7 @@ class AppDependencies {
     staffAccess: getIt<StaffAccessRepository>(),
     sync: getIt<SyncService>(),
     home: getIt<HomeRepository>(),
+    herd: getIt<HerdRepository>(),
   );
 
   final SessionController session;
@@ -33,4 +36,5 @@ class AppDependencies {
   final StaffAccessRepository staffAccess;
   final SyncService sync;
   final HomeRepository home;
+  final HerdRepository herd;
 }

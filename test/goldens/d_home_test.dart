@@ -57,16 +57,17 @@ void main() {
 
   screenGoldens(
     'D03_alerts',
-    (_) => inShell(AlertsPage(repo: FakeHomeRepository(clock), today: today), parent: '/home'),
+    (_) => inShell(
+      AlertsPage(repo: FakeHomeRepository(clock), today: today),
+      parent: '/home',
+    ),
   );
 
   screenGoldens(
     'D04_sync_status_sheet',
     (_) => owner(),
-    act: (tester, _) => fromPage(
-      tester,
-      (c) => showSyncStatusSheet(c, FakeSyncService(const SyncSnapshot(synced: 1284, waiting: 3))),
-    ),
+    act: (tester, _) =>
+        fromPage(tester, (c) => showSyncStatusSheet(c, FakeSyncService(const SyncSnapshot(synced: 1284, waiting: 3)))),
   );
 
   screenGoldens('D05_home_offline', (_) => owner(online: false));

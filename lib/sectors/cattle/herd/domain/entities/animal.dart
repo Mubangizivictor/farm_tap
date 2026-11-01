@@ -6,6 +6,10 @@ enum AnimalStatus { active, sold, deceased, transferred }
 
 enum SyncStatus { pending, synced, failed }
 
+/// What the animal is doing in the dairy (badge colour: Milking success,
+/// Treated danger, Pregnant info, Heifer neutral, Dry warning).
+enum DairyStatus { milking, dry, treated, pregnant, heifer, calf, bull }
+
 class Animal extends Equatable {
   const new({
     required this.id,
@@ -24,6 +28,10 @@ class Animal extends Equatable {
     required this.syncStatus,
     this.govIdTag,
     this.isDeleted = false,
+    this.dairyStatus = DairyStatus.milking,
+    this.avatarIndex = 1,
+    this.group,
+    this.motherTag,
   });
 
   final String id;
@@ -43,6 +51,24 @@ class Animal extends Equatable {
   final SyncStatus syncStatus;
   final bool isDeleted;
 
+  final DairyStatus dairyStatus;
+
+  /// Cartoon avatar 1-6 when the farm has no photo.
+  final int avatarIndex;
+
+  /// Paddock or pen: "Paddock 1", "Calf pen".
+  final String? group;
+  final String? motherTag;
+
+  /// Whole years old on [today].
+  int ageYears(DateTime today) {
+    var years = today.year - dateOfBirth.year;
+    if (today.month < dateOfBirth.month || (today.month == dateOfBirth.month && today.day < dateOfBirth.day)) {
+      years--;
+    }
+    return years < 0 ? 0 : years;
+  }
+
   @override
   List<Object?> get props => [
     id,
@@ -61,5 +87,9 @@ class Animal extends Equatable {
     deviceId,
     syncStatus,
     isDeleted,
+    dairyStatus,
+    avatarIndex,
+    group,
+    motherTag,
   ];
 }

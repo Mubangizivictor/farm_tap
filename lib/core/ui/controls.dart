@@ -131,9 +131,9 @@ class SegmentedTabs<T> extends StatelessWidget {
     final c = context.colors;
     return Container(
       height: context.sizes.segmentedHeight,
-      padding: EdgeInsets.all(context.space.xs),
       decoration: BoxDecoration(color: c.surfaceContainer, borderRadius: context.radii.badge),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (final o in options)
             Expanded(
@@ -142,40 +142,45 @@ class SegmentedTabs<T> extends StatelessWidget {
                 button: true,
                 label: o.label,
                 excludeSemantics: true,
-                child: Material(
-                  color: o.value == selected ? c.surfaceContainerLowest : Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: context.radii.segmentedThumb,
-                    side: o.value == selected
-                        ? BorderSide(color: c.outlineVariant, width: context.sizes.borderThin)
-                        : BorderSide.none,
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onTap: () => onChanged(o.value),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (o.icon != null) ...[
-                          Icon(
-                            o.icon,
-                            fill: o.value == selected ? 1 : 0,
-                            size: context.sizes.iconSm,
-                            color: o.value == selected ? c.onSurface : c.onSurfaceVariant,
-                          ),
-                          context.space.gapXs,
-                        ],
-                        Flexible(
-                          child: Text(
-                            o.label,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.text.labelMedium?.copyWith(
+                // The whole 48 dp track height is the tap target; the thumb
+                // is drawn inset by 4.
+                child: InkWell(
+                  onTap: () => onChanged(o.value),
+                  borderRadius: context.radii.badge,
+                  child: Padding(
+                    padding: EdgeInsets.all(context.space.xs),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: o.value == selected ? c.surfaceContainerLowest : Colors.transparent,
+                        borderRadius: context.radii.segmentedThumb,
+                        border: o.value == selected
+                            ? Border.all(color: c.outlineVariant, width: context.sizes.borderThin)
+                            : null,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (o.icon != null) ...[
+                            Icon(
+                              o.icon,
+                              fill: o.value == selected ? 1 : 0,
+                              size: context.sizes.iconSm,
                               color: o.value == selected ? c.onSurface : c.onSurfaceVariant,
-                              fontWeight: o.value == selected ? FarmTapWeights.semiBold : null,
+                            ),
+                            context.space.gapXs,
+                          ],
+                          Flexible(
+                            child: Text(
+                              o.label,
+                              overflow: TextOverflow.ellipsis,
+                              style: context.text.labelMedium?.copyWith(
+                                color: o.value == selected ? c.onSurface : c.onSurfaceVariant,
+                                fontWeight: o.value == selected ? FarmTapWeights.semiBold : null,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

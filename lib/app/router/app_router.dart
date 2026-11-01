@@ -26,6 +26,10 @@ import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
+import 'package:farm_tap/sectors/cattle/herd/presentation/pages/animal_detail_page.dart';
+import 'package:farm_tap/sectors/cattle/herd/presentation/pages/herd_list_page.dart';
+import 'package:farm_tap/sectors/cattle/herd/presentation/pages/herd_tools_pages.dart';
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/alerts_page.dart';
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/home_page.dart';
 import 'package:flutter/material.dart';
@@ -87,7 +91,58 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       onOpen: (target) => _openFromHome(context, target),
     ),
   };
+  sectionRoots[AppRoutes.herd] = (context, state) => HerdListPage(
+    repo: deps.herd,
+    onAnimal: (a) => context.push(AppRoutes.herdAnimal(a.id)),
+    onAdd: () => context.push(AppRoutes.herdAdd),
+    onScan: () => context.push(AppRoutes.herdScan),
+  );
   final sectionChildren = <String, List<RouteBase>>{
+    AppRoutes.herd: [
+      page(
+        'add',
+        parent: AppRoutes.herd,
+        builder: (context, state) => AddAnimalPage(repo: deps.herd, onSaved: (_) => popOrGo(context, AppRoutes.herd)),
+      ),
+      page(
+        'scan',
+        parent: AppRoutes.herd,
+        builder: (context, state) => ScanTagPage(
+          onTypeTag: () async {
+            final animal = await showTypeTagSheet(context, deps.herd);
+            if (animal != null && context.mounted) {
+              context.pushReplacement(AppRoutes.herdAnimal(animal.id));
+            }
+          },
+        ),
+      ),
+      page(
+        'count',
+        parent: AppRoutes.herd,
+        builder: (context, state) => HeadCountPage(repo: deps.herd),
+      ),
+      page(
+        'labels',
+        parent: AppRoutes.herd,
+        builder: (context, state) => QrLabelsPage(repo: deps.herd),
+      ),
+      page(
+        ':animalId',
+        parent: AppRoutes.herd,
+        builder: (context, state) => AnimalDetailPage(
+          repo: deps.herd,
+          animalId: state.pathParameters['animalId']!,
+          onLabels: () => context.push(AppRoutes.herdLabels),
+          onGone: () => popOrGo(context, AppRoutes.herd),
+          onEvent: (kind) => context.go(switch (kind) {
+            HerdEventKind.milk => AppRoutes.milk,
+            HerdEventKind.treatment => AppRoutes.health,
+            HerdEventKind.heat => AppRoutes.breeding,
+            _ => AppRoutes.money,
+          }),
+        ),
+      ),
+    ],
     AppRoutes.home: [
       page(
         'alerts',
@@ -338,7 +393,7 @@ void _openFromHome(BuildContext context, HomeTarget target) {
   final path = switch (target) {
     HomeTarget.milk => AppRoutes.milk,
     HomeTarget.recordMilk => AppRoutes.milk,
-    HomeTarget.herd => AppRoutes.herd,
+    HomeTarget.herd => AppRoutes.herdCount,
     HomeTarget.health => AppRoutes.health,
     HomeTarget.treatment => AppRoutes.health,
     HomeTarget.workers => AppRoutes.workers,

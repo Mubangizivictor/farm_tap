@@ -985,4 +985,402 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dairyMeal => 'Dairy meal';
+
+  @override
+  String animalsCount(int count) {
+    return '$count animals';
+  }
+
+  @override
+  String get scanTag => 'Scan ear tag';
+
+  @override
+  String get filter => 'Filter';
+
+  @override
+  String get searchAnimals => 'Search by name or tag number';
+
+  @override
+  String get statusMilking => 'Milking';
+
+  @override
+  String get statusDry => 'Dry';
+
+  @override
+  String get statusTreated => 'Treated';
+
+  @override
+  String get statusPregnant => 'Pregnant';
+
+  @override
+  String get statusHeifer => 'Heifer';
+
+  @override
+  String get statusCalf => 'Calf';
+
+  @override
+  String get statusBull => 'Bull';
+
+  @override
+  String get filterCalves => 'Calves';
+
+  @override
+  String tagAndBreedAge(String tag, String breed, int age) {
+    return '$tag · $breed · $age yrs';
+  }
+
+  @override
+  String breedAge(String breed, int age) {
+    return '$breed · $age yrs';
+  }
+
+  @override
+  String get colAnimal => 'Animal';
+
+  @override
+  String get colTag => 'Tag';
+
+  @override
+  String get colBreedAge => 'Breed & age';
+
+  @override
+  String get colStatus => 'Status';
+
+  @override
+  String get colMilkToday => 'Milk today';
+
+  @override
+  String get notForSale => 'Not for sale';
+
+  @override
+  String get addAnimal2 => 'Add animal';
+
+  @override
+  String get filterAnimals => 'Filter animals';
+
+  @override
+  String get statusLabel => 'Status';
+
+  @override
+  String get groupLabel => 'Group';
+
+  @override
+  String get sortBy => 'Sort by';
+
+  @override
+  String get sortName => 'Name';
+
+  @override
+  String get sortTag => 'Tag';
+
+  @override
+  String get sortMilk => 'Milk';
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String showAnimals(int count) {
+    return 'Show $count animals';
+  }
+
+  @override
+  String get calfPen => 'Calf pen';
+
+  @override
+  String get animalTitle => 'Animal';
+
+  @override
+  String get printLabels => 'Print ear-tag labels';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String animalHeaderLine(String tag, String breed, String kind, int age) {
+    return '$tag · $breed · $kind · $age yrs';
+  }
+
+  @override
+  String get kindCow => 'Cow';
+
+  @override
+  String get kindHeifer => 'Heifer';
+
+  @override
+  String get kindBull => 'Bull';
+
+  @override
+  String get kindCalf => 'Calf';
+
+  @override
+  String get treatedNotForSale => 'Treated — milk not for sale';
+
+  @override
+  String notForSaleUntil(String date) {
+    return 'Milk not for sale until $date';
+  }
+
+  @override
+  String withdrawalBody(String drug, int days) {
+    return '$drug withdrawal: $days days left. Milk is recorded as \'not for sale\'.';
+  }
+
+  @override
+  String get avgMilkDay => 'Avg milk / day';
+
+  @override
+  String get daysInMilk => 'Days in milk';
+
+  @override
+  String get pregnancy => 'Pregnancy';
+
+  @override
+  String get pregnancyCheck => 'Check';
+
+  @override
+  String dueDate(String date) {
+    return 'Due $date';
+  }
+
+  @override
+  String get tabTimeline => 'Timeline';
+
+  @override
+  String get tabMilk => 'Milk';
+
+  @override
+  String get tabHealth => 'Health';
+
+  @override
+  String get tabBreeding => 'Breeding';
+
+  @override
+  String get record => 'Record';
+
+  @override
+  String evTreatment(String drug) {
+    return '$drug treatment';
+  }
+
+  @override
+  String evTreatmentSub(String reason, String vet, String date) {
+    return '$reason · $vet · safe from $date';
+  }
+
+  @override
+  String evMilk(String litres) {
+    return 'Milk $litres L';
+  }
+
+  @override
+  String evMilkSub(String am, String pm) {
+    return 'AM $am · PM $pm';
+  }
+
+  @override
+  String evServed(String method) {
+    return 'Served — $method';
+  }
+
+  @override
+  String evServedSub(String straw, String by) {
+    return 'Straw: $straw · $by';
+  }
+
+  @override
+  String evVaccination(String name) {
+    return '$name vaccination';
+  }
+
+  @override
+  String evBatch(String batch) {
+    return 'Batch $batch';
+  }
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String get noEventsYet => 'Nothing recorded here yet';
+
+  @override
+  String get addPhoto => 'Add photo';
+
+  @override
+  String get tagNumberLabel => 'Tag number';
+
+  @override
+  String get breedLabel => 'Breed';
+
+  @override
+  String get dobLabel => 'Date of birth';
+
+  @override
+  String get sexLabel => 'Sex';
+
+  @override
+  String get sexCowHeifer => 'Cow / heifer';
+
+  @override
+  String get nationalTagLabel => 'National livestock tag number';
+
+  @override
+  String get motherOptional => 'Mother (optional)';
+
+  @override
+  String get saveAnimal => 'Save animal';
+
+  @override
+  String animalSaved(String name) {
+    return '$name added to the herd';
+  }
+
+  @override
+  String get tagRequired => 'Enter the tag number.';
+
+  @override
+  String get pointAtQr => 'Point at the QR code on the ear tag';
+
+  @override
+  String get torch => 'Torch';
+
+  @override
+  String get typeTagInstead => 'Type tag number instead';
+
+  @override
+  String recordFor(String name) {
+    return 'Record for $name';
+  }
+
+  @override
+  String get whatHappened => 'What happened?';
+
+  @override
+  String get evKindMilk => 'Milk';
+
+  @override
+  String get evKindTreatment => 'Treatment';
+
+  @override
+  String get evKindHeat => 'Heat / service';
+
+  @override
+  String get evKindCalving => 'Calving';
+
+  @override
+  String get evKindSold => 'Sold';
+
+  @override
+  String get evKindDied => 'Died';
+
+  @override
+  String get welcomeLittleOne => 'Welcome, little one!';
+
+  @override
+  String calfBornBody(String mother, String tag) {
+    return '$mother had a heifer calf. We added her to your herd as $tag.';
+  }
+
+  @override
+  String get mother => 'Mother';
+
+  @override
+  String get born => 'Born';
+
+  @override
+  String get calf => 'Calf';
+
+  @override
+  String todayAt(String time) {
+    return 'Today $time';
+  }
+
+  @override
+  String heiferTag(String tag) {
+    return 'Heifer · $tag';
+  }
+
+  @override
+  String get nameTheCalf => 'Name the calf';
+
+  @override
+  String recordDeathTitle(String name) {
+    return 'Record $name as dead?';
+  }
+
+  @override
+  String get recordDeathBody =>
+      'She will move to \'Past animals\'. Her records are kept. This is sent to the owner\'s daily report.';
+
+  @override
+  String get causeHint => 'e.g. East Coast Fever';
+
+  @override
+  String get causeLabel => 'Cause (optional)';
+
+  @override
+  String get yesRecordDeath => 'Yes, record death';
+
+  @override
+  String get headCount => 'Head count';
+
+  @override
+  String get totalAnimals => 'Total animals';
+
+  @override
+  String get milkingCows => 'Milking cows';
+
+  @override
+  String get dryCows => 'Dry cows';
+
+  @override
+  String get heifers => 'Heifers';
+
+  @override
+  String get calves => 'Calves';
+
+  @override
+  String get bulls => 'Bulls';
+
+  @override
+  String get thisMonth => 'This month';
+
+  @override
+  String get bornCount => 'Born';
+
+  @override
+  String get bought => 'Bought';
+
+  @override
+  String get sold => 'Sold';
+
+  @override
+  String get died => 'Died';
+
+  @override
+  String labelsSelected(int count) {
+    return '$count labels selected';
+  }
+
+  @override
+  String get labelsHint => 'Print on sticker paper and fix to the ear tags.';
+
+  @override
+  String get sharePdf => 'Share PDF';
+
+  @override
+  String get print => 'Print';
+
+  @override
+  String get emptyHerdTitle => 'No cows yet';
+
+  @override
+  String get emptyHerdBody => 'Add your first cow to start recording milk.';
+
+  @override
+  String get noMatches => 'No animals match this filter.';
 }

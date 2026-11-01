@@ -31,6 +31,11 @@ const _routes = <(String, String, bool, bool)>[
   (AppRoutes.unlockNumber, AppRoutes.unlock, true, true),
   ('${AppRoutes.unlockPin}?card=0142', AppRoutes.unlock, true, true),
   (AppRoutes.homeAlerts, AppRoutes.home, true, true),
+  (AppRoutes.herdAdd, AppRoutes.herd, true, true),
+  (AppRoutes.herdScan, AppRoutes.herd, true, true),
+  (AppRoutes.herdCount, AppRoutes.herd, true, true),
+  (AppRoutes.herdLabels, AppRoutes.herd, true, true),
+  ('/herd/animal-FT-022', AppRoutes.herd, true, true),
 ];
 
 class _Harness {
