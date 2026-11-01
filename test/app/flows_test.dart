@@ -141,4 +141,58 @@ void main() {
     expect(_location(router), AppRoutes.milkRecord);
     await tester.pumpWidget(const SizedBox());
   });
+
+  testWidgets('centre delivery: G02 -> G03 back to G02; save resets to G02 with Undo', (tester) async {
+    tester.view
+      ..physicalSize = const Size(390, 900)
+      ..devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final deps = await fakeDependencies(signedIn: true, farm: true, centre: true);
+    final router = buildRouter(deps, initialLocation: AppRoutes.collect);
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      MaterialApp.router(
+        theme: FarmTapTheme.light,
+        routerConfig: router,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en')],
+      ),
+    );
+    await _settle(tester);
+    expect(_location(router), AppRoutes.collect);
+    expect(find.text("Tap the farmer's card"), findsOneWidget);
+
+    await tester.tap(find.text('Simulate tap (debug)'));
+    await _settle(tester);
+    expect(_location(router), '/collect/farmer-0142');
+    expect(find.text('Card OK'), findsOneWidget);
+    await tester.tap(find.byTooltip('Back').last);
+    await _settle(tester);
+    expect(_location(router), AppRoutes.collect);
+
+    await tester.tap(find.text('Simulate tap (debug)'));
+    await _settle(tester);
+    for (final k in ['3', '8']) {
+      await tester.tap(find.text(k).last);
+      await tester.pump();
+    }
+    await tester.tap(find.text('Next'));
+    await _settle(tester);
+    expect(find.text('38.0 litres'), findsOneWidget);
+    await tester.tap(find.text('Yes, save'));
+    await _settle(tester);
+    expect(_location(router), AppRoutes.collect);
+    expect(find.text('Tap the next card'), findsOneWidget);
+    expect(find.text('Saved 38.0 L for Muhwezi Robert'), findsOneWidget);
+    await tester.tap(find.text('Undo'));
+    await _settle(tester);
+    expect(find.text('Delivery removed'), findsOneWidget);
+    expect(find.text("Tap the farmer's card"), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
 }

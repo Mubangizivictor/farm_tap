@@ -26,6 +26,8 @@ import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_collect_pages.dart';
+import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_farmers_pay_pages.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/animal_detail_page.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/herd_list_page.dart';
@@ -78,19 +80,31 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
 
   // Roots of the shell branches; filled in section by section.
   final sectionRoots = <String, PageBuilder>{
-    AppRoutes.home: (context, state) => HomePage(
-      repo: deps.home,
-      farmName: session.farm?.name ?? '',
-      ownerName: session.auth.currentUser?.name ?? '',
-      staff: session.staff,
-      trialDaysLeft: session.farm?.subscription == SubscriptionState.trial ? session.farm?.trialDaysLeft : null,
-      onRefresh: deps.sync.sync,
-      onLock: () {
-        session.lock();
-        context.go(AppRoutes.unlock);
-      },
-      onOpen: (target) => _openFromHome(context, target),
-    ),
+    AppRoutes.home: (context, state) => session.isCentre
+        ? CentreHomePage(
+            repo: deps.centre,
+            centreName: session.farm?.name ?? '',
+            onRefresh: deps.sync.sync,
+            onTapCard: () => context.go(AppRoutes.collect),
+            onSeeAll: () => context.go(AppRoutes.farmers),
+            onTool: (tool) => switch (tool) {
+              CentreTool.dispatch => unawaited(context.push(AppRoutes.centreReconcile)),
+              _ => context.go(AppRoutes.collect),
+            },
+          )
+        : HomePage(
+            repo: deps.home,
+            farmName: session.farm?.name ?? '',
+            ownerName: session.auth.currentUser?.name ?? '',
+            staff: session.staff,
+            trialDaysLeft: session.farm?.subscription == SubscriptionState.trial ? session.farm?.trialDaysLeft : null,
+            onRefresh: deps.sync.sync,
+            onLock: () {
+              session.lock();
+              context.go(AppRoutes.unlock);
+            },
+            onOpen: (target) => _openFromHome(context, target),
+          ),
   };
   sectionRoots[AppRoutes.herd] = (context, state) => HerdListPage(
     repo: deps.herd,
@@ -102,6 +116,22 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     repo: deps.milk,
     onRecord: () => context.push(AppRoutes.milkRecord),
     onTool: (i) => context.push([AppRoutes.milkTotal, AppRoutes.milkUse, AppRoutes.milkSales, AppRoutes.milkTrends][i]),
+  );
+  sectionRoots[AppRoutes.collect] = (context, state) => ReceiveMilkPage(
+    repo: deps.centre,
+    savedDeliveryId: state.uri.queryParameters['saved'],
+    onFarmer: (farmer) => context.push(AppRoutes.collectFarmer(farmer.id)),
+  );
+  sectionRoots[AppRoutes.farmers] = (context, state) => CentreFarmersPage(
+    repo: deps.centre,
+    onFarmer: (farmer) => context.push(AppRoutes.centreFarmer(farmer.id)),
+    onAdd: () => unawaited(showAddFarmerSheet(context, deps.centre)),
+  );
+  sectionRoots[AppRoutes.pay] = (context, state) => CentrePaymentsPage(
+    repo: deps.centre,
+    onSendSms: () => context.push(AppRoutes.paySms),
+    onPaymentSheet: () => context.push(AppRoutes.payFarmers),
+    onFarmer: (farmer) => context.go(AppRoutes.centreFarmer(farmer.id)),
   );
   String recorder() => session.staff?.greetingName ?? (session.auth.currentUser?.name.split(' ').first ?? '');
   final sectionChildren = <String, List<RouteBase>>{
@@ -197,7 +227,45 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         ),
       ),
     ],
+    AppRoutes.collect: [
+      page(
+        ':farmerId',
+        parent: AppRoutes.collect,
+        builder: (context, state) => DeliveryKeypadPage(
+          repo: deps.centre,
+          farmerId: state.pathParameters['farmerId']!,
+          // After a save the stack resets to G02, which shows the Undo toast.
+          onSaved: (delivery) => context.go(AppRoutes.collectSaved(delivery.id)),
+          onRejected: () => context.go(AppRoutes.collect),
+        ),
+      ),
+    ],
+    AppRoutes.farmers: [
+      page(
+        ':farmerId',
+        parent: AppRoutes.farmers,
+        builder: (context, state) => CentreFarmerPage(repo: deps.centre, farmerId: state.pathParameters['farmerId']!),
+      ),
+    ],
+    AppRoutes.pay: [
+      page(
+        'sheet',
+        parent: AppRoutes.pay,
+        builder: (context, state) => PayFarmersPage(repo: deps.centre, onDone: () => popOrGo(context, AppRoutes.pay)),
+      ),
+      page(
+        'sms',
+        parent: AppRoutes.pay,
+        builder: (context, state) =>
+            SmsStatementsPage(repo: deps.centre, onSent: () => popOrGo(context, AppRoutes.pay)),
+      ),
+    ],
     AppRoutes.home: [
+      page(
+        'reconcile',
+        parent: AppRoutes.home,
+        builder: (context, state) => ReconcilePage(repo: deps.centre, onSaved: () => popOrGo(context, AppRoutes.home)),
+      ),
       page(
         'alerts',
         parent: AppRoutes.home,

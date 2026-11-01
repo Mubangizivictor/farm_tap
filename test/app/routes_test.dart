@@ -42,6 +42,11 @@ const _routes = <(String, String, bool, bool)>[
   (AppRoutes.milkUse, AppRoutes.milk, true, true),
   (AppRoutes.milkSales, AppRoutes.milk, true, true),
   (AppRoutes.milkTrends, AppRoutes.milk, true, true),
+  ('/collect/farmer-0142', AppRoutes.collect, true, true),
+  ('/farmers/farmer-0142', AppRoutes.farmers, true, true),
+  (AppRoutes.payFarmers, AppRoutes.pay, true, true),
+  (AppRoutes.paySms, AppRoutes.pay, true, true),
+  (AppRoutes.centreReconcile, AppRoutes.home, true, true),
 ];
 
 class _Harness {

@@ -1195,5 +1195,500 @@
         "type": "String"
       }
     }
+  },
+  "sessionOpenSince": "{session} session · open since {time}",
+  "@sessionOpenSince": {
+    "placeholders": {
+      "session": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "collectedThisSession": "Collected this {session}",
+  "@collectedThisSession": {
+    "placeholders": {
+      "session": {
+        "type": "String"
+      }
+    }
+  },
+  "fromFarmersRejected": "from {farmers} farmers · {rejected} rejected",
+  "@fromFarmersRejected": {
+    "placeholders": {
+      "farmers": {
+        "type": "int"
+      },
+      "rejected": {
+        "type": "int"
+      }
+    }
+  },
+  "tapFarmerCard": "Tap farmer card",
+  "cardNumber": "Card number",
+  "qualityTest": "Quality test",
+  "dispatch": "Dispatch",
+  "closeSession": "Close session",
+  "latestDeliveries": "Latest deliveries",
+  "timeAndCard": "{time} · Card {card}",
+  "@timeAndCard": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "litresByHour": "Litres by hour",
+  "receiveMilk": "Receive milk",
+  "tapFarmersCard": "Tap the farmer's card",
+  "holdCardBack": "Hold the card on the back of the phone.",
+  "enterCardNumber": "Enter card number",
+  "searchFarmerByName": "Search farmer by name",
+  "cardAndVillage": "Card {card} · {village}",
+  "@cardAndVillage": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      },
+      "village": {
+        "type": "String"
+      }
+    }
+  },
+  "cardOk": "Card OK",
+  "usuallyBrings": "Usually brings {low}–{high} L",
+  "@usuallyBrings": {
+    "placeholders": {
+      "low": {
+        "type": "int"
+      },
+      "high": {
+        "type": "int"
+      }
+    }
+  },
+  "deliveryDetail": "{session} · Card {card} · Test: {test}",
+  "@deliveryDetail": {
+    "placeholders": {
+      "session": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      },
+      "test": {
+        "type": "String"
+      }
+    }
+  },
+  "testPassed": "passed",
+  "testNotDone": "not done",
+  "tapNextCard": "Tap the next card",
+  "readyNextFarmer": "Ready for the next farmer.",
+  "lastSaved": "Last saved",
+  "smsQueuedPrintSlip": "SMS receipt queued · Print slip",
+  "savedForFarmer": "Saved {litres} L for {name}",
+  "@savedForFarmer": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deliveryUndone": "Delivery removed",
+  "suppliersCount": "{count} suppliers",
+  "@suppliersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchFarmers": "Search name or card number",
+  "deliveredToday": "Delivered today {count}",
+  "@deliveredToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notToday": "Not today {count}",
+  "@notToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noCard": "No card {count}",
+  "@noCard": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cardThisPeriod": "Card {card} · this period {litres} L",
+  "@cardThisPeriod": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      },
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "colFarmer": "Farmer",
+  "colCard": "Card",
+  "colToday": "Today",
+  "colThisPeriod": "This period",
+  "colOwed": "Owed",
+  "addFarmer": "Add farmer",
+  "farmerTitle": "Farmer",
+  "call": "Call",
+  "cardAndPhone": "Card {card} · {phone}",
+  "@cardAndPhone": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      },
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "smsReceiptsOn": "SMS receipts on",
+  "thisPeriod": "This period",
+  "toBePaid": "To be paid",
+  "payDay": "Pay day: {date}",
+  "@payDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "rejected": "Rejected",
+  "statementPeriod": "Statement {period}",
+  "@statementPeriod": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "share": "Share",
+  "litresDelivered": "Litres delivered",
+  "pricePerLitre": "Price per litre",
+  "gross": "Gross",
+  "advanceOn": "Advance ({date})",
+  "@advanceOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "feedsOnCredit": "Feeds on credit",
+  "toPay": "To pay",
+  "closeSessionTitle": "Close the {session} session?",
+  "@closeSessionTitle": {
+    "placeholders": {
+      "session": {
+        "type": "String"
+      }
+    }
+  },
+  "closeSessionBody": "{litres} L from {farmers} farmers. After closing, changes need a manager PIN and are reported to the owner.",
+  "@closeSessionBody": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "farmers": {
+        "type": "int"
+      }
+    }
+  },
+  "keepOpen": "Keep open",
+  "managerPin": "Manager PIN",
+  "sessionClosed": "Session closed",
+  "payments": "Payments",
+  "periodLabel": "Period {period}",
+  "@periodLabel": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "toPayOn": "To pay on {date}",
+  "@toPayOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "payHeroSub": "{farmers} farmers · {litres} L · {price} / L",
+  "@payHeroSub": {
+    "placeholders": {
+      "farmers": {
+        "type": "int"
+      },
+      "litres": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "sendSmsStatements": "Send SMS statements",
+  "paymentSheet": "Payment sheet",
+  "litresAndCard": "{litres} L · Card {card}",
+  "@litresAndCard": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "colGross": "Gross",
+  "colDeductions": "Deductions",
+  "colNet": "Net",
+  "ready": "Ready",
+  "payFarmers": "Pay farmers",
+  "farmersAndAmount": "{farmers} farmers · {amount}",
+  "@farmersAndAmount": {
+    "placeholders": {
+      "farmers": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "mobileMoney": "Mobile Money",
+  "cashSheet": "Cash sheet",
+  "mobileMoneyPayouts": "Mobile Money payouts",
+  "mobileMoneyBody": "Each farmer receives an SMS when paid. Fees are shown before you confirm.",
+  "sent": "Sent",
+  "sending": "Sending…",
+  "failedRetry": "Failed — retry",
+  "farmersLabel": "Farmers",
+  "amount": "Amount",
+  "estimatedFees": "Estimated fees",
+  "total": "Total",
+  "confirmAndPay": "Confirm and pay",
+  "payoutStarted": "Payouts started",
+  "smsStatements": "SMS statements",
+  "previewWhatFarmersGet": "Preview of what each farmer receives:",
+  "messages": "Messages",
+  "smsLeftThisMonth": "SMS left this month",
+  "extraSmsNeeded": "Extra SMS needed",
+  "countOfTotal": "{count} of {total}",
+  "@countOfTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "sendToFarmers": "Send to {count} farmers",
+  "@sendToFarmers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "smsSent": "Statements sent",
+  "farmerAndLitres": "{name} · {litres} L",
+  "@farmerAndLitres": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "alcoholTest": "Alcohol test",
+  "passed": "Passed",
+  "failed": "Failed",
+  "reason": "Reason",
+  "reasonSour": "Sour",
+  "reasonWater": "Added water",
+  "reasonDirty": "Dirty",
+  "reasonTreated": "Treated cow",
+  "reasonOther": "Other",
+  "noteOptional": "Note (optional)",
+  "willBeRejected": "{litres} L will be rejected",
+  "@willBeRejected": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "rejectedBody": "Not paid. The farmer gets an SMS explaining why.",
+  "rejectMilk": "Reject milk",
+  "acceptMilk": "Accept milk",
+  "reconcile": "Reconcile",
+  "receivedFromFarmers": "Received from farmers",
+  "dispatchedToDairy": "Dispatched to dairy",
+  "difference": "Difference",
+  "diffPercent": "{percent}% · above {limit}% limit",
+  "@diffPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "diffPercentOk": "{percent}% · within {limit}% limit",
+  "@diffPercentOk": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "diffAboveLimit": "Difference is above the {limit}% limit",
+  "@diffAboveLimit": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "diffAboveBody": "Check spillage and the cooler dipstick. The owner is notified.",
+  "truck": "Truck",
+  "driver": "Driver",
+  "leftAt": "Left at",
+  "temperature": "Temperature",
+  "explainDifference": "Explain the difference",
+  "saveReconciliation": "Save reconciliation",
+  "reconciliationSaved": "Reconciliation saved",
+  "smsStatementText": "FarmTap: {name}, {period} you delivered {litres} L. Amount so far {amount}. Pay day {payDay}. Thank you!",
+  "@smsStatementText": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "period": {
+        "type": "String"
+      },
+      "litres": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "payDay": {
+        "type": "String"
+      }
+    }
+  },
+  "smsReceiptText": "FarmTap: Today {litres} L received at {time}. Card {card}.",
+  "@smsReceiptText": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "dateAt": "{date}, {time}",
+  "@dateAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "networkPhone": "{network} · {phone}",
+  "@networkPhone": {
+    "placeholders": {
+      "network": {
+        "type": "String"
+      },
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "networkMtn": "MTN",
+  "networkAirtel": "Airtel",
+  "ugxUnit": "UGX",
+  "farmerCardNotFound": "No farmer has this card. Check the number.",
+  "findFarmer": "Find farmer",
+  "pricePerLitreValue": "{price} / L",
+  "@pricePerLitreValue": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "cashSheetInfo": "Cash sheet",
+  "cashSheetBody": "Print the sheet. Each farmer signs when paid in cash.",
+  "printCashSheet": "Print cash sheet",
+  "retryPayout": "Retry payout",
+  "wrongManagerPin": "Wrong PIN. Try again.",
+  "dispatchTitle": "Dispatch",
+  "reasonRequired": "Pick a reason",
+  "farmerName": "Farmer name",
+  "farmerPhone": "Phone (Mobile Money)",
+  "cardOptional": "Card number (optional)",
+  "saveFarmer": "Save farmer",
+  "farmerSaved": "{name} added",
+  "@farmerSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "smsTodayAt": "Today, {time}",
+  "@smsTodayAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   }
 }

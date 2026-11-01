@@ -55,19 +55,19 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | F08 | F08_milk_use_split | Milk | 96.2 | 96.6 | 93.5 | 94.3 | 97.3 | 97.5 | 96.2 | 96.6 | min 93.5 | ✓ | ✓ | ✓ | ✓ | done. |
 | F09 | F09_milk_sales | Milk | 94.7 | 95.0 | 97.5 | 97.6 | 98.1 | 98.1 | 94.7 | 95.0 | min 94.7 | ✓ | ✓ | ✓ | ✓ | done. |
 | F10 | F10_milk_trends | Milk | 96.0 | 96.2 | 96.8 | 97.0 | 97.5 | 97.6 | 96.0 | 96.2 | min 96.0 | ✓ | ✓ | ✓ | ✓ | done. |
-| G01 | G01_centre_home | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G02 | G02_centre_tap_card | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G03 | G03_centre_delivery_keypad | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G04 | G04_centre_delivery_read_back | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G05 | G05_centre_delivery_saved | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G06 | G06_centre_farmers | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G07 | G07_centre_farmer_detail | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G08 | G08_centre_close_session | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G09 | G09_centre_statements | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G10 | G10_centre_payment_sheet | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G11 | G11_centre_sms_preview | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G12 | G12_centre_quality_test | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| G13 | G13_centre_reconciliation | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G01 | G01_centre_home | Collection centre | 95.6 | 96.0 | 93.0 | 93.8 | 96.2 | 96.5 | 95.6 | 96.0 | min 93.0 | ✓ | ✓ | ✓ | ✓ | done. |
+| G02 | G02_centre_tap_card | Collection centre | 95.9 | 96.3 | 98.3 | 98.5 | 98.0 | 98.0 | 95.9 | 96.3 | min 95.9 | ✓ | ✓ | ✓ | ✓ | done. |
+| G03 | G03_centre_delivery_keypad | Collection centre | 95.9 | 96.3 | 95.8 | 96.2 | 97.0 | 97.0 | 95.9 | 96.3 | min 95.8 | ✓ | ✓ | ✓ | ✓ | done. |
+| G04 | G04_centre_delivery_read_back | Collection centre | 90.1 | 91.7 | 93.5 | 96.1 | 92.6 | 95.9 | 90.1 | 91.7 | min 90.1 | ✓ | ✓ | ✓ | ✓ | done. |
+| G05 | G05_centre_delivery_saved | Collection centre | 95.9 | 96.2 | 98.4 | 98.4 | 98.0 | 97.9 | 96.1 | 96.3 | min 95.9 | ✓ | ✓ | ✓ | ✓ | done. |
+| G06 | G06_centre_farmers | Collection centre | 93.1 | 93.2 | 95.7 | 95.8 | 96.6 | 96.6 | 93.0 | 93.1 | min 93.0 | ✓ | ✓ | ✓ | ✓ | done. |
+| G07 | G07_centre_farmer_detail | Collection centre | 93.7 | 93.8 | 96.5 | 96.6 | 97.4 | 97.3 | 93.7 | 93.8 | min 93.7 | ✓ | ✓ | ✓ | ✓ | done. |
+| G08 | G08_centre_close_session | Collection centre | 94.4 | 95.9 | 93.4 | 96.3 | 93.2 | 96.8 | 94.4 | 95.9 | min 93.2 | ✓ | ✓ | ✓ | ✓ | done. |
+| G09 | G09_centre_statements | Collection centre | 91.5 | 92.0 | 93.1 | 93.1 | 94.8 | 94.8 | 91.4 | 91.8 | min 91.4 | ✓ | ✓ | ✓ | ✓ | done. |
+| G10 | G10_centre_payment_sheet | Collection centre | 93.5 | 93.3 | 88.9 | 90.7 | 91.9 | 93.1 | 93.5 | 93.3 | min 88.9 | ✓ | ✓ | ✓ | ✓ | done. |
+| G11 | G11_centre_sms_preview | Collection centre | 86.2 | 88.0 | 96.7 | 96.7 | 95.6 | 95.8 | 86.2 | 88.0 | min 86.2 | ✓ | ✓ | ✓ | ✓ | done. |
+| G12 | G12_centre_quality_test | Collection centre | 87.2 | 88.3 | 94.7 | 96.5 | 93.0 | 95.8 | 87.2 | 88.3 | min 87.2 | ✓ | ✓ | ✓ | ✓ | done. |
+| G13 | G13_centre_reconciliation | Collection centre | 93.3 | 92.0 | 92.7 | 93.2 | 94.6 | 95.3 | 93.3 | 92.0 | min 92.0 | ✓ | ✓ | ✓ | ✓ | done. |
 | H01 | H01_health_home | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | H02 | H02_add_treatment | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | H03 | H03_treatment_saved | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |

@@ -70,15 +70,15 @@ Source of truth for navigation (go_router). Overlays (sheets, dialogs, toasts, c
 | G02 | /collect | — | tab | root tab |
 | G03 | /collect/:farmerId | /collect | push (card tapped) | pop → G02 |
 | G04 | read-back on G03 | /collect/:farmerId | overlay (no scrim dismiss) | "No, change it" closes |
-| G05 | toast on G02 | /collect | state after save | stack resets to G02 (go /collect) |
+| G05 | /collect?saved=:deliveryId | /collect | state after save (toast + Undo 5 s) | stack resets to G02 (go /collect) |
 | G06 | /farmers | — | tab | root tab |
 | G07 | /farmers/:farmerId | /farmers | push | pop |
 | G08 | dialog on G01 | /home | overlay | back closes dialog |
 | G09 | /pay | — | tab | root tab |
-| G10 | sheet on G09 | /pay | overlay | back closes sheet |
-| G11 | /pay/:farmerId/sms | /pay | push | pop |
+| G10 | /pay/sheet | /pay | push | pop |
+| G11 | /pay/sms | /pay | push | pop |
 | G12 | sheet on G03 | /collect/:farmerId | overlay | back closes sheet |
-| G13 | /collect/reconcile | /collect | push | pop |
+| G13 | /home/reconcile | /home | push (Dispatch tile) | pop |
 | H01 | /health | — | tab | root tab |
 | H02 | /health/treatment | /health | push (FAB) | pop; Discard changes? if edited |
 | H03 | celebration on H02 | /health/treatment | overlay | Done → pop to /health |

@@ -3013,6 +3013,900 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{today} L today vs {avg} L avg'**
   String todayVsAvg(String today, String avg);
+
+  /// No description provided for @sessionOpenSince.
+  ///
+  /// In en, this message translates to:
+  /// **'{session} session · open since {time}'**
+  String sessionOpenSince(String session, String time);
+
+  /// No description provided for @collectedThisSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Collected this {session}'**
+  String collectedThisSession(String session);
+
+  /// No description provided for @fromFarmersRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'from {farmers} farmers · {rejected} rejected'**
+  String fromFarmersRejected(int farmers, int rejected);
+
+  /// No description provided for @tapFarmerCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap farmer card'**
+  String get tapFarmerCard;
+
+  /// No description provided for @cardNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Card number'**
+  String get cardNumber;
+
+  /// No description provided for @qualityTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality test'**
+  String get qualityTest;
+
+  /// No description provided for @dispatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Dispatch'**
+  String get dispatch;
+
+  /// No description provided for @closeSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Close session'**
+  String get closeSession;
+
+  /// No description provided for @latestDeliveries.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest deliveries'**
+  String get latestDeliveries;
+
+  /// No description provided for @timeAndCard.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} · Card {card}'**
+  String timeAndCard(String time, String card);
+
+  /// No description provided for @litresByHour.
+  ///
+  /// In en, this message translates to:
+  /// **'Litres by hour'**
+  String get litresByHour;
+
+  /// No description provided for @receiveMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive milk'**
+  String get receiveMilk;
+
+  /// No description provided for @tapFarmersCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the farmer\'s card'**
+  String get tapFarmersCard;
+
+  /// No description provided for @holdCardBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the card on the back of the phone.'**
+  String get holdCardBack;
+
+  /// No description provided for @enterCardNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter card number'**
+  String get enterCardNumber;
+
+  /// No description provided for @searchFarmerByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Search farmer by name'**
+  String get searchFarmerByName;
+
+  /// No description provided for @cardAndVillage.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {card} · {village}'**
+  String cardAndVillage(String card, String village);
+
+  /// No description provided for @cardOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Card OK'**
+  String get cardOk;
+
+  /// No description provided for @usuallyBrings.
+  ///
+  /// In en, this message translates to:
+  /// **'Usually brings {low}–{high} L'**
+  String usuallyBrings(int low, int high);
+
+  /// No description provided for @deliveryDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'{session} · Card {card} · Test: {test}'**
+  String deliveryDetail(String session, String card, String test);
+
+  /// No description provided for @testPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'passed'**
+  String get testPassed;
+
+  /// No description provided for @testNotDone.
+  ///
+  /// In en, this message translates to:
+  /// **'not done'**
+  String get testNotDone;
+
+  /// No description provided for @tapNextCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the next card'**
+  String get tapNextCard;
+
+  /// No description provided for @readyNextFarmer.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for the next farmer.'**
+  String get readyNextFarmer;
+
+  /// No description provided for @lastSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Last saved'**
+  String get lastSaved;
+
+  /// No description provided for @smsQueuedPrintSlip.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS receipt queued · Print slip'**
+  String get smsQueuedPrintSlip;
+
+  /// No description provided for @savedForFarmer.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {litres} L for {name}'**
+  String savedForFarmer(String litres, String name);
+
+  /// No description provided for @deliveryUndone.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery removed'**
+  String get deliveryUndone;
+
+  /// No description provided for @suppliersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} suppliers'**
+  String suppliersCount(int count);
+
+  /// No description provided for @searchFarmers.
+  ///
+  /// In en, this message translates to:
+  /// **'Search name or card number'**
+  String get searchFarmers;
+
+  /// No description provided for @deliveredToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered today {count}'**
+  String deliveredToday(int count);
+
+  /// No description provided for @notToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Not today {count}'**
+  String notToday(int count);
+
+  /// No description provided for @noCard.
+  ///
+  /// In en, this message translates to:
+  /// **'No card {count}'**
+  String noCard(int count);
+
+  /// No description provided for @cardThisPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {card} · this period {litres} L'**
+  String cardThisPeriod(String card, String litres);
+
+  /// No description provided for @colFarmer.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmer'**
+  String get colFarmer;
+
+  /// No description provided for @colCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Card'**
+  String get colCard;
+
+  /// No description provided for @colToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get colToday;
+
+  /// No description provided for @colThisPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'This period'**
+  String get colThisPeriod;
+
+  /// No description provided for @colOwed.
+  ///
+  /// In en, this message translates to:
+  /// **'Owed'**
+  String get colOwed;
+
+  /// No description provided for @addFarmer.
+  ///
+  /// In en, this message translates to:
+  /// **'Add farmer'**
+  String get addFarmer;
+
+  /// No description provided for @farmerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmer'**
+  String get farmerTitle;
+
+  /// No description provided for @call.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get call;
+
+  /// No description provided for @cardAndPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {card} · {phone}'**
+  String cardAndPhone(String card, String phone);
+
+  /// No description provided for @smsReceiptsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS receipts on'**
+  String get smsReceiptsOn;
+
+  /// No description provided for @thisPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'This period'**
+  String get thisPeriod;
+
+  /// No description provided for @toBePaid.
+  ///
+  /// In en, this message translates to:
+  /// **'To be paid'**
+  String get toBePaid;
+
+  /// No description provided for @payDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay day: {date}'**
+  String payDay(String date);
+
+  /// No description provided for @rejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get rejected;
+
+  /// No description provided for @statementPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement {period}'**
+  String statementPeriod(String period);
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// No description provided for @litresDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Litres delivered'**
+  String get litresDelivered;
+
+  /// No description provided for @pricePerLitre.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per litre'**
+  String get pricePerLitre;
+
+  /// No description provided for @gross.
+  ///
+  /// In en, this message translates to:
+  /// **'Gross'**
+  String get gross;
+
+  /// No description provided for @advanceOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Advance ({date})'**
+  String advanceOn(String date);
+
+  /// No description provided for @feedsOnCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeds on credit'**
+  String get feedsOnCredit;
+
+  /// No description provided for @toPay.
+  ///
+  /// In en, this message translates to:
+  /// **'To pay'**
+  String get toPay;
+
+  /// No description provided for @closeSessionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Close the {session} session?'**
+  String closeSessionTitle(String session);
+
+  /// No description provided for @closeSessionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{litres} L from {farmers} farmers. After closing, changes need a manager PIN and are reported to the owner.'**
+  String closeSessionBody(String litres, int farmers);
+
+  /// No description provided for @keepOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep open'**
+  String get keepOpen;
+
+  /// No description provided for @managerPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Manager PIN'**
+  String get managerPin;
+
+  /// No description provided for @sessionClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Session closed'**
+  String get sessionClosed;
+
+  /// No description provided for @payments.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get payments;
+
+  /// No description provided for @periodLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Period {period}'**
+  String periodLabel(String period);
+
+  /// No description provided for @toPayOn.
+  ///
+  /// In en, this message translates to:
+  /// **'To pay on {date}'**
+  String toPayOn(String date);
+
+  /// No description provided for @payHeroSub.
+  ///
+  /// In en, this message translates to:
+  /// **'{farmers} farmers · {litres} L · {price} / L'**
+  String payHeroSub(int farmers, String litres, String price);
+
+  /// No description provided for @sendSmsStatements.
+  ///
+  /// In en, this message translates to:
+  /// **'Send SMS statements'**
+  String get sendSmsStatements;
+
+  /// No description provided for @paymentSheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment sheet'**
+  String get paymentSheet;
+
+  /// No description provided for @litresAndCard.
+  ///
+  /// In en, this message translates to:
+  /// **'{litres} L · Card {card}'**
+  String litresAndCard(String litres, String card);
+
+  /// No description provided for @colGross.
+  ///
+  /// In en, this message translates to:
+  /// **'Gross'**
+  String get colGross;
+
+  /// No description provided for @colDeductions.
+  ///
+  /// In en, this message translates to:
+  /// **'Deductions'**
+  String get colDeductions;
+
+  /// No description provided for @colNet.
+  ///
+  /// In en, this message translates to:
+  /// **'Net'**
+  String get colNet;
+
+  /// No description provided for @ready.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get ready;
+
+  /// No description provided for @payFarmers.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay farmers'**
+  String get payFarmers;
+
+  /// No description provided for @farmersAndAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'{farmers} farmers · {amount}'**
+  String farmersAndAmount(int farmers, String amount);
+
+  /// No description provided for @mobileMoney.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Money'**
+  String get mobileMoney;
+
+  /// No description provided for @cashSheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash sheet'**
+  String get cashSheet;
+
+  /// No description provided for @mobileMoneyPayouts.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Money payouts'**
+  String get mobileMoneyPayouts;
+
+  /// No description provided for @mobileMoneyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Each farmer receives an SMS when paid. Fees are shown before you confirm.'**
+  String get mobileMoneyBody;
+
+  /// No description provided for @sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get sent;
+
+  /// No description provided for @sending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get sending;
+
+  /// No description provided for @failedRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed — retry'**
+  String get failedRetry;
+
+  /// No description provided for @farmersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmers'**
+  String get farmersLabel;
+
+  /// No description provided for @amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// No description provided for @estimatedFees.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated fees'**
+  String get estimatedFees;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// No description provided for @confirmAndPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm and pay'**
+  String get confirmAndPay;
+
+  /// No description provided for @payoutStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Payouts started'**
+  String get payoutStarted;
+
+  /// No description provided for @smsStatements.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS statements'**
+  String get smsStatements;
+
+  /// No description provided for @previewWhatFarmersGet.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview of what each farmer receives:'**
+  String get previewWhatFarmersGet;
+
+  /// No description provided for @messages.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get messages;
+
+  /// No description provided for @smsLeftThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS left this month'**
+  String get smsLeftThisMonth;
+
+  /// No description provided for @extraSmsNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra SMS needed'**
+  String get extraSmsNeeded;
+
+  /// No description provided for @countOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {total}'**
+  String countOfTotal(int count, int total);
+
+  /// No description provided for @sendToFarmers.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to {count} farmers'**
+  String sendToFarmers(int count);
+
+  /// No description provided for @smsSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Statements sent'**
+  String get smsSent;
+
+  /// No description provided for @farmerAndLitres.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} · {litres} L'**
+  String farmerAndLitres(String name, String litres);
+
+  /// No description provided for @alcoholTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Alcohol test'**
+  String get alcoholTest;
+
+  /// No description provided for @passed.
+  ///
+  /// In en, this message translates to:
+  /// **'Passed'**
+  String get passed;
+
+  /// No description provided for @failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get failed;
+
+  /// No description provided for @reason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get reason;
+
+  /// No description provided for @reasonSour.
+  ///
+  /// In en, this message translates to:
+  /// **'Sour'**
+  String get reasonSour;
+
+  /// No description provided for @reasonWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Added water'**
+  String get reasonWater;
+
+  /// No description provided for @reasonDirty.
+  ///
+  /// In en, this message translates to:
+  /// **'Dirty'**
+  String get reasonDirty;
+
+  /// No description provided for @reasonTreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Treated cow'**
+  String get reasonTreated;
+
+  /// No description provided for @reasonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get reasonOther;
+
+  /// No description provided for @noteOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get noteOptional;
+
+  /// No description provided for @willBeRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'{litres} L will be rejected'**
+  String willBeRejected(String litres);
+
+  /// No description provided for @rejectedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Not paid. The farmer gets an SMS explaining why.'**
+  String get rejectedBody;
+
+  /// No description provided for @rejectMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject milk'**
+  String get rejectMilk;
+
+  /// No description provided for @acceptMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept milk'**
+  String get acceptMilk;
+
+  /// No description provided for @reconcile.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconcile'**
+  String get reconcile;
+
+  /// No description provided for @receivedFromFarmers.
+  ///
+  /// In en, this message translates to:
+  /// **'Received from farmers'**
+  String get receivedFromFarmers;
+
+  /// No description provided for @dispatchedToDairy.
+  ///
+  /// In en, this message translates to:
+  /// **'Dispatched to dairy'**
+  String get dispatchedToDairy;
+
+  /// No description provided for @difference.
+  ///
+  /// In en, this message translates to:
+  /// **'Difference'**
+  String get difference;
+
+  /// No description provided for @diffPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% · above {limit}% limit'**
+  String diffPercent(String percent, int limit);
+
+  /// No description provided for @diffPercentOk.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% · within {limit}% limit'**
+  String diffPercentOk(String percent, int limit);
+
+  /// No description provided for @diffAboveLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Difference is above the {limit}% limit'**
+  String diffAboveLimit(int limit);
+
+  /// No description provided for @diffAboveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Check spillage and the cooler dipstick. The owner is notified.'**
+  String get diffAboveBody;
+
+  /// No description provided for @truck.
+  ///
+  /// In en, this message translates to:
+  /// **'Truck'**
+  String get truck;
+
+  /// No description provided for @driver.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver'**
+  String get driver;
+
+  /// No description provided for @leftAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Left at'**
+  String get leftAt;
+
+  /// No description provided for @temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get temperature;
+
+  /// No description provided for @explainDifference.
+  ///
+  /// In en, this message translates to:
+  /// **'Explain the difference'**
+  String get explainDifference;
+
+  /// No description provided for @saveReconciliation.
+  ///
+  /// In en, this message translates to:
+  /// **'Save reconciliation'**
+  String get saveReconciliation;
+
+  /// No description provided for @reconciliationSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconciliation saved'**
+  String get reconciliationSaved;
+
+  /// No description provided for @smsStatementText.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap: {name}, {period} you delivered {litres} L. Amount so far {amount}. Pay day {payDay}. Thank you!'**
+  String smsStatementText(
+    String name,
+    String period,
+    String litres,
+    String amount,
+    String payDay,
+  );
+
+  /// No description provided for @smsReceiptText.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap: Today {litres} L received at {time}. Card {card}.'**
+  String smsReceiptText(String litres, String time, String card);
+
+  /// No description provided for @dateAt.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}, {time}'**
+  String dateAt(String date, String time);
+
+  /// No description provided for @networkPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'{network} · {phone}'**
+  String networkPhone(String network, String phone);
+
+  /// No description provided for @networkMtn.
+  ///
+  /// In en, this message translates to:
+  /// **'MTN'**
+  String get networkMtn;
+
+  /// No description provided for @networkAirtel.
+  ///
+  /// In en, this message translates to:
+  /// **'Airtel'**
+  String get networkAirtel;
+
+  /// No description provided for @ugxUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'UGX'**
+  String get ugxUnit;
+
+  /// No description provided for @farmerCardNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No farmer has this card. Check the number.'**
+  String get farmerCardNotFound;
+
+  /// No description provided for @findFarmer.
+  ///
+  /// In en, this message translates to:
+  /// **'Find farmer'**
+  String get findFarmer;
+
+  /// No description provided for @pricePerLitreValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} / L'**
+  String pricePerLitreValue(String price);
+
+  /// No description provided for @cashSheetInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash sheet'**
+  String get cashSheetInfo;
+
+  /// No description provided for @cashSheetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Print the sheet. Each farmer signs when paid in cash.'**
+  String get cashSheetBody;
+
+  /// No description provided for @printCashSheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Print cash sheet'**
+  String get printCashSheet;
+
+  /// No description provided for @retryPayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry payout'**
+  String get retryPayout;
+
+  /// No description provided for @wrongManagerPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong PIN. Try again.'**
+  String get wrongManagerPin;
+
+  /// No description provided for @dispatchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dispatch'**
+  String get dispatchTitle;
+
+  /// No description provided for @reasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a reason'**
+  String get reasonRequired;
+
+  /// No description provided for @farmerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmer name'**
+  String get farmerName;
+
+  /// No description provided for @farmerPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone (Mobile Money)'**
+  String get farmerPhone;
+
+  /// No description provided for @cardOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Card number (optional)'**
+  String get cardOptional;
+
+  /// No description provided for @saveFarmer.
+  ///
+  /// In en, this message translates to:
+  /// **'Save farmer'**
+  String get saveFarmer;
+
+  /// No description provided for @farmerSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} added'**
+  String farmerSaved(String name);
+
+  /// No description provided for @smsTodayAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Today, {time}'**
+  String smsTodayAt(String time);
 }
 
 class _AppLocalizationsDelegate

@@ -7,6 +7,8 @@ import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
+import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
+import 'package:farm_tap/sectors/cattle/collection_centre/data/fake/fake_centre_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
@@ -18,11 +20,15 @@ class FixedClock implements Clock {
 }
 
 /// App dependencies built from fakes; optionally signed in with a farm open.
-Future<AppDependencies> fakeDependencies({bool signedIn = false, bool farm = false}) async {
+Future<AppDependencies> fakeDependencies({bool signedIn = false, bool farm = false, bool centre = false}) async {
   final auth = FakeAuthRepository();
   if (signedIn) await auth.signInWithGoogle();
   final session = SessionController(auth: auth);
-  if (farm) session.openFarm(FakeFarmMembershipRepository.places.first);
+  if (farm) {
+    session.openFarm(
+      FakeFarmMembershipRepository.places.firstWhere((p) => centre == (p.kind == PlaceKind.collectionCentre)),
+    );
+  }
   final clock = SystemClock();
   return AppDependencies(
     session: session,
@@ -33,5 +39,6 @@ Future<AppDependencies> fakeDependencies({bool signedIn = false, bool farm = fal
     home: FakeHomeRepository(clock),
     herd: FakeHerdRepository(clock: clock, tenantProvider: InMemoryTenantProvider()),
     milk: FakeMilkRepository(clock),
+    centre: FakeCentreRepository(clock),
   );
 }

@@ -25,6 +25,14 @@ class FarmTapFormat {
   /// "42.5 L".
   String litres(num litres) => '${litresValue(litres, trim: false)} L';
 
+  /// "561k" (no currency) for tight list columns.
+  String compact(num n) => NumberFormat.compact(locale: _l).format(n).toLowerCase();
+
+  /// "1–15 Nov" (same month) or "28 Oct – 3 Nov".
+  String period(DateTime a, DateTime b) => a.month == b.month && a.year == b.year
+      ? '${a.day}–${DateFormat('d MMM', _l).format(b)}'
+      : '${dayMonth(a)} – ${dayMonth(b)}';
+
   String count(num n) => NumberFormat.decimalPattern(_l).format(n);
 
   /// "Thu 12 Nov".

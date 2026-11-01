@@ -144,17 +144,22 @@ class HeroCard extends StatelessWidget {
                   children: [
                     Text(label, style: context.textStyles.metricLabel.copyWith(color: on)),
                     context.space.gapXs,
-                    Text.rich(
-                      TextSpan(
-                        text: value,
-                        style: context.textStyles.hero.copyWith(color: on),
-                        children: [
-                          if (unit != null)
-                            TextSpan(
-                              text: ' $unit',
-                              style: context.text.titleLarge?.copyWith(color: on),
-                            ),
-                        ],
+                    // One line: long money values scale down instead of wrapping.
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text.rich(
+                        TextSpan(
+                          text: value,
+                          style: context.textStyles.hero.copyWith(color: on),
+                          children: [
+                            if (unit != null)
+                              TextSpan(
+                                text: ' $unit',
+                                style: context.text.titleLarge?.copyWith(color: on),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                     if (sub != null) ...[
@@ -616,6 +621,39 @@ class Timeline extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// "Litres delivered ........ 512.0 L" line in a summary card (statements,
+/// totals, dispatch). [emphasis] makes both sides titleMedium (Total, To pay).
+class SummaryRow extends StatelessWidget {
+  const new({required this.label, required this.value, super.key, this.emphasis = false, this.valueColor});
+
+  final String label;
+  final String value;
+  final bool emphasis;
+  final Color? valueColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final labelStyle = emphasis
+        ? context.text.titleMedium
+        : context.text.bodyLarge?.copyWith(color: context.colors.onSurfaceVariant);
+    final valueStyle = (emphasis ? context.text.titleMedium : context.text.titleSmall)?.copyWith(color: valueColor);
+    return MergeSemantics(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: context.space.xs),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Expanded(child: Text(label, style: labelStyle)),
+            context.space.gapMd,
+            Text(value, textAlign: TextAlign.end, style: valueStyle),
+          ],
+        ),
+      ),
     );
   }
 }

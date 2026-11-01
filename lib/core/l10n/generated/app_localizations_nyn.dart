@@ -1664,4 +1664,536 @@ class AppLocalizationsNyn extends AppLocalizations {
   String todayVsAvg(String today, String avg) {
     return '[nyn] $today L today vs $avg L avg';
   }
+
+  @override
+  String sessionOpenSince(String session, String time) {
+    return '[nyn] $session session · open since $time';
+  }
+
+  @override
+  String collectedThisSession(String session) {
+    return '[nyn] Collected this $session';
+  }
+
+  @override
+  String fromFarmersRejected(int farmers, int rejected) {
+    return '[nyn] from $farmers farmers · $rejected rejected';
+  }
+
+  @override
+  String get tapFarmerCard => '[nyn] Tap farmer card';
+
+  @override
+  String get cardNumber => '[nyn] Card number';
+
+  @override
+  String get qualityTest => '[nyn] Quality test';
+
+  @override
+  String get dispatch => '[nyn] Dispatch';
+
+  @override
+  String get closeSession => '[nyn] Close session';
+
+  @override
+  String get latestDeliveries => '[nyn] Latest deliveries';
+
+  @override
+  String timeAndCard(String time, String card) {
+    return '[nyn] $time · Card $card';
+  }
+
+  @override
+  String get litresByHour => '[nyn] Litres by hour';
+
+  @override
+  String get receiveMilk => '[nyn] Receive milk';
+
+  @override
+  String get tapFarmersCard => '[nyn] Tap the farmer\'s card';
+
+  @override
+  String get holdCardBack => '[nyn] Hold the card on the back of the phone.';
+
+  @override
+  String get enterCardNumber => '[nyn] Enter card number';
+
+  @override
+  String get searchFarmerByName => '[nyn] Search farmer by name';
+
+  @override
+  String cardAndVillage(String card, String village) {
+    return '[nyn] Card $card · $village';
+  }
+
+  @override
+  String get cardOk => '[nyn] Card OK';
+
+  @override
+  String usuallyBrings(int low, int high) {
+    return '[nyn] Usually brings $low–$high L';
+  }
+
+  @override
+  String deliveryDetail(String session, String card, String test) {
+    return '[nyn] $session · Card $card · Test: $test';
+  }
+
+  @override
+  String get testPassed => '[nyn] passed';
+
+  @override
+  String get testNotDone => '[nyn] not done';
+
+  @override
+  String get tapNextCard => '[nyn] Tap the next card';
+
+  @override
+  String get readyNextFarmer => '[nyn] Ready for the next farmer.';
+
+  @override
+  String get lastSaved => '[nyn] Last saved';
+
+  @override
+  String get smsQueuedPrintSlip => '[nyn] SMS receipt queued · Print slip';
+
+  @override
+  String savedForFarmer(String litres, String name) {
+    return '[nyn] Saved $litres L for $name';
+  }
+
+  @override
+  String get deliveryUndone => '[nyn] Delivery removed';
+
+  @override
+  String suppliersCount(int count) {
+    return '[nyn] $count suppliers';
+  }
+
+  @override
+  String get searchFarmers => '[nyn] Search name or card number';
+
+  @override
+  String deliveredToday(int count) {
+    return '[nyn] Delivered today $count';
+  }
+
+  @override
+  String notToday(int count) {
+    return '[nyn] Not today $count';
+  }
+
+  @override
+  String noCard(int count) {
+    return '[nyn] No card $count';
+  }
+
+  @override
+  String cardThisPeriod(String card, String litres) {
+    return '[nyn] Card $card · this period $litres L';
+  }
+
+  @override
+  String get colFarmer => '[nyn] Farmer';
+
+  @override
+  String get colCard => '[nyn] Card';
+
+  @override
+  String get colToday => '[nyn] Today';
+
+  @override
+  String get colThisPeriod => '[nyn] This period';
+
+  @override
+  String get colOwed => '[nyn] Owed';
+
+  @override
+  String get addFarmer => '[nyn] Add farmer';
+
+  @override
+  String get farmerTitle => '[nyn] Farmer';
+
+  @override
+  String get call => '[nyn] Call';
+
+  @override
+  String cardAndPhone(String card, String phone) {
+    return '[nyn] Card $card · $phone';
+  }
+
+  @override
+  String get smsReceiptsOn => '[nyn] SMS receipts on';
+
+  @override
+  String get thisPeriod => '[nyn] This period';
+
+  @override
+  String get toBePaid => '[nyn] To be paid';
+
+  @override
+  String payDay(String date) {
+    return '[nyn] Pay day: $date';
+  }
+
+  @override
+  String get rejected => '[nyn] Rejected';
+
+  @override
+  String statementPeriod(String period) {
+    return '[nyn] Statement $period';
+  }
+
+  @override
+  String get share => '[nyn] Share';
+
+  @override
+  String get litresDelivered => '[nyn] Litres delivered';
+
+  @override
+  String get pricePerLitre => '[nyn] Price per litre';
+
+  @override
+  String get gross => '[nyn] Gross';
+
+  @override
+  String advanceOn(String date) {
+    return '[nyn] Advance ($date)';
+  }
+
+  @override
+  String get feedsOnCredit => '[nyn] Feeds on credit';
+
+  @override
+  String get toPay => '[nyn] To pay';
+
+  @override
+  String closeSessionTitle(String session) {
+    return '[nyn] Close the $session session?';
+  }
+
+  @override
+  String closeSessionBody(String litres, int farmers) {
+    return '[nyn] $litres L from $farmers farmers. After closing, changes need a manager PIN and are reported to the owner.';
+  }
+
+  @override
+  String get keepOpen => '[nyn] Keep open';
+
+  @override
+  String get managerPin => '[nyn] Manager PIN';
+
+  @override
+  String get sessionClosed => '[nyn] Session closed';
+
+  @override
+  String get payments => '[nyn] Payments';
+
+  @override
+  String periodLabel(String period) {
+    return '[nyn] Period $period';
+  }
+
+  @override
+  String toPayOn(String date) {
+    return '[nyn] To pay on $date';
+  }
+
+  @override
+  String payHeroSub(int farmers, String litres, String price) {
+    return '[nyn] $farmers farmers · $litres L · $price / L';
+  }
+
+  @override
+  String get sendSmsStatements => '[nyn] Send SMS statements';
+
+  @override
+  String get paymentSheet => '[nyn] Payment sheet';
+
+  @override
+  String litresAndCard(String litres, String card) {
+    return '[nyn] $litres L · Card $card';
+  }
+
+  @override
+  String get colGross => '[nyn] Gross';
+
+  @override
+  String get colDeductions => '[nyn] Deductions';
+
+  @override
+  String get colNet => '[nyn] Net';
+
+  @override
+  String get ready => '[nyn] Ready';
+
+  @override
+  String get payFarmers => '[nyn] Pay farmers';
+
+  @override
+  String farmersAndAmount(int farmers, String amount) {
+    return '[nyn] $farmers farmers · $amount';
+  }
+
+  @override
+  String get mobileMoney => '[nyn] Mobile Money';
+
+  @override
+  String get cashSheet => '[nyn] Cash sheet';
+
+  @override
+  String get mobileMoneyPayouts => '[nyn] Mobile Money payouts';
+
+  @override
+  String get mobileMoneyBody =>
+      '[nyn] Each farmer receives an SMS when paid. Fees are shown before you confirm.';
+
+  @override
+  String get sent => '[nyn] Sent';
+
+  @override
+  String get sending => '[nyn] Sending…';
+
+  @override
+  String get failedRetry => '[nyn] Failed — retry';
+
+  @override
+  String get farmersLabel => '[nyn] Farmers';
+
+  @override
+  String get amount => '[nyn] Amount';
+
+  @override
+  String get estimatedFees => '[nyn] Estimated fees';
+
+  @override
+  String get total => '[nyn] Total';
+
+  @override
+  String get confirmAndPay => '[nyn] Confirm and pay';
+
+  @override
+  String get payoutStarted => '[nyn] Payouts started';
+
+  @override
+  String get smsStatements => '[nyn] SMS statements';
+
+  @override
+  String get previewWhatFarmersGet =>
+      '[nyn] Preview of what each farmer receives:';
+
+  @override
+  String get messages => '[nyn] Messages';
+
+  @override
+  String get smsLeftThisMonth => '[nyn] SMS left this month';
+
+  @override
+  String get extraSmsNeeded => '[nyn] Extra SMS needed';
+
+  @override
+  String countOfTotal(int count, int total) {
+    return '[nyn] $count of $total';
+  }
+
+  @override
+  String sendToFarmers(int count) {
+    return '[nyn] Send to $count farmers';
+  }
+
+  @override
+  String get smsSent => '[nyn] Statements sent';
+
+  @override
+  String farmerAndLitres(String name, String litres) {
+    return '[nyn] $name · $litres L';
+  }
+
+  @override
+  String get alcoholTest => '[nyn] Alcohol test';
+
+  @override
+  String get passed => '[nyn] Passed';
+
+  @override
+  String get failed => '[nyn] Failed';
+
+  @override
+  String get reason => '[nyn] Reason';
+
+  @override
+  String get reasonSour => '[nyn] Sour';
+
+  @override
+  String get reasonWater => '[nyn] Added water';
+
+  @override
+  String get reasonDirty => '[nyn] Dirty';
+
+  @override
+  String get reasonTreated => '[nyn] Treated cow';
+
+  @override
+  String get reasonOther => '[nyn] Other';
+
+  @override
+  String get noteOptional => '[nyn] Note (optional)';
+
+  @override
+  String willBeRejected(String litres) {
+    return '[nyn] $litres L will be rejected';
+  }
+
+  @override
+  String get rejectedBody =>
+      '[nyn] Not paid. The farmer gets an SMS explaining why.';
+
+  @override
+  String get rejectMilk => '[nyn] Reject milk';
+
+  @override
+  String get acceptMilk => '[nyn] Accept milk';
+
+  @override
+  String get reconcile => '[nyn] Reconcile';
+
+  @override
+  String get receivedFromFarmers => '[nyn] Received from farmers';
+
+  @override
+  String get dispatchedToDairy => '[nyn] Dispatched to dairy';
+
+  @override
+  String get difference => '[nyn] Difference';
+
+  @override
+  String diffPercent(String percent, int limit) {
+    return '[nyn] $percent% · above $limit% limit';
+  }
+
+  @override
+  String diffPercentOk(String percent, int limit) {
+    return '[nyn] $percent% · within $limit% limit';
+  }
+
+  @override
+  String diffAboveLimit(int limit) {
+    return '[nyn] Difference is above the $limit% limit';
+  }
+
+  @override
+  String get diffAboveBody =>
+      '[nyn] Check spillage and the cooler dipstick. The owner is notified.';
+
+  @override
+  String get truck => '[nyn] Truck';
+
+  @override
+  String get driver => '[nyn] Driver';
+
+  @override
+  String get leftAt => '[nyn] Left at';
+
+  @override
+  String get temperature => '[nyn] Temperature';
+
+  @override
+  String get explainDifference => '[nyn] Explain the difference';
+
+  @override
+  String get saveReconciliation => '[nyn] Save reconciliation';
+
+  @override
+  String get reconciliationSaved => '[nyn] Reconciliation saved';
+
+  @override
+  String smsStatementText(
+    String name,
+    String period,
+    String litres,
+    String amount,
+    String payDay,
+  ) {
+    return '[nyn] FarmTap: $name, $period you delivered $litres L. Amount so far $amount. Pay day $payDay. Thank you!';
+  }
+
+  @override
+  String smsReceiptText(String litres, String time, String card) {
+    return '[nyn] FarmTap: Today $litres L received at $time. Card $card.';
+  }
+
+  @override
+  String dateAt(String date, String time) {
+    return '[nyn] $date, $time';
+  }
+
+  @override
+  String networkPhone(String network, String phone) {
+    return '[nyn] $network · $phone';
+  }
+
+  @override
+  String get networkMtn => '[nyn] MTN';
+
+  @override
+  String get networkAirtel => '[nyn] Airtel';
+
+  @override
+  String get ugxUnit => '[nyn] UGX';
+
+  @override
+  String get farmerCardNotFound =>
+      '[nyn] No farmer has this card. Check the number.';
+
+  @override
+  String get findFarmer => '[nyn] Find farmer';
+
+  @override
+  String pricePerLitreValue(String price) {
+    return '[nyn] $price / L';
+  }
+
+  @override
+  String get cashSheetInfo => '[nyn] Cash sheet';
+
+  @override
+  String get cashSheetBody =>
+      '[nyn] Print the sheet. Each farmer signs when paid in cash.';
+
+  @override
+  String get printCashSheet => '[nyn] Print cash sheet';
+
+  @override
+  String get retryPayout => '[nyn] Retry payout';
+
+  @override
+  String get wrongManagerPin => '[nyn] Wrong PIN. Try again.';
+
+  @override
+  String get dispatchTitle => '[nyn] Dispatch';
+
+  @override
+  String get reasonRequired => '[nyn] Pick a reason';
+
+  @override
+  String get farmerName => '[nyn] Farmer name';
+
+  @override
+  String get farmerPhone => '[nyn] Phone (Mobile Money)';
+
+  @override
+  String get cardOptional => '[nyn] Card number (optional)';
+
+  @override
+  String get saveFarmer => '[nyn] Save farmer';
+
+  @override
+  String farmerSaved(String name) {
+    return '[nyn] $name added';
+  }
+
+  @override
+  String smsTodayAt(String time) {
+    return '[nyn] Today, $time';
+  }
 }

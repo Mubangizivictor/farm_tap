@@ -47,6 +47,12 @@ abstract final class AppRoutes {
   static const collect = '/collect';
   static const farmers = '/farmers';
   static const pay = '/pay';
+  static const centreReconcile = '/home/reconcile';
+  static String collectFarmer(String farmerId) => '/collect/$farmerId';
+  static String collectSaved(String deliveryId) => '/collect?saved=$deliveryId';
+  static String centreFarmer(String farmerId) => '/farmers/$farmerId';
+  static const payFarmers = '/pay/sheet';
+  static const paySms = '/pay/sms';
   static const feeding = '/feeding';
   static const breeding = '/breeding';
   static const workers = '/workers';
