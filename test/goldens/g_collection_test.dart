@@ -23,7 +23,7 @@ void main() {
   }
 
   Widget shell(Widget page, String current, {String? parent}) =>
-      inShell(page, current: current, parent: parent, centre: true, profileName: 'Mugisha Tom');
+      inShell(page, current: current, parent: parent, centre: true);
 
   Widget home() => shell(
     CentreHomePage(

@@ -5,9 +5,9 @@ import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.da
 import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
+import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
-import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/data/fake/fake_centre_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
