@@ -3,6 +3,7 @@
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
@@ -60,7 +61,7 @@ class _HerdListPageState extends State<HerdListPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final f = FarmTapFormat(Localizations.localeOf(context).toLanguageTag());
-    final today = widget.today ?? DateTime.now();
+    final today = widget.today ?? context.clock.now();
     return FutureBuilder<(List<HerdRow>, HerdCounts?)>(
       future: _load,
       builder: (context, snapshot) {

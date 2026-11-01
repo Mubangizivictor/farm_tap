@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
@@ -56,7 +57,7 @@ class _AnimalDetailPageState extends State<AnimalDetailPage> {
         await widget.repo.recordDeath(animal.id, cause: cause.isEmpty ? null : cause);
         widget.onGone?.call();
       case HerdEventKind.calving:
-        final calf = (await widget.repo.recordCalving(animal.id, at: widget.today ?? DateTime.now())).data;
+        final calf = (await widget.repo.recordCalving(animal.id, at: widget.today ?? context.clock.now())).data;
         if (calf == null || !mounted) return;
         await showCalfBorn(context, mother: animal, calf: calf);
         setState(() {
@@ -71,7 +72,7 @@ class _AnimalDetailPageState extends State<AnimalDetailPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final f = FarmTapFormat(Localizations.localeOf(context).toLanguageTag());
-    final today = DateUtils.dateOnly(widget.today ?? DateTime.now());
+    final today = DateUtils.dateOnly(widget.today ?? context.clock.now());
     return FutureBuilder<AnimalDetail?>(
       future: _detail,
       builder: (context, snapshot) {

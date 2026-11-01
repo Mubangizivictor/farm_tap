@@ -14,9 +14,9 @@ import '../../helpers/pump_app.dart';
 void main() {
   test('fake herd is seeded with the 8 sample cows', () async {
     final repo = FakeHerdRepository(
-      clock: SystemClock(),
+      clock: FakeClock(),
       tenantProvider: InMemoryTenantProvider(),
-      treatments: FakeTreatmentRepository(SystemClock()),
+      treatments: FakeTreatmentRepository(FakeClock()),
     );
     final first = await repo.watchAnimals().first;
     expect(first.data!.map((a) => a.tagNumber), contains('FT-014'));

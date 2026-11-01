@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_models.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
@@ -40,7 +41,7 @@ class MilkTodayPage extends StatefulWidget {
 }
 
 class _MilkTodayPageState extends State<MilkTodayPage> {
-  late _DayView _view = sessionAt(widget.today ?? DateTime.now()) == MilkSession.morning
+  late _DayView _view = sessionAt(widget.today ?? context.clock.now()) == MilkSession.morning
       ? _DayView.morning
       : _DayView.evening;
 
@@ -51,7 +52,7 @@ class _MilkTodayPageState extends State<MilkTodayPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final f = _fmt(context);
-    final today = widget.today ?? DateTime.now();
+    final today = widget.today ?? context.clock.now();
     return AdaptiveScaffold(
       title: l10n.milk,
       subtitle: f.longDay(today),
@@ -213,7 +214,7 @@ class _PickCowPageState extends State<PickCowPage> {
   bool _onlyMissing = false;
   String _query = '';
 
-  MilkSession get _session => sessionAt(widget.now ?? DateTime.now());
+  MilkSession get _session => sessionAt(widget.now ?? context.clock.now());
 
   Future<void> _pick(MilkCow cow) async {
     final t = cow.treatment;
@@ -399,7 +400,7 @@ class _MilkKeypadPageState extends State<MilkKeypadPage> {
   late final Future<MilkCow?> _cow = widget.repo.cow(widget.cowId).then((r) => r.data);
   DecimalEntry _entry = const DecimalEntry(maxIntegerDigits: 2);
 
-  MilkSession get _session => sessionAt(widget.now ?? DateTime.now());
+  MilkSession get _session => sessionAt(widget.now ?? context.clock.now());
 
   Future<void> _next(MilkCow cow) async {
     final l10n = AppLocalizations.of(context);
@@ -537,7 +538,7 @@ class QuickTotalPage extends StatefulWidget {
 class _QuickTotalPageState extends State<QuickTotalPage> {
   DecimalEntry _entry = const DecimalEntry(maxIntegerDigits: 4);
 
-  MilkSession get _session => sessionAt(widget.now ?? DateTime.now());
+  MilkSession get _session => sessionAt(widget.now ?? context.clock.now());
 
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context);
@@ -845,7 +846,7 @@ class MilkTrendsPage extends StatefulWidget {
 class _MilkTrendsPageState extends State<MilkTrendsPage> {
   TrendRange _range = TrendRange.month;
 
-  DateTime get _now => widget.today ?? DateTime.now();
+  DateTime get _now => widget.today ?? context.clock.now();
 
   @override
   Widget build(BuildContext context) {

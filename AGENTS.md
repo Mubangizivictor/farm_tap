@@ -21,6 +21,7 @@ Read this first, then `docs/ROADMAP.md`, `docs/THEME.md`, `docs/design/UX_SPEC.m
   - **presentation:** blocs/cubits, pages, widgets.
 - Layout: `lib/app/` (router, di, bootstrap), `lib/core/` (theme, ui, error, l10n, sound, settings, ...), `lib/sectors/cattle/<feature>/{data,domain,presentation}`, `lib/admin/`.
 - `core/` never imports `sectors/` or `admin/`. Sector features never import another feature's `data/` or `presentation/`; share through `domain/` interfaces.
+- Time: never `DateTime.now()` in `lib/`. Use the injected `Clock` (`core/utils/clock.dart`): repositories take it in the constructor, widgets read `context.clock`. `FakeClock` (Sat 7 Nov 2026, 8:41 am; `--dart-define=DEMO_DATE=...`) while `useFakeData`, `SystemClock` (Africa/Kampala) otherwise. Enforced by `test/core/utils/clock_guard_test.dart`.
 - Errors: sealed `Result<T>` and a sealed `Failure` hierarchy. Nothing throws across layers.
 - DI: `get_it`, manual registration in `lib/app/di/injection.dart`. While `useFakeData` is true, register the fake repositories; real Isar/Firebase repositories replace them later without touching the UI.
 - Every record has base fields: `id` (UUID v4), `tenantId`, `createdAt`, `updatedAt`, `createdBy`, `updatedBy`, `deviceId`, `syncStatus`, `isDeleted`.

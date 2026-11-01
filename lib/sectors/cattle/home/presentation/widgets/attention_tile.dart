@@ -1,5 +1,6 @@
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_models.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class AttentionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final f = FarmTapFormat(Localizations.localeOf(context).toLanguageTag());
-    final today = DateUtils.dateOnly(this.today ?? DateTime.now());
+    final today = DateUtils.dateOnly(this.today ?? context.clock.now());
     final (IconData icon, FarmTapTone tone, String title, String subtitle) = switch (item) {
       MilkNotForSale(:final animal, :final drug, :final safeFrom) => (
         Symbols.medication_rounded,

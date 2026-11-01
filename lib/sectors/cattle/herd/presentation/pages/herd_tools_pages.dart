@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
@@ -74,7 +75,7 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
   }
 
   Future<void> _pickDate() async {
-    final now = widget.now ?? DateTime.now();
+    final now = widget.now ?? context.clock.now();
     final picked = await showDatePicker(
       context: context,
       initialDate: _born ?? now,
@@ -88,7 +89,7 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
     final l10n = AppLocalizations.of(context);
     setState(() => _tagError = _tag.text.trim().isEmpty ? l10n.tagRequired : null);
     if (_tagError != null) return;
-    final now = widget.now ?? DateTime.now();
+    final now = widget.now ?? context.clock.now();
     final animal = Animal(
       id: 'animal-${_tag.text.trim()}',
       tenantId: '',

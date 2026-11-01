@@ -14,7 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/screen_golden.dart';
 
 /// The mockups' "today": Saturday 7 Nov 2026.
-class FixedClock implements Clock {
+class FixedClock extends Clock {
   @override
   DateTime now() => DateTime(2026, 11, 7, 6, 52);
 }

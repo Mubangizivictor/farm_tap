@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_models.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_repository.dart';
@@ -430,7 +431,7 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
     final l10n = AppLocalizations.of(context);
     final f = _fmt(context);
     final saved = _saved;
-    final session = centreSessionAt(widget.now ?? DateTime.now());
+    final session = centreSessionAt(widget.now ?? context.clock.now());
     return AdaptiveScaffold(
       title: l10n.receiveMilk,
       subtitle: l10n.sessionLabel(centreSessionName(l10n, session)),
@@ -621,7 +622,7 @@ class _DeliveryKeypadPageState extends State<DeliveryKeypadPage> {
   late DecimalEntry _entry = DecimalEntry(text: widget.initialLitres);
   QualityTest _test = QualityTest.notDone;
 
-  CentreSession get _session => centreSessionAt(widget.now ?? DateTime.now());
+  CentreSession get _session => centreSessionAt(widget.now ?? context.clock.now());
 
   Future<void> _quality(CentreFarmer farmer) async {
     if (_entry.value <= 0) return;

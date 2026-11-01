@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_models.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
@@ -60,7 +61,7 @@ class HealthHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final f = _fmt(context);
-    final now = this.now ?? DateTime.now();
+    final now = this.now ?? context.clock.now();
     return AdaptiveScaffold(
       title: l10n.health,
       actions: [
@@ -205,7 +206,7 @@ class _AddTreatmentPageState extends State<AddTreatmentPage> {
     super.dispose();
   }
 
-  DateTime get _now => widget.now ?? DateTime.now();
+  DateTime get _now => widget.now ?? context.clock.now();
 
   /// The same rule as the records: treatment day + withdrawal days.
   DateTime _safeFrom(Drug d) => DateTime(_now.year, _now.month, _now.day + d.withdrawalDays);
@@ -650,7 +651,7 @@ class _HealthCalendarPageState extends State<HealthCalendarPage> {
   Future<void> _add() async {
     final task = await showAdaptiveSheet<HealthTask>(
       context,
-      builder: (_) => _AddTaskSheet(now: widget.now ?? DateTime.now()),
+      builder: (_) => _AddTaskSheet(now: widget.now ?? context.clock.now()),
     );
     if (task == null || !mounted) return;
     await widget.repo.addTask(task);
@@ -663,7 +664,7 @@ class _HealthCalendarPageState extends State<HealthCalendarPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final f = _fmt(context);
-    final now = widget.now ?? DateTime.now();
+    final now = widget.now ?? context.clock.now();
     return FutureBuilder<List<HealthTask>>(
       future: _load,
       builder: (context, snapshot) {
@@ -863,7 +864,7 @@ class WithdrawalListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final f = _fmt(context);
-    final now = this.now ?? DateTime.now();
+    final now = this.now ?? context.clock.now();
     return FutureBuilder<List<TreatmentRecord>?>(
       future: repo.withdrawals(now).then((r) => r.data),
       builder: (context, snapshot) {

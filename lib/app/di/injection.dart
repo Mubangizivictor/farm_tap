@@ -43,7 +43,7 @@ Future<void> configureDependencies(Flavor flavor) async {
   // Core utils and services
   getIt
     ..registerLazySingleton<AppLogger>(LoggerImpl.new)
-    ..registerLazySingleton<Clock>(SystemClock.new)
+    ..registerLazySingleton<Clock>(() => useFakeData ? FakeClock() : SystemClock())
     ..registerLazySingleton<IdGenerator>(UuidGenerator.new)
     ..registerSingleton<TenantProvider>(tenants)
     ..registerLazySingleton<SyncService>(FakeSyncService.new)

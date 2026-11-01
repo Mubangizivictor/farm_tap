@@ -4,6 +4,7 @@ import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_models.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
@@ -92,7 +93,7 @@ class _HomePageState extends State<HomePage> {
   Widget _ownerBody(BuildContext context, bool online) {
     final l10n = AppLocalizations.of(context);
     final f = FarmTapFormat(Localizations.localeOf(context).toLanguageTag());
-    final now = widget.today ?? DateTime.now();
+    final now = widget.today ?? context.clock.now();
     final first = widget.ownerName.trim().split(RegExp(r'\s+')).first;
     final greeting = now.hour < 12
         ? l10n.goodMorning(first)

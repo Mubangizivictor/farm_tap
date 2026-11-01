@@ -1,3 +1,4 @@
+import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/app/flavor.dart';
 import 'package:farm_tap/app/router/app_dependencies.dart';
 import 'package:farm_tap/app/router/app_router.dart';
@@ -5,6 +6,7 @@ import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/l10n/nyn_delegates.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/theme/farmtap_theme.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -30,11 +32,14 @@ class _FarmTapAppState extends State<FarmTapApp> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => AppSettingsCubit(),
-      child: BlocBuilder<AppSettingsCubit, AppSettings>(
-        buildWhen: (a, b) => a.languageCode != b.languageCode,
-        builder: (context, settings) => _app(Locale(settings.languageCode)),
+    return ClockScope(
+      clock: getIt<Clock>(),
+      child: BlocProvider(
+        create: (_) => AppSettingsCubit(),
+        child: BlocBuilder<AppSettingsCubit, AppSettings>(
+          buildWhen: (a, b) => a.languageCode != b.languageCode,
+          builder: (context, settings) => _app(Locale(settings.languageCode)),
+        ),
       ),
     );
   }

@@ -15,7 +15,7 @@ import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart
 import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
 
 /// The mockups' "today": Saturday 7 Nov 2026, 6:52 am.
-class FixedClock implements Clock {
+class FixedClock extends Clock {
   @override
   DateTime now() => DateTime(2026, 11, 7, 6, 52);
 }
@@ -30,7 +30,7 @@ Future<AppDependencies> fakeDependencies({bool signedIn = false, bool farm = fal
       FakeFarmMembershipRepository.places.firstWhere((p) => centre == (p.kind == PlaceKind.collectionCentre)),
     );
   }
-  final clock = SystemClock();
+  final clock = FakeClock();
   final treatments = FakeTreatmentRepository(clock);
   return AppDependencies(
     session: session,
