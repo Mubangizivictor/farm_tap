@@ -4,5 +4,5 @@ abstract class TenantProvider {
 
 class InMemoryTenantProvider implements TenantProvider {
   @override
-  String get currentTenantId => 'default-tenant';
+  String currentTenantId = 'farm-rwemera';
 }

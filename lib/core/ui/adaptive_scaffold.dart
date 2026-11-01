@@ -441,6 +441,8 @@ class FarmTapLogo extends StatelessWidget {
     return Image.asset(
       FarmTapAssets.byBrightness(context, FarmTapAssets.appBarLogoLight, FarmTapAssets.appBarLogoDark),
       height: height ?? context.sizes.appBarLogoHeight,
+      // contain, not the default scaleDown: the 1x asset must grow to the height.
+      fit: BoxFit.contain,
       semanticLabel: l10n.appName,
     );
   }
@@ -461,7 +463,7 @@ class FarmTapLogoMark extends StatelessWidget {
         ? FarmTapAssets.logoMarkWhite
         : FarmTapAssets.byBrightness(context, FarmTapAssets.logoMarkLight, FarmTapAssets.logoMarkDark);
     final s = size ?? context.sizes.logoMark;
-    return Image.asset(asset, width: s, height: s, excludeFromSemantics: true);
+    return Image.asset(asset, width: s, height: s, fit: BoxFit.contain, excludeFromSemantics: true);
   }
 }
 

@@ -24,6 +24,7 @@ void main() {
           brightness: brightness,
         );
         await tester.pump(const Duration(milliseconds: 400));
+        await precacheImages(tester);
         await expectLater(find.byType(MaterialApp), matchesGoldenFile('UI_kit_gallery_${entry.key}_$mode.png'));
         // Dispose the tree so no timers are left pending.
         await tester.pumpWidget(const SizedBox());
@@ -31,9 +32,5 @@ void main() {
     }
   }
 
-  screenGoldens(
-    'D01_home_owner',
-    (_) => const UiGalleryPage(),
-    dir: 'gallery/',
-  );
+  screenGoldens('D01_home_owner', (_) => const UiGalleryPage(), dir: 'gallery/');
 }

@@ -499,6 +499,324 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{place} · {role}'**
   String farmRoleLine(String place, String role);
+
+  /// No description provided for @splashTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap. Record. Grow.'**
+  String get splashTagline;
+
+  /// No description provided for @splashLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your farm…'**
+  String get splashLoading;
+
+  /// No description provided for @welcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to FarmTap'**
+  String get welcomeTitle;
+
+  /// No description provided for @welcomeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Records for your farm and milk centre — even without network.'**
+  String get welcomeBody;
+
+  /// No description provided for @continueGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueGoogle;
+
+  /// No description provided for @continueApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get continueApple;
+
+  /// No description provided for @continueEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with email'**
+  String get continueEmail;
+
+  /// No description provided for @languageEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// No description provided for @languageRunyankore.
+  ///
+  /// In en, this message translates to:
+  /// **'Runyankore'**
+  String get languageRunyankore;
+
+  /// No description provided for @terms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms'**
+  String get terms;
+
+  /// No description provided for @privacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get privacy;
+
+  /// No description provided for @brandTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the card, record the work.'**
+  String get brandTagline;
+
+  /// No description provided for @brandBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Records for farms and milk centres in Western Uganda — offline, in Runyankore and English.'**
+  String get brandBody;
+
+  /// No description provided for @emailSignInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with email'**
+  String get emailSignInTitle;
+
+  /// No description provided for @emailSignInSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the email you signed up with.'**
+  String get emailSignInSubtitle;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordLabel;
+
+  /// No description provided for @showPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get showPassword;
+
+  /// No description provided for @hidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get hidePassword;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// No description provided for @newToFarmTap.
+  ///
+  /// In en, this message translates to:
+  /// **'New to FarmTap? Create an account'**
+  String get newToFarmTap;
+
+  /// No description provided for @signInFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or password is wrong.'**
+  String get signInFailed;
+
+  /// No description provided for @signUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your account'**
+  String get signUpTitle;
+
+  /// No description provided for @signUpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll set up your farm next. 14 days free.'**
+  String get signUpSubtitle;
+
+  /// No description provided for @fullNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get fullNameLabel;
+
+  /// No description provided for @nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name.'**
+  String get nameRequired;
+
+  /// No description provided for @emailIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the email — it looks incomplete.'**
+  String get emailIncomplete;
+
+  /// No description provided for @passwordRule.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 8 characters'**
+  String get passwordRule;
+
+  /// No description provided for @passwordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Use at least 8 characters.'**
+  String get passwordTooShort;
+
+  /// No description provided for @agreeTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree to the Terms and Privacy Policy'**
+  String get agreeTerms;
+
+  /// No description provided for @agreeTermsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Tick the box to agree first.'**
+  String get agreeTermsRequired;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get createAccount;
+
+  /// No description provided for @resetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset your password'**
+  String get resetTitle;
+
+  /// No description provided for @resetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll email you a link to set a new password.'**
+  String get resetSubtitle;
+
+  /// No description provided for @sendResetLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset link'**
+  String get sendResetLink;
+
+  /// No description provided for @resetLinkSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset link sent to {email}'**
+  String resetLinkSent(String email);
+
+  /// No description provided for @checkEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email'**
+  String get checkEmailTitle;
+
+  /// No description provided for @checkEmailBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a link to {email}. You can keep setting up your farm meanwhile.'**
+  String checkEmailBody(String email);
+
+  /// No description provided for @continueSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue setup'**
+  String get continueSetup;
+
+  /// No description provided for @resendEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend email'**
+  String get resendEmail;
+
+  /// No description provided for @emailSentAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Email sent again'**
+  String get emailSentAgain;
+
+  /// No description provided for @chooseFarmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a farm'**
+  String get chooseFarmTitle;
+
+  /// No description provided for @chooseFarmSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You have access to {count} places.'**
+  String chooseFarmSubtitle(int count);
+
+  /// No description provided for @roleOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get roleOwner;
+
+  /// No description provided for @roleManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Manager'**
+  String get roleManager;
+
+  /// No description provided for @roleClerk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk clerk'**
+  String get roleClerk;
+
+  /// No description provided for @roleWorker.
+  ///
+  /// In en, this message translates to:
+  /// **'Worker'**
+  String get roleWorker;
+
+  /// No description provided for @statusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get statusActive;
+
+  /// No description provided for @statusTrial.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial'**
+  String get statusTrial;
+
+  /// No description provided for @statusReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only'**
+  String get statusReadOnly;
+
+  /// No description provided for @trialDaysShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial {days} days'**
+  String trialDaysShort(int days);
+
+  /// No description provided for @addAnotherFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another farm'**
+  String get addAnotherFarm;
+
+  /// No description provided for @somethingWentWrongShort.
+  ///
+  /// In en, this message translates to:
+  /// **'That did not work. Try again.'**
+  String get somethingWentWrongShort;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

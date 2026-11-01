@@ -12,12 +12,16 @@ class FarmTapButton extends StatelessWidget {
     super.key,
     this.kind = ButtonKind.filled,
     this.icon,
+    this.leading,
     this.large = false,
     this.expand = true,
   });
 
   final String label;
   final VoidCallback? onPressed;
+
+  /// Custom leading widget instead of [icon] (e.g. a provider letter badge).
+  final Widget? leading;
   final ButtonKind kind;
   final IconData? icon;
   final bool large;
@@ -45,7 +49,11 @@ class FarmTapButton extends StatelessWidget {
     final height = large ? context.sizes.buttonHeightLarge : context.sizes.buttonHeight;
     final style = ButtonStyle(
       backgroundColor: WidgetStateProperty.resolveWith(
-        (states) => states.contains(WidgetState.disabled) && bg != null ? c.surfaceContainerHigh : bg,
+        (states) => bg == null
+            ? Colors.transparent
+            : states.contains(WidgetState.disabled)
+            ? c.surfaceContainerHigh
+            : bg,
       ),
       foregroundColor: WidgetStateProperty.resolveWith(
         (states) => states.contains(WidgetState.disabled) ? c.onSurfaceVariant : fg,
@@ -61,13 +69,14 @@ class FarmTapButton extends StatelessWidget {
       iconSize: WidgetStatePropertyAll(context.sizes.iconMd),
     );
     final text = Text(label, maxLines: 1, overflow: TextOverflow.ellipsis);
-    final child = icon == null
+    final lead = leading ?? (icon == null ? null : Icon(icon, fill: 1));
+    final child = lead == null
         ? text
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, fill: 1),
-              SizedBox(width: context.space.xs + context.space.xxs),
+              lead,
+              SizedBox(width: leading == null ? context.space.xs + context.space.xxs : context.space.md),
               Flexible(child: text),
             ],
           );

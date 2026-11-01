@@ -20,6 +20,8 @@ abstract final class FarmTapToast {
     VoidCallback? onAction,
     Duration? duration,
     bool playSound = true,
+    bool singleLine = false,
+    bool abovePinnedButton = false,
   }) {
     if (playSound && tone == FarmTapTone.success) {
       unawaited(SoundService.instance.play(FarmTapSound.success));
@@ -40,8 +42,21 @@ abstract final class FarmTapToast {
                 right: context.space.xxl,
                 bottom: context.space.xxl,
               )
-            : EdgeInsets.fromLTRB(context.space.lg, 0, context.space.lg, context.space.lg),
-        content: ToastContent(message: message, icon: icon, tone: tone, actionLabel: actionLabel, onAction: onAction),
+            : EdgeInsets.fromLTRB(
+                context.space.lg,
+                0,
+                context.space.lg,
+                // Clear a full-width button pinned 24 from the bottom.
+                abovePinnedButton ? context.space.xl + context.sizes.buttonHeight + context.space.lg : context.space.lg,
+              ),
+        content: ToastContent(
+          message: message,
+          icon: icon,
+          tone: tone,
+          actionLabel: actionLabel,
+          onAction: onAction,
+          maxLines: singleLine ? 1 : 2,
+        ),
       ),
     );
   }
@@ -56,9 +71,11 @@ class ToastContent extends StatelessWidget {
     this.tone = FarmTapTone.success,
     this.actionLabel,
     this.onAction,
+    this.maxLines = 2,
   });
 
   final String message;
+  final int maxLines;
   final IconData icon;
   final FarmTapTone tone;
   final String? actionLabel;
@@ -77,7 +94,17 @@ class ToastContent extends StatelessWidget {
     return Container(
       height: context.sizes.toastHeight,
       padding: EdgeInsets.symmetric(horizontal: context.space.lg),
-      decoration: BoxDecoration(color: context.colors.inverseSurface, borderRadius: context.radii.snackBar),
+      decoration: BoxDecoration(
+        color: context.colors.inverseSurface,
+        borderRadius: context.radii.snackBar,
+        boxShadow: [
+          BoxShadow(
+            color: context.colors.shadow.withValues(alpha: 0.18),
+            offset: Offset(0, context.space.xs),
+            blurRadius: context.space.md,
+          ),
+        ],
+      ),
       child: Row(
         children: [
           Icon(icon, fill: 1, color: _accent(context), size: context.sizes.iconMd),
@@ -85,7 +112,7 @@ class ToastContent extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              maxLines: 2,
+              maxLines: maxLines,
               overflow: TextOverflow.ellipsis,
               style: context.text.bodyMedium?.copyWith(color: context.colors.onInverseSurface),
             ),

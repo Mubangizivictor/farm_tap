@@ -222,4 +222,172 @@ class AppLocalizationsNyn extends AppLocalizations {
   String farmRoleLine(String place, String role) {
     return '[nyn] $place · $role';
   }
+
+  @override
+  String get splashTagline => '[nyn] Tap. Record. Grow.';
+
+  @override
+  String get splashLoading => '[nyn] Loading your farm…';
+
+  @override
+  String get welcomeTitle => '[nyn] Welcome to FarmTap';
+
+  @override
+  String get welcomeBody => '[nyn] Records for your farm and milk centre — even without network.';
+
+  @override
+  String get continueGoogle => '[nyn] Continue with Google';
+
+  @override
+  String get continueApple => '[nyn] Continue with Apple';
+
+  @override
+  String get continueEmail => '[nyn] Continue with email';
+
+  @override
+  String get languageEnglish => '[nyn] English';
+
+  @override
+  String get languageRunyankore => '[nyn] Runyankore';
+
+  @override
+  String get terms => '[nyn] Terms';
+
+  @override
+  String get privacy => '[nyn] Privacy';
+
+  @override
+  String get brandTagline => '[nyn] Tap the card, record the work.';
+
+  @override
+  String get brandBody =>
+      '[nyn] Records for farms and milk centres in Western Uganda — offline, in Runyankore and English.';
+
+  @override
+  String get emailSignInTitle => '[nyn] Sign in with email';
+
+  @override
+  String get emailSignInSubtitle => '[nyn] Use the email you signed up with.';
+
+  @override
+  String get emailLabel => '[nyn] Email';
+
+  @override
+  String get passwordLabel => '[nyn] Password';
+
+  @override
+  String get showPassword => '[nyn] Show password';
+
+  @override
+  String get hidePassword => '[nyn] Hide password';
+
+  @override
+  String get forgotPassword => '[nyn] Forgot password?';
+
+  @override
+  String get newToFarmTap => '[nyn] New to FarmTap? Create an account';
+
+  @override
+  String get signInFailed => '[nyn] Email or password is wrong.';
+
+  @override
+  String get signUpTitle => '[nyn] Create your account';
+
+  @override
+  String get signUpSubtitle => '[nyn] You\'ll set up your farm next. 14 days free.';
+
+  @override
+  String get fullNameLabel => '[nyn] Full name';
+
+  @override
+  String get nameRequired => '[nyn] Enter your name.';
+
+  @override
+  String get emailIncomplete => '[nyn] Check the email — it looks incomplete.';
+
+  @override
+  String get passwordRule => '[nyn] At least 8 characters';
+
+  @override
+  String get passwordTooShort => '[nyn] Use at least 8 characters.';
+
+  @override
+  String get agreeTerms => '[nyn] I agree to the Terms and Privacy Policy';
+
+  @override
+  String get agreeTermsRequired => '[nyn] Tick the box to agree first.';
+
+  @override
+  String get createAccount => '[nyn] Create account';
+
+  @override
+  String get resetTitle => '[nyn] Reset your password';
+
+  @override
+  String get resetSubtitle => '[nyn] We\'ll email you a link to set a new password.';
+
+  @override
+  String get sendResetLink => '[nyn] Send reset link';
+
+  @override
+  String resetLinkSent(String email) {
+    return '[nyn] Reset link sent to $email';
+  }
+
+  @override
+  String get checkEmailTitle => '[nyn] Check your email';
+
+  @override
+  String checkEmailBody(String email) {
+    return '[nyn] We sent a link to $email. You can keep setting up your farm meanwhile.';
+  }
+
+  @override
+  String get continueSetup => '[nyn] Continue setup';
+
+  @override
+  String get resendEmail => '[nyn] Resend email';
+
+  @override
+  String get emailSentAgain => '[nyn] Email sent again';
+
+  @override
+  String get chooseFarmTitle => '[nyn] Choose a farm';
+
+  @override
+  String chooseFarmSubtitle(int count) {
+    return '[nyn] You have access to $count places.';
+  }
+
+  @override
+  String get roleOwner => '[nyn] Owner';
+
+  @override
+  String get roleManager => '[nyn] Manager';
+
+  @override
+  String get roleClerk => '[nyn] Milk clerk';
+
+  @override
+  String get roleWorker => '[nyn] Worker';
+
+  @override
+  String get statusActive => '[nyn] Active';
+
+  @override
+  String get statusTrial => '[nyn] Trial';
+
+  @override
+  String get statusReadOnly => '[nyn] Read-only';
+
+  @override
+  String trialDaysShort(int days) {
+    return '[nyn] Trial $days days';
+  }
+
+  @override
+  String get addAnotherFarm => '[nyn] Add another farm';
+
+  @override
+  String get somethingWentWrongShort => '[nyn] That did not work. Try again.';
 }

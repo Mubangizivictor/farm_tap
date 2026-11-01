@@ -37,7 +37,7 @@ Read this first, then `docs/ROADMAP.md`, `docs/THEME.md`, `docs/design/UX_SPEC.m
 - Assets via `FarmTapAssets` / `FarmTapAnimations` / `FarmTapSound`; never type paths.
 
 ## 4. UX rules (`docs/design/UX_SPEC.md`)
-- Breakpoints by **width**: compact < 600 (bottom bar), medium 600-1023 (rail), expanded >= 1024 (sidebar, max content 1120). Tables replace tiles at 700.
+- Breakpoints by **width**: compact < 600 (bottom bar), medium 600-1279 (rail, 7 items), expanded >= 1280 (sidebar, 11 items, max content 1120; decision 0012 overrides the 1024 in the rebuild prompt). Tables replace tiles at 700.
 - Build every screen in `AdaptiveScaffold`; grids with `ResponsiveGrid`; record lists with `RecordCollection`; popups with `showAdaptiveSheet` (bottom sheet on compact, dialog wider).
 - Primary action: FAB bottom-right. One main action per screen, biggest filled button.
 - Read-back before any save affecting money or milk (`showReadBack`). Confirmation dialogs name the verb ("Record death", never "OK").

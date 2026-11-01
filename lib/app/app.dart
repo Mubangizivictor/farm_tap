@@ -2,8 +2,10 @@ import 'package:farm_tap/app/flavor.dart';
 import 'package:farm_tap/app/router/app_router.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/l10n/nyn_delegates.dart';
+import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/theme/farmtap_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 class FarmTapApp extends StatelessWidget {
@@ -13,8 +15,19 @@ class FarmTapApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => AppSettingsCubit(),
+      child: BlocBuilder<AppSettingsCubit, AppSettings>(
+        buildWhen: (a, b) => a.languageCode != b.languageCode,
+        builder: (context, settings) => _app(Locale(settings.languageCode)),
+      ),
+    );
+  }
+
+  Widget _app(Locale locale) {
     return MaterialApp.router(
       title: config.appName,
+      locale: locale,
       theme: FarmTapTheme.light,
       darkTheme: FarmTapTheme.dark,
       routerConfig: appRouter,

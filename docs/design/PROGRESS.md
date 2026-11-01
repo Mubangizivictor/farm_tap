@@ -6,13 +6,13 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 
 | ID | Screen | Section | P·L | P·K | T·L | T·K | D·L | D·K | M·L | M·K | Score | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| A01 | A01_splash | Launch & account | — | — | — | — | — | — | — | — | | |
-| A02 | A02_sign_in | Launch & account | wip | wip | wip | wip | wip | wip | wip | wip | 79–90 | old stub, rewrite |
-| A03 | A03_email_sign_in | Launch & account | — | — | — | — | — | — | — | — | | |
-| A04 | A04_email_sign_up | Launch & account | — | — | — | — | — | — | — | — | | |
-| A05 | A05_forgot_password | Launch & account | — | — | — | — | — | — | — | — | | |
-| A06 | A06_check_email | Launch & account | — | — | — | — | — | — | — | — | | |
-| A07 | A07_farm_picker | Launch & account | — | — | — | — | — | — | — | — | | |
+| A01 | A01_splash | Launch & account | 97.4 | 98.0 | 99.2 | 99.4 | 99.4 | 99.5 | 97.4 | 98.0 | min 97.4 | done. Animation frame differs (stills taken mid-loop). |
+| A02 | A02_sign_in | Launch & account | 95.6 | 96.1 | 96.9 | 97.6 | 97.4 | 98.1 | 95.6 | 96.1 | min 95.6 | done. Apple button shown on all platforms in goldens (iOS/web only at runtime). |
+| A03 | A03_email_sign_in | Launch & account | 97.3 | 97.6 | 98.1 | 98.6 | 98.5 | 98.9 | 97.3 | 97.6 | min 97.3 | done. |
+| A04 | A04_email_sign_up | Launch & account | 96.2 | 96.0 | 96.8 | 97.3 | 97.4 | 97.8 | 96.2 | 96.0 | min 96.0 | done. Mockup eye icon is "visibility_off" while hidden; A03 shows "visibility" — kept one rule: eye = show. |
+| A05 | A05_forgot_password | Launch & account | 97.7 | 98.0 | 97.6 | 98.2 | 97.9 | 98.5 | 97.7 | 98.0 | min 97.6 | done. Toast copy includes the email ("Reset link sent to muhwezi.robert@gm…"); mockup shows a truncated placeholder. |
+| A06 | A06_check_email | Launch & account | 96.5 | 96.7 | 98.8 | 98.8 | 99.1 | 99.1 | 95.1 | 95.5 | min 95.1 | done. |
+| A07 | A07_farm_picker | Launch & account | 98.0 | 98.0 | 98.3 | 98.8 | 98.5 | 99.0 | 98.0 | 98.0 | min 98.0 | done. "Add another farm" goes nowhere until onboarding (section B). |
 | B01 | B01_onboard_language | Onboarding | — | — | — | — | — | — | — | — | | |
 | B02 | B02_onboard_sector | Onboarding | — | — | — | — | — | — | — | — | | |
 | B03 | B03_onboard_waitlist_sheet | Onboarding | — | — | — | — | — | — | — | — | | |

@@ -108,5 +108,86 @@
         "type": "String"
       }
     }
-  }
+  },
+  "splashTagline": "Tap. Record. Grow.",
+  "splashLoading": "Loading your farm…",
+  "welcomeTitle": "Welcome to FarmTap",
+  "welcomeBody": "Records for your farm and milk centre — even without network.",
+  "continueGoogle": "Continue with Google",
+  "continueApple": "Continue with Apple",
+  "continueEmail": "Continue with email",
+  "languageEnglish": "English",
+  "languageRunyankore": "Runyankore",
+  "terms": "Terms",
+  "privacy": "Privacy",
+  "brandTagline": "Tap the card, record the work.",
+  "brandBody": "Records for farms and milk centres in Western Uganda — offline, in Runyankore and English.",
+  "emailSignInTitle": "Sign in with email",
+  "emailSignInSubtitle": "Use the email you signed up with.",
+  "emailLabel": "Email",
+  "passwordLabel": "Password",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "forgotPassword": "Forgot password?",
+  "newToFarmTap": "New to FarmTap? Create an account",
+  "signInFailed": "Email or password is wrong.",
+  "signUpTitle": "Create your account",
+  "signUpSubtitle": "You'll set up your farm next. 14 days free.",
+  "fullNameLabel": "Full name",
+  "nameRequired": "Enter your name.",
+  "emailIncomplete": "Check the email — it looks incomplete.",
+  "passwordRule": "At least 8 characters",
+  "passwordTooShort": "Use at least 8 characters.",
+  "agreeTerms": "I agree to the Terms and Privacy Policy",
+  "agreeTermsRequired": "Tick the box to agree first.",
+  "createAccount": "Create account",
+  "resetTitle": "Reset your password",
+  "resetSubtitle": "We'll email you a link to set a new password.",
+  "sendResetLink": "Send reset link",
+  "resetLinkSent": "Reset link sent to {email}",
+  "@resetLinkSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "checkEmailTitle": "Check your email",
+  "checkEmailBody": "We sent a link to {email}. You can keep setting up your farm meanwhile.",
+  "@checkEmailBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "continueSetup": "Continue setup",
+  "resendEmail": "Resend email",
+  "emailSentAgain": "Email sent again",
+  "chooseFarmTitle": "Choose a farm",
+  "chooseFarmSubtitle": "You have access to {count} places.",
+  "@chooseFarmSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "roleOwner": "Owner",
+  "roleManager": "Manager",
+  "roleClerk": "Milk clerk",
+  "roleWorker": "Worker",
+  "statusActive": "Active",
+  "statusTrial": "Trial",
+  "statusReadOnly": "Read-only",
+  "trialDaysShort": "Trial {days} days",
+  "@trialDaysShort": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "addAnotherFarm": "Add another farm",
+  "somethingWentWrongShort": "That did not work. Try again."
 }

@@ -52,10 +52,25 @@ void screenGoldens(
           await act(tester, ff);
           await tester.pump(settle);
         }
+        await precacheImages(tester);
         await expectLater(find.byType(MaterialApp), matchesGoldenFile('$dir${ff.folder}/${brightness.name}/$name.png'));
         // Dispose the tree so no timers are left pending.
         await tester.pumpWidget(const SizedBox());
       });
     }
   }
+}
+
+/// Decodes every Image on screen for real (test image loading is async and
+/// otherwise never finishes inside the fake clock), then rebuilds.
+Future<void> precacheImages(WidgetTester tester) async {
+  await tester.runAsync(() async {
+    for (final element in find.byType(Image).evaluate()) {
+      final image = element.widget as Image;
+      // Animated WebP streams may never report "complete"; the first frame
+      // arrives well within this.
+      await precacheImage(image.image, element).timeout(const Duration(seconds: 2), onTimeout: () {});
+    }
+  });
+  await tester.pump();
 }

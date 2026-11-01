@@ -222,4 +222,171 @@ class AppLocalizationsEn extends AppLocalizations {
   String farmRoleLine(String place, String role) {
     return '$place · $role';
   }
+
+  @override
+  String get splashTagline => 'Tap. Record. Grow.';
+
+  @override
+  String get splashLoading => 'Loading your farm…';
+
+  @override
+  String get welcomeTitle => 'Welcome to FarmTap';
+
+  @override
+  String get welcomeBody => 'Records for your farm and milk centre — even without network.';
+
+  @override
+  String get continueGoogle => 'Continue with Google';
+
+  @override
+  String get continueApple => 'Continue with Apple';
+
+  @override
+  String get continueEmail => 'Continue with email';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageRunyankore => 'Runyankore';
+
+  @override
+  String get terms => 'Terms';
+
+  @override
+  String get privacy => 'Privacy';
+
+  @override
+  String get brandTagline => 'Tap the card, record the work.';
+
+  @override
+  String get brandBody => 'Records for farms and milk centres in Western Uganda — offline, in Runyankore and English.';
+
+  @override
+  String get emailSignInTitle => 'Sign in with email';
+
+  @override
+  String get emailSignInSubtitle => 'Use the email you signed up with.';
+
+  @override
+  String get emailLabel => 'Email';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get showPassword => 'Show password';
+
+  @override
+  String get hidePassword => 'Hide password';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get newToFarmTap => 'New to FarmTap? Create an account';
+
+  @override
+  String get signInFailed => 'Email or password is wrong.';
+
+  @override
+  String get signUpTitle => 'Create your account';
+
+  @override
+  String get signUpSubtitle => 'You\'ll set up your farm next. 14 days free.';
+
+  @override
+  String get fullNameLabel => 'Full name';
+
+  @override
+  String get nameRequired => 'Enter your name.';
+
+  @override
+  String get emailIncomplete => 'Check the email — it looks incomplete.';
+
+  @override
+  String get passwordRule => 'At least 8 characters';
+
+  @override
+  String get passwordTooShort => 'Use at least 8 characters.';
+
+  @override
+  String get agreeTerms => 'I agree to the Terms and Privacy Policy';
+
+  @override
+  String get agreeTermsRequired => 'Tick the box to agree first.';
+
+  @override
+  String get createAccount => 'Create account';
+
+  @override
+  String get resetTitle => 'Reset your password';
+
+  @override
+  String get resetSubtitle => 'We\'ll email you a link to set a new password.';
+
+  @override
+  String get sendResetLink => 'Send reset link';
+
+  @override
+  String resetLinkSent(String email) {
+    return 'Reset link sent to $email';
+  }
+
+  @override
+  String get checkEmailTitle => 'Check your email';
+
+  @override
+  String checkEmailBody(String email) {
+    return 'We sent a link to $email. You can keep setting up your farm meanwhile.';
+  }
+
+  @override
+  String get continueSetup => 'Continue setup';
+
+  @override
+  String get resendEmail => 'Resend email';
+
+  @override
+  String get emailSentAgain => 'Email sent again';
+
+  @override
+  String get chooseFarmTitle => 'Choose a farm';
+
+  @override
+  String chooseFarmSubtitle(int count) {
+    return 'You have access to $count places.';
+  }
+
+  @override
+  String get roleOwner => 'Owner';
+
+  @override
+  String get roleManager => 'Manager';
+
+  @override
+  String get roleClerk => 'Milk clerk';
+
+  @override
+  String get roleWorker => 'Worker';
+
+  @override
+  String get statusActive => 'Active';
+
+  @override
+  String get statusTrial => 'Trial';
+
+  @override
+  String get statusReadOnly => 'Read-only';
+
+  @override
+  String trialDaysShort(int days) {
+    return 'Trial $days days';
+  }
+
+  @override
+  String get addAnotherFarm => 'Add another farm';
+
+  @override
+  String get somethingWentWrongShort => 'That did not work. Try again.';
 }

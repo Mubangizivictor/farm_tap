@@ -77,6 +77,7 @@ abstract final class FarmTapTheme {
       tooltipTheme: FarmTapComponentThemes.tooltip(t),
       dividerTheme: FarmTapComponentThemes.divider(t),
       progressIndicatorTheme: FarmTapComponentThemes.progress(t),
+      checkboxTheme: FarmTapComponentThemes.checkbox(t),
       iconTheme: FarmTapComponentThemes.icon(t),
       primaryIconTheme: FarmTapComponentThemes.primaryIcon(t),
     );

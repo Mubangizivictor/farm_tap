@@ -13,6 +13,7 @@ export 'controls.dart';
 export 'farmtap_platform.dart';
 export 'farmtap_toast.dart';
 export 'icon_bubble.dart';
+export 'inputs.dart';
 export 'layouts.dart';
 export 'number_entry.dart';
 export 'pin_pad.dart';

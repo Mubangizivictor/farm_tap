@@ -1,12 +1,16 @@
 import 'package:farm_tap/app/flavor.dart';
 import 'package:farm_tap/core/audit/audit_logger.dart';
-import 'package:farm_tap/core/auth/auth_repository.dart';
+import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
+import 'package:farm_tap/core/auth/domain/auth_repository.dart';
 import 'package:farm_tap/core/database/isar_service.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
+import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
+import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/id_generator.dart';
 import 'package:farm_tap/core/utils/logger.dart';
+import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/herd_repository_impl.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/usecases/add_animal.dart';
@@ -16,39 +20,46 @@ import 'package:get_it/get_it.dart';
 
 final GetIt getIt = GetIt.instance;
 
+/// UI phase: in-memory fake repositories with the sample data from the
+/// mockups. No Isar writes, no Firebase. Set to false in the backend phase.
+const bool useFakeData = true;
+
 Future<void> configureDependencies(Flavor flavor) async {
-  // Core Utils
+  final tenants = InMemoryTenantProvider();
+
+  // Core utils and services
   getIt
     ..registerLazySingleton<AppLogger>(LoggerImpl.new)
     ..registerLazySingleton<Clock>(SystemClock.new)
-    ..registerLazySingleton<IdGenerator>(UuidGenerator.new);
-
-  // Database
-  final isarService = IsarService();
-  await isarService.init();
-  getIt
-    ..registerSingleton<IsarService>(isarService)
-    // Core Services (Interfaces & Fake/Dev Impls)
-    ..registerLazySingleton<AuthRepository>(FakeAuthRepository.new)
-    ..registerLazySingleton<TenantProvider>(InMemoryTenantProvider.new)
+    ..registerLazySingleton<IdGenerator>(UuidGenerator.new)
+    ..registerSingleton<TenantProvider>(tenants)
     ..registerLazySingleton<SyncService>(NoOpSyncService.new)
     ..registerLazySingleton<AuditLogger>(LocalAuditLogger.new);
 
-  // Features - Herd
-  getIt.registerLazySingleton<HerdRepository>(
-    () => HerdRepositoryImpl(
-      isar: getIt<IsarService>().isar,
-      idGenerator: getIt<IdGenerator>(),
-      clock: getIt<Clock>(),
-      tenantProvider: getIt<TenantProvider>(),
-    ),
-  );
+  if (useFakeData) {
+    getIt
+      ..registerLazySingleton<AuthRepository>(FakeAuthRepository.new)
+      ..registerLazySingleton<FarmMembershipRepository>(() => FakeFarmMembershipRepository(tenants))
+      ..registerLazySingleton<HerdRepository>(() => FakeHerdRepository(clock: getIt<Clock>(), tenantProvider: tenants));
+  } else {
+    // Backend phase: real Firebase auth / membership repositories go here.
+    final isarService = IsarService();
+    await isarService.init();
+    getIt
+      ..registerSingleton<IsarService>(isarService)
+      ..registerLazySingleton<HerdRepository>(
+        () => HerdRepositoryImpl(
+          isar: isarService.isar,
+          idGenerator: getIt<IdGenerator>(),
+          clock: getIt<Clock>(),
+          tenantProvider: tenants,
+        ),
+      );
+  }
 
-  // Use Cases
+  // Herd use cases and bloc
   getIt
     ..registerLazySingleton(() => AddAnimal(getIt<HerdRepository>()))
-    ..registerLazySingleton(() => WatchAnimals(getIt<HerdRepository>()));
-
-  // Blocs
-  getIt.registerFactory(() => HerdBloc(watchAnimals: getIt<WatchAnimals>(), addAnimal: getIt<AddAnimal>()));
+    ..registerLazySingleton(() => WatchAnimals(getIt<HerdRepository>()))
+    ..registerFactory(() => HerdBloc(watchAnimals: getIt<WatchAnimals>(), addAnimal: getIt<AddAnimal>()));
 }

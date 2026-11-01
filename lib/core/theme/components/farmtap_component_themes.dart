@@ -128,7 +128,10 @@ abstract final class FarmTapComponentThemes {
       constraints: BoxConstraints(minHeight: t.sizes.inputHeight),
       labelStyle: t.text.bodyLarge?.copyWith(color: t.colors.onSurfaceVariant),
       floatingLabelStyle: WidgetStateTextStyle.resolveWith(
-        (states) => t.text.labelSmall!.copyWith(
+        // InputDecorator draws the floating label at 75%, so labelLarge (17)
+        // lands at about the labelSmall size (13) on the border.
+        (states) => t.text.labelLarge!.copyWith(
+          fontWeight: FarmTapWeights.medium,
           color: states.contains(WidgetState.error)
               ? t.colors.error
               : states.contains(WidgetState.focused)
@@ -229,6 +232,15 @@ abstract final class FarmTapComponentThemes {
     color: t.colors.primary,
     linearTrackColor: t.colors.surfaceContainerHigh,
     circularTrackColor: t.colors.surfaceContainerHigh,
+  );
+
+  static CheckboxThemeData checkbox(FarmTapTokens t) => CheckboxThemeData(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(t.radii.xs)),
+    side: BorderSide(color: t.colors.outline, width: t.sizes.borderThick),
+    fillColor: WidgetStateProperty.resolveWith(
+      (states) => states.contains(WidgetState.selected) ? t.colors.primary : Colors.transparent,
+    ),
+    checkColor: WidgetStatePropertyAll(t.colors.onPrimary),
   );
 
   static IconThemeData icon(FarmTapTokens t) => IconThemeData(color: t.colors.onSurface, size: t.sizes.iconMd);

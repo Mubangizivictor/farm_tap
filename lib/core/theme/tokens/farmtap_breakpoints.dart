@@ -13,7 +13,9 @@ abstract final class FarmTapBreakpoints {
   static const double table = 700;
 
   /// At or above this: sidebar, top bar with search, max content width.
-  static const double expanded = 1024;
+  /// 1280, not 1024, so landscape tablets (1194 dp) keep the rail
+  /// (docs/decisions/0012-tablet-rail-breakpoint.md).
+  static const double expanded = 1280;
 
   static FormFactor of(double width) {
     if (width >= expanded) return FormFactor.expanded;

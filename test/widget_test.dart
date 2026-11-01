@@ -1,40 +1,16 @@
 import 'package:farm_tap/app/app.dart';
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/app/flavor.dart';
-import 'package:farm_tap/core/database/isar_service.dart';
-import 'package:farm_tap/core/utils/logger.dart';
+import 'package:farm_tap/core/auth/presentation/pages/sign_in_page.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:isar_community/isar.dart';
-import 'package:mocktail/mocktail.dart';
-
-class MockAppLogger extends Mock implements AppLogger;
-class MockIsarService extends Mock implements IsarService;
-class MockIsar extends Mock implements Isar;
 
 void main() {
-  setUpAll(() async {
-    final logger = MockAppLogger();
-    final isarService = MockIsarService();
-    final isar = MockIsar();
+  setUpAll(() => configureDependencies(Flavor.dev));
 
-    when(() => isarService.isar).thenReturn(isar);
-
-    getIt
-      ..registerSingleton<AppLogger>(logger)
-      ..registerSingleton<IsarService>(isarService);
-    // Add other minimum required for splash
-  });
-
-  testWidgets('App boots to splash screen', (tester) async {
-    final config = AppConfig.forFlavor(Flavor.dev);
-
-    await tester.pumpWidget(FarmTapApp(config: config));
-
-    expect(find.byType(FarmTapApp), findsOneWidget);
-    // Let the splash timer finish so no timer is left pending.
-    await tester.pump(const Duration(seconds: 3));
-    await tester.pump();
-    // Since SplashPage uses Image.asset which might not load in tests without mocks
-    // we just check if it navigates or stays on splash
+  testWidgets('App boots: A01 splash, then A02 sign-in after 2 s', (tester) async {
+    await tester.pumpWidget(FarmTapApp(config: AppConfig.forFlavor(Flavor.dev)));
+    await tester.pump(const Duration(milliseconds: 2100));
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byType(SignInPage), findsOneWidget);
   });
 }

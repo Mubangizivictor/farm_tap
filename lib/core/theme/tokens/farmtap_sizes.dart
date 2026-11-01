@@ -64,6 +64,10 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
 
   // ---- Small atoms ----
   double get badgeHeight => 26 * scale;
+
+  /// Material draws its checkbox 18 dp; scale it to the spec's 24 dp box.
+  double get materialCheckbox => 18 * scale;
+  double get checkbox => 24 * scale;
   double get chipHeight => 40 * scale;
   double get segmentedHeight => 48 * scale;
   double get dot => 10 * scale;
@@ -147,8 +151,13 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
   double get authPanelFractionWide => 0.42;
   double get authPanelFractionMedium => 0.40;
 
-  /// Share of the illustration box the animation fills.
-  double get illustrationFill => 0.85;
+  /// Logo on sign-in / splash (mark + wordmark), and the welcome animation.
+  double get authLogoHeight => 52 * scale;
+  double get authIllustration => 200 * scale;
+
+  /// Brand panel: logo inset 32, illustration inset 40.
+  double get brandPanelLogoInset => 32 * scale;
+  double get brandPanelInset => 40 * scale;
 
   // ---- Charts ----
   double get chartHeight => 200 * scale;
@@ -167,7 +176,7 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
   double get sidebarLogoHeight => 40 * scale;
   double get signInLogoWidth => 200 * scale;
   double get loaderSize => 72 * scale;
-  double get splashAnimationWidth => 240 * scale;
+  double get splashAnimationWidth => 260 * scale;
 
   // ---- Borders and strokes ----
   double get borderThin => 1;

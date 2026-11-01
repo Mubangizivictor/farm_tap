@@ -48,8 +48,9 @@ void main() {
   test('breakpoints', () {
     expect(FarmTapBreakpoints.of(599), FormFactor.compact);
     expect(FarmTapBreakpoints.of(600), FormFactor.medium);
-    expect(FarmTapBreakpoints.of(1023), FormFactor.medium);
-    expect(FarmTapBreakpoints.of(1024), FormFactor.expanded);
+    expect(FarmTapBreakpoints.of(1194), FormFactor.medium); // landscape tablet keeps the rail (0012)
+    expect(FarmTapBreakpoints.of(1279), FormFactor.medium);
+    expect(FarmTapBreakpoints.of(1280), FormFactor.expanded);
   });
 
   testWidgets('PersonAvatar initials', (tester) async {
@@ -88,7 +89,7 @@ void main() {
     });
 
     testWidgets('tablet: rail', (tester) async {
-      await pumpFarmTap(tester, scaffold(), size: tabletSize.shortestSide < 1024 ? const Size(800, 900) : tabletSize);
+      await pumpFarmTap(tester, scaffold(), size: tabletSize);
       expect(find.byKey(AdaptiveScaffold.railKey), findsOneWidget);
       expect(find.byKey(AdaptiveScaffold.bottomBarKey), findsNothing);
     });
