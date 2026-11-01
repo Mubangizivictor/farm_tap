@@ -13,6 +13,7 @@ class FarmTapButton extends StatelessWidget {
     this.kind = ButtonKind.filled,
     this.icon,
     this.leading,
+    this.trailingIcon,
     this.large = false,
     this.expand = true,
   });
@@ -22,6 +23,9 @@ class FarmTapButton extends StatelessWidget {
 
   /// Custom leading widget instead of [icon] (e.g. a provider letter badge).
   final Widget? leading;
+
+  /// Icon pinned to the right edge with the label centred ("Continue →").
+  final IconData? trailingIcon;
   final ButtonKind kind;
   final IconData? icon;
   final bool large;
@@ -70,16 +74,27 @@ class FarmTapButton extends StatelessWidget {
     );
     final text = Text(label, maxLines: 1, overflow: TextOverflow.ellipsis);
     final lead = leading ?? (icon == null ? null : Icon(icon, fill: 1));
-    final child = lead == null
-        ? text
-        : Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              lead,
-              SizedBox(width: leading == null ? context.space.xs + context.space.xxs : context.space.md),
-              Flexible(child: text),
-            ],
-          );
+    final Widget child;
+    if (trailingIcon != null) {
+      child = Stack(
+        alignment: Alignment.center,
+        children: [
+          text,
+          Align(alignment: AlignmentDirectional.centerEnd, child: Icon(trailingIcon, fill: 1)),
+        ],
+      );
+    } else {
+      child = lead == null
+          ? text
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                lead,
+                SizedBox(width: leading == null ? context.space.xs + context.space.xxs : context.space.md),
+                Flexible(child: text),
+              ],
+            );
+    }
     final button = kind == ButtonKind.text
         ? TextButton(onPressed: onPressed, style: style, child: child)
         : FilledButton(onPressed: onPressed, style: style, child: child);
@@ -116,7 +131,7 @@ class ButtonPair extends StatelessWidget {
 
 /// Text action in the primary colour: "Pay now", "See all" (labelLarge).
 class TextAction extends StatelessWidget {
-  const new({required this.label, required this.onPressed, super.key, this.color, this.small = false});
+  const new({required this.label, required this.onPressed, super.key, this.color, this.small = false, this.icon});
 
   final String label;
   final VoidCallback? onPressed;
@@ -124,6 +139,9 @@ class TextAction extends StatelessWidget {
 
   /// labelMedium instead of labelLarge (card header actions).
   final bool small;
+
+  /// Filled icon before the label ("Use my location").
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +156,19 @@ class TextAction extends StatelessWidget {
         borderRadius: context.radii.button,
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: context.sizes.touchTarget, minWidth: context.sizes.touchTarget),
-          child: Align(widthFactor: 1, child: Text(label, style: style)),
+          child: Align(
+            widthFactor: 1,
+            child: icon == null
+                ? Text(label, style: style)
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(icon, fill: 1, size: context.sizes.iconMd, color: style?.color),
+                      context.space.gapSm,
+                      Text(label, style: style),
+                    ],
+                  ),
+          ),
         ),
       ),
     );

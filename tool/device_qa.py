@@ -23,8 +23,8 @@ ROOT = Path(__file__).resolve().parent.parent
 UDID = os.environ.get("SIM_UDID", "29FA47F4-DB31-4273-ADAA-C1E71FCAE948")
 IDB = os.path.expanduser("~/Library/Python/3.9/bin/idb")
 OUT = ROOT / "test" / "device" / "iphone16promax"
-# `flutter run` reads its keys from this pipe (see docs/design/PROGRESS.md, device QA).
-FIFO = Path(os.environ.get("TMPDIR", "/tmp")) / "flutter_in"
+# `flutter run` reads its keys from this file via `tail -f` (hot restart = "R").
+FIFO = Path(os.environ.get("TMPDIR", "/tmp")) / "flutter_keys"
 
 
 def idb(*args):
@@ -40,10 +40,16 @@ def elements():
 
 
 def find(label):
-    """First element whose AXLabel contains [label]."""
-    for e in elements():
-        if label in (e.get("AXLabel") or ""):
-            return e
+    """Exact label first, then a button containing it, then any element."""
+    els = elements()
+    for test in (
+        lambda e: (e.get("AXLabel") or "").strip() == label,
+        lambda e: e.get("type") == "Button" and label in (e.get("AXLabel") or ""),
+        lambda e: label in (e.get("AXLabel") or ""),
+    ):
+        for e in els:
+            if test(e):
+                return e
     return None
 
 
@@ -116,7 +122,8 @@ def run(steps, mode):
             time.sleep(1.0)
         elif cmd == "restart":
             # Hot restart through the `flutter run` input pipe: fresh state.
-            Path(os.environ.get("FLUTTER_IN", str(FIFO))).write_text("R\n")
+            with open(os.environ.get("FLUTTER_IN", str(FIFO)), "a") as keys:
+                keys.write("R\n")
             time.sleep(6)
         elif cmd == "wait":
             time.sleep(float(arg))
@@ -151,6 +158,55 @@ SCRIPTS = {
         "tap Continue with Google",
         "expect Choose a farm",
         "shot A07",
+    ],
+    "B": [
+        "restart",
+        "tap Continue with Google",
+        "tap Add another farm",
+        "expect Choose your language",
+        "shot B01",
+        "tap Continue",
+        "expect What do you do?",
+        "shot B02",
+        "tap Poultry",
+        "expect Poultry is coming soon",
+        "tap Your name",
+        "type Kyomugisha Annet",
+        "tap WhatsApp number",
+        "type 772451908",
+        "shot B03",
+        "tap Join the waitlist",
+        "expect You're on the list!",
+        "shot B04",
+        "tap Done",
+        "expect What do you do?",
+        "tap Continue",
+        "expect What kind of dairy?",
+        "shot B05",
+        "swipeback",
+        "expect What do you do?",
+        "tap Continue",
+        "tap Continue",
+        "expect About your farm",
+        "tap Farm name",
+        "type Rwemera Dairy Farm",
+        "tap 31–100",
+        "shot B06",
+        "tap Continue",
+        "expect Where should we send reports?",
+        "tap WhatsApp number",
+        "type 772451908",
+        "shot B07",
+        "tap Continue",
+        "expect What is your role?",
+        "shot B08",
+        "tap Continue",
+        "expect Add your first worker",
+        "shot B09",
+        "tap Skip",
+        "expect Your farm is ready!",
+        "shot B10",
+        "tap Start using FarmTap",
     ],
 }
 

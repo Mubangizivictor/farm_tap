@@ -31,27 +31,40 @@ class FarmTapChip extends StatelessWidget {
     return Semantics(
       selected: selected,
       button: true,
-      child: Material(
-        color: selected ? c.secondaryContainer : c.surfaceContainerLowest,
-        shape: RoundedRectangleBorder(
-          borderRadius: context.radii.chip,
-          side: selected ? BorderSide.none : BorderSide(color: c.outlineVariant, width: context.sizes.borderThin),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-            height: context.sizes.chipHeight,
-            padding: EdgeInsets.symmetric(horizontal: context.space.lg),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (leading != null) ...[
-                  Icon(leading, fill: 1, size: context.sizes.iconSm, color: fg),
-                  context.space.gapXs,
-                ],
-                Text(label, style: context.text.labelMedium?.copyWith(color: fg)),
-              ],
+      label: label,
+      excludeSemantics: true,
+      // 40 dp chip inside a 48 dp tap area (rows of chips sit 48 apart).
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: context.sizes.touchTarget),
+          child: Center(
+            widthFactor: 1,
+            child: Material(
+              color: selected ? c.secondaryContainer : c.surfaceContainerLowest,
+              shape: RoundedRectangleBorder(
+                borderRadius: context.radii.chip,
+                side: selected ? BorderSide.none : BorderSide(color: c.outlineVariant, width: context.sizes.borderThin),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: onTap,
+                child: Container(
+                  height: context.sizes.chipHeight,
+                  padding: EdgeInsets.symmetric(horizontal: context.space.lg),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (leading != null) ...[
+                        Icon(leading, fill: 1, size: context.sizes.iconSm, color: fg),
+                        context.space.gapXs,
+                      ],
+                      Text(label, style: context.text.labelMedium?.copyWith(color: fg)),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -83,7 +96,7 @@ class FilterChips<T> extends StatelessWidget {
     ];
     final gap = context.space.chipRun;
     if (wrap) {
-      return Wrap(spacing: gap, runSpacing: context.sizes.touchTarget - context.sizes.chipHeight, children: chips);
+      return Wrap(spacing: gap, children: chips);
     }
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -343,6 +356,48 @@ class SearchField extends StatelessWidget {
           ),
           prefixIconConstraints: const BoxConstraints(),
           suffixIcon: trailing,
+        ),
+      ),
+    );
+  }
+}
+
+/// Checkbox + label; the whole row is the 48 dp target and the 24 dp box
+/// lines up with the fields above it.
+class CheckRow extends StatelessWidget {
+  const new({required this.label, required this.value, required this.onChanged, super.key});
+
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      checked: value,
+      label: label,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: () => onChanged(!value),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: context.sizes.touchTarget),
+          child: Row(
+            children: [
+              SizedBox.square(
+                dimension: context.sizes.checkbox,
+                child: Transform.scale(
+                  scale: context.sizes.checkbox / context.sizes.materialCheckbox,
+                  child: Checkbox(
+                    value: value,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    onChanged: (v) => onChanged(v ?? false),
+                  ),
+                ),
+              ),
+              context.space.gapMd,
+              Expanded(child: Text(label, style: context.text.bodyMedium)),
+            ],
+          ),
         ),
       ),
     );

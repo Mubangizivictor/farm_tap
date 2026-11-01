@@ -2,6 +2,8 @@
 // nested under their parent and opened with push; go only for top-level
 // jumps. Every page is wrapped in RouteInfo(parent) so its back arrow works
 // even after a deep link or a web refresh.
+import 'dart:async';
+
 import 'package:farm_tap/app/router/routes.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/app/shell/app_shell.dart';
@@ -13,10 +15,18 @@ import 'package:farm_tap/core/auth/presentation/pages/farm_picker_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/forgot_password_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/sign_in_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/splash_page.dart';
+import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
+import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
+import 'package:farm_tap/core/onboarding/presentation/cubit/onboarding_cubit.dart';
+import 'package:farm_tap/core/onboarding/presentation/pages/choice_steps.dart';
+import 'package:farm_tap/core/onboarding/presentation/pages/form_steps.dart';
+import 'package:farm_tap/core/onboarding/presentation/pages/waitlist_and_done.dart';
+import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 typedef PageBuilder = Widget Function(BuildContext context, GoRouterState state);
@@ -31,7 +41,15 @@ GoRoute page(
 }) => GoRoute(
   path: path,
   parentNavigatorKey: parentNavigatorKey,
-  pageBuilder: (context, state) => _material(state, RouteInfo(parent: parent, child: builder(context, state))),
+  // Build inside the page route, so the context handed to the page's
+  // callbacks has a Navigator (sheets, dialogs) as well as the router.
+  pageBuilder: (context, state) => _material(
+    state,
+    RouteInfo(
+      parent: parent,
+      child: Builder(builder: (pageContext) => builder(pageContext, state)),
+    ),
+  ),
   routes: routes,
 );
 
@@ -44,10 +62,12 @@ Page<void> _material(GoRouterState state, Widget child) =>
 GoRouter buildRouter({
   required SessionController session,
   required FarmMembershipRepository places,
+  required OnboardingRepository onboarding,
   String? initialLocation,
 }) {
   final rootKey = GlobalKey<NavigatorState>();
   final auth = session.auth;
+  final setup = OnboardingCubit();
 
   // Roots of the shell branches; filled in section by section.
   final sectionRoots = <String, PageBuilder>{};
@@ -123,8 +143,7 @@ GoRouter buildRouter({
         builder: (context, state) => CheckEmailPage(
           auth: auth,
           email: state.uri.queryParameters['email'] ?? auth.currentUser?.email ?? '',
-          // Section B: onboarding starts at /setup/language.
-          onContinue: () => context.go(AppRoutes.farmPicker),
+          onContinue: () => context.go(AppRoutes.setupLanguage),
         ),
       ),
       page(
@@ -134,6 +153,95 @@ GoRouter buildRouter({
           places: places,
           onOpened: (farm) {
             session.openFarm(farm);
+            context.go(AppRoutes.home);
+          },
+          onAddFarm: () {
+            setup.reset();
+            unawaited(context.push(AppRoutes.setupLanguage));
+          },
+        ),
+      ),
+
+      // ---- B: onboarding (each step pushes the next; back = previous step) ----
+      page(
+        AppRoutes.setupLanguage,
+        parent: null,
+        builder: (context, state) => OnboardLanguagePage(
+          cubit: setup,
+          onLanguage: (code) => context.read<AppSettingsCubit>().setLanguage(code),
+          onContinue: () => context.push(AppRoutes.setupSector),
+        ),
+      ),
+      page(
+        AppRoutes.setupSector,
+        parent: AppRoutes.setupLanguage,
+        builder: (context, state) => OnboardSectorPage(
+          cubit: setup,
+          onContinue: () => context.push(AppRoutes.setupDairyType),
+          onComingSoon: (sector) async {
+            final name = await showWaitlistSheet(context, sector: sector, repo: onboarding);
+            if (name == null || !context.mounted) return;
+            unawaited(
+              context.push(
+                Uri(
+                  path: AppRoutes.setupWaitlistDone,
+                  queryParameters: {'sector': sector.name, 'name': name},
+                ).toString(),
+              ),
+            );
+          },
+        ),
+      ),
+      page(
+        AppRoutes.setupWaitlistDone,
+        parent: AppRoutes.setupSector,
+        builder: (context, state) => WaitlistDonePage(
+          sector: Sector.values.asNameMap()[state.uri.queryParameters['sector']] ?? Sector.poultry,
+          name: state.uri.queryParameters['name'] ?? '',
+          onDone: () => popOrGo(context, AppRoutes.setupSector),
+        ),
+      ),
+      page(
+        AppRoutes.setupDairyType,
+        parent: AppRoutes.setupSector,
+        builder: (context, state) =>
+            OnboardDairyTypePage(cubit: setup, onContinue: () => context.push(AppRoutes.setupFarm)),
+      ),
+      page(
+        AppRoutes.setupFarm,
+        parent: AppRoutes.setupDairyType,
+        builder: (context, state) => OnboardFarmDetailsPage(
+          cubit: setup,
+          districts: onboarding.districts,
+          onContinue: () => context.push(AppRoutes.setupContacts),
+        ),
+      ),
+      page(
+        AppRoutes.setupContacts,
+        parent: AppRoutes.setupFarm,
+        builder: (context, state) =>
+            OnboardContactsPage(cubit: setup, onContinue: () => context.push(AppRoutes.setupRole)),
+      ),
+      page(
+        AppRoutes.setupRole,
+        parent: AppRoutes.setupContacts,
+        builder: (context, state) =>
+            OnboardRolePage(cubit: setup, onContinue: () => context.push(AppRoutes.setupStaff)),
+      ),
+      page(
+        AppRoutes.setupStaff,
+        parent: AppRoutes.setupRole,
+        builder: (context, state) => OnboardFirstStaffPage(cubit: setup, onDone: () => context.go(AppRoutes.setupDone)),
+      ),
+      page(
+        AppRoutes.setupDone,
+        parent: null,
+        builder: (context, state) => FarmReadyPage(
+          setup: setup.state,
+          repo: onboarding,
+          onStart: (farm) {
+            session.openFarm(farm);
+            setup.reset();
             context.go(AppRoutes.home);
           },
         ),

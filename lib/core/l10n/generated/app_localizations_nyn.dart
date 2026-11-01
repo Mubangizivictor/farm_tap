@@ -407,4 +407,250 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String get keepEditing => '[nyn] Keep editing';
+
+  @override
+  String get chooseLanguageTitle => '[nyn] Choose your language';
+
+  @override
+  String get chooseLanguageSubtitle =>
+      '[nyn] Hitamu orurimi. You can change it later.';
+
+  @override
+  String get runyankoreSubtitle => '[nyn] Orurimi rw\'Ankole';
+
+  @override
+  String get englishSubtitle => '[nyn] Use the app in English';
+
+  @override
+  String get sectorTitle => '[nyn] What do you do?';
+
+  @override
+  String get sectorSubtitle => '[nyn] Pick your main work. Dairy is ready now.';
+
+  @override
+  String get sectorDairy => '[nyn] Dairy (cattle)';
+
+  @override
+  String get sectorDairySub => '[nyn] Farms and milk collection centres';
+
+  @override
+  String get sectorPoultry => '[nyn] Poultry';
+
+  @override
+  String get sectorPoultrySub => '[nyn] Layers, broilers, eggs';
+
+  @override
+  String get sectorPiggery => '[nyn] Piggery';
+
+  @override
+  String get sectorPiggerySub => '[nyn] Sows, piglets, sales';
+
+  @override
+  String get sectorGoats => '[nyn] Goats & sheep';
+
+  @override
+  String get sectorCrops => '[nyn] Crops & produce buying';
+
+  @override
+  String get sectorCropsSub => '[nyn] Coffee, matooke, maize';
+
+  @override
+  String get sectorFish => '[nyn] Fish farming';
+
+  @override
+  String waitlistTitle(String sector) {
+    return '[nyn] $sector is coming soon';
+  }
+
+  @override
+  String get waitlistBody =>
+      '[nyn] Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
+
+  @override
+  String get yourNameLabel => '[nyn] Your name';
+
+  @override
+  String get whatsappLabel => '[nyn] WhatsApp number';
+
+  @override
+  String get joinWaitlist => '[nyn] Join the waitlist';
+
+  @override
+  String get waitlistDoneTitle => '[nyn] You\'re on the list!';
+
+  @override
+  String waitlistDoneBody(String sector, String name) {
+    return '[nyn] We\'ll WhatsApp you when $sector opens in FarmTap. Thank you, $name.';
+  }
+
+  @override
+  String get done => '[nyn] Done';
+
+  @override
+  String get dairyTypeTitle => '[nyn] What kind of dairy?';
+
+  @override
+  String get dairyTypeSubtitle =>
+      '[nyn] This decides your home screen. You can add the other later.';
+
+  @override
+  String get dairyFarm => '[nyn] Dairy farm';
+
+  @override
+  String get dairyFarmSub =>
+      '[nyn] I keep cows and record milk, health, feeding';
+
+  @override
+  String get centreOption => '[nyn] Milk collection centre';
+
+  @override
+  String get centreOptionSub => '[nyn] Farmers bring milk to me';
+
+  @override
+  String get bothOption => '[nyn] Both';
+
+  @override
+  String get bothOptionSub => '[nyn] Farm and collection centre';
+
+  @override
+  String get farmDetailsTitle => '[nyn] About your farm';
+
+  @override
+  String get farmNameLabel => '[nyn] Farm name';
+
+  @override
+  String get districtLabel => '[nyn] District';
+
+  @override
+  String get villageLabel => '[nyn] Village / parish';
+
+  @override
+  String get herdSizeLabel => '[nyn] How many cows?';
+
+  @override
+  String get useMyLocation => '[nyn] Use my location';
+
+  @override
+  String get contactsTitle => '[nyn] Where should we send reports?';
+
+  @override
+  String get contactsSubtitle =>
+      '[nyn] Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
+
+  @override
+  String get dailyReportTime => '[nyn] Daily report at 7:00 pm';
+
+  @override
+  String get smsSameAsWhatsapp => '[nyn] SMS number is the same as WhatsApp';
+
+  @override
+  String get smsNumberLabel => '[nyn] SMS number';
+
+  @override
+  String get sendDailyWhatsapp => '[nyn] Send me the daily report on WhatsApp';
+
+  @override
+  String get sendSmsAlerts =>
+      '[nyn] Send me SMS alerts (sick cows, low stock, trial)';
+
+  @override
+  String get roleTitle => '[nyn] What is your role?';
+
+  @override
+  String get roleOwnerSub => '[nyn] I own the farm and pay for FarmTap';
+
+  @override
+  String get roleManagerSub => '[nyn] I run the farm for the owner';
+
+  @override
+  String get firstStaffTitle => '[nyn] Add your first worker';
+
+  @override
+  String get firstStaffSubtitle =>
+      '[nyn] Workers use a card and a 4-digit PIN — no email needed.';
+
+  @override
+  String get nameLabel => '[nyn] Name';
+
+  @override
+  String get roleLabel => '[nyn] Role';
+
+  @override
+  String get roleHerdsman => '[nyn] Herdsman';
+
+  @override
+  String get roleVet => '[nyn] Vet';
+
+  @override
+  String get choosePin => '[nyn] Choose a 4-digit PIN';
+
+  @override
+  String get choosePinHint => '[nyn] Tap to choose the PIN';
+
+  @override
+  String get nfcLaterTitle => '[nyn] Add an NFC card later';
+
+  @override
+  String get nfcLaterBody =>
+      '[nyn] Tap \'Assign card\' on the worker\'s page when cards arrive.';
+
+  @override
+  String get saveWorker => '[nyn] Save worker';
+
+  @override
+  String get farmReadyTitle => '[nyn] Your farm is ready!';
+
+  @override
+  String farmReadyBody(String date) {
+    return '[nyn] Your 14 free days start today and end on $date. After that FarmTap is UGX 70,000 a month.';
+  }
+
+  @override
+  String get summaryFarm => '[nyn] Farm';
+
+  @override
+  String get summaryPlan => '[nyn] Plan';
+
+  @override
+  String get summaryFreeUntil => '[nyn] Free until';
+
+  @override
+  String get planDairy => '[nyn] FarmTap Dairy';
+
+  @override
+  String get startUsingFarmTap => '[nyn] Start using FarmTap';
+
+  @override
+  String get choose => '[nyn] Choose';
+
+  @override
+  String get phoneIncomplete =>
+      '[nyn] Check the number — it needs 9 digits after +256.';
+
+  @override
+  String get farmNameRequired => '[nyn] Enter the farm name.';
+
+  @override
+  String get pinRequired => '[nyn] Choose a 4-digit PIN.';
+
+  @override
+  String get herd1to10 => '[nyn] 1–10';
+
+  @override
+  String get herd11to30 => '[nyn] 11–30';
+
+  @override
+  String get herd31to100 => '[nyn] 31–100';
+
+  @override
+  String get herdOver100 => '[nyn] 100+';
+
+  @override
+  String get phonePrefix => '[nyn] +256 ';
+
+  @override
+  String get pinChosen => '[nyn] PIN chosen';
+
+  @override
+  String get roleMilkClerk => '[nyn] Milk clerk';
 }

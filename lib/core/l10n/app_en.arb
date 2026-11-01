@@ -193,5 +193,106 @@
   "discardTitle": "Discard changes?",
   "discardBody": "What you typed on this screen will be lost.",
   "discardConfirm": "Discard",
-  "keepEditing": "Keep editing"
+  "keepEditing": "Keep editing",
+  "chooseLanguageTitle": "Choose your language",
+  "chooseLanguageSubtitle": "Hitamu orurimi. You can change it later.",
+  "runyankoreSubtitle": "Orurimi rw'Ankole",
+  "englishSubtitle": "Use the app in English",
+  "sectorTitle": "What do you do?",
+  "sectorSubtitle": "Pick your main work. Dairy is ready now.",
+  "sectorDairy": "Dairy (cattle)",
+  "sectorDairySub": "Farms and milk collection centres",
+  "sectorPoultry": "Poultry",
+  "sectorPoultrySub": "Layers, broilers, eggs",
+  "sectorPiggery": "Piggery",
+  "sectorPiggerySub": "Sows, piglets, sales",
+  "sectorGoats": "Goats & sheep",
+  "sectorCrops": "Crops & produce buying",
+  "sectorCropsSub": "Coffee, matooke, maize",
+  "sectorFish": "Fish farming",
+  "waitlistTitle": "{sector} is coming soon",
+  "@waitlistTitle": {
+    "placeholders": {
+      "sector": {
+        "type": "String"
+      }
+    }
+  },
+  "waitlistBody": "Join the waitlist and we'll message you the day it's ready. No payment needed.",
+  "yourNameLabel": "Your name",
+  "whatsappLabel": "WhatsApp number",
+  "joinWaitlist": "Join the waitlist",
+  "waitlistDoneTitle": "You're on the list!",
+  "waitlistDoneBody": "We'll WhatsApp you when {sector} opens in FarmTap. Thank you, {name}.",
+  "@waitlistDoneBody": {
+    "placeholders": {
+      "sector": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "done": "Done",
+  "dairyTypeTitle": "What kind of dairy?",
+  "dairyTypeSubtitle": "This decides your home screen. You can add the other later.",
+  "dairyFarm": "Dairy farm",
+  "dairyFarmSub": "I keep cows and record milk, health, feeding",
+  "centreOption": "Milk collection centre",
+  "centreOptionSub": "Farmers bring milk to me",
+  "bothOption": "Both",
+  "bothOptionSub": "Farm and collection centre",
+  "farmDetailsTitle": "About your farm",
+  "farmNameLabel": "Farm name",
+  "districtLabel": "District",
+  "villageLabel": "Village / parish",
+  "herdSizeLabel": "How many cows?",
+  "useMyLocation": "Use my location",
+  "contactsTitle": "Where should we send reports?",
+  "contactsSubtitle": "Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.",
+  "dailyReportTime": "Daily report at 7:00 pm",
+  "smsSameAsWhatsapp": "SMS number is the same as WhatsApp",
+  "smsNumberLabel": "SMS number",
+  "sendDailyWhatsapp": "Send me the daily report on WhatsApp",
+  "sendSmsAlerts": "Send me SMS alerts (sick cows, low stock, trial)",
+  "roleTitle": "What is your role?",
+  "roleOwnerSub": "I own the farm and pay for FarmTap",
+  "roleManagerSub": "I run the farm for the owner",
+  "firstStaffTitle": "Add your first worker",
+  "firstStaffSubtitle": "Workers use a card and a 4-digit PIN — no email needed.",
+  "nameLabel": "Name",
+  "roleLabel": "Role",
+  "roleHerdsman": "Herdsman",
+  "roleVet": "Vet",
+  "choosePin": "Choose a 4-digit PIN",
+  "choosePinHint": "Tap to choose the PIN",
+  "nfcLaterTitle": "Add an NFC card later",
+  "nfcLaterBody": "Tap 'Assign card' on the worker's page when cards arrive.",
+  "saveWorker": "Save worker",
+  "farmReadyTitle": "Your farm is ready!",
+  "farmReadyBody": "Your 14 free days start today and end on {date}. After that FarmTap is UGX 70,000 a month.",
+  "@farmReadyBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryFarm": "Farm",
+  "summaryPlan": "Plan",
+  "summaryFreeUntil": "Free until",
+  "planDairy": "FarmTap Dairy",
+  "startUsingFarmTap": "Start using FarmTap",
+  "choose": "Choose",
+  "phoneIncomplete": "Check the number — it needs 9 digits after +256.",
+  "farmNameRequired": "Enter the farm name.",
+  "pinRequired": "Choose a 4-digit PIN.",
+  "herd1to10": "1–10",
+  "herd11to30": "11–30",
+  "herd31to100": "31–100",
+  "herdOver100": "100+",
+  "phonePrefix": "+256 ",
+  "pinChosen": "PIN chosen",
+  "roleMilkClerk": "Milk clerk"
 }

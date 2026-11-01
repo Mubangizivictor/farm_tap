@@ -12,6 +12,14 @@ abstract final class AppRoutes {
   // B — onboarding
   static const setup = '/setup';
   static const setupLanguage = '/setup/language';
+  static const setupSector = '/setup/sector';
+  static const setupWaitlistDone = '/setup/waitlist-done';
+  static const setupDairyType = '/setup/dairy-type';
+  static const setupFarm = '/setup/farm';
+  static const setupContacts = '/setup/contacts';
+  static const setupRole = '/setup/role';
+  static const setupStaff = '/setup/staff';
+  static const setupDone = '/setup/done';
 
   // C — staff unlock
   static const unlock = '/unlock';

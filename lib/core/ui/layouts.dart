@@ -125,6 +125,18 @@ class SplitAuthLayout extends StatelessWidget {
   }
 }
 
+/// Where a dialog sits on a split auth screen: centred over the content
+/// column (right of the brand panel), as in the B03 mockups.
+Alignment splitContentAlignment(BuildContext context) {
+  final panel = switch (context.formFactor) {
+    FormFactor.expanded => context.sizes.authPanelFractionWide,
+    FormFactor.medium => context.sizes.authPanelFractionMedium,
+    FormFactor.compact => 0.0,
+  };
+  // Centre of the remaining width, in Alignment units (-1 .. 1).
+  return Alignment(panel, 0);
+}
+
 class _BrandPanel extends StatelessWidget {
   const new({required this.animation, required this.tagline, required this.description});
 

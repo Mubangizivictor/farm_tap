@@ -508,13 +508,16 @@ class OptionRow extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(title, style: context.text.titleMedium),
-                      if (subtitle != null) Text(subtitle!, style: context.text.bodySmall),
+                      if (subtitle != null)
+                        Text(subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.bodySmall),
                     ],
                   ),
                 ),
                 if (comingSoon) ...[
                   context.space.gapSm,
                   StatusBadge(label: l10n.comingSoon, tone: FarmTapTone.gold),
+                  // Keep the check slot so badges line up with the radios.
+                  SizedBox(width: context.space.sm + context.sizes.iconLg),
                 ] else ...[
                   context.space.gapSm,
                   if (selected)

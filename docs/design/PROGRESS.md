@@ -14,16 +14,16 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | A05 | A05_forgot_password | Launch & account | 97.7 | 98.0 | 97.6 | 98.2 | 97.9 | 98.5 | 97.7 | 98.0 | min 97.6 | ✓ | ✓ | ✓ | ✓ | done. Toast copy includes the email ("Reset link sent to muhwezi.robert@gm…"); mockup shows a truncated placeholder. Back arrow added on phone (navigation rule: every non-root screen), not in the mockup. |
 | A06 | A06_check_email | Launch & account | 96.5 | 96.7 | 98.8 | 98.8 | 99.1 | 99.1 | 95.1 | 95.5 | min 95.1 | ✓ | ✓ | ✓ | ✓ | done. |
 | A07 | A07_farm_picker | Launch & account | 98.0 | 98.0 | 98.3 | 98.8 | 98.5 | 99.0 | 98.0 | 98.0 | min 98.0 | ✓ | ✓ | ✓ | ✓ | done. "Add another farm" opens onboarding once section B exists. |
-| B01 | B01_onboard_language | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| B02 | B02_onboard_sector | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| B03 | B03_onboard_waitlist_sheet | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| B04 | B04_onboard_waitlist_done | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| B05 | B05_onboard_dairy_type | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| B06 | B06_onboard_farm_details | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| B07 | B07_onboard_contacts | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| B08 | B08_onboard_role | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| B09 | B09_onboard_first_staff | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| B10 | B10_onboard_trial_started | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| B01 | B01_onboard_language | Onboarding | 96.3 | 97.0 | 96.4 | 97.2 | 97.0 | 97.7 | 96.3 | 97.0 | min 96.3 | ✓ | ✓ | ✓ | ✓ | done. |
+| B02 | B02_onboard_sector | Onboarding | 95.3 | 95.3 | 97.2 | 97.8 | 97.3 | 98.0 | 95.3 | 95.3 | min 95.3 | ✓ | ✓ | ✓ | ✓ | done. |
+| B03 | B03_onboard_waitlist_sheet | Onboarding | 86.8 | 90.0 | 90.0 | 95.5 | 91.4 | 95.9 | 86.8 | 90.0 | min 86.8 | ✓ | ✓ | ✓ | ✓ | done. Phone score lower: the mockup sheet includes the home-indicator safe area (added on devices, not in goldens). Wide: dialog centred over the content column; mockup also swaps the panel animation. |
+| B04 | B04_onboard_waitlist_done | Onboarding | 97.5 | 97.3 | 99.2 | 99.1 | 99.4 | 99.3 | 96.3 | 96.3 | min 96.3 | ✓ | ✓ | ✓ | ✓ | done. Back arrow added (navigation rule), not in the mockup. |
+| B05 | B05_onboard_dairy_type | Onboarding | 97.1 | 97.2 | 97.4 | 98.0 | 97.8 | 98.3 | 97.1 | 97.2 | min 97.1 | ✓ | ✓ | ✓ | ✓ | done. |
+| B06 | B06_onboard_farm_details | Onboarding | 95.8 | 95.9 | 97.5 | 97.9 | 98.0 | 98.3 | 95.8 | 95.9 | min 95.8 | ✓ | ✓ | ✓ | ✓ | done. |
+| B07 | B07_onboard_contacts | Onboarding | 95.0 | 94.9 | 95.0 | 95.6 | 96.0 | 96.4 | 95.0 | 94.9 | min 94.9 | ✓ | ✓ | ✓ | ✓ | done. |
+| B08 | B08_onboard_role | Onboarding | 97.9 | 98.1 | 97.6 | 98.3 | 98.0 | 98.6 | 97.9 | 98.1 | min 97.6 | ✓ | ✓ | ✓ | ✓ | done. |
+| B09 | B09_onboard_first_staff | Onboarding | 96.5 | 96.5 | 97.1 | 97.6 | 97.7 | 98.1 | 96.5 | 96.5 | min 96.5 | ✓ | ✓ | ✓ | ✓ | done. |
+| B10 | B10_onboard_trial_started | Onboarding | 94.0 | 94.5 | 98.1 | 98.2 | 98.5 | 98.7 | 92.7 | 93.5 | min 92.7 | ✓ | ✓ | ✓ | ✓ | done. Uses the real date; mockup date is Sat 7 Nov (trial ends 21 Nov). |
 | C01 | C01_staff_tap_card | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | C02 | C02_staff_card_number | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | C03 | C03_staff_pin | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |

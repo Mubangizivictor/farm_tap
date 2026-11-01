@@ -4,6 +4,8 @@ import 'package:farm_tap/core/audit/audit_logger.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
 import 'package:farm_tap/core/database/isar_service.dart';
+import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
+import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
@@ -41,6 +43,7 @@ Future<void> configureDependencies(Flavor flavor) async {
     getIt
       ..registerLazySingleton<AuthRepository>(FakeAuthRepository.new)
       ..registerLazySingleton<FarmMembershipRepository>(() => FakeFarmMembershipRepository(tenants))
+      ..registerLazySingleton<OnboardingRepository>(() => FakeOnboardingRepository(getIt<Clock>()))
       ..registerLazySingleton<HerdRepository>(() => FakeHerdRepository(clock: getIt<Clock>(), tenantProvider: tenants));
   } else {
     // Backend phase: real Firebase auth / membership repositories go here.

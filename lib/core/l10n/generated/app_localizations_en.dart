@@ -405,4 +405,249 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keepEditing => 'Keep editing';
+
+  @override
+  String get chooseLanguageTitle => 'Choose your language';
+
+  @override
+  String get chooseLanguageSubtitle =>
+      'Hitamu orurimi. You can change it later.';
+
+  @override
+  String get runyankoreSubtitle => 'Orurimi rw\'Ankole';
+
+  @override
+  String get englishSubtitle => 'Use the app in English';
+
+  @override
+  String get sectorTitle => 'What do you do?';
+
+  @override
+  String get sectorSubtitle => 'Pick your main work. Dairy is ready now.';
+
+  @override
+  String get sectorDairy => 'Dairy (cattle)';
+
+  @override
+  String get sectorDairySub => 'Farms and milk collection centres';
+
+  @override
+  String get sectorPoultry => 'Poultry';
+
+  @override
+  String get sectorPoultrySub => 'Layers, broilers, eggs';
+
+  @override
+  String get sectorPiggery => 'Piggery';
+
+  @override
+  String get sectorPiggerySub => 'Sows, piglets, sales';
+
+  @override
+  String get sectorGoats => 'Goats & sheep';
+
+  @override
+  String get sectorCrops => 'Crops & produce buying';
+
+  @override
+  String get sectorCropsSub => 'Coffee, matooke, maize';
+
+  @override
+  String get sectorFish => 'Fish farming';
+
+  @override
+  String waitlistTitle(String sector) {
+    return '$sector is coming soon';
+  }
+
+  @override
+  String get waitlistBody =>
+      'Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
+
+  @override
+  String get yourNameLabel => 'Your name';
+
+  @override
+  String get whatsappLabel => 'WhatsApp number';
+
+  @override
+  String get joinWaitlist => 'Join the waitlist';
+
+  @override
+  String get waitlistDoneTitle => 'You\'re on the list!';
+
+  @override
+  String waitlistDoneBody(String sector, String name) {
+    return 'We\'ll WhatsApp you when $sector opens in FarmTap. Thank you, $name.';
+  }
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get dairyTypeTitle => 'What kind of dairy?';
+
+  @override
+  String get dairyTypeSubtitle =>
+      'This decides your home screen. You can add the other later.';
+
+  @override
+  String get dairyFarm => 'Dairy farm';
+
+  @override
+  String get dairyFarmSub => 'I keep cows and record milk, health, feeding';
+
+  @override
+  String get centreOption => 'Milk collection centre';
+
+  @override
+  String get centreOptionSub => 'Farmers bring milk to me';
+
+  @override
+  String get bothOption => 'Both';
+
+  @override
+  String get bothOptionSub => 'Farm and collection centre';
+
+  @override
+  String get farmDetailsTitle => 'About your farm';
+
+  @override
+  String get farmNameLabel => 'Farm name';
+
+  @override
+  String get districtLabel => 'District';
+
+  @override
+  String get villageLabel => 'Village / parish';
+
+  @override
+  String get herdSizeLabel => 'How many cows?';
+
+  @override
+  String get useMyLocation => 'Use my location';
+
+  @override
+  String get contactsTitle => 'Where should we send reports?';
+
+  @override
+  String get contactsSubtitle =>
+      'Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
+
+  @override
+  String get dailyReportTime => 'Daily report at 7:00 pm';
+
+  @override
+  String get smsSameAsWhatsapp => 'SMS number is the same as WhatsApp';
+
+  @override
+  String get smsNumberLabel => 'SMS number';
+
+  @override
+  String get sendDailyWhatsapp => 'Send me the daily report on WhatsApp';
+
+  @override
+  String get sendSmsAlerts =>
+      'Send me SMS alerts (sick cows, low stock, trial)';
+
+  @override
+  String get roleTitle => 'What is your role?';
+
+  @override
+  String get roleOwnerSub => 'I own the farm and pay for FarmTap';
+
+  @override
+  String get roleManagerSub => 'I run the farm for the owner';
+
+  @override
+  String get firstStaffTitle => 'Add your first worker';
+
+  @override
+  String get firstStaffSubtitle =>
+      'Workers use a card and a 4-digit PIN — no email needed.';
+
+  @override
+  String get nameLabel => 'Name';
+
+  @override
+  String get roleLabel => 'Role';
+
+  @override
+  String get roleHerdsman => 'Herdsman';
+
+  @override
+  String get roleVet => 'Vet';
+
+  @override
+  String get choosePin => 'Choose a 4-digit PIN';
+
+  @override
+  String get choosePinHint => 'Tap to choose the PIN';
+
+  @override
+  String get nfcLaterTitle => 'Add an NFC card later';
+
+  @override
+  String get nfcLaterBody =>
+      'Tap \'Assign card\' on the worker\'s page when cards arrive.';
+
+  @override
+  String get saveWorker => 'Save worker';
+
+  @override
+  String get farmReadyTitle => 'Your farm is ready!';
+
+  @override
+  String farmReadyBody(String date) {
+    return 'Your 14 free days start today and end on $date. After that FarmTap is UGX 70,000 a month.';
+  }
+
+  @override
+  String get summaryFarm => 'Farm';
+
+  @override
+  String get summaryPlan => 'Plan';
+
+  @override
+  String get summaryFreeUntil => 'Free until';
+
+  @override
+  String get planDairy => 'FarmTap Dairy';
+
+  @override
+  String get startUsingFarmTap => 'Start using FarmTap';
+
+  @override
+  String get choose => 'Choose';
+
+  @override
+  String get phoneIncomplete =>
+      'Check the number — it needs 9 digits after +256.';
+
+  @override
+  String get farmNameRequired => 'Enter the farm name.';
+
+  @override
+  String get pinRequired => 'Choose a 4-digit PIN.';
+
+  @override
+  String get herd1to10 => '1–10';
+
+  @override
+  String get herd11to30 => '11–30';
+
+  @override
+  String get herd31to100 => '31–100';
+
+  @override
+  String get herdOver100 => '100+';
+
+  @override
+  String get phonePrefix => '+256 ';
+
+  @override
+  String get pinChosen => 'PIN chosen';
+
+  @override
+  String get roleMilkClerk => 'Milk clerk';
 }

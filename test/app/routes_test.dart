@@ -8,9 +8,11 @@ import 'package:farm_tap/app/router/routes.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
+import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
 import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/theme/theme.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -22,6 +24,13 @@ const _routes = <(String, String, bool, bool)>[
   (AppRoutes.emailSignIn, AppRoutes.signIn, false, false),
   (AppRoutes.signUp, AppRoutes.emailSignIn, false, false),
   (AppRoutes.forgotPassword, AppRoutes.emailSignIn, false, false),
+  (AppRoutes.setupSector, AppRoutes.setupLanguage, true, false),
+  (AppRoutes.setupWaitlistDone, AppRoutes.setupSector, true, false),
+  (AppRoutes.setupDairyType, AppRoutes.setupSector, true, false),
+  (AppRoutes.setupFarm, AppRoutes.setupDairyType, true, false),
+  (AppRoutes.setupContacts, AppRoutes.setupFarm, true, false),
+  (AppRoutes.setupRole, AppRoutes.setupContacts, true, false),
+  (AppRoutes.setupStaff, AppRoutes.setupRole, true, false),
 ];
 
 class _Harness {
@@ -48,6 +57,7 @@ class _Harness {
     final router = buildRouter(
       session: session,
       places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
+      onboarding: FakeOnboardingRepository(SystemClock()),
       initialLocation: start,
     );
     addTearDown(router.dispose);

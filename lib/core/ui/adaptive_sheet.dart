@@ -10,7 +10,12 @@ import 'package:material_symbols_icons/symbols.dart';
 /// padding 24 starting 36 from the top). Wider: the same content in a 560
 /// dialog with a close (x) icon. Tap scrim or back closes it unless
 /// [dismissible] is false (read-back needs a choice).
-Future<T?> showAdaptiveSheet<T>(BuildContext context, {required WidgetBuilder builder, bool dismissible = true}) {
+Future<T?> showAdaptiveSheet<T>(
+  BuildContext context, {
+  required WidgetBuilder builder,
+  bool dismissible = true,
+  AlignmentGeometry? dialogAlignment,
+}) {
   if (context.isCompact) {
     return showModalBottomSheet<T>(
       context: context,
@@ -31,6 +36,7 @@ Future<T?> showAdaptiveSheet<T>(BuildContext context, {required WidgetBuilder bu
     builder: (dialogContext) => PopScope(
       canPop: dismissible,
       child: Dialog(
+        alignment: dialogAlignment,
         child: SheetDialogFrame(showClose: dismissible, child: builder(dialogContext)),
       ),
     ),

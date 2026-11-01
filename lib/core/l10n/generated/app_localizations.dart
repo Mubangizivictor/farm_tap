@@ -847,6 +847,468 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep editing'**
   String get keepEditing;
+
+  /// No description provided for @chooseLanguageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your language'**
+  String get chooseLanguageTitle;
+
+  /// No description provided for @chooseLanguageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hitamu orurimi. You can change it later.'**
+  String get chooseLanguageSubtitle;
+
+  /// No description provided for @runyankoreSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Orurimi rw\'Ankole'**
+  String get runyankoreSubtitle;
+
+  /// No description provided for @englishSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the app in English'**
+  String get englishSubtitle;
+
+  /// No description provided for @sectorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you do?'**
+  String get sectorTitle;
+
+  /// No description provided for @sectorSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick your main work. Dairy is ready now.'**
+  String get sectorSubtitle;
+
+  /// No description provided for @sectorDairy.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy (cattle)'**
+  String get sectorDairy;
+
+  /// No description provided for @sectorDairySub.
+  ///
+  /// In en, this message translates to:
+  /// **'Farms and milk collection centres'**
+  String get sectorDairySub;
+
+  /// No description provided for @sectorPoultry.
+  ///
+  /// In en, this message translates to:
+  /// **'Poultry'**
+  String get sectorPoultry;
+
+  /// No description provided for @sectorPoultrySub.
+  ///
+  /// In en, this message translates to:
+  /// **'Layers, broilers, eggs'**
+  String get sectorPoultrySub;
+
+  /// No description provided for @sectorPiggery.
+  ///
+  /// In en, this message translates to:
+  /// **'Piggery'**
+  String get sectorPiggery;
+
+  /// No description provided for @sectorPiggerySub.
+  ///
+  /// In en, this message translates to:
+  /// **'Sows, piglets, sales'**
+  String get sectorPiggerySub;
+
+  /// No description provided for @sectorGoats.
+  ///
+  /// In en, this message translates to:
+  /// **'Goats & sheep'**
+  String get sectorGoats;
+
+  /// No description provided for @sectorCrops.
+  ///
+  /// In en, this message translates to:
+  /// **'Crops & produce buying'**
+  String get sectorCrops;
+
+  /// No description provided for @sectorCropsSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Coffee, matooke, maize'**
+  String get sectorCropsSub;
+
+  /// No description provided for @sectorFish.
+  ///
+  /// In en, this message translates to:
+  /// **'Fish farming'**
+  String get sectorFish;
+
+  /// No description provided for @waitlistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{sector} is coming soon'**
+  String waitlistTitle(String sector);
+
+  /// No description provided for @waitlistBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.'**
+  String get waitlistBody;
+
+  /// No description provided for @yourNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get yourNameLabel;
+
+  /// No description provided for @whatsappLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp number'**
+  String get whatsappLabel;
+
+  /// No description provided for @joinWaitlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the waitlist'**
+  String get joinWaitlist;
+
+  /// No description provided for @waitlistDoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re on the list!'**
+  String get waitlistDoneTitle;
+
+  /// No description provided for @waitlistDoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll WhatsApp you when {sector} opens in FarmTap. Thank you, {name}.'**
+  String waitlistDoneBody(String sector, String name);
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// No description provided for @dairyTypeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What kind of dairy?'**
+  String get dairyTypeTitle;
+
+  /// No description provided for @dairyTypeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This decides your home screen. You can add the other later.'**
+  String get dairyTypeSubtitle;
+
+  /// No description provided for @dairyFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy farm'**
+  String get dairyFarm;
+
+  /// No description provided for @dairyFarmSub.
+  ///
+  /// In en, this message translates to:
+  /// **'I keep cows and record milk, health, feeding'**
+  String get dairyFarmSub;
+
+  /// No description provided for @centreOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk collection centre'**
+  String get centreOption;
+
+  /// No description provided for @centreOptionSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmers bring milk to me'**
+  String get centreOptionSub;
+
+  /// No description provided for @bothOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Both'**
+  String get bothOption;
+
+  /// No description provided for @bothOptionSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm and collection centre'**
+  String get bothOptionSub;
+
+  /// No description provided for @farmDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About your farm'**
+  String get farmDetailsTitle;
+
+  /// No description provided for @farmNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm name'**
+  String get farmNameLabel;
+
+  /// No description provided for @districtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'District'**
+  String get districtLabel;
+
+  /// No description provided for @villageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Village / parish'**
+  String get villageLabel;
+
+  /// No description provided for @herdSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'How many cows?'**
+  String get herdSizeLabel;
+
+  /// No description provided for @useMyLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my location'**
+  String get useMyLocation;
+
+  /// No description provided for @contactsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where should we send reports?'**
+  String get contactsTitle;
+
+  /// No description provided for @contactsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.'**
+  String get contactsSubtitle;
+
+  /// No description provided for @dailyReportTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily report at 7:00 pm'**
+  String get dailyReportTime;
+
+  /// No description provided for @smsSameAsWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS number is the same as WhatsApp'**
+  String get smsSameAsWhatsapp;
+
+  /// No description provided for @smsNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS number'**
+  String get smsNumberLabel;
+
+  /// No description provided for @sendDailyWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'Send me the daily report on WhatsApp'**
+  String get sendDailyWhatsapp;
+
+  /// No description provided for @sendSmsAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Send me SMS alerts (sick cows, low stock, trial)'**
+  String get sendSmsAlerts;
+
+  /// No description provided for @roleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What is your role?'**
+  String get roleTitle;
+
+  /// No description provided for @roleOwnerSub.
+  ///
+  /// In en, this message translates to:
+  /// **'I own the farm and pay for FarmTap'**
+  String get roleOwnerSub;
+
+  /// No description provided for @roleManagerSub.
+  ///
+  /// In en, this message translates to:
+  /// **'I run the farm for the owner'**
+  String get roleManagerSub;
+
+  /// No description provided for @firstStaffTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first worker'**
+  String get firstStaffTitle;
+
+  /// No description provided for @firstStaffSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workers use a card and a 4-digit PIN — no email needed.'**
+  String get firstStaffSubtitle;
+
+  /// No description provided for @nameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get nameLabel;
+
+  /// No description provided for @roleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get roleLabel;
+
+  /// No description provided for @roleHerdsman.
+  ///
+  /// In en, this message translates to:
+  /// **'Herdsman'**
+  String get roleHerdsman;
+
+  /// No description provided for @roleVet.
+  ///
+  /// In en, this message translates to:
+  /// **'Vet'**
+  String get roleVet;
+
+  /// No description provided for @choosePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a 4-digit PIN'**
+  String get choosePin;
+
+  /// No description provided for @choosePinHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to choose the PIN'**
+  String get choosePinHint;
+
+  /// No description provided for @nfcLaterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an NFC card later'**
+  String get nfcLaterTitle;
+
+  /// No description provided for @nfcLaterBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \'Assign card\' on the worker\'s page when cards arrive.'**
+  String get nfcLaterBody;
+
+  /// No description provided for @saveWorker.
+  ///
+  /// In en, this message translates to:
+  /// **'Save worker'**
+  String get saveWorker;
+
+  /// No description provided for @farmReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your farm is ready!'**
+  String get farmReadyTitle;
+
+  /// No description provided for @farmReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 14 free days start today and end on {date}. After that FarmTap is UGX 70,000 a month.'**
+  String farmReadyBody(String date);
+
+  /// No description provided for @summaryFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm'**
+  String get summaryFarm;
+
+  /// No description provided for @summaryPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get summaryPlan;
+
+  /// No description provided for @summaryFreeUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Free until'**
+  String get summaryFreeUntil;
+
+  /// No description provided for @planDairy.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap Dairy'**
+  String get planDairy;
+
+  /// No description provided for @startUsingFarmTap.
+  ///
+  /// In en, this message translates to:
+  /// **'Start using FarmTap'**
+  String get startUsingFarmTap;
+
+  /// No description provided for @choose.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose'**
+  String get choose;
+
+  /// No description provided for @phoneIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the number — it needs 9 digits after +256.'**
+  String get phoneIncomplete;
+
+  /// No description provided for @farmNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the farm name.'**
+  String get farmNameRequired;
+
+  /// No description provided for @pinRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a 4-digit PIN.'**
+  String get pinRequired;
+
+  /// No description provided for @herd1to10.
+  ///
+  /// In en, this message translates to:
+  /// **'1–10'**
+  String get herd1to10;
+
+  /// No description provided for @herd11to30.
+  ///
+  /// In en, this message translates to:
+  /// **'11–30'**
+  String get herd11to30;
+
+  /// No description provided for @herd31to100.
+  ///
+  /// In en, this message translates to:
+  /// **'31–100'**
+  String get herd31to100;
+
+  /// No description provided for @herdOver100.
+  ///
+  /// In en, this message translates to:
+  /// **'100+'**
+  String get herdOver100;
+
+  /// No description provided for @phonePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'+256 '**
+  String get phonePrefix;
+
+  /// No description provided for @pinChosen.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN chosen'**
+  String get pinChosen;
+
+  /// No description provided for @roleMilkClerk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk clerk'**
+  String get roleMilkClerk;
 }
 
 class _AppLocalizationsDelegate
