@@ -18,8 +18,7 @@ class FakeCentreRepository implements CentreRepository {
         phone: '+256 772 451 908',
         network: MobileNetwork.mtn,
         todayLitres: 42.5,
-        periodLitres: 510,
-        owed: 538200,
+        periodLitres: 512,
         usualLow: 38,
         usualHigh: 45,
       ),
@@ -32,7 +31,6 @@ class FakeCentreRepository implements CentreRepository {
         network: MobileNetwork.airtel,
         todayLitres: 18,
         periodLitres: 216,
-        owed: 217800,
         usualLow: 15,
         usualHigh: 20,
       ),
@@ -45,7 +43,6 @@ class FakeCentreRepository implements CentreRepository {
         network: MobileNetwork.mtn,
         todayLitres: 26.5,
         periodLitres: 318,
-        owed: 349800,
         usualLow: 24,
         usualHigh: 30,
       ),
@@ -58,7 +55,6 @@ class FakeCentreRepository implements CentreRepository {
         network: MobileNetwork.mtn,
         todayLitres: 12,
         periodLitres: 144,
-        owed: 158400,
         usualLow: 10,
         usualHigh: 14,
       ),
@@ -71,7 +67,6 @@ class FakeCentreRepository implements CentreRepository {
         network: MobileNetwork.airtel,
         todayLitres: 35,
         periodLitres: 420,
-        owed: 462000,
         usualLow: 32,
         usualHigh: 38,
       ),
@@ -84,7 +79,6 @@ class FakeCentreRepository implements CentreRepository {
         network: MobileNetwork.mtn,
         todayLitres: 22,
         periodLitres: 264,
-        owed: 278400,
         usualLow: 20,
         usualHigh: 25,
       ),
@@ -96,7 +90,6 @@ class FakeCentreRepository implements CentreRepository {
         phone: '+256 783 902 117',
         network: MobileNetwork.mtn,
         periodLitres: 96,
-        owed: 105600,
         usualLow: 8,
         usualHigh: 12,
       ),
@@ -107,11 +100,21 @@ class FakeCentreRepository implements CentreRepository {
         phone: '+256 709 334 551',
         network: MobileNetwork.airtel,
         periodLitres: 40,
-        owed: 44000,
         usualLow: 5,
         usualHigh: 10,
       ),
     ];
+    _deductions = {
+      'farmer-0142': [
+        Deduction(kind: DeductionKind.advance, amount: 20000, date: DateTime(_day.year, _day.month, 2)),
+        const Deduction(kind: DeductionKind.feedsOnCredit, amount: 5000),
+      ],
+      'farmer-0087': [const Deduction(kind: DeductionKind.feedsOnCredit, amount: 19800)],
+      'farmer-0128': [Deduction(kind: DeductionKind.advance, amount: 12000, date: DateTime(_day.year, _day.month, 5))],
+    };
+    // Owed is derived from the same period litres and deductions the
+    // statement and payment sheet use, so every screen agrees.
+    _farmers = [for (final x in _farmers) x.withOwed(x.periodLitres * _price - _deducted(x.id))];
     _deliveries = [
       _delivery('d-1', _farmers[1], 18, 6, 41),
       _delivery('d-2', _farmers[4], 35, 6, 47),
@@ -122,6 +125,10 @@ class FakeCentreRepository implements CentreRepository {
 
   final Clock clock;
   late final DateTime _day;
+  late final Map<String, List<Deduction>> _deductions;
+  static const double _price = 1100;
+
+  double _deducted(String farmerId) => (_deductions[farmerId] ?? const []).fold(0, (s, d) => s + d.amount);
   late List<CentreFarmer> _farmers;
   late List<Delivery> _deliveries;
   int _next = 5;
@@ -289,11 +296,11 @@ class FakeCentreRepository implements CentreRepository {
 
   @override
   Future<Result<PaymentPeriod>> payments() async {
-    PaymentLine line(int i, double deductions, [PayoutStatus status = PayoutStatus.ready]) => PaymentLine(
+    PaymentLine line(int i, [PayoutStatus status = PayoutStatus.ready]) => PaymentLine(
       farmer: _farmers[i],
       litres: _farmers[i].periodLitres,
-      gross: _farmers[i].periodLitres * 1100,
-      deductions: deductions,
+      gross: _farmers[i].periodLitres * _price,
+      deductions: _deducted(_farmers[i].id),
       status: status,
     );
     return Result.success(
@@ -301,37 +308,37 @@ class FakeCentreRepository implements CentreRepository {
         start: _start,
         end: _end,
         payDay: _payDay,
-        pricePerLitre: 1100,
+        pricePerLitre: _price,
         farmers: _totalFarmers,
         litres: 16720,
         amount: 18412600,
         fees: 96000,
         lines: [
-          line(0, 22800, PayoutStatus.sent),
-          line(1, 19800, PayoutStatus.sending),
-          line(2, 0, PayoutStatus.failed),
-          line(3, 0),
-          line(4, 0),
-          line(5, 12000),
+          line(0, PayoutStatus.sent),
+          line(1, PayoutStatus.sending),
+          line(2, PayoutStatus.failed),
+          line(3),
+          line(4),
+          line(5),
         ],
       ),
     );
   }
 
   @override
-  Future<Result<FarmerStatement>> statement(String farmerId) async => Result.success(
-    FarmerStatement(
-      start: _start,
-      end: _end,
-      payDay: _payDay,
-      litres: 512,
-      pricePerLitre: 1100,
-      deductions: [
-        Deduction(kind: DeductionKind.advance, amount: 20000, date: DateTime(_day.year, _day.month, 4)),
-        const Deduction(kind: DeductionKind.feedsOnCredit, amount: 5000),
-      ],
-    ),
-  );
+  Future<Result<FarmerStatement>> statement(String farmerId) async {
+    final farmer = _farmers.firstWhere((f) => f.id == farmerId);
+    return Result.success(
+      FarmerStatement(
+        start: _start,
+        end: _end,
+        payDay: _payDay,
+        litres: farmer.periodLitres,
+        pricePerLitre: _price,
+        deductions: _deductions[farmerId] ?? const [],
+      ),
+    );
+  }
 
   @override
   Future<Result<SmsPreview>> smsPreview() async => Result.success(

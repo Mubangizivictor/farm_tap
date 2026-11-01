@@ -57,6 +57,22 @@ class CentreFarmer {
   /// "0772 451 908" for payout rows.
   String get localPhone => phone.startsWith('+256 ') ? '0${phone.substring(5)}' : phone;
 
+  CentreFarmer withOwed(double value) => CentreFarmer(
+    id: id,
+    name: name,
+    card: card,
+    village: village,
+    phone: phone,
+    network: network,
+    todayLitres: todayLitres,
+    periodLitres: periodLitres,
+    rejectedLitres: rejectedLitres,
+    usualLow: usualLow,
+    usualHigh: usualHigh,
+    smsReceipts: smsReceipts,
+    owed: value,
+  );
+
   CentreFarmer withToday(double? litres, {double addPeriod = 0}) => CentreFarmer(
     id: id,
     name: name,
@@ -70,7 +86,7 @@ class CentreFarmer {
     usualLow: usualLow,
     usualHigh: usualHigh,
     smsReceipts: smsReceipts,
-    owed: owed + addPeriod * 1100,
+    owed: owed,
   );
 }
 

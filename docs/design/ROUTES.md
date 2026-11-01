@@ -67,7 +67,7 @@ Source of truth for navigation (go_router). Overlays (sheets, dialogs, toasts, c
 | F09 | /milk/sales | /milk | push | pop |
 | F10 | /milk/trends | /milk | push | pop |
 | G01 | /home (collection centre) | — | tab | root tab |
-| G02 | /collect | — | tab | root tab |
+| G02 | /collect | — | tab | root tab, no back arrow; G01 "Tap farmer card" switches to this tab (go, not push) |
 | G03 | /collect/:farmerId | /collect | push (card tapped) | pop → G02 |
 | G04 | read-back on G03 | /collect/:farmerId | overlay (no scrim dismiss) | "No, change it" closes |
 | G05 | /collect?saved=:deliveryId | /collect | state after save (toast + Undo 5 s) | stack resets to G02 (go /collect) |
