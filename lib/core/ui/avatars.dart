@@ -1,12 +1,24 @@
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 
-/// Cow photo, or a cartoon-style fallback when the farm has no photo yet.
-/// TODO(ui): swap the icon fallback for the cartoon cow artwork once exported.
+/// Cow photo, or one of the cartoon cow avatars when the farm has no photo.
+/// The cartoon is picked from [animalId] so the same cow always looks the same.
 class CowAvatar extends StatelessWidget {
-  const new({super.key, this.photoUrl, this.size, this.ring = false, this.semanticLabel});
+  const new({
+    super.key,
+    this.photoUrl,
+    this.animalId,
+    this.isCalf = false,
+    this.size,
+    this.ring = false,
+    this.semanticLabel,
+  });
 
   final String? photoUrl;
+
+  /// Used to pick the cartoon avatar (hash of the id).
+  final String? animalId;
+  final bool isCalf;
   final double? size;
 
   /// Green ring, used on read-back and detail screens.
@@ -17,7 +29,20 @@ class CowAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final dimension = size ?? context.sizes.avatarLg;
     final url = photoUrl;
-    final fallback = Icon(Icons.pets_rounded, size: dimension * 0.5, color: context.colors.onSurfaceVariant);
+    final cartoon = isCalf
+        ? FarmTapAssets.calfAvatar
+        : animalId == null
+        ? FarmTapAssets.cowAvatar(0)
+        : FarmTapAssets.cowAvatarFor(animalId!);
+    final fallback = Image.asset(
+      cartoon,
+      width: dimension,
+      height: dimension,
+      fit: BoxFit.cover,
+      excludeFromSemantics: true,
+      errorBuilder: (_, _, _) =>
+          Icon(Icons.pets_rounded, size: dimension * 0.5, color: context.colors.onSurfaceVariant),
+    );
     return Semantics(
       label: semanticLabel,
       image: true,
@@ -81,11 +106,12 @@ class PersonAvatar extends StatelessWidget {
         ),
       ),
     );
-    if (onTap == null)
+    if (onTap == null) {
       return Semantics(
         label: name,
         child: ExcludeSemantics(child: avatar),
       );
+    }
     return Semantics(
       label: name,
       button: true,

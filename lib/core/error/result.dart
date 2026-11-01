@@ -10,14 +10,14 @@ sealed class Result<T> {
   bool get isFailure => this is FailureResult<T>;
 
   T? get data => switch (this) {
-        Success(data: final d) => d,
-        FailureResult() => null,
-      };
+    Success(data: final d) => d,
+    FailureResult() => null,
+  };
 
   Failure? get failure => switch (this) {
-        Success() => null,
-        FailureResult(failure: final f) => f,
-      };
+    Success() => null,
+    FailureResult(failure: final f) => f,
+  };
 }
 
 class Success<T> extends Result<T> {

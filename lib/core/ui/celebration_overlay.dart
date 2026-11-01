@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:farm_tap/core/sound/sound_service.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/animation_view.dart';
-import 'package:farm_tap/core/ui/breakpoints.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -22,6 +22,7 @@ Future<CelebrationAction?> showCelebration(
   IconData? primaryIcon,
   String? secondaryLabel,
   bool autoAdvance = false,
+  FarmTapSound sound = FarmTapSound.celebrate,
 }) {
   Widget content(BuildContext ctx) => CelebrationOverlay(
     animation: animation,
@@ -31,6 +32,7 @@ Future<CelebrationAction?> showCelebration(
     primaryIcon: primaryIcon,
     secondaryLabel: secondaryLabel,
     autoAdvance: autoAdvance,
+    sound: sound,
     onResult: (a) => Navigator.of(ctx).pop(a),
   );
   if (context.isCompact) {
@@ -67,6 +69,7 @@ class CelebrationOverlay extends StatefulWidget {
     this.primaryIcon,
     this.secondaryLabel,
     this.autoAdvance = false,
+    this.sound = FarmTapSound.celebrate,
   });
 
   final FarmTapAnimation animation;
@@ -76,6 +79,9 @@ class CelebrationOverlay extends StatefulWidget {
   final IconData? primaryIcon;
   final String? secondaryLabel;
   final bool autoAdvance;
+
+  /// celebrate by default; pop for milk saved, coin for payment received.
+  final FarmTapSound sound;
   final ValueChanged<CelebrationAction> onResult;
 
   @override
@@ -91,8 +97,8 @@ class _CelebrationOverlayState extends State<CelebrationOverlay> {
   @override
   void initState() {
     super.initState();
-    HapticFeedback.mediumImpact();
-    // TODO(audio): play the short success sound (<= 0.5 s, off when silent).
+    unawaited(HapticFeedback.mediumImpact());
+    unawaited(SoundService.instance.play(widget.sound));
   }
 
   @override

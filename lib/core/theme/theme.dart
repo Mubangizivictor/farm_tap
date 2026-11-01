@@ -5,6 +5,7 @@ export 'farmtap_assets.dart';
 export 'farmtap_design.dart';
 export 'farmtap_theme.dart';
 export 'farmtap_theme_context.dart';
+export 'tokens/farmtap_breakpoints.dart';
 export 'tokens/farmtap_motion.dart';
 export 'tokens/farmtap_radii.dart';
 export 'tokens/farmtap_sizes.dart';

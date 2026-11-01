@@ -44,6 +44,23 @@ abstract final class FarmTapAssets {
   static const splashAnimationLightWebp = '$_a/splash_animation_light.webp';
   static const splashAnimationDarkWebp = '$_a/splash_animation_dark.webp';
 
+  // Cartoon avatars (assets/images/avatars): avatar_cow_1..6.png, avatar_calf.png
+  static const _av = 'assets/images/avatars';
+  static const cowAvatarCount = 6;
+  static const calfAvatar = '$_av/avatar_calf.png';
+
+  /// Cow avatar number [i] (any int; wraps to 1..6).
+  static String cowAvatar(int i) => '$_av/avatar_cow_${i.abs() % cowAvatarCount + 1}.png';
+
+  /// Same cow always gets the same cartoon: picks by a stable hash of its id.
+  static String cowAvatarFor(String id) {
+    var h = 0;
+    for (final c in id.codeUnits) {
+      h = (h * 31 + c) & 0x7fffffff;
+    }
+    return cowAvatar(h);
+  }
+
   static String byBrightness(BuildContext context, String light, String dark) =>
       Theme.of(context).brightness == Brightness.dark ? dark : light;
 }
@@ -52,7 +69,7 @@ abstract final class FarmTapAssets {
 /// WebP (transparent) is the default; GIF is a fallback with a solid background.
 @immutable
 class FarmTapAnimation {
-  const FarmTapAnimation(this.base);
+  const new(this.base);
 
   /// e.g. 'assets/animations/anim_milk_saved'
   final String base;
@@ -63,12 +80,10 @@ class FarmTapAnimation {
   String get darkGif => '${base}_dark.gif';
 
   /// Transparent WebP matching the current theme.
-  String of(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? darkWebp : lightWebp;
+  String of(BuildContext context) => Theme.of(context).brightness == Brightness.dark ? darkWebp : lightWebp;
 
   /// GIF matching the current theme (solid cream/night background).
-  String gifOf(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? darkGif : lightGif;
+  String gifOf(BuildContext context) => Theme.of(context).brightness == Brightness.dark ? darkGif : lightGif;
 }
 
 /// Character animations (see docs/UX_SPEC.md section 5 for where each is used).
@@ -93,4 +108,18 @@ abstract final class FarmTapAnimations {
   static const pregnant = FarmTapAnimation('$_a/anim_pregnant');
   static const waitlist = FarmTapAnimation('$_a/anim_waitlist');
   static const welcome = FarmTapAnimation('$_a/anim_welcome');
+}
+
+/// Short UI sounds (assets/sounds/*.wav). Played through SoundService, only
+/// when Settings > Sounds is on and the phone is not silent.
+enum FarmTapSound {
+  tap('assets/sounds/tap.wav'),
+  pop('assets/sounds/pop.wav'),
+  success('assets/sounds/success.wav'),
+  celebrate('assets/sounds/celebrate.wav'),
+  coin('assets/sounds/coin.wav'),
+  error('assets/sounds/error.wav');
+
+  new(this.asset);
+  final String asset;
 }

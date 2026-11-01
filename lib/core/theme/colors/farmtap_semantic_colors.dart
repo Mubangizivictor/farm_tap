@@ -41,41 +41,55 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
   final Color onSuccess;
   final Color successContainer;
   final Color onSuccessContainer;
+
   /// Due soon, low stock, pending.
   final Color warning;
   final Color onWarning;
   final Color warningContainer;
   final Color onWarningContainer;
+
   /// Problem, overdue, withdrawal period, deleted.
   final Color danger;
   final Color onDanger;
   final Color dangerContainer;
   final Color onDangerContainer;
+
   /// Neutral information, tips.
   final Color info;
   final Color onInfo;
   final Color infoContainer;
   final Color onInfoContainer;
+
   /// Logo posts colour.
   final Color brandGreen;
+
   /// Logo ring and centre colour.
   final Color brandGold;
+
   /// Number keypad key background.
   final Color keypadKey;
+
   /// Number keypad digit colour.
   final Color onKeypadKey;
+
   /// Keypad confirm key background.
   final Color keypadAction;
+
   /// Keypad confirm key content.
   final Color onKeypadAction;
+
   /// Record is synced to the cloud.
   final Color synced;
+
   /// Record waiting to sync.
   final Color syncPending;
+
   /// Record failed to sync.
   final Color syncFailed;
+
   /// Animal under drug withdrawal (milk/meat not for sale).
   final Color withdrawal;
+
   /// NFC reader is listening.
   final Color nfcActive;
 
@@ -168,42 +182,38 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     Color? syncFailed,
     Color? withdrawal,
     Color? nfcActive,
-  }) =>
-      FarmTapSemanticColors(
-        success: success ?? this.success,
-        onSuccess: onSuccess ?? this.onSuccess,
-        successContainer: successContainer ?? this.successContainer,
-        onSuccessContainer: onSuccessContainer ?? this.onSuccessContainer,
-        warning: warning ?? this.warning,
-        onWarning: onWarning ?? this.onWarning,
-        warningContainer: warningContainer ?? this.warningContainer,
-        onWarningContainer: onWarningContainer ?? this.onWarningContainer,
-        danger: danger ?? this.danger,
-        onDanger: onDanger ?? this.onDanger,
-        dangerContainer: dangerContainer ?? this.dangerContainer,
-        onDangerContainer: onDangerContainer ?? this.onDangerContainer,
-        info: info ?? this.info,
-        onInfo: onInfo ?? this.onInfo,
-        infoContainer: infoContainer ?? this.infoContainer,
-        onInfoContainer: onInfoContainer ?? this.onInfoContainer,
-        brandGreen: brandGreen ?? this.brandGreen,
-        brandGold: brandGold ?? this.brandGold,
-        keypadKey: keypadKey ?? this.keypadKey,
-        onKeypadKey: onKeypadKey ?? this.onKeypadKey,
-        keypadAction: keypadAction ?? this.keypadAction,
-        onKeypadAction: onKeypadAction ?? this.onKeypadAction,
-        synced: synced ?? this.synced,
-        syncPending: syncPending ?? this.syncPending,
-        syncFailed: syncFailed ?? this.syncFailed,
-        withdrawal: withdrawal ?? this.withdrawal,
-        nfcActive: nfcActive ?? this.nfcActive,
-      );
+  }) => FarmTapSemanticColors(
+    success: success ?? this.success,
+    onSuccess: onSuccess ?? this.onSuccess,
+    successContainer: successContainer ?? this.successContainer,
+    onSuccessContainer: onSuccessContainer ?? this.onSuccessContainer,
+    warning: warning ?? this.warning,
+    onWarning: onWarning ?? this.onWarning,
+    warningContainer: warningContainer ?? this.warningContainer,
+    onWarningContainer: onWarningContainer ?? this.onWarningContainer,
+    danger: danger ?? this.danger,
+    onDanger: onDanger ?? this.onDanger,
+    dangerContainer: dangerContainer ?? this.dangerContainer,
+    onDangerContainer: onDangerContainer ?? this.onDangerContainer,
+    info: info ?? this.info,
+    onInfo: onInfo ?? this.onInfo,
+    infoContainer: infoContainer ?? this.infoContainer,
+    onInfoContainer: onInfoContainer ?? this.onInfoContainer,
+    brandGreen: brandGreen ?? this.brandGreen,
+    brandGold: brandGold ?? this.brandGold,
+    keypadKey: keypadKey ?? this.keypadKey,
+    onKeypadKey: onKeypadKey ?? this.onKeypadKey,
+    keypadAction: keypadAction ?? this.keypadAction,
+    onKeypadAction: onKeypadAction ?? this.onKeypadAction,
+    synced: synced ?? this.synced,
+    syncPending: syncPending ?? this.syncPending,
+    syncFailed: syncFailed ?? this.syncFailed,
+    withdrawal: withdrawal ?? this.withdrawal,
+    nfcActive: nfcActive ?? this.nfcActive,
+  );
 
   @override
-  ThemeExtension<FarmTapSemanticColors> lerp(
-    covariant ThemeExtension<FarmTapSemanticColors>? other,
-    double t,
-  ) {
+  ThemeExtension<FarmTapSemanticColors> lerp(covariant ThemeExtension<FarmTapSemanticColors>? other, double t) {
     if (other is! FarmTapSemanticColors) return this;
     return FarmTapSemanticColors(
       success: Color.lerp(success, other.success, t)!,

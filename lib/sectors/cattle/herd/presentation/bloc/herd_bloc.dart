@@ -7,7 +7,7 @@ import 'package:farm_tap/sectors/cattle/herd/presentation/bloc/herd_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HerdBloc extends Bloc<HerdEvent, HerdState> {
-  HerdBloc({
+  new({
     required this.watchAnimals,
     required this.addAnimal,
   })  : super(const HerdState()) {
@@ -57,8 +57,8 @@ class HerdBloc extends Bloc<HerdEvent, HerdState> {
   }
 
   @override
-  Future<void> close() {
-    _animalsSubscription?.cancel();
-    return super.close();
+  Future<void> close() async {
+    await _animalsSubscription?.cancel();
+    await super.close();
   }
 }

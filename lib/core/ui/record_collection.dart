@@ -1,5 +1,4 @@
 import 'package:farm_tap/core/theme/theme.dart';
-import 'package:farm_tap/core/ui/breakpoints.dart';
 import 'package:flutter/material.dart';
 
 class RecordColumn<T> {
@@ -94,7 +93,7 @@ class _RecordCollectionState<T> extends State<RecordCollection<T>> {
                       onTap: widget.columns[c].sortKey == null
                           ? null
                           : () => setState(() {
-                              _ascending = _sortColumn == c ? !_ascending : true;
+                              _ascending = _sortColumn != c || !_ascending;
                               _sortColumn = c;
                             }),
                       child: Row(

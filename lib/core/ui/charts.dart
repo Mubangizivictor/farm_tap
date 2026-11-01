@@ -140,7 +140,7 @@ class FarmTapBarChart extends StatelessWidget {
             minY: 0,
             alignment: BarChartAlignment.spaceAround,
             borderData: FlBorderData(show: false),
-            barTouchData: BarTouchData(enabled: false),
+            barTouchData: const BarTouchData(enabled: false),
             gridData: FlGridData(
               drawVerticalLine: false,
               horizontalInterval: maxY / 3,

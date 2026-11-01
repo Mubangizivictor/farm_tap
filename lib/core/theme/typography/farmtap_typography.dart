@@ -19,12 +19,12 @@ abstract final class FarmTapTypography {
   /// Material defaults for low-literacy readability.
   static TextTheme textTheme(FarmTapDesign d, ColorScheme cs) {
     TextStyle s(double size, FontWeight w, double h) => TextStyle(
-          fontFamily: d.fontFamily,
-          fontSize: size * d.textScale,
-          fontWeight: w,
-          height: h,
-          color: cs.onSurface,
-        );
+      fontFamily: d.fontFamily,
+      fontSize: size * d.textScale,
+      fontWeight: w,
+      height: h,
+      color: cs.onSurface,
+    );
     return TextTheme(
       displayLarge: s(52, FarmTapWeights.bold, 1.1),
       displayMedium: s(44, FarmTapWeights.bold, 1.1),
@@ -63,13 +63,13 @@ class FarmTapTextStyles extends ThemeExtension<FarmTapTextStyles> {
 
   factory from(FarmTapDesign d, ColorScheme cs) {
     TextStyle s(double size, FontWeight w, {double h = 1.2, Color? c, double ls = 0}) => TextStyle(
-          fontFamily: d.fontFamily,
-          fontSize: size * d.textScale,
-          fontWeight: w,
-          height: h,
-          letterSpacing: ls,
-          color: c ?? cs.onSurface,
-        );
+      fontFamily: d.fontFamily,
+      fontSize: size * d.textScale,
+      fontWeight: w,
+      height: h,
+      letterSpacing: ls,
+      color: c ?? cs.onSurface,
+    );
     return FarmTapTextStyles(
       keypadDigit: s(32, FarmTapWeights.semiBold),
       keypadDisplay: s(48, FarmTapWeights.bold, h: 1.1),
@@ -126,25 +126,21 @@ class FarmTapTextStyles extends ThemeExtension<FarmTapTextStyles> {
     TextStyle? tagNumber,
     TextStyle? button,
     TextStyle? buttonLarge,
-  }) =>
-      FarmTapTextStyles(
-        keypadDigit: keypadDigit ?? this.keypadDigit,
-        keypadDisplay: keypadDisplay ?? this.keypadDisplay,
-        readBackValue: readBackValue ?? this.readBackValue,
-        readBackLabel: readBackLabel ?? this.readBackLabel,
-        metricValue: metricValue ?? this.metricValue,
-        metricLabel: metricLabel ?? this.metricLabel,
-        sectionLabel: sectionLabel ?? this.sectionLabel,
-        tagNumber: tagNumber ?? this.tagNumber,
-        button: button ?? this.button,
-        buttonLarge: buttonLarge ?? this.buttonLarge,
-      );
+  }) => FarmTapTextStyles(
+    keypadDigit: keypadDigit ?? this.keypadDigit,
+    keypadDisplay: keypadDisplay ?? this.keypadDisplay,
+    readBackValue: readBackValue ?? this.readBackValue,
+    readBackLabel: readBackLabel ?? this.readBackLabel,
+    metricValue: metricValue ?? this.metricValue,
+    metricLabel: metricLabel ?? this.metricLabel,
+    sectionLabel: sectionLabel ?? this.sectionLabel,
+    tagNumber: tagNumber ?? this.tagNumber,
+    button: button ?? this.button,
+    buttonLarge: buttonLarge ?? this.buttonLarge,
+  );
 
   @override
-  ThemeExtension<FarmTapTextStyles> lerp(
-    covariant ThemeExtension<FarmTapTextStyles>? other,
-    double t,
-  ) {
+  ThemeExtension<FarmTapTextStyles> lerp(covariant ThemeExtension<FarmTapTextStyles>? other, double t) {
     if (other is! FarmTapTextStyles) return this;
     return FarmTapTextStyles(
       keypadDigit: TextStyle.lerp(keypadDigit, other.keypadDigit, t)!,

@@ -1,3 +1,5 @@
+import 'package:farm_tap/core/settings/app_settings_cubit.dart';
+import 'package:farm_tap/core/sound/sound_service.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
+  soundAndAvatarTests();
   group('DecimalEntry', () {
     test('builds 9.5 and limits to one decimal', () {
       var e = const DecimalEntry();
@@ -320,10 +323,10 @@ void main() {
   testWidgets('MetricCard and StatusBadge render at 1.3x text without overflow', (tester) async {
     await pumpFarmTap(
       tester,
-      Scaffold(
+      const Scaffold(
         body: ResponsiveGrid(
           minItemWidth: 150,
-          children: const [
+          children: [
             MetricCard(icon: Icons.water_drop_rounded, label: 'Milk today', value: '312', unit: 'L', trend: '+6%'),
             MetricCard(icon: Icons.pets_rounded, label: 'Cows', value: '48', caption: '41 milking · 7 dry'),
           ],
@@ -332,5 +335,69 @@ void main() {
       textScale: 1.3,
     );
     expect(tester.takeException(), isNull);
+  });
+}
+
+void soundAndAvatarTests() {
+  group('avatars', () {
+    test('same id always gives the same cartoon, 1..6', () {
+      expect(FarmTapAssets.cowAvatarFor('cow-014'), FarmTapAssets.cowAvatarFor('cow-014'));
+      final all = {for (var i = 0; i < 50; i++) FarmTapAssets.cowAvatarFor('cow-$i')};
+      expect(all.length, greaterThan(1));
+      for (final a in all) {
+        expect(RegExp(r'avatar_cow_[1-6]\.png$').hasMatch(a), isTrue);
+      }
+    });
+  });
+
+  group('sounds', () {
+    late NoOpSoundService sounds;
+    setUp(() {
+      sounds = NoOpSoundService();
+      SoundService.instance = sounds;
+    });
+    tearDown(() => SoundService.instance = NoOpSoundService());
+
+    testWidgets('keypad key plays tap; muted plays nothing', (tester) async {
+      await pumpFarmTap(tester, Scaffold(body: BigNumberKeypad(onDigit: (_) {}, onBackspace: () {})));
+      await tester.tap(find.text('5'));
+      expect(sounds.played, [FarmTapSound.tap]);
+      AppSettingsCubit().setSounds(enabled: false);
+      await tester.tap(find.text('6'));
+      expect(sounds.played, [FarmTapSound.tap]);
+    });
+
+    testWidgets('wrong PIN plays error', (tester) async {
+      await pumpFarmTap(tester, Scaffold(body: PinPad(onCompleted: (_) async => false)));
+      for (final d in ['1', '1', '1', '1']) {
+        await tester.tap(find.text(d));
+        await tester.pump();
+      }
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(sounds.played, contains(FarmTapSound.error));
+    });
+
+    testWidgets('celebration plays its sound; toast plays success', (tester) async {
+      await pumpFarmTap(
+        tester,
+        Builder(
+          builder: (context) => TextButton(
+            onPressed: () => showCelebration(
+              context,
+              animation: FarmTapAnimations.paymentReceived,
+              title: 'Paid',
+              primaryLabel: 'Done',
+              sound: FarmTapSound.coin,
+            ),
+            child: const Text('go'),
+          ),
+        ),
+      );
+      await tester.tap(find.text('go'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(sounds.played, [FarmTapSound.coin]);
+      await tester.pump(const Duration(seconds: 3));
+    });
   });
 }

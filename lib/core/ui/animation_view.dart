@@ -1,6 +1,7 @@
 // Plays a FarmTap character animation (transparent WebP matching the theme).
 // With "reduce motion" on (MediaQuery.disableAnimations) it shows the first
 // frame as a still image instead. UX_SPEC section 5.
+import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:farm_tap/core/theme/theme.dart';
@@ -41,7 +42,7 @@ class _FarmTapAnimationViewState extends State<FarmTapAnimationView> {
     if (MediaQuery.disableAnimationsOf(context)) {
       if (_stillPath != path) {
         _still = null;
-        _loadStill(path);
+        unawaited(_loadStill(path));
       }
       final still = _still;
       return Semantics(

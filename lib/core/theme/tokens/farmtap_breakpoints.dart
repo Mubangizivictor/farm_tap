@@ -1,5 +1,6 @@
 // Width classes from UX_SPEC section 1. Always use the available WIDTH of the
 // window (MediaQuery / LayoutBuilder), never the device type.
+// Use: context.formFactor, context.isCompact, FarmTapBreakpoints.table
 import 'package:flutter/widgets.dart';
 
 enum FormFactor { compact, medium, expanded }

@@ -6,7 +6,6 @@
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/avatars.dart';
-import 'package:farm_tap/core/ui/breakpoints.dart';
 import 'package:farm_tap/core/ui/status_banner.dart';
 import 'package:flutter/material.dart';
 

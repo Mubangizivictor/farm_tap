@@ -2,18 +2,18 @@ import 'dart:async';
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
+import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/read_back_confirm_sheet.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/id_generator.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/bloc/herd_bloc.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/bloc/herd_event.dart';
-import 'package:farm_tap/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class AddAnimalPage extends StatefulWidget {
-  const AddAnimalPage({super.key});
+  const new({super.key});
 
   @override
   State<AddAnimalPage> createState() => _AddAnimalPageState();

@@ -21,7 +21,7 @@ class SmsPreviewBubble extends StatelessWidget {
         Padding(
           padding: EdgeInsets.only(left: context.space.sm, bottom: context.space.xs),
           child: Text(
-            [sender ?? l10n.appName, if (time != null) time!].join(' · '),
+            [sender ?? l10n.appName, ?time].join(' · '),
             style: context.text.labelMedium?.copyWith(color: context.colors.onSurfaceVariant),
           ),
         ),

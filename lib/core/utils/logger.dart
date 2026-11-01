@@ -8,12 +8,7 @@ abstract class AppLogger {
 }
 
 class LoggerImpl implements AppLogger {
-  final _logger = Logger(
-    printer: PrettyPrinter(
-      methodCount: 0,
-      lineLength: 80,
-    ),
-  );
+  final _logger = Logger(printer: PrettyPrinter(methodCount: 0, lineLength: 80));
 
   @override
   void d(String message) => _logger.d(message);

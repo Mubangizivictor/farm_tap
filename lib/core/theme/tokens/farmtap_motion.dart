@@ -58,21 +58,20 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
     Curve? standard,
     Curve? emphasized,
     Curve? exit,
-  }) =>
-      FarmTapMotion(
-        fast: fast ?? this.fast,
-        normal: normal ?? this.normal,
-        slow: slow ?? this.slow,
-        splash: splash ?? this.splash,
-        snackBar: snackBar ?? this.snackBar,
-        shake: shake ?? this.shake,
-        celebration: celebration ?? this.celebration,
-        autoAdvance: autoAdvance ?? this.autoAdvance,
-        undoWindow: undoWindow ?? this.undoWindow,
-        standard: standard ?? this.standard,
-        emphasized: emphasized ?? this.emphasized,
-        exit: exit ?? this.exit,
-      );
+  }) => FarmTapMotion(
+    fast: fast ?? this.fast,
+    normal: normal ?? this.normal,
+    slow: slow ?? this.slow,
+    splash: splash ?? this.splash,
+    snackBar: snackBar ?? this.snackBar,
+    shake: shake ?? this.shake,
+    celebration: celebration ?? this.celebration,
+    autoAdvance: autoAdvance ?? this.autoAdvance,
+    undoWindow: undoWindow ?? this.undoWindow,
+    standard: standard ?? this.standard,
+    emphasized: emphasized ?? this.emphasized,
+    exit: exit ?? this.exit,
+  );
 
   @override
   FarmTapMotion lerp(FarmTapMotion? other, double t) => t < 0.5 ? this : (other ?? this);

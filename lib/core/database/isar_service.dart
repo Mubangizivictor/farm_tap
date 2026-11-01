@@ -7,9 +7,6 @@ class IsarService {
 
   Future<void> init() async {
     final dir = await getApplicationDocumentsDirectory();
-    isar = await Isar.open(
-      [AnimalModelSchema],
-      directory: dir.path,
-    );
+    isar = await Isar.open([AnimalModelSchema], directory: dir.path);
   }
 }

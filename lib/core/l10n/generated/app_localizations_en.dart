@@ -118,8 +118,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get trialThenPrice =>
-      'Then UGX 70,000 a month. Pay anytime with Mobile Money.';
+  String get trialThenPrice => 'Then UGX 70,000 a month. Pay anytime with Mobile Money.';
 
   @override
   String get trialUpgradeLine => 'Upgrade · UGX 70,000/mo';
@@ -128,8 +127,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get offlineBannerTitle => 'You are offline';
 
   @override
-  String get offlineBannerBody =>
-      'Records are saved on this phone and will sync when you are online.';
+  String get offlineBannerBody => 'Records are saved on this phone and will sync when you are online.';
 
   @override
   String get emptyDefaultTitle => 'Nothing here yet';

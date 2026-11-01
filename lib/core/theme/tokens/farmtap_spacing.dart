@@ -9,8 +9,7 @@ import 'package:flutter/material.dart';
 class FarmTapSpacing extends ThemeExtension<FarmTapSpacing> {
   const new({required this.unit});
 
-  factory from(FarmTapDesign design) =>
-      FarmTapSpacing(unit: design.baseUnit * design.sizeScale);
+  factory from(FarmTapDesign design) => FarmTapSpacing(unit: design.baseUnit * design.sizeScale);
 
   /// One grid unit (4 by default).
   final double unit;

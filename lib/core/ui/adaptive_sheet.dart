@@ -1,5 +1,4 @@
 import 'package:farm_tap/core/theme/theme.dart';
-import 'package:farm_tap/core/ui/breakpoints.dart';
 import 'package:farm_tap/core/ui/icon_bubble.dart';
 import 'package:farm_tap/core/ui/tone.dart';
 import 'package:flutter/material.dart';

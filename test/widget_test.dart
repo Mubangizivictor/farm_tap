@@ -19,8 +19,9 @@ void main() {
     
     when(() => isarService.isar).thenReturn(isar);
     
-    getIt.registerSingleton<AppLogger>(logger);
-    getIt.registerSingleton<IsarService>(isarService);
+    getIt
+      ..registerSingleton<AppLogger>(logger)
+      ..registerSingleton<IsarService>(isarService);
     // Add other minimum required for splash
   });
 

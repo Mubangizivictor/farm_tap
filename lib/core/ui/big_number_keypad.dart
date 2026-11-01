@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
+import 'package:farm_tap/core/sound/sound_service.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +20,8 @@ class BigNumberKeypad extends StatelessWidget {
   final bool pill;
 
   void _tap(VoidCallback cb) {
-    HapticFeedback.selectionClick();
+    unawaited(HapticFeedback.selectionClick());
+    unawaited(SoundService.instance.play(FarmTapSound.tap));
     cb();
   }
 

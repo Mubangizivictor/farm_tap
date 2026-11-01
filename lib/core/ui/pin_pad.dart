@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:farm_tap/core/sound/sound_service.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/big_number_keypad.dart';
 import 'package:flutter/material.dart';
@@ -33,8 +35,9 @@ class _PinDotsState extends State<PinDots> with SingleTickerProviderStateMixin {
     if (widget.errorTick != old.errorTick) {
       _shake.duration = context.motion.shake;
       _shake.forward(from: 0);
-      HapticFeedback.heavyImpact();
-      Future<void>.delayed(context.motion.fast, HapticFeedback.heavyImpact);
+      unawaited(SoundService.instance.play(FarmTapSound.error));
+      unawaited(HapticFeedback.heavyImpact());
+      unawaited(Future<void>.delayed(context.motion.fast, HapticFeedback.heavyImpact));
     }
   }
 

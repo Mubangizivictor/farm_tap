@@ -1,5 +1,7 @@
+import 'dart:async';
+
+import 'package:farm_tap/core/sound/sound_service.dart';
 import 'package:farm_tap/core/theme/theme.dart';
-import 'package:farm_tap/core/ui/breakpoints.dart';
 import 'package:farm_tap/core/ui/tone.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +17,11 @@ abstract final class FarmTapToast {
     String? actionLabel,
     VoidCallback? onAction,
     Duration? duration,
+    bool playSound = true,
   }) {
+    if (playSound && tone == FarmTapTone.success) {
+      unawaited(SoundService.instance.play(FarmTapSound.success));
+    }
     final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
     final accent = tone == FarmTapTone.neutral ? context.colors.onInverseSurface : _toastAccent(context, tone);
     final wide = !context.isCompact;
