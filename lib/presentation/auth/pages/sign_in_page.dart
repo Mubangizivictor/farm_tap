@@ -1,6 +1,6 @@
 import 'package:farm_tap/app/router/routes.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
-import 'package:farm_tap/core/theme/farmtap_assets.dart';
+import 'package:farm_tap/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,7 +14,7 @@ class SignInPage extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: context.space.sheet,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -37,7 +37,7 @@ class SignInPage extends StatelessWidget {
                 ),
                 keyboardType: TextInputType.phone,
               ),
-              const SizedBox(height: 16),
+              context.space.gapLg,
               TextField(
                 decoration: InputDecoration(
                   labelText: l10n.pin,
@@ -46,12 +46,12 @@ class SignInPage extends StatelessWidget {
                 keyboardType: TextInputType.number,
                 obscureText: true,
               ),
-              const SizedBox(height: 32),
+              context.space.gapXxl,
               FilledButton(
                 onPressed: () => context.go(AppRoutes.home),
                 child: Text(l10n.signIn),
               ),
-              const SizedBox(height: 16),
+              context.space.gapLg,
               OutlinedButton.icon(
                 onPressed: () => context.go(AppRoutes.home),
                 icon: const Icon(Icons.nfc),

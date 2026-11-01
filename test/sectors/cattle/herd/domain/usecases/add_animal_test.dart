@@ -33,6 +33,8 @@ void main() {
     syncStatus: SyncStatus.pending,
   );
 
+  setUpAll(() => registerFallbackValue(tAnimal));
+
   test('should call addAnimal on the repository', () async {
     when(() => mockRepository.addAnimal(any()))
         .thenAnswer((_) async => const Result.success(null));

@@ -8,6 +8,7 @@ import 'package:farm_tap/core/utils/id_generator.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/bloc/herd_bloc.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/bloc/herd_event.dart';
+import 'package:farm_tap/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -41,24 +42,24 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
         title: Text(l10n.addAnimal),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: context.space.sheet,
         child: Column(
           children: [
             TextField(
               controller: _tagController,
               decoration: InputDecoration(labelText: l10n.tagNumber),
             ),
-            const SizedBox(height: 16),
+            context.space.gapLg,
             TextField(
               controller: _nameController,
               decoration: InputDecoration(labelText: l10n.name),
             ),
-            const SizedBox(height: 16),
+            context.space.gapLg,
             TextField(
               controller: _breedController,
               decoration: InputDecoration(labelText: l10n.breed),
             ),
-            const SizedBox(height: 16),
+            context.space.gapLg,
             DropdownButtonFormField<AnimalSex>(
               initialValue: _sex,
               decoration: InputDecoration(labelText: l10n.sex),
@@ -71,7 +72,7 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
               ],
               onChanged: (val) => setState(() => _sex = val!),
             ),
-            const SizedBox(height: 32),
+            context.space.gapXxl,
             SizedBox(
               width: double.infinity,
               child: FilledButton(

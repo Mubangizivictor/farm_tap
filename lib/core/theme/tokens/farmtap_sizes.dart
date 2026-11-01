@@ -38,6 +38,30 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
   double get thumbnail => 64 * scale;
   double get photoPreview => 160 * scale;
 
+  // ---- Large avatars, animations (added for the UI kit) ----
+  double get avatarXl => 96 * scale;
+  double get avatarHero => 128 * scale;
+  double get animationSm => 120 * scale;
+  double get animationMd => 180 * scale;
+  double get animationLg => 240 * scale;
+
+  // ---- PIN and keypad (added for the UI kit) ----
+  double get pinDot => 20 * scale;
+  double get shakeDistance => 10 * scale;
+  double get keypadMaxWidth => 360 * scale;
+  double get keypadDisplayHeight => 96 * scale;
+
+  // ---- Adaptive shell (added for the UI kit; see UX_SPEC section 1) ----
+  double get railWidth => 96 * scale;
+  double get sidebarWidth => 264 * scale;
+  double get contentMaxWidth => 1120 * scale;
+  double get dialogMaxWidth => 560 * scale;
+  double get toastWidth => 420 * scale;
+  double get searchFieldWidth => 360 * scale;
+  double get chartHeight => 200 * scale;
+  double get progressBar => 8 * scale;
+  double get cardPreviewWidth => 320 * scale;
+
   // ---- Branding ----
   double get appBarLogoHeight => 32 * scale;
   double get signInLogoWidth => 200 * scale;

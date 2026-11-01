@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:farm_tap/app/router/routes.dart';
-import 'package:farm_tap/core/theme/farmtap_assets.dart';
+import 'package:farm_tap/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,7 +19,7 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _navigateToNext() async {
-    await Future<void>.delayed(const Duration(seconds: 2));
+    await Future<void>.delayed(const FarmTapMotion().splash);
     if (mounted) {
       context.go(AppRoutes.signIn);
     }

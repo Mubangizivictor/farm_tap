@@ -74,4 +74,134 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get no => 'No';
+
+  @override
+  String get searchHint => 'Search animals, farmers, records';
+
+  @override
+  String get allRecordsSynced => 'All records synced';
+
+  @override
+  String recordsWaiting(int count) {
+    return '$count waiting to sync';
+  }
+
+  @override
+  String get syncFailedShort => 'Sync failed';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get tryAgain => 'Try again';
+
+  @override
+  String get payNow => 'Pay now';
+
+  @override
+  String trialDaysLeft(int days) {
+    return 'Free trial: $days days left';
+  }
+
+  @override
+  String trialDaysLeftShort(int days) {
+    return 'Free trial · $days days left';
+  }
+
+  @override
+  String get trialThenPrice =>
+      'Then UGX 70,000 a month. Pay anytime with Mobile Money.';
+
+  @override
+  String get trialUpgradeLine => 'Upgrade · UGX 70,000/mo';
+
+  @override
+  String get offlineBannerTitle => 'You are offline';
+
+  @override
+  String get offlineBannerBody =>
+      'Records are saved on this phone and will sync when you are online.';
+
+  @override
+  String get emptyDefaultTitle => 'Nothing here yet';
+
+  @override
+  String get errorDefaultTitle => 'Something went wrong';
+
+  @override
+  String get errorDefaultBody => 'Your data on this phone is safe.';
+
+  @override
+  String get continueLabel => 'Continue';
+
+  @override
+  String stepOfTotal(int step, int total) {
+    return 'Step $step of $total';
+  }
+
+  @override
+  String get switchFarm => 'Switch farm';
+
+  @override
+  String get keypadBackspace => 'Delete last digit';
+
+  @override
+  String get keypadDecimal => 'Decimal point';
+
+  @override
+  String get uiGalleryTitle => 'UI Gallery';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get home => 'Home';
+
+  @override
+  String get collect => 'Collect';
+
+  @override
+  String get farmers => 'Farmers';
+
+  @override
+  String get pay => 'Pay';
+
+  @override
+  String get collectionCentre => 'Collection centre';
+
+  @override
+  String get feeding => 'Feeding';
+
+  @override
+  String get breeding => 'Breeding';
+
+  @override
+  String get workers => 'Workers';
+
+  @override
+  String get money => 'Money';
+
+  @override
+  String get reports => 'Reports';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get isThisCorrect => 'Is this correct?';
+
+  @override
+  String get yesSave => 'Yes, save';
+
+  @override
+  String get noChangeIt => 'No, change it';
 }

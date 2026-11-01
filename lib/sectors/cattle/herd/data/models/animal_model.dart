@@ -1,5 +1,5 @@
 import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 part 'animal_model.g.dart';
 

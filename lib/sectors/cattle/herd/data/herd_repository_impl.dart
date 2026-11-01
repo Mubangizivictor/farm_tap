@@ -6,7 +6,7 @@ import 'package:farm_tap/core/utils/id_generator.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/models/animal_model.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 class HerdRepositoryImpl implements HerdRepository {
   new({

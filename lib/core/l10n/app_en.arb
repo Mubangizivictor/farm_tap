@@ -21,5 +21,76 @@
   "female": "Female",
   "correct": "Correct?",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "searchHint": "Search animals, farmers, records",
+  "allRecordsSynced": "All records synced",
+  "recordsWaiting": "{count} waiting to sync",
+  "@recordsWaiting": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "syncFailedShort": "Sync failed",
+  "notifications": "Notifications",
+  "back": "Back",
+  "close": "Close",
+  "undo": "Undo",
+  "tryAgain": "Try again",
+  "payNow": "Pay now",
+  "trialDaysLeft": "Free trial: {days} days left",
+  "@trialDaysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "trialDaysLeftShort": "Free trial · {days} days left",
+  "@trialDaysLeftShort": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "trialThenPrice": "Then UGX 70,000 a month. Pay anytime with Mobile Money.",
+  "trialUpgradeLine": "Upgrade · UGX 70,000/mo",
+  "offlineBannerTitle": "You are offline",
+  "offlineBannerBody": "Records are saved on this phone and will sync when you are online.",
+  "emptyDefaultTitle": "Nothing here yet",
+  "errorDefaultTitle": "Something went wrong",
+  "errorDefaultBody": "Your data on this phone is safe.",
+  "continueLabel": "Continue",
+  "stepOfTotal": "Step {step} of {total}",
+  "@stepOfTotal": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "switchFarm": "Switch farm",
+  "keypadBackspace": "Delete last digit",
+  "keypadDecimal": "Decimal point",
+  "uiGalleryTitle": "UI Gallery",
+  "all": "All",
+  "home": "Home",
+  "collect": "Collect",
+  "farmers": "Farmers",
+  "pay": "Pay",
+  "collectionCentre": "Collection centre",
+  "feeding": "Feeding",
+  "breeding": "Breeding",
+  "workers": "Workers",
+  "money": "Money",
+  "reports": "Reports",
+  "settings": "Settings",
+  "isThisCorrect": "Is this correct?",
+  "yesSave": "Yes, save",
+  "noChangeIt": "No, change it"
 }

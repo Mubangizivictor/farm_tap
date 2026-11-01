@@ -1,5 +1,5 @@
 import 'package:farm_tap/sectors/cattle/herd/data/models/animal_model.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 class IsarService {

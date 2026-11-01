@@ -4,7 +4,7 @@ import 'package:farm_tap/app/flavor.dart';
 import 'package:farm_tap/core/database/isar_service.dart';
 import 'package:farm_tap/core/utils/logger.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockAppLogger extends Mock implements AppLogger;
@@ -30,6 +30,9 @@ void main() {
     await tester.pumpWidget(FarmTapApp(config: config));
 
     expect(find.byType(FarmTapApp), findsOneWidget);
+    // Let the splash timer finish so no timer is left pending.
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump();
     // Since SplashPage uses Image.asset which might not load in tests without mocks
     // we just check if it navigates or stays on splash
   });

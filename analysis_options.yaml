@@ -5,6 +5,8 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - "lib/core/l10n/generated/**"
+    # FlutterFire output; firebase_core is not a dependency yet (UI-first phase)
+    - lib/firebase_options.dart
     - build/**
     - android/**
     - ios/**

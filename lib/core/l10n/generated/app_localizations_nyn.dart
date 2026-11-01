@@ -74,4 +74,134 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String get no => '[nyn] No';
+
+  @override
+  String get searchHint => '[nyn] Search animals, farmers, records';
+
+  @override
+  String get allRecordsSynced => '[nyn] All records synced';
+
+  @override
+  String recordsWaiting(int count) {
+    return '[nyn] $count waiting to sync';
+  }
+
+  @override
+  String get syncFailedShort => '[nyn] Sync failed';
+
+  @override
+  String get notifications => '[nyn] Notifications';
+
+  @override
+  String get back => '[nyn] Back';
+
+  @override
+  String get close => '[nyn] Close';
+
+  @override
+  String get undo => '[nyn] Undo';
+
+  @override
+  String get tryAgain => '[nyn] Try again';
+
+  @override
+  String get payNow => '[nyn] Pay now';
+
+  @override
+  String trialDaysLeft(int days) {
+    return '[nyn] Free trial: $days days left';
+  }
+
+  @override
+  String trialDaysLeftShort(int days) {
+    return '[nyn] Free trial · $days days left';
+  }
+
+  @override
+  String get trialThenPrice =>
+      '[nyn] Then UGX 70,000 a month. Pay anytime with Mobile Money.';
+
+  @override
+  String get trialUpgradeLine => '[nyn] Upgrade · UGX 70,000/mo';
+
+  @override
+  String get offlineBannerTitle => '[nyn] You are offline';
+
+  @override
+  String get offlineBannerBody =>
+      '[nyn] Records are saved on this phone and will sync when you are online.';
+
+  @override
+  String get emptyDefaultTitle => '[nyn] Nothing here yet';
+
+  @override
+  String get errorDefaultTitle => '[nyn] Something went wrong';
+
+  @override
+  String get errorDefaultBody => '[nyn] Your data on this phone is safe.';
+
+  @override
+  String get continueLabel => '[nyn] Continue';
+
+  @override
+  String stepOfTotal(int step, int total) {
+    return '[nyn] Step $step of $total';
+  }
+
+  @override
+  String get switchFarm => '[nyn] Switch farm';
+
+  @override
+  String get keypadBackspace => '[nyn] Delete last digit';
+
+  @override
+  String get keypadDecimal => '[nyn] Decimal point';
+
+  @override
+  String get uiGalleryTitle => '[nyn] UI Gallery';
+
+  @override
+  String get all => '[nyn] All';
+
+  @override
+  String get home => '[nyn] Home';
+
+  @override
+  String get collect => '[nyn] Collect';
+
+  @override
+  String get farmers => '[nyn] Farmers';
+
+  @override
+  String get pay => '[nyn] Pay';
+
+  @override
+  String get collectionCentre => '[nyn] Collection centre';
+
+  @override
+  String get feeding => '[nyn] Feeding';
+
+  @override
+  String get breeding => '[nyn] Breeding';
+
+  @override
+  String get workers => '[nyn] Workers';
+
+  @override
+  String get money => '[nyn] Money';
+
+  @override
+  String get reports => '[nyn] Reports';
+
+  @override
+  String get settings => '[nyn] Settings';
+
+  @override
+  String get isThisCorrect => '[nyn] Is this correct?';
+
+  @override
+  String get yesSave => '[nyn] Yes, save';
+
+  @override
+  String get noChangeIt => '[nyn] No, change it';
 }

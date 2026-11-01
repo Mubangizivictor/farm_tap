@@ -9,7 +9,7 @@ abstract class AuthRepository {
 class FakeAuthRepository implements AuthRepository {
   @override
   Future<Result<bool>> signIn(String phone, String pin) async {
-    await Future<void>.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(Duration.zero);
     return const Result.success(true);
   }
 

@@ -45,6 +45,7 @@ void main() {
             }),
           ),
         );
+        await tester.pumpAndSettle();
         expect(captured.isDark, mode == ThemeMode.dark);
         expect(captured.space.lg, greaterThan(0));
         expect(captured.status.success, isNotNull);

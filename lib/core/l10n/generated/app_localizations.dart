@@ -229,6 +229,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No'**
   String get no;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search animals, farmers, records'**
+  String get searchHint;
+
+  /// No description provided for @allRecordsSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'All records synced'**
+  String get allRecordsSynced;
+
+  /// No description provided for @recordsWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} waiting to sync'**
+  String recordsWaiting(int count);
+
+  /// No description provided for @syncFailedShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed'**
+  String get syncFailedShort;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgain;
+
+  /// No description provided for @payNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay now'**
+  String get payNow;
+
+  /// No description provided for @trialDaysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Free trial: {days} days left'**
+  String trialDaysLeft(int days);
+
+  /// No description provided for @trialDaysLeftShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Free trial · {days} days left'**
+  String trialDaysLeftShort(int days);
+
+  /// No description provided for @trialThenPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Then UGX 70,000 a month. Pay anytime with Mobile Money.'**
+  String get trialThenPrice;
+
+  /// No description provided for @trialUpgradeLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade · UGX 70,000/mo'**
+  String get trialUpgradeLine;
+
+  /// No description provided for @offlineBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You are offline'**
+  String get offlineBannerTitle;
+
+  /// No description provided for @offlineBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Records are saved on this phone and will sync when you are online.'**
+  String get offlineBannerBody;
+
+  /// No description provided for @emptyDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet'**
+  String get emptyDefaultTitle;
+
+  /// No description provided for @errorDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get errorDefaultTitle;
+
+  /// No description provided for @errorDefaultBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data on this phone is safe.'**
+  String get errorDefaultBody;
+
+  /// No description provided for @continueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueLabel;
+
+  /// No description provided for @stepOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {step} of {total}'**
+  String stepOfTotal(int step, int total);
+
+  /// No description provided for @switchFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch farm'**
+  String get switchFarm;
+
+  /// No description provided for @keypadBackspace.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete last digit'**
+  String get keypadBackspace;
+
+  /// No description provided for @keypadDecimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Decimal point'**
+  String get keypadDecimal;
+
+  /// No description provided for @uiGalleryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'UI Gallery'**
+  String get uiGalleryTitle;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @home.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home;
+
+  /// No description provided for @collect.
+  ///
+  /// In en, this message translates to:
+  /// **'Collect'**
+  String get collect;
+
+  /// No description provided for @farmers.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmers'**
+  String get farmers;
+
+  /// No description provided for @pay.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay'**
+  String get pay;
+
+  /// No description provided for @collectionCentre.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection centre'**
+  String get collectionCentre;
+
+  /// No description provided for @feeding.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeding'**
+  String get feeding;
+
+  /// No description provided for @breeding.
+  ///
+  /// In en, this message translates to:
+  /// **'Breeding'**
+  String get breeding;
+
+  /// No description provided for @workers.
+  ///
+  /// In en, this message translates to:
+  /// **'Workers'**
+  String get workers;
+
+  /// No description provided for @money.
+  ///
+  /// In en, this message translates to:
+  /// **'Money'**
+  String get money;
+
+  /// No description provided for @reports.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get reports;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @isThisCorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Is this correct?'**
+  String get isThisCorrect;
+
+  /// No description provided for @yesSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, save'**
+  String get yesSave;
+
+  /// No description provided for @noChangeIt.
+  ///
+  /// In en, this message translates to:
+  /// **'No, change it'**
+  String get noChangeIt;
 }
 
 class _AppLocalizationsDelegate

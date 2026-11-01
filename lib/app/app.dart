@@ -7,10 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 class FarmTapApp extends StatelessWidget {
-  const new({
-    required this.config,
-    super.key,
-  });
+  const new({required this.config, super.key});
 
   final AppConfig config;
 
@@ -29,10 +26,7 @@ class FarmTapApp extends StatelessWidget {
         RunyankoreMaterialLocalizationsDelegate(),
         RunyankoreCupertinoLocalizationsDelegate(),
       ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('nyn'),
-      ],
+      supportedLocales: const [Locale('en'), Locale('nyn')],
       debugShowCheckedModeBanner: false,
     );
   }

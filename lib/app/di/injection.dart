@@ -28,8 +28,7 @@ Future<void> configureDependencies(Flavor flavor) async {
   await isarService.init();
   getIt
     ..registerSingleton<IsarService>(isarService)
-
-  // Core Services (Interfaces & Fake/Dev Impls)
+    // Core Services (Interfaces & Fake/Dev Impls)
     ..registerLazySingleton<AuthRepository>(FakeAuthRepository.new)
     ..registerLazySingleton<TenantProvider>(InMemoryTenantProvider.new)
     ..registerLazySingleton<SyncService>(NoOpSyncService.new)
@@ -51,10 +50,5 @@ Future<void> configureDependencies(Flavor flavor) async {
     ..registerLazySingleton(() => WatchAnimals(getIt<HerdRepository>()));
 
   // Blocs
-  getIt.registerFactory(
-    () => HerdBloc(
-      watchAnimals: getIt<WatchAnimals>(),
-      addAnimal: getIt<AddAnimal>(),
-    ),
-  );
+  getIt.registerFactory(() => HerdBloc(watchAnimals: getIt<WatchAnimals>(), addAnimal: getIt<AddAnimal>()));
 }
