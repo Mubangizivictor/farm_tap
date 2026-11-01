@@ -6,6 +6,7 @@ import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
+import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 
 /// Everything the router hands to pages (repositories behind domain
 /// interfaces). Built from get_it in the app, from fakes in tests.
@@ -18,6 +19,7 @@ class AppDependencies {
     required this.sync,
     required this.home,
     required this.herd,
+    required this.milk,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -28,6 +30,7 @@ class AppDependencies {
     sync: getIt<SyncService>(),
     home: getIt<HomeRepository>(),
     herd: getIt<HerdRepository>(),
+    milk: getIt<MilkRepository>(),
   );
 
   final SessionController session;
@@ -37,4 +40,5 @@ class AppDependencies {
   final SyncService sync;
   final HomeRepository home;
   final HerdRepository herd;
+  final MilkRepository milk;
 }

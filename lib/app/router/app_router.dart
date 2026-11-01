@@ -32,6 +32,7 @@ import 'package:farm_tap/sectors/cattle/herd/presentation/pages/herd_list_page.d
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/herd_tools_pages.dart';
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/alerts_page.dart';
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/home_page.dart';
+import 'package:farm_tap/sectors/cattle/milk/presentation/pages/milk_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -97,7 +98,60 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     onAdd: () => context.push(AppRoutes.herdAdd),
     onScan: () => context.push(AppRoutes.herdScan),
   );
+  sectionRoots[AppRoutes.milk] = (context, state) => MilkTodayPage(
+    repo: deps.milk,
+    onRecord: () => context.push(AppRoutes.milkRecord),
+    onTool: (i) => context.push([AppRoutes.milkTotal, AppRoutes.milkUse, AppRoutes.milkSales, AppRoutes.milkTrends][i]),
+  );
+  String recorder() => session.staff?.greetingName ?? (session.auth.currentUser?.name.split(' ').first ?? '');
   final sectionChildren = <String, List<RouteBase>>{
+    AppRoutes.milk: [
+      page(
+        'record',
+        parent: AppRoutes.milk,
+        builder: (context, state) => PickCowPage(
+          repo: deps.milk,
+          onCow: (cow, {required notForSale}) => context.push(AppRoutes.milkCow(cow.id, notForSale: notForSale)),
+          onScan: () => context.go(AppRoutes.herdScan),
+        ),
+        routes: [
+          page(
+            ':cowId',
+            parent: AppRoutes.milkRecord,
+            builder: (context, state) => MilkKeypadPage(
+              repo: deps.milk,
+              cowId: state.pathParameters['cowId']!,
+              notForSale: state.uri.queryParameters['nfs'] == '1',
+              recorderName: recorder(),
+              // After a save the stack resets to F02, with the next cow on top.
+              onDone: (next, nextCow) => context.go(
+                next == MilkSaveNext.nextCow && nextCow != null ? AppRoutes.milkCow(nextCow.id) : AppRoutes.milk,
+              ),
+            ),
+          ),
+        ],
+      ),
+      page(
+        'herd-total',
+        parent: AppRoutes.milk,
+        builder: (context, state) => QuickTotalPage(repo: deps.milk, onSaved: () => popOrGo(context, AppRoutes.milk)),
+      ),
+      page(
+        'use',
+        parent: AppRoutes.milk,
+        builder: (context, state) => MilkUsePage(repo: deps.milk, onSaved: () => popOrGo(context, AppRoutes.milk)),
+      ),
+      page(
+        'sales',
+        parent: AppRoutes.milk,
+        builder: (context, state) => MilkSalesPage(repo: deps.milk),
+      ),
+      page(
+        'trends',
+        parent: AppRoutes.milk,
+        builder: (context, state) => MilkTrendsPage(repo: deps.milk),
+      ),
+    ],
     AppRoutes.herd: [
       page(
         'add',
@@ -392,7 +446,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
 void _openFromHome(BuildContext context, HomeTarget target) {
   final path = switch (target) {
     HomeTarget.milk => AppRoutes.milk,
-    HomeTarget.recordMilk => AppRoutes.milk,
+    HomeTarget.recordMilk => AppRoutes.milkRecord,
     HomeTarget.herd => AppRoutes.herdCount,
     HomeTarget.health => AppRoutes.health,
     HomeTarget.treatment => AppRoutes.health,

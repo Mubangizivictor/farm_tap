@@ -919,5 +919,281 @@
   "print": "Print",
   "emptyHerdTitle": "No cows yet",
   "emptyHerdBody": "Add your first cow to start recording milk.",
-  "noMatches": "No animals match this filter."
+  "noMatches": "No animals match this filter.",
+  "morning": "Morning",
+  "evening": "Evening",
+  "dayTotal": "Day total",
+  "pickDay": "Pick a day",
+  "sessionLabel": "{session} session",
+  "@sessionLabel": {
+    "placeholders": {
+      "session": {
+        "type": "String"
+      }
+    }
+  },
+  "fromCows": "from {done} of {total} cows",
+  "@fromCows": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "cowsRecorded": "Cows recorded",
+  "countOf": "{done} / {total}",
+  "@countOf": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "justRecorded": "Just recorded",
+  "checkThese": "Check these",
+  "notForSaleUntilShort": "Not for sale until {date}",
+  "@notForSaleUntilShort": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "notRecordedYet": "Not recorded yet",
+  "milkTools": "Milk tools",
+  "quickTotal": "Quick total",
+  "milkUse": "Milk use",
+  "milkSales": "Milk sales",
+  "milkTrends": "Milk trends",
+  "searchCow": "Search cow or scan tag",
+  "notRecordedCount": "Not recorded {count}",
+  "@notRecordedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allCount": "All {count}",
+  "@allCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scan": "Scan",
+  "recorded": "Recorded",
+  "howManyLitres": "How many litres?",
+  "lastTime": "Last time: {litres} L",
+  "@lastTime": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "litresValue": "{litres} litres",
+  "@litresValue": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "recordedBy": "{session} · recorded by {name}",
+  "@recordedBy": {
+    "placeholders": {
+      "session": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "areYouSure": "Are you sure?",
+  "bigMilkBody": "{litres} L is more than usual for one cow.",
+  "@bigMilkBody": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "yesCorrect": "Yes, it is correct",
+  "savedMilk": "Saved! {litres} L from {name}",
+  "@savedMilk": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cowsDoneThisSession": "{done} of {total} cows done this {session}. Keep going!",
+  "@cowsDoneThisSession": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "session": {
+        "type": "String"
+      }
+    }
+  },
+  "nextCow": "Next cow: {name}",
+  "@nextCow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "finishSession": "Finish session",
+  "allCowsDone": "All cows recorded",
+  "underTreatmentTitle": "{name} is under treatment",
+  "@underTreatmentTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "underTreatmentBody": "{drug} given {given}. Her milk must not be sold until {until}. You can still record it as 'not for sale'.",
+  "@underTreatmentBody": {
+    "placeholders": {
+      "drug": {
+        "type": "String"
+      },
+      "given": {
+        "type": "String"
+      },
+      "until": {
+        "type": "String"
+      }
+    }
+  },
+  "recordNotForSale": "Record as not for sale",
+  "wholeHerdSession": "Whole herd · {session}",
+  "@wholeHerdSession": {
+    "placeholders": {
+      "session": {
+        "type": "String"
+      }
+    }
+  },
+  "quickMode": "Quick mode",
+  "quickModeBody": "Use this when you can't record each cow. Per-cow records give better alerts.",
+  "totalFromAllCows": "Total litres from all cows this {session}",
+  "@totalFromAllCows": {
+    "placeholders": {
+      "session": {
+        "type": "String"
+      }
+    }
+  },
+  "saveTotal": "Save total",
+  "totalSaved": "Saved {litres} L for the whole herd",
+  "@totalSaved": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "wholeHerd": "Whole herd",
+  "todayLitres": "Today · {litres} L",
+  "@todayLitres": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "accountedFor": "Accounted for",
+  "useSold": "Sold",
+  "useHome": "Home use",
+  "useCalves": "Fed to calves",
+  "useNotForSale": "Not for sale (treated)",
+  "useSpoiled": "Spoiled",
+  "useSaved": "Milk use saved",
+  "download": "Download",
+  "soldThisWeek": "Sold this week",
+  "owedToYou": "Owed to you",
+  "buyersCount": "{count} buyers",
+  "@buyersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "litresTimesPrice": "{litres} L × {price}",
+  "@litresTimesPrice": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "paid": "Paid",
+  "unpaid": "Unpaid",
+  "colBuyer": "Buyer",
+  "colLitres": "Litres",
+  "colPricePerL": "Price / L",
+  "colAmount": "Amount",
+  "addSale": "Add sale",
+  "week": "Week",
+  "month": "Month",
+  "year": "Year",
+  "totalThisMonth": "Total this month",
+  "totalThisWeek": "Total this week",
+  "totalThisYear": "Total this year",
+  "vsPrevious": "{change} vs {period}",
+  "@vsPrevious": {
+    "placeholders": {
+      "change": {
+        "type": "String"
+      },
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "topCows": "Top cows",
+  "averagePerDay": "Average {litres} L / day",
+  "@averagePerDay": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "droppingCheckHealth": "Dropping — check health",
+  "todayVsAvg": "{today} L today vs {avg} L avg",
+  "@todayVsAvg": {
+    "placeholders": {
+      "today": {
+        "type": "String"
+      },
+      "avg": {
+        "type": "String"
+      }
+    }
+  }
 }

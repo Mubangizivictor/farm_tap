@@ -1383,4 +1383,278 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noMatches => 'No animals match this filter.';
+
+  @override
+  String get morning => 'Morning';
+
+  @override
+  String get evening => 'Evening';
+
+  @override
+  String get dayTotal => 'Day total';
+
+  @override
+  String get pickDay => 'Pick a day';
+
+  @override
+  String sessionLabel(String session) {
+    return '$session session';
+  }
+
+  @override
+  String fromCows(int done, int total) {
+    return 'from $done of $total cows';
+  }
+
+  @override
+  String get cowsRecorded => 'Cows recorded';
+
+  @override
+  String countOf(int done, int total) {
+    return '$done / $total';
+  }
+
+  @override
+  String get justRecorded => 'Just recorded';
+
+  @override
+  String get checkThese => 'Check these';
+
+  @override
+  String notForSaleUntilShort(String date) {
+    return 'Not for sale until $date';
+  }
+
+  @override
+  String get notRecordedYet => 'Not recorded yet';
+
+  @override
+  String get milkTools => 'Milk tools';
+
+  @override
+  String get quickTotal => 'Quick total';
+
+  @override
+  String get milkUse => 'Milk use';
+
+  @override
+  String get milkSales => 'Milk sales';
+
+  @override
+  String get milkTrends => 'Milk trends';
+
+  @override
+  String get searchCow => 'Search cow or scan tag';
+
+  @override
+  String notRecordedCount(int count) {
+    return 'Not recorded $count';
+  }
+
+  @override
+  String allCount(int count) {
+    return 'All $count';
+  }
+
+  @override
+  String get scan => 'Scan';
+
+  @override
+  String get recorded => 'Recorded';
+
+  @override
+  String get howManyLitres => 'How many litres?';
+
+  @override
+  String lastTime(String litres) {
+    return 'Last time: $litres L';
+  }
+
+  @override
+  String litresValue(String litres) {
+    return '$litres litres';
+  }
+
+  @override
+  String recordedBy(String session, String name) {
+    return '$session · recorded by $name';
+  }
+
+  @override
+  String get areYouSure => 'Are you sure?';
+
+  @override
+  String bigMilkBody(String litres) {
+    return '$litres L is more than usual for one cow.';
+  }
+
+  @override
+  String get yesCorrect => 'Yes, it is correct';
+
+  @override
+  String savedMilk(String litres, String name) {
+    return 'Saved! $litres L from $name';
+  }
+
+  @override
+  String cowsDoneThisSession(int done, int total, String session) {
+    return '$done of $total cows done this $session. Keep going!';
+  }
+
+  @override
+  String nextCow(String name) {
+    return 'Next cow: $name';
+  }
+
+  @override
+  String get finishSession => 'Finish session';
+
+  @override
+  String get allCowsDone => 'All cows recorded';
+
+  @override
+  String underTreatmentTitle(String name) {
+    return '$name is under treatment';
+  }
+
+  @override
+  String underTreatmentBody(String drug, String given, String until) {
+    return '$drug given $given. Her milk must not be sold until $until. You can still record it as \'not for sale\'.';
+  }
+
+  @override
+  String get recordNotForSale => 'Record as not for sale';
+
+  @override
+  String wholeHerdSession(String session) {
+    return 'Whole herd · $session';
+  }
+
+  @override
+  String get quickMode => 'Quick mode';
+
+  @override
+  String get quickModeBody =>
+      'Use this when you can\'t record each cow. Per-cow records give better alerts.';
+
+  @override
+  String totalFromAllCows(String session) {
+    return 'Total litres from all cows this $session';
+  }
+
+  @override
+  String get saveTotal => 'Save total';
+
+  @override
+  String totalSaved(String litres) {
+    return 'Saved $litres L for the whole herd';
+  }
+
+  @override
+  String get wholeHerd => 'Whole herd';
+
+  @override
+  String todayLitres(String litres) {
+    return 'Today · $litres L';
+  }
+
+  @override
+  String get accountedFor => 'Accounted for';
+
+  @override
+  String get useSold => 'Sold';
+
+  @override
+  String get useHome => 'Home use';
+
+  @override
+  String get useCalves => 'Fed to calves';
+
+  @override
+  String get useNotForSale => 'Not for sale (treated)';
+
+  @override
+  String get useSpoiled => 'Spoiled';
+
+  @override
+  String get useSaved => 'Milk use saved';
+
+  @override
+  String get download => 'Download';
+
+  @override
+  String get soldThisWeek => 'Sold this week';
+
+  @override
+  String get owedToYou => 'Owed to you';
+
+  @override
+  String buyersCount(int count) {
+    return '$count buyers';
+  }
+
+  @override
+  String litresTimesPrice(String litres, String price) {
+    return '$litres L × $price';
+  }
+
+  @override
+  String get paid => 'Paid';
+
+  @override
+  String get unpaid => 'Unpaid';
+
+  @override
+  String get colBuyer => 'Buyer';
+
+  @override
+  String get colLitres => 'Litres';
+
+  @override
+  String get colPricePerL => 'Price / L';
+
+  @override
+  String get colAmount => 'Amount';
+
+  @override
+  String get addSale => 'Add sale';
+
+  @override
+  String get week => 'Week';
+
+  @override
+  String get month => 'Month';
+
+  @override
+  String get year => 'Year';
+
+  @override
+  String get totalThisMonth => 'Total this month';
+
+  @override
+  String get totalThisWeek => 'Total this week';
+
+  @override
+  String get totalThisYear => 'Total this year';
+
+  @override
+  String vsPrevious(String change, String period) {
+    return '$change vs $period';
+  }
+
+  @override
+  String get topCows => 'Top cows';
+
+  @override
+  String averagePerDay(String litres) {
+    return 'Average $litres L / day';
+  }
+
+  @override
+  String get droppingCheckHealth => 'Dropping — check health';
+
+  @override
+  String todayVsAvg(String today, String avg) {
+    return '$today L today vs $avg L avg';
+  }
 }

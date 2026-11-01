@@ -1390,4 +1390,278 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String get noMatches => '[nyn] No animals match this filter.';
+
+  @override
+  String get morning => '[nyn] Morning';
+
+  @override
+  String get evening => '[nyn] Evening';
+
+  @override
+  String get dayTotal => '[nyn] Day total';
+
+  @override
+  String get pickDay => '[nyn] Pick a day';
+
+  @override
+  String sessionLabel(String session) {
+    return '[nyn] $session session';
+  }
+
+  @override
+  String fromCows(int done, int total) {
+    return '[nyn] from $done of $total cows';
+  }
+
+  @override
+  String get cowsRecorded => '[nyn] Cows recorded';
+
+  @override
+  String countOf(int done, int total) {
+    return '[nyn] $done / $total';
+  }
+
+  @override
+  String get justRecorded => '[nyn] Just recorded';
+
+  @override
+  String get checkThese => '[nyn] Check these';
+
+  @override
+  String notForSaleUntilShort(String date) {
+    return '[nyn] Not for sale until $date';
+  }
+
+  @override
+  String get notRecordedYet => '[nyn] Not recorded yet';
+
+  @override
+  String get milkTools => '[nyn] Milk tools';
+
+  @override
+  String get quickTotal => '[nyn] Quick total';
+
+  @override
+  String get milkUse => '[nyn] Milk use';
+
+  @override
+  String get milkSales => '[nyn] Milk sales';
+
+  @override
+  String get milkTrends => '[nyn] Milk trends';
+
+  @override
+  String get searchCow => '[nyn] Search cow or scan tag';
+
+  @override
+  String notRecordedCount(int count) {
+    return '[nyn] Not recorded $count';
+  }
+
+  @override
+  String allCount(int count) {
+    return '[nyn] All $count';
+  }
+
+  @override
+  String get scan => '[nyn] Scan';
+
+  @override
+  String get recorded => '[nyn] Recorded';
+
+  @override
+  String get howManyLitres => '[nyn] How many litres?';
+
+  @override
+  String lastTime(String litres) {
+    return '[nyn] Last time: $litres L';
+  }
+
+  @override
+  String litresValue(String litres) {
+    return '[nyn] $litres litres';
+  }
+
+  @override
+  String recordedBy(String session, String name) {
+    return '[nyn] $session · recorded by $name';
+  }
+
+  @override
+  String get areYouSure => '[nyn] Are you sure?';
+
+  @override
+  String bigMilkBody(String litres) {
+    return '[nyn] $litres L is more than usual for one cow.';
+  }
+
+  @override
+  String get yesCorrect => '[nyn] Yes, it is correct';
+
+  @override
+  String savedMilk(String litres, String name) {
+    return '[nyn] Saved! $litres L from $name';
+  }
+
+  @override
+  String cowsDoneThisSession(int done, int total, String session) {
+    return '[nyn] $done of $total cows done this $session. Keep going!';
+  }
+
+  @override
+  String nextCow(String name) {
+    return '[nyn] Next cow: $name';
+  }
+
+  @override
+  String get finishSession => '[nyn] Finish session';
+
+  @override
+  String get allCowsDone => '[nyn] All cows recorded';
+
+  @override
+  String underTreatmentTitle(String name) {
+    return '[nyn] $name is under treatment';
+  }
+
+  @override
+  String underTreatmentBody(String drug, String given, String until) {
+    return '[nyn] $drug given $given. Her milk must not be sold until $until. You can still record it as \'not for sale\'.';
+  }
+
+  @override
+  String get recordNotForSale => '[nyn] Record as not for sale';
+
+  @override
+  String wholeHerdSession(String session) {
+    return '[nyn] Whole herd · $session';
+  }
+
+  @override
+  String get quickMode => '[nyn] Quick mode';
+
+  @override
+  String get quickModeBody =>
+      '[nyn] Use this when you can\'t record each cow. Per-cow records give better alerts.';
+
+  @override
+  String totalFromAllCows(String session) {
+    return '[nyn] Total litres from all cows this $session';
+  }
+
+  @override
+  String get saveTotal => '[nyn] Save total';
+
+  @override
+  String totalSaved(String litres) {
+    return '[nyn] Saved $litres L for the whole herd';
+  }
+
+  @override
+  String get wholeHerd => '[nyn] Whole herd';
+
+  @override
+  String todayLitres(String litres) {
+    return '[nyn] Today · $litres L';
+  }
+
+  @override
+  String get accountedFor => '[nyn] Accounted for';
+
+  @override
+  String get useSold => '[nyn] Sold';
+
+  @override
+  String get useHome => '[nyn] Home use';
+
+  @override
+  String get useCalves => '[nyn] Fed to calves';
+
+  @override
+  String get useNotForSale => '[nyn] Not for sale (treated)';
+
+  @override
+  String get useSpoiled => '[nyn] Spoiled';
+
+  @override
+  String get useSaved => '[nyn] Milk use saved';
+
+  @override
+  String get download => '[nyn] Download';
+
+  @override
+  String get soldThisWeek => '[nyn] Sold this week';
+
+  @override
+  String get owedToYou => '[nyn] Owed to you';
+
+  @override
+  String buyersCount(int count) {
+    return '[nyn] $count buyers';
+  }
+
+  @override
+  String litresTimesPrice(String litres, String price) {
+    return '[nyn] $litres L × $price';
+  }
+
+  @override
+  String get paid => '[nyn] Paid';
+
+  @override
+  String get unpaid => '[nyn] Unpaid';
+
+  @override
+  String get colBuyer => '[nyn] Buyer';
+
+  @override
+  String get colLitres => '[nyn] Litres';
+
+  @override
+  String get colPricePerL => '[nyn] Price / L';
+
+  @override
+  String get colAmount => '[nyn] Amount';
+
+  @override
+  String get addSale => '[nyn] Add sale';
+
+  @override
+  String get week => '[nyn] Week';
+
+  @override
+  String get month => '[nyn] Month';
+
+  @override
+  String get year => '[nyn] Year';
+
+  @override
+  String get totalThisMonth => '[nyn] Total this month';
+
+  @override
+  String get totalThisWeek => '[nyn] Total this week';
+
+  @override
+  String get totalThisYear => '[nyn] Total this year';
+
+  @override
+  String vsPrevious(String change, String period) {
+    return '[nyn] $change vs $period';
+  }
+
+  @override
+  String get topCows => '[nyn] Top cows';
+
+  @override
+  String averagePerDay(String litres) {
+    return '[nyn] Average $litres L / day';
+  }
+
+  @override
+  String get droppingCheckHealth => '[nyn] Dropping — check health';
+
+  @override
+  String todayVsAvg(String today, String avg) {
+    return '[nyn] $today L today vs $avg L avg';
+  }
 }

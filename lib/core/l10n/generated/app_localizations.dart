@@ -2563,6 +2563,456 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No animals match this filter.'**
   String get noMatches;
+
+  /// No description provided for @morning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get morning;
+
+  /// No description provided for @evening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get evening;
+
+  /// No description provided for @dayTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Day total'**
+  String get dayTotal;
+
+  /// No description provided for @pickDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a day'**
+  String get pickDay;
+
+  /// No description provided for @sessionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{session} session'**
+  String sessionLabel(String session);
+
+  /// No description provided for @fromCows.
+  ///
+  /// In en, this message translates to:
+  /// **'from {done} of {total} cows'**
+  String fromCows(int done, int total);
+
+  /// No description provided for @cowsRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Cows recorded'**
+  String get cowsRecorded;
+
+  /// No description provided for @countOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} / {total}'**
+  String countOf(int done, int total);
+
+  /// No description provided for @justRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Just recorded'**
+  String get justRecorded;
+
+  /// No description provided for @checkThese.
+  ///
+  /// In en, this message translates to:
+  /// **'Check these'**
+  String get checkThese;
+
+  /// No description provided for @notForSaleUntilShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Not for sale until {date}'**
+  String notForSaleUntilShort(String date);
+
+  /// No description provided for @notRecordedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not recorded yet'**
+  String get notRecordedYet;
+
+  /// No description provided for @milkTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk tools'**
+  String get milkTools;
+
+  /// No description provided for @quickTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick total'**
+  String get quickTotal;
+
+  /// No description provided for @milkUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk use'**
+  String get milkUse;
+
+  /// No description provided for @milkSales.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk sales'**
+  String get milkSales;
+
+  /// No description provided for @milkTrends.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk trends'**
+  String get milkTrends;
+
+  /// No description provided for @searchCow.
+  ///
+  /// In en, this message translates to:
+  /// **'Search cow or scan tag'**
+  String get searchCow;
+
+  /// No description provided for @notRecordedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Not recorded {count}'**
+  String notRecordedCount(int count);
+
+  /// No description provided for @allCount.
+  ///
+  /// In en, this message translates to:
+  /// **'All {count}'**
+  String allCount(int count);
+
+  /// No description provided for @scan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get scan;
+
+  /// No description provided for @recorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded'**
+  String get recorded;
+
+  /// No description provided for @howManyLitres.
+  ///
+  /// In en, this message translates to:
+  /// **'How many litres?'**
+  String get howManyLitres;
+
+  /// No description provided for @lastTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Last time: {litres} L'**
+  String lastTime(String litres);
+
+  /// No description provided for @litresValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{litres} litres'**
+  String litresValue(String litres);
+
+  /// No description provided for @recordedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{session} · recorded by {name}'**
+  String recordedBy(String session, String name);
+
+  /// No description provided for @areYouSure.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure?'**
+  String get areYouSure;
+
+  /// No description provided for @bigMilkBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{litres} L is more than usual for one cow.'**
+  String bigMilkBody(String litres);
+
+  /// No description provided for @yesCorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, it is correct'**
+  String get yesCorrect;
+
+  /// No description provided for @savedMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved! {litres} L from {name}'**
+  String savedMilk(String litres, String name);
+
+  /// No description provided for @cowsDoneThisSession.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} cows done this {session}. Keep going!'**
+  String cowsDoneThisSession(int done, int total, String session);
+
+  /// No description provided for @nextCow.
+  ///
+  /// In en, this message translates to:
+  /// **'Next cow: {name}'**
+  String nextCow(String name);
+
+  /// No description provided for @finishSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish session'**
+  String get finishSession;
+
+  /// No description provided for @allCowsDone.
+  ///
+  /// In en, this message translates to:
+  /// **'All cows recorded'**
+  String get allCowsDone;
+
+  /// No description provided for @underTreatmentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is under treatment'**
+  String underTreatmentTitle(String name);
+
+  /// No description provided for @underTreatmentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{drug} given {given}. Her milk must not be sold until {until}. You can still record it as \'not for sale\'.'**
+  String underTreatmentBody(String drug, String given, String until);
+
+  /// No description provided for @recordNotForSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Record as not for sale'**
+  String get recordNotForSale;
+
+  /// No description provided for @wholeHerdSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole herd · {session}'**
+  String wholeHerdSession(String session);
+
+  /// No description provided for @quickMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick mode'**
+  String get quickMode;
+
+  /// No description provided for @quickModeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this when you can\'t record each cow. Per-cow records give better alerts.'**
+  String get quickModeBody;
+
+  /// No description provided for @totalFromAllCows.
+  ///
+  /// In en, this message translates to:
+  /// **'Total litres from all cows this {session}'**
+  String totalFromAllCows(String session);
+
+  /// No description provided for @saveTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Save total'**
+  String get saveTotal;
+
+  /// No description provided for @totalSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {litres} L for the whole herd'**
+  String totalSaved(String litres);
+
+  /// No description provided for @wholeHerd.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole herd'**
+  String get wholeHerd;
+
+  /// No description provided for @todayLitres.
+  ///
+  /// In en, this message translates to:
+  /// **'Today · {litres} L'**
+  String todayLitres(String litres);
+
+  /// No description provided for @accountedFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounted for'**
+  String get accountedFor;
+
+  /// No description provided for @useSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get useSold;
+
+  /// No description provided for @useHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home use'**
+  String get useHome;
+
+  /// No description provided for @useCalves.
+  ///
+  /// In en, this message translates to:
+  /// **'Fed to calves'**
+  String get useCalves;
+
+  /// No description provided for @useNotForSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Not for sale (treated)'**
+  String get useNotForSale;
+
+  /// No description provided for @useSpoiled.
+  ///
+  /// In en, this message translates to:
+  /// **'Spoiled'**
+  String get useSpoiled;
+
+  /// No description provided for @useSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk use saved'**
+  String get useSaved;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @soldThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold this week'**
+  String get soldThisWeek;
+
+  /// No description provided for @owedToYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Owed to you'**
+  String get owedToYou;
+
+  /// No description provided for @buyersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} buyers'**
+  String buyersCount(int count);
+
+  /// No description provided for @litresTimesPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'{litres} L × {price}'**
+  String litresTimesPrice(String litres, String price);
+
+  /// No description provided for @paid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get paid;
+
+  /// No description provided for @unpaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpaid'**
+  String get unpaid;
+
+  /// No description provided for @colBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyer'**
+  String get colBuyer;
+
+  /// No description provided for @colLitres.
+  ///
+  /// In en, this message translates to:
+  /// **'Litres'**
+  String get colLitres;
+
+  /// No description provided for @colPricePerL.
+  ///
+  /// In en, this message translates to:
+  /// **'Price / L'**
+  String get colPricePerL;
+
+  /// No description provided for @colAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get colAmount;
+
+  /// No description provided for @addSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Add sale'**
+  String get addSale;
+
+  /// No description provided for @week.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get week;
+
+  /// No description provided for @month.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get month;
+
+  /// No description provided for @year.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get year;
+
+  /// No description provided for @totalThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Total this month'**
+  String get totalThisMonth;
+
+  /// No description provided for @totalThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Total this week'**
+  String get totalThisWeek;
+
+  /// No description provided for @totalThisYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Total this year'**
+  String get totalThisYear;
+
+  /// No description provided for @vsPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'{change} vs {period}'**
+  String vsPrevious(String change, String period);
+
+  /// No description provided for @topCows.
+  ///
+  /// In en, this message translates to:
+  /// **'Top cows'**
+  String get topCows;
+
+  /// No description provided for @averagePerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Average {litres} L / day'**
+  String averagePerDay(String litres);
+
+  /// No description provided for @droppingCheckHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Dropping — check health'**
+  String get droppingCheckHealth;
+
+  /// No description provided for @todayVsAvg.
+  ///
+  /// In en, this message translates to:
+  /// **'{today} L today vs {avg} L avg'**
+  String todayVsAvg(String today, String avg);
 }
 
 class _AppLocalizationsDelegate

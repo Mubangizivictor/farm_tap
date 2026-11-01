@@ -41,20 +41,20 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | E04 | E04_add_animal | Herd | 94.3 | 94.7 | 96.0 | 96.4 | 96.8 | 96.9 | 94.3 | 94.7 | min 94.3 | ✓ | ✓ | ✓ | ✓ | done. |
 | E05 | E05_scan_qr | Herd | 95.8 | 95.4 | 95.9 | 97.2 | 96.7 | 96.8 | 95.8 | 95.4 | min 95.4 | ✓ | ✓ | ✓ | ✓ | done. Viewfinder without live camera in the UI phase (mobile_scanner wiring with functionality). |
 | E06 | E06_record_event_sheet | Herd | 91.6 | 94.3 | 94.9 | 96.8 | 93.7 | 96.7 | 91.6 | 94.3 | min 91.6 | ✓ | ✓ | ✓ | ✓ | done. |
-| E07 | E07_calf_born | Herd | 91.3 | 92.5 | 91.7 | 95.1 | 89.9 | 95.2 | 91.3 | 92.5 | min 89.9 | ✓ | ✓ | ✓ | ✓ | done. |
+| E07 | E07_calf_born | Herd | 91.7 | 92.9 | 91.7 | 95.1 | 89.9 | 95.2 | 91.7 | 92.9 | min 89.9 | ✓ | ✓ | ✓ | ✓ | done. |
 | E08 | E08_confirm_death | Herd | 92.5 | 94.2 | 94.1 | 96.1 | 93.1 | 95.8 | 92.5 | 94.2 | min 92.5 | ✓ | ✓ | ✓ | ✓ | done. |
 | E09 | E09_head_count | Herd | 96.9 | 97.0 | 97.4 | 97.2 | 98.0 | 97.9 | 96.9 | 97.0 | min 96.9 | ✓ | ✓ | ✓ | ✓ | done. |
 | E10 | E10_print_qr_labels | Herd | 87.5 | 79.3 | 94.9 | 90.2 | 95.8 | 95.6 | 87.5 | 79.3 | min 79.3 | ✓ | ✓ | ✓ | ✓ | done. Real scannable QR codes (farmtap:animal:<tag>); Print / Share PDF via printing. |
-| F01 | F01_milk_today | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| F02 | F02_milk_pick_cow | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| F03 | F03_milk_keypad | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| F04 | F04_milk_read_back | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| F05 | F05_milk_saved | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| F06 | F06_treated_cow_warning | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| F07 | F07_milk_herd_total | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| F08 | F08_milk_use_split | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| F09 | F09_milk_sales | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| F10 | F10_milk_trends | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| F01 | F01_milk_today | Milk | 94.2 | 95.1 | 95.1 | 95.4 | 96.7 | 96.8 | 94.0 | 94.9 | min 94.0 | ✓ | ✓ | ✓ | ✓ | done. Adds a Milk tools row (quick total, use, sales, trends) so F07-F10 are reachable. |
+| F02 | F02_milk_pick_cow | Milk | 91.9 | 91.8 | 97.2 | 97.2 | 97.0 | 96.9 | 91.9 | 91.8 | min 91.8 | ✓ | ✓ | ✓ | ✓ | done. |
+| F03 | F03_milk_keypad | Milk | 95.3 | 95.6 | 97.7 | 97.9 | 97.7 | 97.7 | 95.3 | 95.6 | min 95.3 | ✓ | ✓ | ✓ | ✓ | done. |
+| F04 | F04_milk_read_back | Milk | 88.6 | 91.7 | 96.2 | 97.8 | 94.3 | 97.1 | 88.6 | 91.7 | min 88.6 | ✓ | ✓ | ✓ | ✓ | done. Mockup's background screen omits the 'How many litres?' row shown on F03. |
+| F05 | F05_milk_saved | Milk | 92.0 | 92.9 | 95.5 | 97.6 | 93.4 | 96.9 | 92.0 | 92.9 | min 92.0 | ✓ | ✓ | ✓ | ✓ | done. Auto-advances after 2 s; next cow is the next unrecorded one. |
+| F06 | F06_treated_cow_warning | Milk | 95.2 | 96.0 | 95.8 | 97.2 | 94.6 | 96.7 | 95.2 | 96.0 | min 94.6 | ✓ | ✓ | ✓ | ✓ | done. |
+| F07 | F07_milk_herd_total | Milk | 96.9 | 97.2 | 96.5 | 96.5 | 98.2 | 98.2 | 96.9 | 97.2 | min 96.5 | ✓ | ✓ | ✓ | ✓ | done. |
+| F08 | F08_milk_use_split | Milk | 96.2 | 96.6 | 93.5 | 94.3 | 97.3 | 97.5 | 96.2 | 96.6 | min 93.5 | ✓ | ✓ | ✓ | ✓ | done. |
+| F09 | F09_milk_sales | Milk | 94.7 | 95.0 | 97.5 | 97.6 | 98.1 | 98.1 | 94.7 | 95.0 | min 94.7 | ✓ | ✓ | ✓ | ✓ | done. |
+| F10 | F10_milk_trends | Milk | 96.0 | 96.2 | 96.8 | 97.0 | 97.5 | 97.6 | 96.0 | 96.2 | min 96.0 | ✓ | ✓ | ✓ | ✓ | done. |
 | G01 | G01_centre_home | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | G02 | G02_centre_tap_card | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | G03 | G03_centre_delivery_keypad | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |

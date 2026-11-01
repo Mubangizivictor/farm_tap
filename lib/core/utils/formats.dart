@@ -36,6 +36,9 @@ class FarmTapFormat {
   /// "13 Nov".
   String dayMonth(DateTime d) => DateFormat('d MMM', _l).format(d);
 
+  /// "Oct".
+  String monthShort(DateTime d) => DateFormat('MMM', _l).format(d);
+
   /// "Friday".
   String weekday(DateTime d) => DateFormat('EEEE', _l).format(d);
 

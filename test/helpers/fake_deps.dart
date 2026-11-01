@@ -9,6 +9,7 @@ import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
+import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
 
 /// The mockups' "today": Saturday 7 Nov 2026, 6:52 am.
 class FixedClock implements Clock {
@@ -31,5 +32,6 @@ Future<AppDependencies> fakeDependencies({bool signedIn = false, bool farm = fal
     sync: FakeSyncService(),
     home: FakeHomeRepository(clock),
     herd: FakeHerdRepository(clock: clock, tenantProvider: InMemoryTenantProvider()),
+    milk: FakeMilkRepository(clock),
   );
 }

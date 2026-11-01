@@ -36,6 +36,12 @@ const _routes = <(String, String, bool, bool)>[
   (AppRoutes.herdCount, AppRoutes.herd, true, true),
   (AppRoutes.herdLabels, AppRoutes.herd, true, true),
   ('/herd/animal-FT-022', AppRoutes.herd, true, true),
+  (AppRoutes.milkRecord, AppRoutes.milk, true, true),
+  ('/milk/record/animal-FT-033', AppRoutes.milkRecord, true, true),
+  (AppRoutes.milkTotal, AppRoutes.milk, true, true),
+  (AppRoutes.milkUse, AppRoutes.milk, true, true),
+  (AppRoutes.milkSales, AppRoutes.milk, true, true),
+  (AppRoutes.milkTrends, AppRoutes.milk, true, true),
 ];
 
 class _Harness {

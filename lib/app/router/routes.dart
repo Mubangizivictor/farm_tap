@@ -36,6 +36,12 @@ abstract final class AppRoutes {
   static const herdLabels = '/herd/labels';
   static String herdAnimal(String id) => '/herd/$id';
   static const milk = '/milk';
+  static const milkRecord = '/milk/record';
+  static const milkTotal = '/milk/herd-total';
+  static const milkUse = '/milk/use';
+  static const milkSales = '/milk/sales';
+  static const milkTrends = '/milk/trends';
+  static String milkCow(String cowId, {bool notForSale = false}) => '/milk/record/$cowId${notForSale ? '?nfs=1' : ''}';
   static const health = '/health';
   static const more = '/more';
   static const collect = '/collect';

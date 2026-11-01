@@ -52,7 +52,11 @@ void main() {
 
   screenGoldens(
     'E04_add_animal',
-    (_) => inShell(AddAnimalPage(repo: repo(), onSaved: (_) {}, now: today), current: '/herd', parent: '/herd'),
+    (_) => inShell(
+      AddAnimalPage(repo: repo(), onSaved: (_) {}, now: today),
+      current: '/herd',
+      parent: '/herd',
+    ),
     act: (tester, _) async {
       await tester.enterText(find.byType(TextField).at(1), 'Kyakuhaire');
       FocusManager.instance.primaryFocus?.unfocus();
@@ -62,7 +66,11 @@ void main() {
 
   screenGoldens(
     'E05_scan_qr',
-    (_) => inShell(ScanTagPage(onTypeTag: () {}), current: '/herd', parent: '/herd'),
+    (_) => inShell(
+      ScanTagPage(onTypeTag: () {}),
+      current: '/herd',
+      parent: '/herd',
+    ),
   );
 
   screenGoldens(
@@ -96,7 +104,21 @@ void main() {
     },
   );
 
-  screenGoldens('E09_head_count', (_) => inShell(HeadCountPage(repo: repo()), current: '/herd', parent: '/herd'));
+  screenGoldens(
+    'E09_head_count',
+    (_) => inShell(
+      HeadCountPage(repo: repo()),
+      current: '/herd',
+      parent: '/herd',
+    ),
+  );
 
-  screenGoldens('E10_print_qr_labels', (_) => inShell(QrLabelsPage(repo: repo()), current: '/herd', parent: '/herd'));
+  screenGoldens(
+    'E10_print_qr_labels',
+    (_) => inShell(
+      QrLabelsPage(repo: repo()),
+      current: '/herd',
+      parent: '/herd',
+    ),
+  );
 }

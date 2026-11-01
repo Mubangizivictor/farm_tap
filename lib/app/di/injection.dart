@@ -23,6 +23,8 @@ import 'package:farm_tap/sectors/cattle/herd/domain/usecases/watch_animals.dart'
 import 'package:farm_tap/sectors/cattle/herd/presentation/bloc/herd_bloc.dart';
 import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
+import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
+import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 import 'package:get_it/get_it.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -50,6 +52,7 @@ Future<void> configureDependencies(Flavor flavor) async {
       ..registerLazySingleton<OnboardingRepository>(() => FakeOnboardingRepository(getIt<Clock>()))
       ..registerLazySingleton<StaffAccessRepository>(FakeStaffAccessRepository.new)
       ..registerLazySingleton<HomeRepository>(() => FakeHomeRepository(getIt<Clock>()))
+      ..registerLazySingleton<MilkRepository>(() => FakeMilkRepository(getIt<Clock>()))
       ..registerLazySingleton<HerdRepository>(() => FakeHerdRepository(clock: getIt<Clock>(), tenantProvider: tenants));
   } else {
     // Backend phase: real Firebase auth / membership repositories go here.

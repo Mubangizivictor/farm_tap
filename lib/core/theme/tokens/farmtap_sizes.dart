@@ -92,6 +92,9 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
   double get animationSheet => 136 * scale;
   double get animationMd => 180 * scale;
   double get animationCelebration => 230 * scale;
+
+  /// Phones: celebration content sits this far up (Alignment y, -1 = top).
+  double get celebrationAlignY => -0.45;
   double get animationLg => 240 * scale;
   double get heroAnimationWidth => 120 * scale;
   double get photoPreview => 160 * scale;

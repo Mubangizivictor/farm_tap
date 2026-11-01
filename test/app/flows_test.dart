@@ -88,4 +88,57 @@ void main() {
     expect(session.farm?.name, 'Rwemera Dairy Farm');
     await tester.pumpWidget(const SizedBox());
   });
+
+  testWidgets('milk: F02 -> F03 back to F02; save resets to F02 with the next cow', (tester) async {
+    tester.view
+      ..physicalSize = const Size(390, 900)
+      ..devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final deps = await fakeDependencies(signedIn: true, farm: true);
+    final router = buildRouter(deps, initialLocation: AppRoutes.milkRecord);
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      MaterialApp.router(
+        theme: FarmTapTheme.light,
+        routerConfig: router,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en')],
+      ),
+    );
+    await _settle(tester);
+    expect(_location(router), AppRoutes.milkRecord);
+
+    await tester.tap(find.text('Kahara'));
+    await _settle(tester);
+    expect(_location(router), '/milk/record/animal-FT-033');
+    await tester.tap(find.byTooltip('Back').last);
+    await _settle(tester);
+    expect(_location(router), AppRoutes.milkRecord);
+
+    await tester.tap(find.text('Kahara'));
+    await _settle(tester);
+    for (final k in ['9', '.', '5']) {
+      await tester.tap(find.text(k).last);
+      await tester.pump();
+    }
+    await tester.tap(find.text('Next'));
+    await _settle(tester);
+    expect(find.text('9.5 litres'), findsOneWidget);
+    await tester.tap(find.text('Yes, save'));
+    await _settle(tester);
+    expect(find.textContaining('Saved! 9.5 L from Kahara'), findsOneWidget);
+    // Auto-advance after 2 s to the next unrecorded cow.
+    await tester.pump(const Duration(seconds: 3));
+    await _settle(tester);
+    expect(_location(router), startsWith('/milk/record/animal-'));
+    await tester.tap(find.byTooltip('Back').last);
+    await _settle(tester);
+    expect(_location(router), AppRoutes.milkRecord);
+    await tester.pumpWidget(const SizedBox());
+  });
 }
