@@ -44,6 +44,7 @@ dependencies:
   json_annotation: any
   just_audio: ^0.10.6
   logger: ^2.3.0
+  material_symbols_icons: ^4.2960.0
   mobile_scanner: ^7.4.3
   nfc_manager: ^4.2.1
   path_provider: ^2.1.2

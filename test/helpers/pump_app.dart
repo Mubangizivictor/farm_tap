@@ -1,5 +1,6 @@
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
+import 'package:farm_tap/core/ui/farmtap_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +17,7 @@ Future<void> pumpFarmTap(
   Brightness brightness = Brightness.light,
   double textScale = 1,
   bool disableAnimations = false,
+  bool web = false,
 }) async {
   tester.view
     ..physicalSize = size
@@ -34,12 +36,15 @@ Future<void> pumpFarmTap(
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en')],
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(
-          textScaler: TextScaler.linear(textScale),
-          disableAnimations: disableAnimations,
+      builder: (context, child) => FarmTapPlatform(
+        isWeb: web,
+        child: MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScale),
+            disableAnimations: disableAnimations,
+          ),
+          child: child!,
         ),
-        child: child!,
       ),
       home: home,
     ),

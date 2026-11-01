@@ -1,6 +1,7 @@
-// Loads the real Outfit and Material Icons fonts so golden screenshots show
+// Loads the real Outfit, Material Icons and Material Symbols Rounded fonts so golden screenshots show
 // real text and icons instead of the default "Ahem" blocks.
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -16,6 +17,9 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
     'assets/fonts/Outfit/Outfit-ExtraBold.ttf',
   ]);
   await _loadFont('MaterialIcons', [_materialIconsPath()]);
+  await _loadFont('packages/material_symbols_icons/MaterialSymbolsRounded', [
+    _packageFile('material_symbols_icons', 'fonts/MaterialSymbolsRounded.ttf'),
+  ]);
   await testMain();
 }
 
@@ -37,4 +41,20 @@ String _flutterRootFromDart() {
   // .../flutter/bin/cache/dart-sdk/bin/dart -> .../flutter
   final dart = Platform.resolvedExecutable.split(Platform.pathSeparator);
   return dart.sublist(0, dart.length - 5).join(Platform.pathSeparator);
+}
+
+/// Resolves a file inside a dependency's `lib/` via package_config.json.
+String _packageFile(String package, String relative) {
+  final config =
+      jsonDecode(File('.dart_tool/package_config.json').readAsStringSync())
+          as Map<String, dynamic>;
+  final entry = (config['packages'] as List<dynamic>)
+      .cast<Map<String, dynamic>>()
+      .firstWhere((p) => p['name'] == package);
+  final rootUri = entry['rootUri'] as String;
+  final root = Uri.parse(rootUri.endsWith('/') ? rootUri : '$rootUri/');
+  final base = root.isAbsolute
+      ? root
+      : Uri.directory('${Directory.current.path}/.dart_tool/').resolveUri(root);
+  return base.resolve('lib/$relative').toFilePath();
 }
