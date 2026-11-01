@@ -26,7 +26,7 @@ void main() {
     );
   });
 
-  test('FakeClock is the mockups\' Sat 7 Nov 2026, 8:41 am', () {
+  test("FakeClock is the mockups' Sat 7 Nov 2026, 8:41 am", () {
     final clock = FakeClock();
     expect(clock.now(), DateTime(2026, 11, 7, 8, 41));
     expect(clock.today(), DateTime(2026, 11, 7));
