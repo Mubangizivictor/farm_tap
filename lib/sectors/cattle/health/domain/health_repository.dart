@@ -17,5 +17,7 @@ abstract interface class TreatmentRepository {
   Future<Result<List<TreatableAnimal>>> animals();
   Future<Result<TreatmentRecord>> addTreatment(NewTreatment input);
   Future<Result<List<HealthTask>>> schedule();
+  Future<Result<void>> addTask(HealthTask task);
+  Future<Result<Drug>> addDrug({required String name, required double stock, required int withdrawalDays});
   List<String> get vets;
 }

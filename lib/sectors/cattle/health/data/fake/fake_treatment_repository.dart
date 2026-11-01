@@ -81,7 +81,8 @@ class FakeTreatmentRepository implements TreatmentRepository {
 
   final Clock clock;
   late List<TreatmentRecord> _records;
-  late final List<HealthTask> _schedule;
+  late List<HealthTask> _schedule;
+  late List<Drug> _drugList = List.of(_drugs);
   int _next = 4;
 
   static const penStrep = Drug(
@@ -150,7 +151,7 @@ class FakeTreatmentRepository implements TreatmentRepository {
       Result.success(_records.where((r) => r.animalId == animalId && r.inWithdrawal(now)).firstOrNull);
 
   @override
-  Future<Result<List<Drug>>> drugs() async => const Result.success(_drugs);
+  Future<Result<List<Drug>>> drugs() async => Result.success(List.unmodifiable(_drugList));
 
   @override
   Future<Result<List<TreatableAnimal>>> animals() async => const Result.success(_animals);
@@ -165,7 +166,7 @@ class FakeTreatmentRepository implements TreatmentRepository {
       tag: a.tag,
       avatarIndex: a.avatarIndex,
       condition: input.condition,
-      drug: _drugs.firstWhere((d) => d.id == input.drugId),
+      drug: _drugList.firstWhere((d) => d.id == input.drugId),
       given: input.given,
       courseDays: 3,
       animalDry: a.dry,
@@ -180,6 +181,25 @@ class FakeTreatmentRepository implements TreatmentRepository {
 
   @override
   Future<Result<List<HealthTask>>> schedule() async => Result.success(_schedule);
+
+  @override
+  Future<Result<void>> addTask(HealthTask task) async {
+    _schedule = [..._schedule, task]..sort((a, b) => a.due.compareTo(b.due));
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<Drug>> addDrug({required String name, required double stock, required int withdrawalDays}) async {
+    final drug = Drug(
+      id: 'drug-${_next++}',
+      name: name,
+      shortName: name.split(' ').first,
+      withdrawalDays: withdrawalDays,
+      stock: stock,
+    );
+    _drugList = [..._drugList, drug];
+    return Result.success(drug);
+  }
 
   @override
   List<String> get vets => const ['Dr. Kamugisha Ivan', 'Twinomujuni Amos', 'Muhwezi Robert'];

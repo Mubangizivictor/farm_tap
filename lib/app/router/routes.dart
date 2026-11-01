@@ -43,6 +43,10 @@ abstract final class AppRoutes {
   static const milkTrends = '/milk/trends';
   static String milkCow(String cowId, {bool notForSale = false}) => '/milk/record/$cowId${notForSale ? '?nfs=1' : ''}';
   static const health = '/health';
+  static const healthTreatment = '/health/treatment';
+  static const healthDrugs = '/health/drugs';
+  static const healthSchedule = '/health/schedule';
+  static const healthWithdrawal = '/health/withdrawal';
   static const more = '/more';
   static const collect = '/collect';
   static const farmers = '/farmers';

@@ -28,6 +28,7 @@ import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_collect_pages.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_farmers_pay_pages.dart';
+import 'package:farm_tap/sectors/cattle/health/presentation/pages/health_pages.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/animal_detail_page.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/herd_list_page.dart';
@@ -133,6 +134,15 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     onPaymentSheet: () => context.push(AppRoutes.payFarmers),
     onFarmer: (farmer) => context.go(AppRoutes.centreFarmer(farmer.id)),
   );
+  sectionRoots[AppRoutes.health] = (context, state) => HealthHomePage(
+    repo: deps.treatments,
+    onOpen: (target) => context.push(switch (target) {
+      HealthTarget.treatment => AppRoutes.healthTreatment,
+      HealthTarget.calendar => AppRoutes.healthSchedule,
+      HealthTarget.drugs => AppRoutes.healthDrugs,
+      HealthTarget.withdrawal => AppRoutes.healthWithdrawal,
+    }),
+  );
   String recorder() => session.staff?.greetingName ?? (session.auth.currentUser?.name.split(' ').first ?? '');
   final sectionChildren = <String, List<RouteBase>>{
     AppRoutes.milk: [
@@ -220,7 +230,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           onGone: () => popOrGo(context, AppRoutes.herd),
           onEvent: (kind) => context.go(switch (kind) {
             HerdEventKind.milk => AppRoutes.milk,
-            HerdEventKind.treatment => AppRoutes.health,
+            HerdEventKind.treatment => '${AppRoutes.healthTreatment}?animal=${state.pathParameters['animalId']}',
             HerdEventKind.heat => AppRoutes.breeding,
             _ => AppRoutes.money,
           }),
@@ -258,6 +268,36 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         parent: AppRoutes.pay,
         builder: (context, state) =>
             SmsStatementsPage(repo: deps.centre, onSent: () => popOrGo(context, AppRoutes.pay)),
+      ),
+    ],
+    AppRoutes.health: [
+      page(
+        'treatment',
+        parent: AppRoutes.health,
+        builder: (context, state) => AddTreatmentPage(
+          repo: deps.treatments,
+          animalId: state.uri.queryParameters['animal'],
+          onScan: () => context.go(AppRoutes.herdScan),
+          // "Add another" starts a fresh form; Done returns to Health.
+          onDone: (another) =>
+              another ? context.pushReplacement(AppRoutes.healthTreatment) : popOrGo(context, AppRoutes.health),
+        ),
+      ),
+      page(
+        'drugs',
+        parent: AppRoutes.health,
+        builder: (context, state) => DrugStockPage(repo: deps.treatments),
+      ),
+      page(
+        'schedule',
+        parent: AppRoutes.health,
+        builder: (context, state) => HealthCalendarPage(repo: deps.treatments),
+      ),
+      page(
+        'withdrawal',
+        parent: AppRoutes.health,
+        builder: (context, state) =>
+            WithdrawalListPage(repo: deps.treatments, onAnimal: (id) => context.go(AppRoutes.herdAnimal(id))),
       ),
     ],
     AppRoutes.home: [
@@ -517,7 +557,7 @@ void _openFromHome(BuildContext context, HomeTarget target) {
     HomeTarget.recordMilk => AppRoutes.milkRecord,
     HomeTarget.herd => AppRoutes.herdCount,
     HomeTarget.health => AppRoutes.health,
-    HomeTarget.treatment => AppRoutes.health,
+    HomeTarget.treatment => AppRoutes.healthTreatment,
     HomeTarget.workers => AppRoutes.workers,
     HomeTarget.tapCard => AppRoutes.collect,
     HomeTarget.feeding => AppRoutes.feeding,

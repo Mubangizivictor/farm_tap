@@ -80,7 +80,7 @@ Source of truth for navigation (go_router). Overlays (sheets, dialogs, toasts, c
 | G12 | sheet on G03 | /collect/:farmerId | overlay | back closes sheet |
 | G13 | /home/reconcile | /home | push (Dispatch tile) | pop |
 | H01 | /health | — | tab | root tab |
-| H02 | /health/treatment | /health | push (FAB) | pop; Discard changes? if edited |
+| H02 | /health/treatment[?animal=:id] | /health | push (FAB; E03 "Treatment" opens it for that cow) | pop; Discard changes? if edited |
 | H03 | celebration on H02 | /health/treatment | overlay | Done → pop to /health |
 | H04 | /health/drugs | /health | push | pop |
 | H05 | /health/schedule | /health | push | pop |

@@ -47,6 +47,10 @@ const _routes = <(String, String, bool, bool)>[
   (AppRoutes.payFarmers, AppRoutes.pay, true, true),
   (AppRoutes.paySms, AppRoutes.pay, true, true),
   (AppRoutes.centreReconcile, AppRoutes.home, true, true),
+  (AppRoutes.healthTreatment, AppRoutes.health, true, true),
+  (AppRoutes.healthDrugs, AppRoutes.health, true, true),
+  (AppRoutes.healthSchedule, AppRoutes.health, true, true),
+  (AppRoutes.healthWithdrawal, AppRoutes.health, true, true),
 ];
 
 class _Harness {

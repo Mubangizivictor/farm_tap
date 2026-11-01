@@ -42,5 +42,6 @@ Future<AppDependencies> fakeDependencies({bool signedIn = false, bool farm = fal
     herd: FakeHerdRepository(clock: clock, tenantProvider: InMemoryTenantProvider(), treatments: treatments),
     milk: FakeMilkRepository(clock, treatments),
     centre: FakeCentreRepository(clock),
+    treatments: treatments,
   );
 }

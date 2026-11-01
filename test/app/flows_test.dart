@@ -1,10 +1,13 @@
 // Multi-step flows (ROUTES.md): onboarding steps go forward with Continue and
 // back to the previous step; finishing opens Home with the new farm.
+import 'dart:async';
+
 import 'package:farm_tap/app/router/app_router.dart';
 import 'package:farm_tap/app/router/routes.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/formats.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -193,6 +196,57 @@ void main() {
     await _settle(tester);
     expect(find.text('Delivery removed'), findsOneWidget);
     expect(find.text("Tap the farmer's card"), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('health: H01 -> H02 save with read-back -> Done returns to H01; H06 lists withdrawals', (tester) async {
+    tester.view
+      ..physicalSize = const Size(390, 1400)
+      ..devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final deps = await fakeDependencies(signedIn: true, farm: true);
+    final router = buildRouter(deps, initialLocation: AppRoutes.health);
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      MaterialApp.router(
+        theme: FarmTapTheme.light,
+        routerConfig: router,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en')],
+      ),
+    );
+    await _settle(tester);
+    expect(find.text('Sick list'), findsOneWidget);
+
+    await tester.tap(find.text('Treatment'));
+    await _settle(tester);
+    expect(_location(router), AppRoutes.healthTreatment);
+    await tester.tap(find.text('Fever'));
+    await tester.pump();
+    await tester.tap(find.text('Save'));
+    await _settle(tester);
+    expect(find.text('Is this correct?'), findsOneWidget);
+    await tester.tap(find.text('Yes, save'));
+    await _settle(tester);
+    expect(find.text('Treatment saved'), findsOneWidget);
+    // Buttons appear once the celebration has played.
+    await tester.pump(const Duration(seconds: 4));
+    await tester.tap(find.text('Done'));
+    await _settle(tester);
+    expect(_location(router), AppRoutes.health);
+
+    unawaited(router.push(AppRoutes.healthWithdrawal));
+    await _settle(tester);
+    // H06 shows each cow's safe-from date straight from her record.
+    final f = FarmTapFormat('en');
+    for (final r in (await deps.treatments.withdrawals(DateTime.now())).data!) {
+      expect(find.text('${f.weekdayShort(r.safeFrom)} ${r.safeFrom.day}'), findsWidgets, reason: r.animalName);
+    }
     await tester.pumpWidget(const SizedBox());
   });
 }

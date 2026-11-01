@@ -68,12 +68,12 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | G11 | G11_centre_sms_preview | Collection centre | 86.2 | 88.0 | 96.7 | 96.7 | 95.6 | 95.8 | 86.2 | 88.0 | min 86.2 | ✓ | ✓ | ✓ | ✓ | done. |
 | G12 | G12_centre_quality_test | Collection centre | 87.2 | 88.3 | 94.7 | 96.5 | 93.0 | 95.8 | 87.2 | 88.3 | min 87.2 | ✓ | ✓ | ✓ | ✓ | done. |
 | G13 | G13_centre_reconciliation | Collection centre | 93.3 | 92.0 | 92.7 | 93.2 | 94.6 | 95.3 | 93.3 | 92.0 | min 92.0 | ✓ | ✓ | ✓ | ✓ | done. |
-| H01 | H01_health_home | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| H02 | H02_add_treatment | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| H03 | H03_treatment_saved | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| H04 | H04_drug_stock | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| H05 | H05_health_schedule | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| H06 | H06_withdrawal_list | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| H01 | H01_health_home | Health | 96.1 | 96.6 | 96.8 | 97.0 | 97.3 | 97.4 | 95.9 | 96.5 | min 95.9 | ✓ | ✓ | ✓ | ✓ | done. |
+| H02 | H02_add_treatment | Health | 93.1 | 93.0 | 91.1 | 90.9 | 92.5 | 92.3 | 93.1 | 93.0 | min 90.9 | ✓ | ✓ | ✓ | ✓ | done. |
+| H03 | H03_treatment_saved | Health | 92.0 | 93.4 | 92.0 | 95.3 | 90.6 | 95.3 | 92.0 | 93.4 | min 90.6 | ✓ | ✓ | ✓ | ✓ | done. |
+| H04 | H04_drug_stock | Health | 96.3 | 96.3 | 97.5 | 97.2 | 98.0 | 98.0 | 96.3 | 96.3 | min 96.3 | ✓ | ✓ | ✓ | ✓ | done. |
+| H05 | H05_health_schedule | Health | 96.7 | 96.7 | 97.7 | 97.7 | 98.0 | 97.9 | 96.7 | 96.7 | min 96.7 | ✓ | ✓ | ✓ | ✓ | done. |
+| H06 | H06_withdrawal_list | Health | 94.3 | 94.2 | 97.2 | 97.0 | 97.6 | 97.5 | 94.3 | 94.2 | min 94.2 | ✓ | ✓ | ✓ | ✓ | done. |
 | I01 | I01_feed_stock | Feeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | I02 | I02_record_feeding | Feeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | I03 | I03_feed_purchase_sheet | Feeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |

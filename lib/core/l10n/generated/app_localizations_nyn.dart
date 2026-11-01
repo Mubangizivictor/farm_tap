@@ -2196,4 +2196,262 @@ class AppLocalizationsNyn extends AppLocalizations {
   String smsTodayAt(String time) {
     return '[nyn] Today, $time';
   }
+
+  @override
+  String get healthCalendar => '[nyn] Health calendar';
+
+  @override
+  String milkNotForSaleCount(int count) {
+    return '[nyn] $count milk not for sale';
+  }
+
+  @override
+  String get dueThisWeek => '[nyn] Due this week';
+
+  @override
+  String get drugsLow => '[nyn] Drugs low';
+
+  @override
+  String get sickList => '[nyn] Sick list';
+
+  @override
+  String courseDay(int day, int total) {
+    return '[nyn] day $day of $total';
+  }
+
+  @override
+  String daysWithdrawal(int count) {
+    return '[nyn] $count days';
+  }
+
+  @override
+  String get withdrawalLabel => '[nyn] withdrawal';
+
+  @override
+  String get newTreatment => '[nyn] New treatment';
+
+  @override
+  String tagTapToChange(String tag) {
+    return '[nyn] $tag · tap to change';
+  }
+
+  @override
+  String get whatIsTheProblem => '[nyn] What is the problem?';
+
+  @override
+  String get condMastitis => '[nyn] Mastitis';
+
+  @override
+  String get condLame => '[nyn] Lame';
+
+  @override
+  String get condFever => '[nyn] Fever';
+
+  @override
+  String get condWound => '[nyn] Wound';
+
+  @override
+  String get condEye => '[nyn] Eye';
+
+  @override
+  String get condDiarrhoea => '[nyn] Diarrhoea';
+
+  @override
+  String get condOther => '[nyn] Other';
+
+  @override
+  String get drugLabel => '[nyn] Drug';
+
+  @override
+  String get doseLabel => '[nyn] Dose';
+
+  @override
+  String get routeLabel => '[nyn] Route';
+
+  @override
+  String get givenBy => '[nyn] Given by';
+
+  @override
+  String get routeInjection => '[nyn] Injection (IM)';
+
+  @override
+  String get routeOral => '[nyn] By mouth';
+
+  @override
+  String get routeSpray => '[nyn] Spray';
+
+  @override
+  String get routePourOn => '[nyn] Pour-on';
+
+  @override
+  String drugStockLine(String stock, int days) {
+    return '[nyn] Stock: $stock · withdrawal $days days (milk)';
+  }
+
+  @override
+  String get noWithdrawal => '[nyn] No milk withdrawal';
+
+  @override
+  String get blockMilkBody =>
+      '[nyn] FarmTap will block her milk and remind you when it\'s safe.';
+
+  @override
+  String get treatmentSaved => '[nyn] Treatment saved';
+
+  @override
+  String treatmentSavedBody(String name, String weekday) {
+    return '[nyn] $name\'s milk is marked \'not for sale\' until $weekday. We\'ll remind you on day 3 to check her.';
+  }
+
+  @override
+  String treatmentSavedNoWithdrawal(String name) {
+    return '[nyn] $name\'s treatment is saved. We\'ll remind you on day 3 to check her.';
+  }
+
+  @override
+  String get addAnotherTreatment => '[nyn] Add another treatment';
+
+  @override
+  String get pickAnimal => '[nyn] Pick animal';
+
+  @override
+  String get drugStock => '[nyn] Drug stock';
+
+  @override
+  String get addDrug => '[nyn] Add drug';
+
+  @override
+  String drugIsLow(String drug) {
+    return '[nyn] $drug is low';
+  }
+
+  @override
+  String drugLowBody(String count) {
+    return '[nyn] $count bottle left. Usage this month is higher than recorded treatments.';
+  }
+
+  @override
+  String get reorder => '[nyn] Reorder';
+
+  @override
+  String get reorderNoted => '[nyn] Added to the shopping list';
+
+  @override
+  String bottlesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bottles',
+      one: '1 bottle',
+    );
+    return '[nyn] $_temp0';
+  }
+
+  @override
+  String litresCount(String count) {
+    return '[nyn] $count litres';
+  }
+
+  @override
+  String withdrawalDaysLine(int days) {
+    return '[nyn] withdrawal $days days';
+  }
+
+  @override
+  String reorderAt(String count) {
+    return '[nyn] reorder at $count';
+  }
+
+  @override
+  String get lowBadge => '[nyn] Low';
+
+  @override
+  String get drugName => '[nyn] Drug name';
+
+  @override
+  String get stockLabel => '[nyn] Stock';
+
+  @override
+  String get withdrawalDaysLabel => '[nyn] Withdrawal days (milk)';
+
+  @override
+  String get saveDrug => '[nyn] Save drug';
+
+  @override
+  String drugSaved(String name) {
+    return '[nyn] $name added';
+  }
+
+  @override
+  String get listView => '[nyn] List';
+
+  @override
+  String get monthView => '[nyn] Month';
+
+  @override
+  String get addToCalendar => '[nyn] Add to calendar';
+
+  @override
+  String get taskTitle => '[nyn] What needs doing?';
+
+  @override
+  String get taskDate => '[nyn] Date';
+
+  @override
+  String get saveTask => '[nyn] Save';
+
+  @override
+  String get taskAdded => '[nyn] Added to the calendar';
+
+  @override
+  String get milkNotForSale => '[nyn] Milk not for sale';
+
+  @override
+  String keepMilkSeparate(int count) {
+    return '[nyn] $count cows — keep their milk separate';
+  }
+
+  @override
+  String get keepMilkSeparateBody =>
+      '[nyn] Do not sell or mix this milk until the date shown.';
+
+  @override
+  String drugSince(String drug, String date) {
+    return '[nyn] $drug · since $date';
+  }
+
+  @override
+  String get safeFrom => '[nyn] safe from';
+
+  @override
+  String get whyThisMatters => '[nyn] Why this matters';
+
+  @override
+  String get whyThisMattersBody =>
+      '[nyn] Collection centres test for drug residues and reject the whole can. One treated cow can spoil a full delivery.';
+
+  @override
+  String get noWithdrawalsTitle => '[nyn] All milk can be sold';
+
+  @override
+  String get noWithdrawalsBody => '[nyn] No cow is under drug withdrawal.';
+
+  @override
+  String treatmentReadBack(String condition, String drug) {
+    return '[nyn] $condition · $drug';
+  }
+
+  @override
+  String treatmentReadBackDetail(String date) {
+    return '[nyn] Milk not for sale until $date';
+  }
+
+  @override
+  String get kindVaccination => '[nyn] Vaccination';
+
+  @override
+  String get kindDipping => '[nyn] Dipping';
+
+  @override
+  String get kindDeworming => '[nyn] Deworming';
 }

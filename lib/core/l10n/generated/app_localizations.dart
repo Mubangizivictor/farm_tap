@@ -3907,6 +3907,432 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Today, {time}'**
   String smsTodayAt(String time);
+
+  /// No description provided for @healthCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Health calendar'**
+  String get healthCalendar;
+
+  /// No description provided for @milkNotForSaleCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} milk not for sale'**
+  String milkNotForSaleCount(int count);
+
+  /// No description provided for @dueThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Due this week'**
+  String get dueThisWeek;
+
+  /// No description provided for @drugsLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Drugs low'**
+  String get drugsLow;
+
+  /// No description provided for @sickList.
+  ///
+  /// In en, this message translates to:
+  /// **'Sick list'**
+  String get sickList;
+
+  /// No description provided for @courseDay.
+  ///
+  /// In en, this message translates to:
+  /// **'day {day} of {total}'**
+  String courseDay(int day, int total);
+
+  /// No description provided for @daysWithdrawal.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days'**
+  String daysWithdrawal(int count);
+
+  /// No description provided for @withdrawalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'withdrawal'**
+  String get withdrawalLabel;
+
+  /// No description provided for @newTreatment.
+  ///
+  /// In en, this message translates to:
+  /// **'New treatment'**
+  String get newTreatment;
+
+  /// No description provided for @tagTapToChange.
+  ///
+  /// In en, this message translates to:
+  /// **'{tag} · tap to change'**
+  String tagTapToChange(String tag);
+
+  /// No description provided for @whatIsTheProblem.
+  ///
+  /// In en, this message translates to:
+  /// **'What is the problem?'**
+  String get whatIsTheProblem;
+
+  /// No description provided for @condMastitis.
+  ///
+  /// In en, this message translates to:
+  /// **'Mastitis'**
+  String get condMastitis;
+
+  /// No description provided for @condLame.
+  ///
+  /// In en, this message translates to:
+  /// **'Lame'**
+  String get condLame;
+
+  /// No description provided for @condFever.
+  ///
+  /// In en, this message translates to:
+  /// **'Fever'**
+  String get condFever;
+
+  /// No description provided for @condWound.
+  ///
+  /// In en, this message translates to:
+  /// **'Wound'**
+  String get condWound;
+
+  /// No description provided for @condEye.
+  ///
+  /// In en, this message translates to:
+  /// **'Eye'**
+  String get condEye;
+
+  /// No description provided for @condDiarrhoea.
+  ///
+  /// In en, this message translates to:
+  /// **'Diarrhoea'**
+  String get condDiarrhoea;
+
+  /// No description provided for @condOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get condOther;
+
+  /// No description provided for @drugLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Drug'**
+  String get drugLabel;
+
+  /// No description provided for @doseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dose'**
+  String get doseLabel;
+
+  /// No description provided for @routeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Route'**
+  String get routeLabel;
+
+  /// No description provided for @givenBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Given by'**
+  String get givenBy;
+
+  /// No description provided for @routeInjection.
+  ///
+  /// In en, this message translates to:
+  /// **'Injection (IM)'**
+  String get routeInjection;
+
+  /// No description provided for @routeOral.
+  ///
+  /// In en, this message translates to:
+  /// **'By mouth'**
+  String get routeOral;
+
+  /// No description provided for @routeSpray.
+  ///
+  /// In en, this message translates to:
+  /// **'Spray'**
+  String get routeSpray;
+
+  /// No description provided for @routePourOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Pour-on'**
+  String get routePourOn;
+
+  /// No description provided for @drugStockLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock: {stock} · withdrawal {days} days (milk)'**
+  String drugStockLine(String stock, int days);
+
+  /// No description provided for @noWithdrawal.
+  ///
+  /// In en, this message translates to:
+  /// **'No milk withdrawal'**
+  String get noWithdrawal;
+
+  /// No description provided for @blockMilkBody.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap will block her milk and remind you when it\'s safe.'**
+  String get blockMilkBody;
+
+  /// No description provided for @treatmentSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Treatment saved'**
+  String get treatmentSaved;
+
+  /// No description provided for @treatmentSavedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s milk is marked \'not for sale\' until {weekday}. We\'ll remind you on day 3 to check her.'**
+  String treatmentSavedBody(String name, String weekday);
+
+  /// No description provided for @treatmentSavedNoWithdrawal.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s treatment is saved. We\'ll remind you on day 3 to check her.'**
+  String treatmentSavedNoWithdrawal(String name);
+
+  /// No description provided for @addAnotherTreatment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another treatment'**
+  String get addAnotherTreatment;
+
+  /// No description provided for @pickAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick animal'**
+  String get pickAnimal;
+
+  /// No description provided for @drugStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Drug stock'**
+  String get drugStock;
+
+  /// No description provided for @addDrug.
+  ///
+  /// In en, this message translates to:
+  /// **'Add drug'**
+  String get addDrug;
+
+  /// No description provided for @drugIsLow.
+  ///
+  /// In en, this message translates to:
+  /// **'{drug} is low'**
+  String drugIsLow(String drug);
+
+  /// No description provided for @drugLowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} bottle left. Usage this month is higher than recorded treatments.'**
+  String drugLowBody(String count);
+
+  /// No description provided for @reorder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder'**
+  String get reorder;
+
+  /// No description provided for @reorderNoted.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to the shopping list'**
+  String get reorderNoted;
+
+  /// No description provided for @bottlesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 bottle} other{{count} bottles}}'**
+  String bottlesCount(int count);
+
+  /// No description provided for @litresCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} litres'**
+  String litresCount(String count);
+
+  /// No description provided for @withdrawalDaysLine.
+  ///
+  /// In en, this message translates to:
+  /// **'withdrawal {days} days'**
+  String withdrawalDaysLine(int days);
+
+  /// No description provided for @reorderAt.
+  ///
+  /// In en, this message translates to:
+  /// **'reorder at {count}'**
+  String reorderAt(String count);
+
+  /// No description provided for @lowBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get lowBadge;
+
+  /// No description provided for @drugName.
+  ///
+  /// In en, this message translates to:
+  /// **'Drug name'**
+  String get drugName;
+
+  /// No description provided for @stockLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock'**
+  String get stockLabel;
+
+  /// No description provided for @withdrawalDaysLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdrawal days (milk)'**
+  String get withdrawalDaysLabel;
+
+  /// No description provided for @saveDrug.
+  ///
+  /// In en, this message translates to:
+  /// **'Save drug'**
+  String get saveDrug;
+
+  /// No description provided for @drugSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} added'**
+  String drugSaved(String name);
+
+  /// No description provided for @listView.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get listView;
+
+  /// No description provided for @monthView.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get monthView;
+
+  /// No description provided for @addToCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to calendar'**
+  String get addToCalendar;
+
+  /// No description provided for @taskTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What needs doing?'**
+  String get taskTitle;
+
+  /// No description provided for @taskDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get taskDate;
+
+  /// No description provided for @saveTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveTask;
+
+  /// No description provided for @taskAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to the calendar'**
+  String get taskAdded;
+
+  /// No description provided for @milkNotForSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk not for sale'**
+  String get milkNotForSale;
+
+  /// No description provided for @keepMilkSeparate.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} cows — keep their milk separate'**
+  String keepMilkSeparate(int count);
+
+  /// No description provided for @keepMilkSeparateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not sell or mix this milk until the date shown.'**
+  String get keepMilkSeparateBody;
+
+  /// No description provided for @drugSince.
+  ///
+  /// In en, this message translates to:
+  /// **'{drug} · since {date}'**
+  String drugSince(String drug, String date);
+
+  /// No description provided for @safeFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'safe from'**
+  String get safeFrom;
+
+  /// No description provided for @whyThisMatters.
+  ///
+  /// In en, this message translates to:
+  /// **'Why this matters'**
+  String get whyThisMatters;
+
+  /// No description provided for @whyThisMattersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection centres test for drug residues and reject the whole can. One treated cow can spoil a full delivery.'**
+  String get whyThisMattersBody;
+
+  /// No description provided for @noWithdrawalsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All milk can be sold'**
+  String get noWithdrawalsTitle;
+
+  /// No description provided for @noWithdrawalsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No cow is under drug withdrawal.'**
+  String get noWithdrawalsBody;
+
+  /// No description provided for @treatmentReadBack.
+  ///
+  /// In en, this message translates to:
+  /// **'{condition} · {drug}'**
+  String treatmentReadBack(String condition, String drug);
+
+  /// No description provided for @treatmentReadBackDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk not for sale until {date}'**
+  String treatmentReadBackDetail(String date);
+
+  /// No description provided for @kindVaccination.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccination'**
+  String get kindVaccination;
+
+  /// No description provided for @kindDipping.
+  ///
+  /// In en, this message translates to:
+  /// **'Dipping'**
+  String get kindDipping;
+
+  /// No description provided for @kindDeworming.
+  ///
+  /// In en, this message translates to:
+  /// **'Deworming'**
+  String get kindDeworming;
 }
 
 class _AppLocalizationsDelegate

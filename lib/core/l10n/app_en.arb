@@ -1690,5 +1690,217 @@
         "type": "String"
       }
     }
-  }
+  },
+  "healthCalendar": "Health calendar",
+  "milkNotForSaleCount": "{count} milk not for sale",
+  "@milkNotForSaleCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dueThisWeek": "Due this week",
+  "drugsLow": "Drugs low",
+  "sickList": "Sick list",
+  "courseDay": "day {day} of {total}",
+  "@courseDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "daysWithdrawal": "{count} days",
+  "@daysWithdrawal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "withdrawalLabel": "withdrawal",
+  "newTreatment": "New treatment",
+  "tagTapToChange": "{tag} · tap to change",
+  "@tagTapToChange": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "whatIsTheProblem": "What is the problem?",
+  "condMastitis": "Mastitis",
+  "condLame": "Lame",
+  "condFever": "Fever",
+  "condWound": "Wound",
+  "condEye": "Eye",
+  "condDiarrhoea": "Diarrhoea",
+  "condOther": "Other",
+  "drugLabel": "Drug",
+  "doseLabel": "Dose",
+  "routeLabel": "Route",
+  "givenBy": "Given by",
+  "routeInjection": "Injection (IM)",
+  "routeOral": "By mouth",
+  "routeSpray": "Spray",
+  "routePourOn": "Pour-on",
+  "drugStockLine": "Stock: {stock} · withdrawal {days} days (milk)",
+  "@drugStockLine": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "noWithdrawal": "No milk withdrawal",
+  "blockMilkBody": "FarmTap will block her milk and remind you when it's safe.",
+  "treatmentSaved": "Treatment saved",
+  "treatmentSavedBody": "{name}'s milk is marked 'not for sale' until {weekday}. We'll remind you on day 3 to check her.",
+  "@treatmentSavedBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "treatmentSavedNoWithdrawal": "{name}'s treatment is saved. We'll remind you on day 3 to check her.",
+  "@treatmentSavedNoWithdrawal": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "addAnotherTreatment": "Add another treatment",
+  "pickAnimal": "Pick animal",
+  "drugStock": "Drug stock",
+  "addDrug": "Add drug",
+  "drugIsLow": "{drug} is low",
+  "@drugIsLow": {
+    "placeholders": {
+      "drug": {
+        "type": "String"
+      }
+    }
+  },
+  "drugLowBody": "{count} bottle left. Usage this month is higher than recorded treatments.",
+  "@drugLowBody": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "reorder": "Reorder",
+  "reorderNoted": "Added to the shopping list",
+  "bottlesCount": "{count, plural, =1{1 bottle} other{{count} bottles}}",
+  "@bottlesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "litresCount": "{count} litres",
+  "@litresCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "withdrawalDaysLine": "withdrawal {days} days",
+  "@withdrawalDaysLine": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "reorderAt": "reorder at {count}",
+  "@reorderAt": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "lowBadge": "Low",
+  "drugName": "Drug name",
+  "stockLabel": "Stock",
+  "withdrawalDaysLabel": "Withdrawal days (milk)",
+  "saveDrug": "Save drug",
+  "drugSaved": "{name} added",
+  "@drugSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "listView": "List",
+  "monthView": "Month",
+  "addToCalendar": "Add to calendar",
+  "taskTitle": "What needs doing?",
+  "taskDate": "Date",
+  "saveTask": "Save",
+  "taskAdded": "Added to the calendar",
+  "milkNotForSale": "Milk not for sale",
+  "keepMilkSeparate": "{count} cows — keep their milk separate",
+  "@keepMilkSeparate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "keepMilkSeparateBody": "Do not sell or mix this milk until the date shown.",
+  "drugSince": "{drug} · since {date}",
+  "@drugSince": {
+    "placeholders": {
+      "drug": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "safeFrom": "safe from",
+  "whyThisMatters": "Why this matters",
+  "whyThisMattersBody": "Collection centres test for drug residues and reject the whole can. One treated cow can spoil a full delivery.",
+  "noWithdrawalsTitle": "All milk can be sold",
+  "noWithdrawalsBody": "No cow is under drug withdrawal.",
+  "treatmentReadBack": "{condition} · {drug}",
+  "@treatmentReadBack": {
+    "placeholders": {
+      "condition": {
+        "type": "String"
+      },
+      "drug": {
+        "type": "String"
+      }
+    }
+  },
+  "treatmentReadBackDetail": "Milk not for sale until {date}",
+  "@treatmentReadBackDetail": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "kindVaccination": "Vaccination",
+  "kindDipping": "Dipping",
+  "kindDeworming": "Deworming"
 }
