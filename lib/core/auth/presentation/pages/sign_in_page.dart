@@ -91,6 +91,8 @@ class _SignInView extends StatelessWidget {
       tagline: l10n.brandTagline,
       description: l10n.brandBody,
       bottom: buttons,
+      // The footer links are 48 dp tall; keep the text where the mockup has it.
+      compactBottomPadding: context.space.sm,
       child: Padding(
         padding: EdgeInsets.only(top: context.isCompact ? context.space.xxl : context.space.xl),
         child: Column(

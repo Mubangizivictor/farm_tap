@@ -16,12 +16,15 @@ class ProviderBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = context.sizes.iconMd;
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: context.colors.surfaceContainerHigh),
-      child: Text(letter, style: context.text.labelSmall),
+    // Decorative: the button label already names the provider.
+    return ExcludeSemantics(
+      child: Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(shape: BoxShape.circle, color: context.colors.surfaceContainerHigh),
+        child: Text(letter, style: context.text.labelSmall),
+      ),
     );
   }
 }
@@ -38,14 +41,17 @@ class AuthFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final style = context.text.bodySmall;
-    Widget link(String label, VoidCallback? onTap) => InkWell(
-      onTap: onTap,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: context.sizes.inlineActionHeight),
-        child: Align(widthFactor: 1, child: Text(label, style: style)),
+    Widget link(String label, VoidCallback? onTap) => Semantics(
+      button: true,
+      child: InkWell(
+        onTap: onTap,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: context.sizes.touchTarget, minWidth: context.sizes.touchTarget),
+          child: Align(widthFactor: 1, child: Text(label, style: style)),
+        ),
       ),
     );
-    final dot = Text(' · ', style: style);
+    final dot = ExcludeSemantics(child: Text(' · ', style: style));
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

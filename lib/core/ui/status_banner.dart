@@ -1,6 +1,5 @@
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
-import 'package:farm_tap/core/ui/buttons.dart';
 import 'package:farm_tap/core/ui/controls.dart';
 import 'package:farm_tap/core/ui/tone.dart';
 import 'package:flutter/material.dart';
@@ -31,37 +30,51 @@ class FarmTapBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = tone.of(context);
     final on = colors.onContainer;
+    // The whole banner is the tap target (>= 48 dp); the action is its label.
     final action = actionLabel == null
         ? null
-        : TextAction(label: actionLabel!, onPressed: onAction, color: on, dense: true);
+        : Padding(
+            padding: EdgeInsets.only(top: context.space.sm),
+            child: Text(
+              actionLabel!,
+              style: context.text.labelLarge?.copyWith(color: on, fontWeight: FarmTapWeights.semiBold),
+            ),
+          );
     return Semantics(
       container: true,
       liveRegion: true,
+      button: onAction != null,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final actionRight = constraints.maxWidth > context.sizes.centeredMaxWidth;
-          return Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(context.space.banner),
-            decoration: BoxDecoration(color: colors.container, borderRadius: context.radii.banner),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(icon, fill: 1, color: on, size: context.sizes.iconBanner),
-                context.space.gapMd,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(title, style: context.text.titleSmall?.copyWith(color: on)),
-                      if (message != null) Text(message!, style: context.text.bodySmall?.copyWith(color: on)),
-                      if (action != null && !actionRight) action,
-                    ],
-                  ),
+          return Material(
+            color: colors.container,
+            borderRadius: context.radii.banner,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: onAction,
+              child: Padding(
+                padding: EdgeInsets.all(context.space.banner),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(icon, fill: 1, color: on, size: context.sizes.iconBanner),
+                    context.space.gapMd,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(title, style: context.text.titleSmall?.copyWith(color: on)),
+                          if (message != null) Text(message!, style: context.text.bodySmall?.copyWith(color: on)),
+                          if (action != null && !actionRight) action,
+                        ],
+                      ),
+                    ),
+                    if (action != null && actionRight) ...[context.space.gapMd, action],
+                  ],
                 ),
-                if (action != null && actionRight) ...[context.space.gapMd, action],
-              ],
+              ),
             ),
           );
         },

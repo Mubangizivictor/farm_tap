@@ -34,6 +34,7 @@ enum GoldenFormFactor {
 /// Registers 8 golden tests for [name] (e.g. "A01_splash").
 /// [build] gets the form factor so a test can pick web-only variants.
 /// [dir] (e.g. 'gallery/') puts the goldens in a sub-folder.
+/// [smallScreens] adds overflow checks at 375x667, 360x640 and 1.3x text.
 /// [act] runs after the first frame, e.g. to open the overlay the mockup shows.
 void screenGoldens(
   String name,
@@ -42,6 +43,7 @@ void screenGoldens(
   Set<GoldenFormFactor> only = const {...GoldenFormFactor.values},
   Duration settle = const Duration(milliseconds: 400),
   String dir = '',
+  bool smallScreens = true,
 }) {
   for (final ff in only) {
     for (final brightness in Brightness.values) {
@@ -59,7 +61,30 @@ void screenGoldens(
       });
     }
   }
+  if (!smallScreens) return;
+  // Small phones and large text: any RenderFlex overflow fails the test.
+  for (final (label, size, scale) in _smallChecks) {
+    testWidgets('$name $label', (tester) async {
+      await pumpFarmTap(tester, build(GoldenFormFactor.phone), size: size, textScale: scale);
+      await tester.pump(settle);
+      if (act != null) {
+        await act(tester, GoldenFormFactor.phone);
+        await tester.pump(settle);
+      }
+      await precacheImages(tester);
+      if (scale == 1) {
+        await expectLater(find.byType(MaterialApp), matchesGoldenFile('${dir}small/$label/$name.png'));
+      }
+      await tester.pumpWidget(const SizedBox());
+    });
+  }
 }
+
+const _smallChecks = <(String, Size, double)>[
+  ('se_375x667', Size(375, 667), 1),
+  ('android_360x640', Size(360, 640), 1),
+  ('text_1_3x', Size(390, 788), 1.3),
+];
 
 /// Decodes every Image on screen for real (test image loading is async and
 /// otherwise never finishes inside the fake clock), then rebuilds.

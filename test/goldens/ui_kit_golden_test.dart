@@ -32,5 +32,5 @@ void main() {
     }
   }
 
-  screenGoldens('D01_home_owner', (_) => const UiGalleryPage(), dir: 'gallery/');
+  screenGoldens('D01_home_owner', (_) => const UiGalleryPage(), dir: 'gallery/', smallScreens: false);
 }

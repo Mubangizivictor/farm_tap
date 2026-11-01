@@ -17,8 +17,6 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
   // ---- Touch targets (low-literacy: bigger than Material defaults) ----
   double get touchTarget => 48 * scale;
 
-  /// Inline text actions inside banners (the banner itself is the target).
-  double get inlineActionHeight => 32 * scale;
   double get buttonHeight => 56 * scale;
   double get buttonHeightLarge => 64 * scale;
   double get buttonMinWidth => 64 * scale;

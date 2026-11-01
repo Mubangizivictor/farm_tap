@@ -2,112 +2,113 @@
 
 Tracks every screen against its mockups (see `docs/UI_REBUILD_PROMPT.md`).
 Cell legend: `—` not started · `wip` built, not matched · score (from `tool/compare_mockups.py`) once the compare image has been reviewed.
+A screen is DONE only when Nav (ROUTES.md behaviour: button, iOS swipe, Android/browser back), Device (iPhone 16 Pro Max simulator, light + dark, via `tool/device_qa.py`), Small (375x667, 360x640, 1.3x text: no overflow) and A11y (labels, 48 dp targets) are ticked and the compare images look alike.
 Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = dark.
 
-| ID | Screen | Section | P·L | P·K | T·L | T·K | D·L | D·K | M·L | M·K | Score | Notes |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| A01 | A01_splash | Launch & account | 97.4 | 98.0 | 99.2 | 99.4 | 99.4 | 99.5 | 97.4 | 98.0 | min 97.4 | done. Animation frame differs (stills taken mid-loop). |
-| A02 | A02_sign_in | Launch & account | 95.6 | 96.1 | 96.9 | 97.6 | 97.4 | 98.1 | 95.6 | 96.1 | min 95.6 | done. Apple button shown on all platforms in goldens (iOS/web only at runtime). |
-| A03 | A03_email_sign_in | Launch & account | 97.3 | 97.6 | 98.1 | 98.6 | 98.5 | 98.9 | 97.3 | 97.6 | min 97.3 | done. |
-| A04 | A04_email_sign_up | Launch & account | 96.2 | 96.0 | 96.8 | 97.3 | 97.4 | 97.8 | 96.2 | 96.0 | min 96.0 | done. Mockup eye icon is "visibility_off" while hidden; A03 shows "visibility" — kept one rule: eye = show. |
-| A05 | A05_forgot_password | Launch & account | 97.7 | 98.0 | 97.6 | 98.2 | 97.9 | 98.5 | 97.7 | 98.0 | min 97.6 | done. Toast copy includes the email ("Reset link sent to muhwezi.robert@gm…"); mockup shows a truncated placeholder. |
-| A06 | A06_check_email | Launch & account | 96.5 | 96.7 | 98.8 | 98.8 | 99.1 | 99.1 | 95.1 | 95.5 | min 95.1 | done. |
-| A07 | A07_farm_picker | Launch & account | 98.0 | 98.0 | 98.3 | 98.8 | 98.5 | 99.0 | 98.0 | 98.0 | min 98.0 | done. "Add another farm" goes nowhere until onboarding (section B). |
-| B01 | B01_onboard_language | Onboarding | — | — | — | — | — | — | — | — | | |
-| B02 | B02_onboard_sector | Onboarding | — | — | — | — | — | — | — | — | | |
-| B03 | B03_onboard_waitlist_sheet | Onboarding | — | — | — | — | — | — | — | — | | |
-| B04 | B04_onboard_waitlist_done | Onboarding | — | — | — | — | — | — | — | — | | |
-| B05 | B05_onboard_dairy_type | Onboarding | — | — | — | — | — | — | — | — | | |
-| B06 | B06_onboard_farm_details | Onboarding | — | — | — | — | — | — | — | — | | |
-| B07 | B07_onboard_contacts | Onboarding | — | — | — | — | — | — | — | — | | |
-| B08 | B08_onboard_role | Onboarding | — | — | — | — | — | — | — | — | | |
-| B09 | B09_onboard_first_staff | Onboarding | — | — | — | — | — | — | — | — | | |
-| B10 | B10_onboard_trial_started | Onboarding | — | — | — | — | — | — | — | — | | |
-| C01 | C01_staff_tap_card | Staff unlock | — | — | — | — | — | — | — | — | | |
-| C02 | C02_staff_card_number | Staff unlock | — | — | — | — | — | — | — | — | | |
-| C03 | C03_staff_pin | Staff unlock | — | — | — | — | — | — | — | — | | |
-| C04 | C04_staff_pin_wrong | Staff unlock | — | — | — | — | — | — | — | — | | |
-| C05 | C05_nfc_unavailable | Staff unlock | — | — | — | — | — | — | — | — | | |
-| D01 | D01_home_owner | Home | — | — | — | — | — | — | — | — | | |
-| D02 | D02_home_worker | Home | — | — | — | — | — | — | — | — | | |
-| D03 | D03_alerts | Home | — | — | — | — | — | — | — | — | | |
-| D04 | D04_sync_status_sheet | Home | — | — | — | — | — | — | — | — | | |
-| D05 | D05_home_offline | Home | — | — | — | — | — | — | — | — | | |
-| D06 | D06_notification_permission | Home | — | — | — | — | — | — | — | — | | |
-| E01 | E01_herd_list | Herd | — | — | — | — | — | — | — | — | | |
-| E02 | E02_herd_filter_sheet | Herd | — | — | — | — | — | — | — | — | | |
-| E03 | E03_animal_detail | Herd | — | — | — | — | — | — | — | — | | |
-| E04 | E04_add_animal | Herd | — | — | — | — | — | — | — | — | | |
-| E05 | E05_scan_qr | Herd | — | — | — | — | — | — | — | — | | |
-| E06 | E06_record_event_sheet | Herd | — | — | — | — | — | — | — | — | | |
-| E07 | E07_calf_born | Herd | — | — | — | — | — | — | — | — | | |
-| E08 | E08_confirm_death | Herd | — | — | — | — | — | — | — | — | | |
-| E09 | E09_head_count | Herd | — | — | — | — | — | — | — | — | | |
-| E10 | E10_print_qr_labels | Herd | — | — | — | — | — | — | — | — | | |
-| F01 | F01_milk_today | Milk | — | — | — | — | — | — | — | — | | |
-| F02 | F02_milk_pick_cow | Milk | — | — | — | — | — | — | — | — | | |
-| F03 | F03_milk_keypad | Milk | — | — | — | — | — | — | — | — | | |
-| F04 | F04_milk_read_back | Milk | — | — | — | — | — | — | — | — | | |
-| F05 | F05_milk_saved | Milk | — | — | — | — | — | — | — | — | | |
-| F06 | F06_treated_cow_warning | Milk | — | — | — | — | — | — | — | — | | |
-| F07 | F07_milk_herd_total | Milk | — | — | — | — | — | — | — | — | | |
-| F08 | F08_milk_use_split | Milk | — | — | — | — | — | — | — | — | | |
-| F09 | F09_milk_sales | Milk | — | — | — | — | — | — | — | — | | |
-| F10 | F10_milk_trends | Milk | — | — | — | — | — | — | — | — | | |
-| G01 | G01_centre_home | Collection centre | — | — | — | — | — | — | — | — | | |
-| G02 | G02_centre_tap_card | Collection centre | — | — | — | — | — | — | — | — | | |
-| G03 | G03_centre_delivery_keypad | Collection centre | — | — | — | — | — | — | — | — | | |
-| G04 | G04_centre_delivery_read_back | Collection centre | — | — | — | — | — | — | — | — | | |
-| G05 | G05_centre_delivery_saved | Collection centre | — | — | — | — | — | — | — | — | | |
-| G06 | G06_centre_farmers | Collection centre | — | — | — | — | — | — | — | — | | |
-| G07 | G07_centre_farmer_detail | Collection centre | — | — | — | — | — | — | — | — | | |
-| G08 | G08_centre_close_session | Collection centre | — | — | — | — | — | — | — | — | | |
-| G09 | G09_centre_statements | Collection centre | — | — | — | — | — | — | — | — | | |
-| G10 | G10_centre_payment_sheet | Collection centre | — | — | — | — | — | — | — | — | | |
-| G11 | G11_centre_sms_preview | Collection centre | — | — | — | — | — | — | — | — | | |
-| G12 | G12_centre_quality_test | Collection centre | — | — | — | — | — | — | — | — | | |
-| G13 | G13_centre_reconciliation | Collection centre | — | — | — | — | — | — | — | — | | |
-| H01 | H01_health_home | Health | — | — | — | — | — | — | — | — | | |
-| H02 | H02_add_treatment | Health | — | — | — | — | — | — | — | — | | |
-| H03 | H03_treatment_saved | Health | — | — | — | — | — | — | — | — | | |
-| H04 | H04_drug_stock | Health | — | — | — | — | — | — | — | — | | |
-| H05 | H05_health_schedule | Health | — | — | — | — | — | — | — | — | | |
-| H06 | H06_withdrawal_list | Health | — | — | — | — | — | — | — | — | | |
-| I01 | I01_feed_stock | Feeding | — | — | — | — | — | — | — | — | | |
-| I02 | I02_record_feeding | Feeding | — | — | — | — | — | — | — | — | | |
-| I03 | I03_feed_purchase_sheet | Feeding | — | — | — | — | — | — | — | — | | |
-| J01 | J01_breeding_calendar | Breeding | — | — | — | — | — | — | — | — | | |
-| J02 | J02_record_service_sheet | Breeding | — | — | — | — | — | — | — | — | | |
-| J03 | J03_pregnancy_confirmed | Breeding | — | — | — | — | — | — | — | — | | |
-| K01 | K01_staff_list | Workers | — | — | — | — | — | — | — | — | | |
-| K02 | K02_staff_detail | Workers | — | — | — | — | — | — | — | — | | |
-| K03 | K03_assign_card | Workers | — | — | — | — | — | — | — | — | | |
-| K04 | K04_attendance | Workers | — | — | — | — | — | — | — | — | | |
-| K05 | K05_tasks | Workers | — | — | — | — | — | — | — | — | | |
-| K06 | K06_wages | Workers | — | — | — | — | — | — | — | — | | |
-| L01 | L01_money_overview | Money | — | — | — | — | — | — | — | — | | |
-| L02 | L02_add_expense | Money | — | — | — | — | — | — | — | — | | |
-| L03 | L03_reports | Money | — | — | — | — | — | — | — | — | | |
-| L04 | L04_whatsapp_report_preview | Money | — | — | — | — | — | — | — | — | | |
-| M01 | M01_subscription | Subscription | — | — | — | — | — | — | — | — | | |
-| M02 | M02_pay_mobile_money | Subscription | — | — | — | — | — | — | — | — | | |
-| M03 | M03_payment_confirmed | Subscription | — | — | — | — | — | — | — | — | | |
-| M04 | M04_trial_ending_popup | Subscription | — | — | — | — | — | — | — | — | | |
-| M05 | M05_read_only_locked | Subscription | — | — | — | — | — | — | — | — | | |
-| N01 | N01_more_menu | Settings | — | — | — | — | — | — | — | — | | |
-| N02 | N02_settings | Settings | — | — | — | — | — | — | — | — | | |
-| N03 | N03_farm_profile | Settings | — | — | — | — | — | — | — | — | | |
-| N04 | N04_language_sheet | Settings | — | — | — | — | — | — | — | — | | |
-| N05 | N05_help_support | Settings | — | — | — | — | — | — | — | — | | |
-| N06 | N06_sign_out_confirm | Settings | — | — | — | — | — | — | — | — | | |
-| N07 | N07_delete_account | Settings | — | — | — | — | — | — | — | — | | |
-| O01 | O01_admin_payments | Admin (Victorbee) | — | — | — | — | — | — | — | — | | |
-| P01 | P01_empty_herd | System states | — | — | — | — | — | — | — | — | | |
-| P02 | P02_error_state | System states | — | — | — | — | — | — | — | — | | |
-| P03 | P03_camera_permission | System states | — | — | — | — | — | — | — | — | | |
-| P04 | P04_manager_pin_required | System states | — | — | — | — | — | — | — | — | | |
-| P05 | P05_offline_saved_toast | System states | — | — | — | — | — | — | — | — | | |
-| P06 | P06_sync_done_toast | System states | — | — | — | — | — | — | — | — | | |
+| ID | Screen | Section | P·L | P·K | T·L | T·K | D·L | D·K | M·L | M·K | Score | Nav | Device | Small | A11y | Notes |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| A01 | A01_splash | Launch & account | 97.4 | 98.0 | 99.2 | 99.4 | 99.4 | 99.5 | 97.4 | 98.0 | min 97.4 | ✓ | ✓ | ✓ | ✓ | done. Animation frame differs (stills taken mid-loop). |
+| A02 | A02_sign_in | Launch & account | 95.6 | 96.1 | 96.9 | 97.6 | 97.4 | 98.1 | 95.6 | 96.1 | min 95.6 | ✓ | ✓ | ✓ | ✓ | done. Apple button shown on all platforms in goldens (iOS/web only at runtime). |
+| A03 | A03_email_sign_in | Launch & account | 97.3 | 97.6 | 98.1 | 98.6 | 98.5 | 98.9 | 97.3 | 97.6 | min 97.3 | ✓ | ✓ | ✓ | ✓ | done. |
+| A04 | A04_email_sign_up | Launch & account | 96.2 | 96.0 | 96.8 | 97.3 | 97.4 | 97.8 | 96.2 | 96.0 | min 96.0 | ✓ | ✓ | ✓ | ✓ | done. Mockup eye icon is "visibility_off" while hidden; A03 shows "visibility" — kept one rule: eye = show. Back arrow added on phone (navigation rule: every non-root screen), not in the mockup. |
+| A05 | A05_forgot_password | Launch & account | 97.7 | 98.0 | 97.6 | 98.2 | 97.9 | 98.5 | 97.7 | 98.0 | min 97.6 | ✓ | ✓ | ✓ | ✓ | done. Toast copy includes the email ("Reset link sent to muhwezi.robert@gm…"); mockup shows a truncated placeholder. Back arrow added on phone (navigation rule: every non-root screen), not in the mockup. |
+| A06 | A06_check_email | Launch & account | 96.5 | 96.7 | 98.8 | 98.8 | 99.1 | 99.1 | 95.1 | 95.5 | min 95.1 | ✓ | ✓ | ✓ | ✓ | done. |
+| A07 | A07_farm_picker | Launch & account | 98.0 | 98.0 | 98.3 | 98.8 | 98.5 | 99.0 | 98.0 | 98.0 | min 98.0 | ✓ | ✓ | ✓ | ✓ | done. "Add another farm" opens onboarding once section B exists. |
+| B01 | B01_onboard_language | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| B02 | B02_onboard_sector | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| B03 | B03_onboard_waitlist_sheet | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| B04 | B04_onboard_waitlist_done | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| B05 | B05_onboard_dairy_type | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| B06 | B06_onboard_farm_details | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| B07 | B07_onboard_contacts | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| B08 | B08_onboard_role | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| B09 | B09_onboard_first_staff | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| B10 | B10_onboard_trial_started | Onboarding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| C01 | C01_staff_tap_card | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| C02 | C02_staff_card_number | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| C03 | C03_staff_pin | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| C04 | C04_staff_pin_wrong | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| C05 | C05_nfc_unavailable | Staff unlock | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| D01 | D01_home_owner | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| D02 | D02_home_worker | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| D03 | D03_alerts | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| D04 | D04_sync_status_sheet | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| D05 | D05_home_offline | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| D06 | D06_notification_permission | Home | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| E01 | E01_herd_list | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| E02 | E02_herd_filter_sheet | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| E03 | E03_animal_detail | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| E04 | E04_add_animal | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| E05 | E05_scan_qr | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| E06 | E06_record_event_sheet | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| E07 | E07_calf_born | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| E08 | E08_confirm_death | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| E09 | E09_head_count | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| E10 | E10_print_qr_labels | Herd | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| F01 | F01_milk_today | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| F02 | F02_milk_pick_cow | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| F03 | F03_milk_keypad | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| F04 | F04_milk_read_back | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| F05 | F05_milk_saved | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| F06 | F06_treated_cow_warning | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| F07 | F07_milk_herd_total | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| F08 | F08_milk_use_split | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| F09 | F09_milk_sales | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| F10 | F10_milk_trends | Milk | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G01 | G01_centre_home | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G02 | G02_centre_tap_card | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G03 | G03_centre_delivery_keypad | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G04 | G04_centre_delivery_read_back | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G05 | G05_centre_delivery_saved | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G06 | G06_centre_farmers | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G07 | G07_centre_farmer_detail | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G08 | G08_centre_close_session | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G09 | G09_centre_statements | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G10 | G10_centre_payment_sheet | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G11 | G11_centre_sms_preview | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G12 | G12_centre_quality_test | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| G13 | G13_centre_reconciliation | Collection centre | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| H01 | H01_health_home | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| H02 | H02_add_treatment | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| H03 | H03_treatment_saved | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| H04 | H04_drug_stock | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| H05 | H05_health_schedule | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| H06 | H06_withdrawal_list | Health | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| I01 | I01_feed_stock | Feeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| I02 | I02_record_feeding | Feeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| I03 | I03_feed_purchase_sheet | Feeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| J01 | J01_breeding_calendar | Breeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| J02 | J02_record_service_sheet | Breeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| J03 | J03_pregnancy_confirmed | Breeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| K01 | K01_staff_list | Workers | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| K02 | K02_staff_detail | Workers | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| K03 | K03_assign_card | Workers | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| K04 | K04_attendance | Workers | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| K05 | K05_tasks | Workers | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| K06 | K06_wages | Workers | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| L01 | L01_money_overview | Money | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| L02 | L02_add_expense | Money | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| L03 | L03_reports | Money | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| L04 | L04_whatsapp_report_preview | Money | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| M01 | M01_subscription | Subscription | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| M02 | M02_pay_mobile_money | Subscription | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| M03 | M03_payment_confirmed | Subscription | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| M04 | M04_trial_ending_popup | Subscription | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| M05 | M05_read_only_locked | Subscription | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| N01 | N01_more_menu | Settings | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| N02 | N02_settings | Settings | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| N03 | N03_farm_profile | Settings | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| N04 | N04_language_sheet | Settings | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| N05 | N05_help_support | Settings | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| N06 | N06_sign_out_confirm | Settings | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| N07 | N07_delete_account | Settings | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| O01 | O01_admin_payments | Admin (Victorbee) | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| P01 | P01_empty_herd | System states | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| P02 | P02_error_state | System states | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| P03 | P03_camera_permission | System states | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| P04 | P04_manager_pin_required | System states | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| P05 | P05_offline_saved_toast | System states | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| P06 | P06_sync_done_toast | System states | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 
 ## UI kit audit (Step 1)
 

@@ -116,14 +116,7 @@ class ButtonPair extends StatelessWidget {
 
 /// Text action in the primary colour: "Pay now", "See all" (labelLarge).
 class TextAction extends StatelessWidget {
-  const new({
-    required this.label,
-    required this.onPressed,
-    super.key,
-    this.color,
-    this.small = false,
-    this.dense = false,
-  });
+  const new({required this.label, required this.onPressed, super.key, this.color, this.small = false});
 
   final String label;
   final VoidCallback? onPressed;
@@ -131,9 +124,6 @@ class TextAction extends StatelessWidget {
 
   /// labelMedium instead of labelLarge (card header actions).
   final bool small;
-
-  /// 32 tall instead of 48 (inside a banner that is itself tappable).
-  final bool dense;
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +137,7 @@ class TextAction extends StatelessWidget {
         onTap: onPressed,
         borderRadius: context.radii.button,
         child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: dense ? context.sizes.inlineActionHeight : context.sizes.touchTarget),
+          constraints: BoxConstraints(minHeight: context.sizes.touchTarget, minWidth: context.sizes.touchTarget),
           child: Align(widthFactor: 1, child: Text(label, style: style)),
         ),
       ),

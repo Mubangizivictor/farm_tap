@@ -118,7 +118,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   }
 
   @override
-  String get trialThenPrice => '[nyn] Then UGX 70,000 a month. Pay anytime with Mobile Money.';
+  String get trialThenPrice =>
+      '[nyn] Then UGX 70,000 a month. Pay anytime with Mobile Money.';
 
   @override
   String get trialUpgradeLine => '[nyn] Upgrade · UGX 70,000/mo';
@@ -127,7 +128,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get offlineBannerTitle => '[nyn] You are offline';
 
   @override
-  String get offlineBannerBody => '[nyn] Records are saved on this phone and will sync when you are online.';
+  String get offlineBannerBody =>
+      '[nyn] Records are saved on this phone and will sync when you are online.';
 
   @override
   String get emptyDefaultTitle => '[nyn] Nothing here yet';
@@ -233,7 +235,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get welcomeTitle => '[nyn] Welcome to FarmTap';
 
   @override
-  String get welcomeBody => '[nyn] Records for your farm and milk centre — even without network.';
+  String get welcomeBody =>
+      '[nyn] Records for your farm and milk centre — even without network.';
 
   @override
   String get continueGoogle => '[nyn] Continue with Google';
@@ -294,7 +297,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get signUpTitle => '[nyn] Create your account';
 
   @override
-  String get signUpSubtitle => '[nyn] You\'ll set up your farm next. 14 days free.';
+  String get signUpSubtitle =>
+      '[nyn] You\'ll set up your farm next. 14 days free.';
 
   @override
   String get fullNameLabel => '[nyn] Full name';
@@ -324,7 +328,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get resetTitle => '[nyn] Reset your password';
 
   @override
-  String get resetSubtitle => '[nyn] We\'ll email you a link to set a new password.';
+  String get resetSubtitle =>
+      '[nyn] We\'ll email you a link to set a new password.';
 
   @override
   String get sendResetLink => '[nyn] Send reset link';

@@ -75,12 +75,13 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
         tagline: l10n.brandTagline,
         description: l10n.brandBody,
         header: const AuthBackButton(),
+        // The last row is a 48 dp text action; keep its text where the mockup has it.
+        compactBottomPadding: context.space.sm,
         bottom: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             FarmTapButton(label: l10n.signIn, onPressed: state.busy ? null : _submit),
-            context.space.gapXs,
-            TextAction(label: l10n.newToFarmTap, onPressed: widget.onCreateAccount, dense: true),
+            TextAction(label: l10n.newToFarmTap, onPressed: widget.onCreateAccount),
           ],
         ),
         child: Column(

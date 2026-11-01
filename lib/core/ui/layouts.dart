@@ -19,6 +19,7 @@ class SplitAuthLayout extends StatelessWidget {
     this.header,
     this.bottom,
     this.centerContent = false,
+    this.compactBottomPadding,
   });
 
   /// The form / content.
@@ -35,6 +36,10 @@ class SplitAuthLayout extends StatelessWidget {
 
   /// Centre the right column vertically on wide screens (A02).
   final bool centerContent;
+
+  /// Space under [bottom] on phones (default 24); smaller when [bottom] ends
+  /// in a row of 48 dp links (A02 footer).
+  final double? compactBottomPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +63,12 @@ class SplitAuthLayout extends StatelessWidget {
               ),
               if (bottom != null)
                 Padding(
-                  padding: EdgeInsets.fromLTRB(context.space.xl, 0, context.space.xl, context.space.xl),
+                  padding: EdgeInsets.fromLTRB(
+                    context.space.xl,
+                    0,
+                    context.space.xl,
+                    compactBottomPadding ?? context.space.xl,
+                  ),
                   child: bottom,
                 ),
             ],
