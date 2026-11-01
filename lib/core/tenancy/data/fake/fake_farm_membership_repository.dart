@@ -9,14 +9,15 @@ class FakeFarmMembershipRepository implements FarmMembershipRepository {
 
   final InMemoryTenantProvider _tenants;
 
-  static const places = [
+  /// Both trials end 21 Nov 2026 (14 days after the demo date, Sat 7 Nov).
+  static final places = [
     FarmMembership(
       tenantId: 'farm-rwemera',
       name: 'Rwemera Dairy Farm',
       place: 'Mbarara',
       kind: PlaceKind.dairyFarm,
       role: PlaceRole.owner,
-      subscription: SubscriptionState.active,
+      subscription: Subscription(trialEndsAt: DateTime(2026, 11, 21)),
     ),
     FarmMembership(
       tenantId: 'centre-kashari',
@@ -24,13 +25,12 @@ class FakeFarmMembershipRepository implements FarmMembershipRepository {
       place: 'Kashari',
       kind: PlaceKind.collectionCentre,
       role: PlaceRole.manager,
-      subscription: SubscriptionState.trial,
-      trialDaysLeft: 9,
+      subscription: Subscription(trialEndsAt: DateTime(2026, 11, 21)),
     ),
   ];
 
   @override
-  Future<Result<List<FarmMembership>>> myPlaces() async => const Result.success(places);
+  Future<Result<List<FarmMembership>>> myPlaces() async => Result.success(places);
 
   @override
   Future<Result<void>> open(String tenantId) async {

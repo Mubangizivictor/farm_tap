@@ -39,7 +39,7 @@
   "undo": "Undo",
   "tryAgain": "Try again",
   "payNow": "Pay now",
-  "trialDaysLeft": "Free trial: {days} days left",
+  "trialDaysLeft": "Free trial: {days, plural, =1{1 day} other{{days} days}} left",
   "@trialDaysLeft": {
     "placeholders": {
       "days": {
@@ -47,7 +47,7 @@
       }
     }
   },
-  "trialDaysLeftShort": "Free trial · {days} days left",
+  "trialDaysLeftShort": "Free trial · {days, plural, =1{1 day} other{{days} days}} left",
   "@trialDaysLeftShort": {
     "placeholders": {
       "days": {
@@ -180,7 +180,7 @@
   "statusActive": "Active",
   "statusTrial": "Trial",
   "statusReadOnly": "Read-only",
-  "trialDaysShort": "Trial {days} days",
+  "trialDaysShort": "Trial {days, plural, =1{1 day} other{{days} days}}",
   "@trialDaysShort": {
     "placeholders": {
       "days": {

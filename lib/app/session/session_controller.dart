@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:flutter/foundation.dart';
 
 /// What the router guards look at (docs/design/ROUTES.md, "Guards"):
 /// signed in? which farm is open? is the farm phone locked? trial ended?
 class SessionController extends ChangeNotifier {
-  new({required this.auth}) {
+  new({required this.auth, required this.clock}) {
     _sub = auth.userChanges.listen((user) {
       if (user == null) _farm = null;
       notifyListeners();
@@ -16,6 +17,7 @@ class SessionController extends ChangeNotifier {
   }
 
   final AuthRepository auth;
+  final Clock clock;
   late final StreamSubscription<Object?> _sub;
   FarmMembership? _farm;
   bool _locked = false;
@@ -34,8 +36,13 @@ class SessionController extends ChangeNotifier {
   /// Worker who unlocked the phone (null = the account owner / manager).
   StaffMember? get staff => _staff;
 
-  /// Trial ended and not paid: screens show the read-only state (M05).
-  bool get readOnly => _farm?.subscription == SubscriptionState.readOnly;
+  /// Trial ended (or grace ran out) and not paid: read-only state (M05).
+  bool get readOnly => _farm?.subscription.readOnly(clock.today()) ?? false;
+
+  /// Calculated against the clock; null when not trialing (no banner).
+  int? get trialDaysLeft => _farm?.subscription.trialBanner(clock.today());
+
+  SubscriptionState? get subscriptionState => _farm?.subscription.state(clock.today());
 
   void openFarm(FarmMembership farm) {
     _farm = farm;

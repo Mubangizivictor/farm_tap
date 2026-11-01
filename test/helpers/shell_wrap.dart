@@ -4,6 +4,8 @@ import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/material.dart';
 
+import 'fake_deps.dart';
+
 /// Wraps a page in what the app shell provides: bottom bar / rail /
 /// sidebar for [current], sync icon, staff avatar, farm switcher, trial card.
 /// [parent] non-null gives the page a back arrow (a pushed screen).
@@ -14,7 +16,7 @@ Widget inShell(
   bool online = true,
   bool centre = false,
   String profileName = 'Mugisha Tom',
-  int? trialDaysLeft = 9,
+  int? trialDaysLeft,
   SyncState syncState = SyncState.synced,
 }) => Builder(
   builder: (context) {
@@ -25,7 +27,7 @@ Widget inShell(
       onSyncTap: () {},
       profileName: profileName,
       farm: const FarmSwitcherInfo(name: 'Rwemera Dairy Farm', subtitle: 'Mbarara · Owner'),
-      trialDaysLeft: trialDaysLeft,
+      trialDaysLeft: trialDaysLeft ?? demoTrialDaysLeft(),
       hasNotifications: true,
       onNotificationsTap: () {},
       child: NavigationScope(

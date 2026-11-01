@@ -23,7 +23,7 @@ void main() {
       repo: FakeHomeRepository(clock, FakeTreatmentRepository(clock)),
       farmName: 'Rwemera Dairy Farm',
       ownerName: 'Muhwezi Robert',
-      trialDaysLeft: 9,
+      trialDaysLeft: demoTrialDaysLeft(),
       today: today,
       onOpen: (_) {},
     ),

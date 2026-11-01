@@ -109,12 +109,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String trialDaysLeft(int days) {
-    return 'Free trial: $days days left';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return 'Free trial: $_temp0 left';
   }
 
   @override
   String trialDaysLeftShort(int days) {
-    return 'Free trial · $days days left';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return 'Free trial · $_temp0 left';
   }
 
   @override
@@ -385,7 +397,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String trialDaysShort(int days) {
-    return 'Trial $days days';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return 'Trial $_temp0';
   }
 
   @override

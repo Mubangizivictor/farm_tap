@@ -23,7 +23,6 @@ import 'package:farm_tap/core/onboarding/presentation/pages/form_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/waitlist_and_done.dart';
 import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
-import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_collect_pages.dart';
@@ -98,7 +97,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
             farmName: session.farm?.name ?? '',
             ownerName: session.auth.currentUser?.name ?? '',
             staff: session.staff,
-            trialDaysLeft: session.farm?.subscription == SubscriptionState.trial ? session.farm?.trialDaysLeft : null,
+            trialDaysLeft: session.trialDaysLeft,
             onRefresh: deps.sync.sync,
             onLock: () {
               session.lock();

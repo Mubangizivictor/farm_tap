@@ -4,6 +4,7 @@ import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -77,9 +78,15 @@ class _PlaceTile extends StatelessWidget {
       PlaceRole.clerk => l10n.roleClerk,
       PlaceRole.worker => l10n.roleWorker,
     };
-    final (status, badge, tone) = switch (place.subscription) {
-      SubscriptionState.active => (l10n.statusActive, l10n.statusActive, FarmTapTone.success),
-      SubscriptionState.trial => (l10n.trialDaysShort(place.trialDaysLeft), l10n.statusTrial, FarmTapTone.gold),
+    final today = context.clock.today();
+    final (status, badge, tone) = switch (place.subscription.state(today)) {
+      SubscriptionState.active ||
+      SubscriptionState.grace => (l10n.statusActive, l10n.statusActive, FarmTapTone.success),
+      SubscriptionState.trial => (
+        l10n.trialDaysShort(place.subscription.trialDaysLeft(today)),
+        l10n.statusTrial,
+        FarmTapTone.gold,
+      ),
       SubscriptionState.readOnly => (l10n.statusReadOnly, l10n.statusReadOnly, FarmTapTone.neutral),
     };
     return RecordTile(

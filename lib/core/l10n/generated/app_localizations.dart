@@ -293,13 +293,13 @@ abstract class AppLocalizations {
   /// No description provided for @trialDaysLeft.
   ///
   /// In en, this message translates to:
-  /// **'Free trial: {days} days left'**
+  /// **'Free trial: {days, plural, =1{1 day} other{{days} days}} left'**
   String trialDaysLeft(int days);
 
   /// No description provided for @trialDaysLeftShort.
   ///
   /// In en, this message translates to:
-  /// **'Free trial · {days} days left'**
+  /// **'Free trial · {days, plural, =1{1 day} other{{days} days}} left'**
   String trialDaysLeftShort(int days);
 
   /// No description provided for @trialThenPrice.
@@ -809,7 +809,7 @@ abstract class AppLocalizations {
   /// No description provided for @trialDaysShort.
   ///
   /// In en, this message translates to:
-  /// **'Trial {days} days'**
+  /// **'Trial {days, plural, =1{1 day} other{{days} days}}'**
   String trialDaysShort(int days);
 
   /// No description provided for @addAnotherFarm.

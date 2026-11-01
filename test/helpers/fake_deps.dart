@@ -21,27 +21,37 @@ class FixedClock extends Clock {
 }
 
 /// App dependencies built from fakes; optionally signed in with a farm open.
-Future<AppDependencies> fakeDependencies({bool signedIn = false, bool farm = false, bool centre = false}) async {
+Future<AppDependencies> fakeDependencies({
+  bool signedIn = false,
+  bool farm = false,
+  bool centre = false,
+  Clock? clock,
+}) async {
+  final c = clock ?? FakeClock();
   final auth = FakeAuthRepository();
   if (signedIn) await auth.signInWithGoogle();
-  final session = SessionController(auth: auth);
+  final session = SessionController(auth: auth, clock: c);
   if (farm) {
     session.openFarm(
       FakeFarmMembershipRepository.places.firstWhere((p) => centre == (p.kind == PlaceKind.collectionCentre)),
     );
   }
-  final clock = FakeClock();
-  final treatments = FakeTreatmentRepository(clock);
+  final treatments = FakeTreatmentRepository(c);
   return AppDependencies(
     session: session,
     places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
-    onboarding: FakeOnboardingRepository(clock),
+    onboarding: FakeOnboardingRepository(c),
     staffAccess: FakeStaffAccessRepository(),
     sync: FakeSyncService(),
-    home: FakeHomeRepository(clock, treatments),
-    herd: FakeHerdRepository(clock: clock, tenantProvider: InMemoryTenantProvider(), treatments: treatments),
-    milk: FakeMilkRepository(clock, treatments),
-    centre: FakeCentreRepository(clock),
+    home: FakeHomeRepository(c, treatments),
+    herd: FakeHerdRepository(clock: c, tenantProvider: InMemoryTenantProvider(), treatments: treatments),
+    milk: FakeMilkRepository(c, treatments),
+    centre: FakeCentreRepository(c),
     treatments: treatments,
   );
 }
+
+/// Trial days left on the sample farm at the golden date, from the same
+/// Subscription calculation the app uses (never a hard-coded number).
+int? demoTrialDaysLeft([DateTime? today]) =>
+    FakeFarmMembershipRepository.places.first.subscription.trialBanner(today ?? FixedClock().today());

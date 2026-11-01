@@ -82,7 +82,7 @@ Future<void> configureDependencies(Flavor flavor) async {
       );
   }
 
-  getIt.registerLazySingleton(() => SessionController(auth: getIt<AuthRepository>()));
+  getIt.registerLazySingleton(() => SessionController(auth: getIt<AuthRepository>(), clock: getIt<Clock>()));
 
   // Herd use cases and bloc
   getIt
