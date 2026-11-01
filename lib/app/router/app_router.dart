@@ -10,7 +10,8 @@ import 'package:go_router/go_router.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final appRouter = GoRouter(
-  initialLocation: AppRoutes.splash,
+  // flutter run --dart-define=START_ROUTE=/dev/gallery opens a screen directly.
+  initialLocation: const String.fromEnvironment('START_ROUTE', defaultValue: AppRoutes.splash),
   navigatorKey: _rootNavigatorKey,
   routes: [
     GoRoute(path: AppRoutes.splash, builder: (context, state) => const SplashPage()),
