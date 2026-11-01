@@ -9,7 +9,8 @@ class FakeFarmMembershipRepository implements FarmMembershipRepository {
 
   final InMemoryTenantProvider _tenants;
 
-  /// Both trials end 21 Nov 2026 (14 days after the demo date, Sat 7 Nov).
+  /// Both trials: started Mon 2 Nov 2026, end Mon 16 Nov (9 days left and
+  /// 5 of 14 used on the demo date, Sat 7 Nov).
   static final places = [
     FarmMembership(
       tenantId: 'farm-rwemera',
@@ -17,7 +18,7 @@ class FakeFarmMembershipRepository implements FarmMembershipRepository {
       place: 'Mbarara',
       kind: PlaceKind.dairyFarm,
       role: PlaceRole.owner,
-      subscription: Subscription(trialEndsAt: DateTime(2026, 11, 21)),
+      subscription: Subscription(trialStartedAt: DateTime(2026, 11, 2), trialEndsAt: DateTime(2026, 11, 16)),
     ),
     FarmMembership(
       tenantId: 'centre-kashari',
@@ -25,7 +26,7 @@ class FakeFarmMembershipRepository implements FarmMembershipRepository {
       place: 'Kashari',
       kind: PlaceKind.collectionCentre,
       role: PlaceRole.manager,
-      subscription: Subscription(trialEndsAt: DateTime(2026, 11, 21)),
+      subscription: Subscription(trialStartedAt: DateTime(2026, 11, 2), trialEndsAt: DateTime(2026, 11, 16)),
     ),
   ];
 

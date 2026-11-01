@@ -10,7 +10,10 @@ enum SubscriptionState { trial, active, grace, readOnly }
 /// The farm's subscription document (ROADMAP 3.2): only dates are stored;
 /// days left, grace and read-only are calculated against the clock.
 class Subscription extends Equatable {
-  const new({this.trialEndsAt, this.paidUntil});
+  const new({this.trialStartedAt, this.trialEndsAt, this.paidUntil});
+
+  /// Day the free trial started (end of onboarding).
+  final DateTime? trialStartedAt;
 
   /// First day without the free trial (14 days after onboarding).
   final DateTime? trialEndsAt;
@@ -49,13 +52,19 @@ class Subscription extends Equatable {
   int graceDaysLeft(DateTime today) =>
       paidUntil == null ? 0 : _daysBetween(today, _day(paidUntil!).add(const Duration(days: graceDays)));
 
+  /// Trial length in days (14) and how many are used ("5 of 14").
+  int get trialLength =>
+      trialStartedAt == null || trialEndsAt == null ? 14 : _day(trialEndsAt!).difference(_day(trialStartedAt!)).inDays;
+
+  int trialDaysUsed(DateTime today) => trialLength - trialDaysLeft(today);
+
   bool readOnly(DateTime today) => state(today) == SubscriptionState.readOnly;
 
   /// Trial days left while trialing, else null (banner and sidebar card hide).
   int? trialBanner(DateTime today) => state(today) == SubscriptionState.trial ? trialDaysLeft(today) : null;
 
   @override
-  List<Object?> get props => [trialEndsAt, paidUntil];
+  List<Object?> get props => [trialStartedAt, trialEndsAt, paidUntil];
 }
 
 /// A farm or collection centre the account can open (A07).

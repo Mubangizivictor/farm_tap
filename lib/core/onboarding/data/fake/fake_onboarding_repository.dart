@@ -37,7 +37,8 @@ class FakeOnboardingRepository implements OnboardingRepository {
       place: setup.district ?? '',
       kind: setup.dairyType == DairyType.centre ? PlaceKind.collectionCentre : PlaceKind.dairyFarm,
       role: setup.role == SetupRole.owner ? PlaceRole.owner : PlaceRole.manager,
-      subscription: Subscription(trialEndsAt: trialEndsOn()),
+      // A new farm's own trial: today + 14 days (never another farm's date).
+      subscription: Subscription(trialStartedAt: clock.today(), trialEndsAt: trialEndsOn()),
     ),
   );
 
