@@ -9,6 +9,7 @@ import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/data/fake/fake_centre_repository.dart';
+import 'package:farm_tap/sectors/cattle/feeding/data/fake/fake_feed_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
@@ -37,6 +38,7 @@ Future<AppDependencies> fakeDependencies({
     );
   }
   final treatments = FakeTreatmentRepository(c);
+  final milk = FakeMilkRepository(c, treatments);
   return AppDependencies(
     session: session,
     places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
@@ -45,9 +47,10 @@ Future<AppDependencies> fakeDependencies({
     sync: FakeSyncService(),
     home: FakeHomeRepository(c, treatments),
     herd: FakeHerdRepository(clock: c, tenantProvider: InMemoryTenantProvider(), treatments: treatments),
-    milk: FakeMilkRepository(c, treatments),
+    milk: milk,
     centre: FakeCentreRepository(c),
     treatments: treatments,
+    feed: FakeFeedRepository(c, milk),
   );
 }
 

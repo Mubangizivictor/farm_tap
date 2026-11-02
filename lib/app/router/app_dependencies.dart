@@ -5,6 +5,7 @@ import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_repository.dart';
+import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
@@ -24,6 +25,7 @@ class AppDependencies {
     required this.milk,
     required this.centre,
     required this.treatments,
+    required this.feed,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -37,6 +39,7 @@ class AppDependencies {
     milk: getIt<MilkRepository>(),
     centre: getIt<CentreRepository>(),
     treatments: getIt<TreatmentRepository>(),
+    feed: getIt<FeedRepository>(),
   );
 
   final SessionController session;
@@ -49,4 +52,5 @@ class AppDependencies {
   final MilkRepository milk;
   final CentreRepository centre;
   final TreatmentRepository treatments;
+  final FeedRepository feed;
 }

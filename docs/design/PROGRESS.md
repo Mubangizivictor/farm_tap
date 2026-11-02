@@ -74,9 +74,9 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | H04 | H04_drug_stock | Health | 96.3 | 96.3 | 97.5 | 97.2 | 98.0 | 98.0 | 96.3 | 96.3 | min 96.3 | ✓ | ✓ | ✓ | ✓ | done. |
 | H05 | H05_health_schedule | Health | 96.7 | 96.7 | 97.7 | 97.7 | 98.0 | 97.9 | 96.7 | 96.7 | min 96.7 | ✓ | ✓ | ✓ | ✓ | done. |
 | H06 | H06_withdrawal_list | Health | 94.3 | 94.2 | 97.2 | 97.0 | 97.6 | 97.5 | 94.3 | 94.2 | min 94.2 | ✓ | ✓ | ✓ | ✓ | done. |
-| I01 | I01_feed_stock | Feeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| I02 | I02_record_feeding | Feeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| I03 | I03_feed_purchase_sheet | Feeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| I01 | I01_feed_stock | Feeding | 94.5 | 94.9 | 97.0 | 96.7 | 97.4 | 97.4 | 94.3 | 94.8 | min 94.3 | ✓ | ✓ | ✓ | ✓ | done. Stock, days left and cost per litre derived from records. |
+| I02 | I02_record_feeding | Feeding | 94.1 | 94.1 | 97.3 | 97.0 | 97.1 | 96.9 | 94.1 | 94.1 | min 94.1 | ✓ | ✓ | ✓ | ✓ | done. Golden types 1.5 as in mockup. Back arrow asks Discard changes?. |
+| I03 | I03_feed_purchase_sheet | Feeding | 89.2 | 91.1 | 90.0 | 93.5 | 89.9 | 94.5 | 89.1 | 91.1 | min 89.1 | ✓ | ✓ | ✓ | ✓ | done. Mockup background shows a low-stock banner; I01 keeps its own mockup (cost card). Save has read-back (money). |
 | J01 | J01_breeding_calendar | Breeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | J02 | J02_record_service_sheet | Breeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | J03 | J03_pregnancy_confirmed | Breeding | — | — | — | — | — | — | — | — |  | — | — | — | — |  |

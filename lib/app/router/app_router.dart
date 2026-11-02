@@ -27,6 +27,7 @@ import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_collect_pages.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_farmers_pay_pages.dart';
+import 'package:farm_tap/sectors/cattle/feeding/presentation/pages/feeding_pages.dart';
 import 'package:farm_tap/sectors/cattle/health/presentation/pages/health_pages.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/animal_detail_page.dart';
@@ -133,6 +134,8 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     onPaymentSheet: () => context.push(AppRoutes.payFarmers),
     onFarmer: (farmer) => context.go(AppRoutes.centreFarmer(farmer.id)),
   );
+  sectionRoots[AppRoutes.feeding] = (context, state) =>
+      FeedStockPage(repo: deps.feed, onRecord: () => context.push(AppRoutes.feedingRecord));
   sectionRoots[AppRoutes.health] = (context, state) => HealthHomePage(
     repo: deps.treatments,
     onOpen: (target) => context.push(switch (target) {
@@ -297,6 +300,14 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         parent: AppRoutes.health,
         builder: (context, state) =>
             WithdrawalListPage(repo: deps.treatments, onAnimal: (id) => context.go(AppRoutes.herdAnimal(id))),
+      ),
+    ],
+    AppRoutes.feeding: [
+      page(
+        'record',
+        parent: AppRoutes.feeding,
+        builder: (context, state) =>
+            RecordFeedingPage(repo: deps.feed, onSaved: () => popOrGo(context, AppRoutes.feeding)),
       ),
     ],
     AppRoutes.home: [

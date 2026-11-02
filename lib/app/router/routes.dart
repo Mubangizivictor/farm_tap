@@ -58,6 +58,7 @@ abstract final class AppRoutes {
   static const payFarmers = '/pay/sheet';
   static const paySms = '/pay/sms';
   static const feeding = '/feeding';
+  static const feedingRecord = '/feeding/record';
   static const breeding = '/breeding';
   static const workers = '/workers';
   static const money = '/money';

@@ -172,7 +172,7 @@ class AdaptiveScaffold extends StatelessWidget {
     final route = RouteInfo.maybeOf(context);
     final parent = backFallback ?? route?.parent;
     final hasBack = showBack || route?.parent != null;
-    final back = onBack ?? () => popOrGo(context, parent);
+    final back = onBack ?? () => backOrGo(context, parent);
     final sidebar = nav == null
         ? null
         : _Sidebar(

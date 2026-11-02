@@ -80,7 +80,9 @@ class _CentreHomePageState extends State<CentreHomePage> {
 
   Future<void> _refresh() async {
     await widget.onRefresh?.call();
-    setState(() => _load = _fetch());
+    setState(() {
+      _load = _fetch();
+    });
     await _load;
   }
 
@@ -89,7 +91,9 @@ class _CentreHomePageState extends State<CentreHomePage> {
     final closed = await showCloseSessionDialog(context, repo: widget.repo, day: day);
     if (!closed || !mounted) return;
     FarmTapToast.show(context, message: AppLocalizations.of(context).sessionClosed, icon: Symbols.lock_rounded);
-    setState(() => _load = _fetch());
+    setState(() {
+      _load = _fetch();
+    });
   }
 
   @override

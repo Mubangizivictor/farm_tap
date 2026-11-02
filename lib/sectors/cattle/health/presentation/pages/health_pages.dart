@@ -455,7 +455,10 @@ class _DrugStockPageState extends State<DrugStockPage> {
 
   Future<void> _add() async {
     final drug = await showAdaptiveSheet<Drug>(context, builder: (_) => _AddDrugSheet(repo: widget.repo));
-    if (drug != null && mounted) setState(() => _load = _fetch());
+    if (drug == null || !mounted) return;
+    setState(() {
+      _load = _fetch();
+    });
   }
 
   @override
@@ -657,7 +660,9 @@ class _HealthCalendarPageState extends State<HealthCalendarPage> {
     await widget.repo.addTask(task);
     if (!mounted) return;
     FarmTapToast.show(context, message: AppLocalizations.of(context).taskAdded);
-    setState(() => _load = _fetch());
+    setState(() {
+      _load = _fetch();
+    });
   }
 
   @override

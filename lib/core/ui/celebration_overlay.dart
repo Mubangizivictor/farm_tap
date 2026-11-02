@@ -206,7 +206,10 @@ class _CelebrationOverlayState extends State<CelebrationOverlay> {
     return Scaffold(
       body: SafeArea(
         // Phones: content sits in the upper part, buttons within thumb reach.
-        child: Align(alignment: Alignment(0, context.sizes.celebrationAlignY), child: SingleChildScrollView(child: body)),
+        child: Align(
+          alignment: Alignment(0, context.sizes.celebrationAlignY),
+          child: SingleChildScrollView(child: body),
+        ),
       ),
     );
   }

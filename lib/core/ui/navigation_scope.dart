@@ -100,6 +100,17 @@ void popOrGo(BuildContext context, String? fallback) {
   }
 }
 
+/// The back arrow: like [popOrGo], but asks the page's PopScope first, so a
+/// dirty form shows "Discard changes?" (router.pop() skips PopScope).
+void backOrGo(BuildContext context, String? fallback) {
+  final router = GoRouter.maybeOf(context);
+  if (router == null || router.canPop()) {
+    Navigator.maybePop(context);
+  } else if (fallback != null) {
+    router.go(fallback);
+  }
+}
+
 /// Wraps a form: when [dirty], leaving (back arrow, swipe, system back)
 /// first asks "Discard changes?".
 class DiscardGuard extends StatelessWidget {

@@ -2462,4 +2462,152 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get kindDeworming => 'Deworming';
+
+  @override
+  String get recordFeeding => 'Record feeding';
+
+  @override
+  String get feedCostThisMonth => 'Feed cost this month';
+
+  @override
+  String perLitreOfMilk(String amount) {
+    return '$amount per litre of milk';
+  }
+
+  @override
+  String get okBadge => 'OK';
+
+  @override
+  String get buyFeed => 'Buy feed';
+
+  @override
+  String get buyFeedSub => 'Adds stock and records an expense.';
+
+  @override
+  String get whichGroup => 'Which group?';
+
+  @override
+  String get whichFeed => 'Which feed?';
+
+  @override
+  String get groupMilkingCows => 'Milking cows';
+
+  @override
+  String get groupDryCows => 'Dry cows';
+
+  @override
+  String get groupHeifers => 'Heifers';
+
+  @override
+  String get groupCalves => 'Calves';
+
+  @override
+  String get feedDairyMeal => 'Dairy meal';
+
+  @override
+  String get feedMaizeBran => 'Maize bran';
+
+  @override
+  String get feedMineralLick => 'Mineral lick';
+
+  @override
+  String get feedSilage => 'Silage';
+
+  @override
+  String feedBags(String n) {
+    return '$n bags';
+  }
+
+  @override
+  String feedBlocks(String n) {
+    return '$n blocks';
+  }
+
+  @override
+  String feedTonnes(String n) {
+    return 'about $n tonnes';
+  }
+
+  @override
+  String feedLeftDays(String stock, int days) {
+    return '$stock left · about $days days';
+  }
+
+  @override
+  String feedLowTitle(String feed, String stock) {
+    return '$feed: $stock left';
+  }
+
+  @override
+  String feedLowBody(int days) {
+    return 'About $days days at the current rate.';
+  }
+
+  @override
+  String get unitBags => 'bags';
+
+  @override
+  String get unitBlocks => 'blocks';
+
+  @override
+  String get unitKg => 'kg';
+
+  @override
+  String get unitTonnes => 'Tonnes';
+
+  @override
+  String get unitBagsLabel => 'Bags';
+
+  @override
+  String get unitBlocksLabel => 'Blocks';
+
+  @override
+  String get pricePerBag => 'Price per bag';
+
+  @override
+  String get pricePerBlock => 'Price per block';
+
+  @override
+  String get pricePerTonne => 'Price per tonne';
+
+  @override
+  String feedAmountCaption(String unit, String feed) {
+    return '$unit of $feed';
+  }
+
+  @override
+  String get colFeed => 'Feed';
+
+  @override
+  String get colInStock => 'In stock';
+
+  @override
+  String get colUsedPerDay => 'Used / day';
+
+  @override
+  String get colDaysLeft => 'Days left';
+
+  @override
+  String get supplier => 'Supplier';
+
+  @override
+  String get savePurchase => 'Save purchase';
+
+  @override
+  String get saveFeeding => 'Save feeding';
+
+  @override
+  String feedingSaved(String amount) {
+    return 'Feeding saved: $amount';
+  }
+
+  @override
+  String purchaseSaved(String amount) {
+    return 'Purchase saved: $amount';
+  }
+
+  @override
+  String moreThanInStock(String stock) {
+    return 'Only $stock in stock';
+  }
 }

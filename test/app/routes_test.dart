@@ -186,4 +186,18 @@ void main() {
     await _tapBack(tester);
     expect(h.location, AppRoutes.more);
   });
+
+  testWidgets('back arrow on a dirty form asks "Discard changes?"', (tester) async {
+    final h = await _Harness.pump(tester, start: AppRoutes.feeding, signedIn: true, farm: true);
+    unawaited(h.router.push(AppRoutes.feedingRecord));
+    await _settle(tester);
+    await tester.tap(find.text('5'));
+    await _settle(tester);
+    await _tapBack(tester);
+    expect(find.text('Discard changes?'), findsOneWidget);
+    expect(h.location, AppRoutes.feedingRecord);
+    await tester.tap(find.text('Discard'));
+    await _settle(tester);
+    expect(h.location, AppRoutes.feeding);
+  });
 }

@@ -4333,6 +4333,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deworming'**
   String get kindDeworming;
+
+  /// No description provided for @recordFeeding.
+  ///
+  /// In en, this message translates to:
+  /// **'Record feeding'**
+  String get recordFeeding;
+
+  /// No description provided for @feedCostThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Feed cost this month'**
+  String get feedCostThisMonth;
+
+  /// No description provided for @perLitreOfMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} per litre of milk'**
+  String perLitreOfMilk(String amount);
+
+  /// No description provided for @okBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get okBadge;
+
+  /// No description provided for @buyFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy feed'**
+  String get buyFeed;
+
+  /// No description provided for @buyFeedSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Adds stock and records an expense.'**
+  String get buyFeedSub;
+
+  /// No description provided for @whichGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Which group?'**
+  String get whichGroup;
+
+  /// No description provided for @whichFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Which feed?'**
+  String get whichFeed;
+
+  /// No description provided for @groupMilkingCows.
+  ///
+  /// In en, this message translates to:
+  /// **'Milking cows'**
+  String get groupMilkingCows;
+
+  /// No description provided for @groupDryCows.
+  ///
+  /// In en, this message translates to:
+  /// **'Dry cows'**
+  String get groupDryCows;
+
+  /// No description provided for @groupHeifers.
+  ///
+  /// In en, this message translates to:
+  /// **'Heifers'**
+  String get groupHeifers;
+
+  /// No description provided for @groupCalves.
+  ///
+  /// In en, this message translates to:
+  /// **'Calves'**
+  String get groupCalves;
+
+  /// No description provided for @feedDairyMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy meal'**
+  String get feedDairyMeal;
+
+  /// No description provided for @feedMaizeBran.
+  ///
+  /// In en, this message translates to:
+  /// **'Maize bran'**
+  String get feedMaizeBran;
+
+  /// No description provided for @feedMineralLick.
+  ///
+  /// In en, this message translates to:
+  /// **'Mineral lick'**
+  String get feedMineralLick;
+
+  /// No description provided for @feedSilage.
+  ///
+  /// In en, this message translates to:
+  /// **'Silage'**
+  String get feedSilage;
+
+  /// No description provided for @feedBags.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} bags'**
+  String feedBags(String n);
+
+  /// No description provided for @feedBlocks.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} blocks'**
+  String feedBlocks(String n);
+
+  /// No description provided for @feedTonnes.
+  ///
+  /// In en, this message translates to:
+  /// **'about {n} tonnes'**
+  String feedTonnes(String n);
+
+  /// No description provided for @feedLeftDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{stock} left · about {days} days'**
+  String feedLeftDays(String stock, int days);
+
+  /// No description provided for @feedLowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{feed}: {stock} left'**
+  String feedLowTitle(String feed, String stock);
+
+  /// No description provided for @feedLowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'About {days} days at the current rate.'**
+  String feedLowBody(int days);
+
+  /// No description provided for @unitBags.
+  ///
+  /// In en, this message translates to:
+  /// **'bags'**
+  String get unitBags;
+
+  /// No description provided for @unitBlocks.
+  ///
+  /// In en, this message translates to:
+  /// **'blocks'**
+  String get unitBlocks;
+
+  /// No description provided for @unitKg.
+  ///
+  /// In en, this message translates to:
+  /// **'kg'**
+  String get unitKg;
+
+  /// No description provided for @unitTonnes.
+  ///
+  /// In en, this message translates to:
+  /// **'Tonnes'**
+  String get unitTonnes;
+
+  /// No description provided for @unitBagsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bags'**
+  String get unitBagsLabel;
+
+  /// No description provided for @unitBlocksLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocks'**
+  String get unitBlocksLabel;
+
+  /// No description provided for @pricePerBag.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per bag'**
+  String get pricePerBag;
+
+  /// No description provided for @pricePerBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per block'**
+  String get pricePerBlock;
+
+  /// No description provided for @pricePerTonne.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per tonne'**
+  String get pricePerTonne;
+
+  /// No description provided for @feedAmountCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'{unit} of {feed}'**
+  String feedAmountCaption(String unit, String feed);
+
+  /// No description provided for @colFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Feed'**
+  String get colFeed;
+
+  /// No description provided for @colInStock.
+  ///
+  /// In en, this message translates to:
+  /// **'In stock'**
+  String get colInStock;
+
+  /// No description provided for @colUsedPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Used / day'**
+  String get colUsedPerDay;
+
+  /// No description provided for @colDaysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Days left'**
+  String get colDaysLeft;
+
+  /// No description provided for @supplier.
+  ///
+  /// In en, this message translates to:
+  /// **'Supplier'**
+  String get supplier;
+
+  /// No description provided for @savePurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Save purchase'**
+  String get savePurchase;
+
+  /// No description provided for @saveFeeding.
+  ///
+  /// In en, this message translates to:
+  /// **'Save feeding'**
+  String get saveFeeding;
+
+  /// No description provided for @feedingSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeding saved: {amount}'**
+  String feedingSaved(String amount);
+
+  /// No description provided for @purchaseSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase saved: {amount}'**
+  String purchaseSaved(String amount);
+
+  /// No description provided for @moreThanInStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Only {stock} in stock'**
+  String moreThanInStock(String stock);
 }
 
 class _AppLocalizationsDelegate

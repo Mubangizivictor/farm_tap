@@ -1902,5 +1902,133 @@
   },
   "kindVaccination": "Vaccination",
   "kindDipping": "Dipping",
-  "kindDeworming": "Deworming"
+  "kindDeworming": "Deworming",
+  "recordFeeding": "Record feeding",
+  "feedCostThisMonth": "Feed cost this month",
+  "perLitreOfMilk": "{amount} per litre of milk",
+  "@perLitreOfMilk": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "okBadge": "OK",
+  "buyFeed": "Buy feed",
+  "buyFeedSub": "Adds stock and records an expense.",
+  "whichGroup": "Which group?",
+  "whichFeed": "Which feed?",
+  "groupMilkingCows": "Milking cows",
+  "groupDryCows": "Dry cows",
+  "groupHeifers": "Heifers",
+  "groupCalves": "Calves",
+  "feedDairyMeal": "Dairy meal",
+  "feedMaizeBran": "Maize bran",
+  "feedMineralLick": "Mineral lick",
+  "feedSilage": "Silage",
+  "feedBags": "{n} bags",
+  "@feedBags": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "feedBlocks": "{n} blocks",
+  "@feedBlocks": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "feedTonnes": "about {n} tonnes",
+  "@feedTonnes": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "feedLeftDays": "{stock} left · about {days} days",
+  "@feedLeftDays": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "feedLowTitle": "{feed}: {stock} left",
+  "@feedLowTitle": {
+    "placeholders": {
+      "feed": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "feedLowBody": "About {days} days at the current rate.",
+  "@feedLowBody": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "unitBags": "bags",
+  "unitBlocks": "blocks",
+  "unitKg": "kg",
+  "unitTonnes": "Tonnes",
+  "unitBagsLabel": "Bags",
+  "unitBlocksLabel": "Blocks",
+  "pricePerBag": "Price per bag",
+  "pricePerBlock": "Price per block",
+  "pricePerTonne": "Price per tonne",
+  "feedAmountCaption": "{unit} of {feed}",
+  "@feedAmountCaption": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      },
+      "feed": {
+        "type": "String"
+      }
+    }
+  },
+  "colFeed": "Feed",
+  "colInStock": "In stock",
+  "colUsedPerDay": "Used / day",
+  "colDaysLeft": "Days left",
+  "supplier": "Supplier",
+  "savePurchase": "Save purchase",
+  "saveFeeding": "Save feeding",
+  "feedingSaved": "Feeding saved: {amount}",
+  "@feedingSaved": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "purchaseSaved": "Purchase saved: {amount}",
+  "@purchaseSaved": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "moreThanInStock": "Only {stock} in stock",
+  "@moreThanInStock": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      }
+    }
+  }
 }

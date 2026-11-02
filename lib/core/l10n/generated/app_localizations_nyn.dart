@@ -2472,4 +2472,152 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String get kindDeworming => '[nyn] Deworming';
+
+  @override
+  String get recordFeeding => '[nyn] Record feeding';
+
+  @override
+  String get feedCostThisMonth => '[nyn] Feed cost this month';
+
+  @override
+  String perLitreOfMilk(String amount) {
+    return '[nyn] $amount per litre of milk';
+  }
+
+  @override
+  String get okBadge => '[nyn] OK';
+
+  @override
+  String get buyFeed => '[nyn] Buy feed';
+
+  @override
+  String get buyFeedSub => '[nyn] Adds stock and records an expense.';
+
+  @override
+  String get whichGroup => '[nyn] Which group?';
+
+  @override
+  String get whichFeed => '[nyn] Which feed?';
+
+  @override
+  String get groupMilkingCows => '[nyn] Milking cows';
+
+  @override
+  String get groupDryCows => '[nyn] Dry cows';
+
+  @override
+  String get groupHeifers => '[nyn] Heifers';
+
+  @override
+  String get groupCalves => '[nyn] Calves';
+
+  @override
+  String get feedDairyMeal => '[nyn] Dairy meal';
+
+  @override
+  String get feedMaizeBran => '[nyn] Maize bran';
+
+  @override
+  String get feedMineralLick => '[nyn] Mineral lick';
+
+  @override
+  String get feedSilage => '[nyn] Silage';
+
+  @override
+  String feedBags(String n) {
+    return '[nyn] $n bags';
+  }
+
+  @override
+  String feedBlocks(String n) {
+    return '[nyn] $n blocks';
+  }
+
+  @override
+  String feedTonnes(String n) {
+    return '[nyn] about $n tonnes';
+  }
+
+  @override
+  String feedLeftDays(String stock, int days) {
+    return '[nyn] $stock left · about $days days';
+  }
+
+  @override
+  String feedLowTitle(String feed, String stock) {
+    return '[nyn] $feed: $stock left';
+  }
+
+  @override
+  String feedLowBody(int days) {
+    return '[nyn] About $days days at the current rate.';
+  }
+
+  @override
+  String get unitBags => '[nyn] bags';
+
+  @override
+  String get unitBlocks => '[nyn] blocks';
+
+  @override
+  String get unitKg => '[nyn] kg';
+
+  @override
+  String get unitTonnes => '[nyn] Tonnes';
+
+  @override
+  String get unitBagsLabel => '[nyn] Bags';
+
+  @override
+  String get unitBlocksLabel => '[nyn] Blocks';
+
+  @override
+  String get pricePerBag => '[nyn] Price per bag';
+
+  @override
+  String get pricePerBlock => '[nyn] Price per block';
+
+  @override
+  String get pricePerTonne => '[nyn] Price per tonne';
+
+  @override
+  String feedAmountCaption(String unit, String feed) {
+    return '[nyn] $unit of $feed';
+  }
+
+  @override
+  String get colFeed => '[nyn] Feed';
+
+  @override
+  String get colInStock => '[nyn] In stock';
+
+  @override
+  String get colUsedPerDay => '[nyn] Used / day';
+
+  @override
+  String get colDaysLeft => '[nyn] Days left';
+
+  @override
+  String get supplier => '[nyn] Supplier';
+
+  @override
+  String get savePurchase => '[nyn] Save purchase';
+
+  @override
+  String get saveFeeding => '[nyn] Save feeding';
+
+  @override
+  String feedingSaved(String amount) {
+    return '[nyn] Feeding saved: $amount';
+  }
+
+  @override
+  String purchaseSaved(String amount) {
+    return '[nyn] Purchase saved: $amount';
+  }
+
+  @override
+  String moreThanInStock(String stock) {
+    return '[nyn] Only $stock in stock';
+  }
 }
