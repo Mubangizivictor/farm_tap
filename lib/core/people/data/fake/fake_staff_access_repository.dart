@@ -7,10 +7,15 @@ import 'package:farm_tap/core/people/domain/staff_member.dart';
 /// Sample staff from the mockups. Every PIN is 1234 in the UI phase.
 /// Peter has no card yet (K01 "No card"); blank cards 0207-0215 are in stock.
 class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory {
-  new({this.nfc = true});
+  new({this.nfc = true, this.today});
 
   /// The simulator and web have no NFC; set false to show C05.
   final bool nfc;
+
+  /// Start date for new staff ("since").
+  final DateTime Function()? today;
+  final _pins = <String, String>{};
+  var _nextId = 1;
   final _wrongTries = <String, int>{};
   final List<StaffMember> _staff = [...sample];
   final List<String> _blankCards = [for (var n = 207; n <= 215; n++) n.toString().padLeft(4, '0')];
@@ -73,7 +78,7 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
 
   @override
   Future<Result<PinCheck>> verifyPin(String staffId, String entered) async {
-    if (entered == pin) {
+    if (entered == (_pins[staffId] ?? pin)) {
       _wrongTries.remove(staffId);
       return const Result.success(PinAccepted());
     }
@@ -85,6 +90,21 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
 
   @override
   Future<Result<List<StaffMember>>> staff() async => Result.success(List.unmodifiable(_staff));
+
+  @override
+  Future<Result<StaffMember>> addStaff({required String name, required StaffRole role, required String pin}) async {
+    final s = StaffMember(id: 'staff-new-${_nextId++}', name: name, role: role, since: today?.call());
+    _staff.add(s);
+    _pins[s.id] = pin;
+    return Result.success(s);
+  }
+
+  @override
+  Future<Result<StaffMember>> updateStaff(String staffId, {required String name, required StaffRole role}) async {
+    final i = _staff.indexWhere((s) => s.id == staffId);
+    _staff[i] = _staff[i].copyWith(name: name, role: role);
+    return Result.success(_staff[i]);
+  }
 
   @override
   Future<Result<String?>> nextBlankCard() async => Result.success(_blankCards.firstOrNull);
@@ -99,6 +119,10 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
     _blankCards.remove(card);
     return Result.success(_staff[i]);
   }
+
+  @override
+  Future<Result<bool>> verifyManagerPin(String entered) async =>
+      Result.success(entered == pin && _staff.any((s) => s.role == StaffRole.manager));
 
   @override
   Future<Result<void>> resetPin(String staffId) async {

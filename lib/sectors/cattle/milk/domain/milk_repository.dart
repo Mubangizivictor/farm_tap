@@ -6,10 +6,19 @@ abstract interface class MilkRepository {
   Future<Result<MilkCow?>> cow(String cowId);
 
   /// Saves one cow's milk for the session (after the read-back).
-  Future<Result<void>> recordCow(String cowId, MilkSession session, double litres, {required bool notForSale});
+  Future<Result<void>> recordCow(
+    String cowId,
+    MilkSession session,
+    double litres, {
+    required bool notForSale,
+    required String recordedBy,
+  });
 
   /// F07 quick mode: one total for the whole herd.
-  Future<Result<void>> recordTotal(MilkSession session, double litres);
+  Future<Result<void>> recordTotal(MilkSession session, double litres, {required String recordedBy});
+
+  /// Records saved by [recordedBy] since [from] (K02 "Milk records").
+  Future<Result<int>> recordCount(String recordedBy, {required DateTime from});
 
   Future<Result<List<MilkUseLine>>> use();
   Future<Result<void>> saveUse(List<MilkUseLine> lines);

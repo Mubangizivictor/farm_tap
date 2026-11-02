@@ -2,6 +2,31 @@ import 'package:equatable/equatable.dart';
 
 enum MilkSession { morning, evening }
 
+/// One saved milk entry: a cow's litres (or a quick herd total) for a
+/// session. [recordedBy] is the staff id, or "owner", for the audit trail
+/// and K02 "Milk records".
+class MilkRecord {
+  const new({
+    required this.id,
+    required this.session,
+    required this.litres,
+    required this.at,
+    required this.recordedBy,
+    this.cowId,
+    this.notForSale = false,
+  });
+
+  final String id;
+
+  /// Null for a quick herd total (F07).
+  final String? cowId;
+  final MilkSession session;
+  final double litres;
+  final DateTime at;
+  final String recordedBy;
+  final bool notForSale;
+}
+
 /// A cow as the milk screens see it.
 class MilkCow extends Equatable {
   const new({

@@ -63,7 +63,7 @@ Future<void> configureDependencies(Flavor flavor) async {
       ..registerLazySingleton<AuthRepository>(FakeAuthRepository.new)
       ..registerLazySingleton<FarmMembershipRepository>(() => FakeFarmMembershipRepository(tenants))
       ..registerLazySingleton<OnboardingRepository>(() => FakeOnboardingRepository(getIt<Clock>()))
-      ..registerLazySingleton<FakeStaffAccessRepository>(FakeStaffAccessRepository.new)
+      ..registerLazySingleton<FakeStaffAccessRepository>(() => FakeStaffAccessRepository(today: getIt<Clock>().today))
       ..registerLazySingleton<StaffAccessRepository>(getIt.call<FakeStaffAccessRepository>)
       ..registerLazySingleton<StaffDirectory>(getIt.call<FakeStaffAccessRepository>)
       ..registerLazySingleton<TreatmentRepository>(() => FakeTreatmentRepository(getIt<Clock>()))
@@ -80,7 +80,12 @@ Future<void> configureDependencies(Flavor flavor) async {
       ..registerLazySingleton<CentreRepository>(() => FakeCentreRepository(getIt<Clock>()))
       ..registerLazySingleton<MoneyRepository>(() => FakeMoneyRepository(getIt<Clock>()))
       ..registerLazySingleton<WorkersRepository>(
-        () => FakeWorkersRepository(getIt<Clock>(), getIt<StaffDirectory>(), getIt<MoneyRepository>()),
+        () => FakeWorkersRepository(
+          getIt<Clock>(),
+          getIt<StaffDirectory>(),
+          getIt<MoneyRepository>(),
+          getIt<MilkRepository>(),
+        ),
       )
       ..registerLazySingleton<BreedingRepository>(
         () => FakeBreedingRepository(getIt<Clock>(), getIt<MoneyRepository>()),

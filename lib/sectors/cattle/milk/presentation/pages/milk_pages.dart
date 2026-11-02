@@ -377,6 +377,7 @@ class MilkKeypadPage extends StatefulWidget {
     required this.repo,
     required this.cowId,
     required this.recorderName,
+    required this.recordedBy,
     required this.onDone,
     super.key,
     this.notForSale = false,
@@ -386,6 +387,9 @@ class MilkKeypadPage extends StatefulWidget {
   final MilkRepository repo;
   final String cowId;
   final String recorderName;
+
+  /// Staff id (or "owner") saved on the record for the audit trail.
+  final String recordedBy;
   final bool notForSale;
 
   /// After the save: the next cow to record (null when all are done).
@@ -431,7 +435,7 @@ class _MilkKeypadPageState extends State<MilkKeypadPage> {
       detail: l10n.recordedBy(sessionName(l10n, _session), widget.recorderName),
     );
     if (!ok || !mounted) return;
-    await widget.repo.recordCow(cow.id, _session, litres, notForSale: widget.notForSale);
+    await widget.repo.recordCow(cow.id, _session, litres, notForSale: widget.notForSale, recordedBy: widget.recordedBy);
     final summary = (await widget.repo.session(_session)).data;
     if (!mounted) return;
     final nextCow = summary?.cows.where((c) => !c.recorded && c.treatment == null).firstOrNull;
@@ -525,10 +529,13 @@ class _MilkKeypadPageState extends State<MilkKeypadPage> {
 // ---------------------------------------------------------------- F07
 
 class QuickTotalPage extends StatefulWidget {
-  const new({required this.repo, required this.onSaved, super.key, this.now});
+  const new({required this.repo, required this.onSaved, required this.recordedBy, super.key, this.now});
 
   final MilkRepository repo;
   final VoidCallback onSaved;
+
+  /// Staff id (or "owner") saved on the record.
+  final String recordedBy;
   final DateTime? now;
 
   @override
@@ -551,7 +558,7 @@ class _QuickTotalPageState extends State<QuickTotalPage> {
       detail: l10n.sessionLabel(sessionName(l10n, _session)),
     );
     if (!ok || !mounted) return;
-    await widget.repo.recordTotal(_session, _entry.value);
+    await widget.repo.recordTotal(_session, _entry.value, recordedBy: widget.recordedBy);
     if (!mounted) return;
     FarmTapToast.show(context, message: l10n.totalSaved(f.litresValue(_entry.value)));
     widget.onSaved();

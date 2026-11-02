@@ -4,6 +4,7 @@ import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
 import 'package:farm_tap/core/onboarding/presentation/cubit/onboarding_cubit.dart';
 import 'package:farm_tap/core/onboarding/presentation/widgets/onboarding_step.dart';
+import 'package:farm_tap/core/people/presentation/widgets/staff_form_fields.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/material.dart';
@@ -265,27 +266,6 @@ class _OnboardFirstStaffPageState extends State<OnboardFirstStaffPage> {
     super.dispose();
   }
 
-  Future<void> _choosePin() async {
-    final l10n = AppLocalizations.of(context);
-    final pin = await showAdaptiveSheet<String>(
-      context,
-      builder: (sheet) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SheetTitle(l10n.choosePin, center: true),
-          sheet.space.gapXl,
-          PinPad(
-            onCompleted: (p) async {
-              Navigator.of(sheet).pop(p);
-              return true;
-            },
-          ),
-        ],
-      ),
-    );
-    if (pin != null) setState(() => _pin = pin);
-  }
-
   void _save() {
     final l10n = AppLocalizations.of(context);
     setState(() {
@@ -313,63 +293,17 @@ class _OnboardFirstStaffPageState extends State<OnboardFirstStaffPage> {
         animation: FarmTapAnimations.attendance,
         onSkip: widget.onDone,
         action: FarmTapButton(label: l10n.saveWorker, icon: Symbols.person_add_rounded, onPressed: _save),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            FarmTapTextField(
-              label: l10n.nameLabel,
-              icon: Symbols.person_rounded,
-              controller: _name,
-              error: _nameError,
-              textInputAction: TextInputAction.done,
-              onChanged: (_) => setState(() {}),
-            ),
-            context.space.gapLg,
-            FarmTapSelectField<WorkerRole>(
-              label: l10n.roleLabel,
-              icon: Symbols.badge_rounded,
-              options: const [
-                WorkerRole.herdsman,
-                WorkerRole.clerk,
-                WorkerRole.worker,
-                WorkerRole.manager,
-                WorkerRole.vet,
-              ],
-              labelOf: (r) => workerRoleLabel(l10n, r),
-              value: _role,
-              onChanged: (r) => setState(() => _role = r),
-            ),
-            context.space.gapLg,
-            Text(l10n.choosePin, style: context.text.titleSmall),
-            Semantics(
-              button: true,
-              label: _pin.length == 4 ? l10n.pinChosen : l10n.choosePinHint,
-              excludeSemantics: true,
-              child: InkWell(
-                onTap: _choosePin,
-                borderRadius: context.radii.card,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: context.space.md),
-                  child: Center(
-                    child: PinDots(filled: _pin.length, error: _pinError != null),
-                  ),
-                ),
-              ),
-            ),
-            if (_pinError != null)
-              Text(
-                _pinError!,
-                textAlign: TextAlign.center,
-                style: context.text.bodySmall?.copyWith(color: context.colors.error),
-              ),
-
-            FarmTapBanner(
-              tone: FarmTapTone.info,
-              icon: Symbols.info_rounded,
-              title: l10n.nfcLaterTitle,
-              message: l10n.nfcLaterBody,
-            ),
-          ],
+        child: StaffFormFields<WorkerRole>(
+          name: _name,
+          roles: const [WorkerRole.herdsman, WorkerRole.clerk, WorkerRole.worker, WorkerRole.manager, WorkerRole.vet],
+          role: _role,
+          roleLabel: (r) => workerRoleLabel(l10n, r),
+          onRole: (r) => setState(() => _role = r),
+          onChanged: () => setState(() {}),
+          pin: _pin,
+          onPin: (p) => setState(() => _pin = p),
+          nameError: _nameError,
+          pinError: _pinError,
         ),
       ),
     );

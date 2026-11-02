@@ -5329,6 +5329,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No one has card {number}'**
   String noOneHasCard(String number);
+
+  /// No description provided for @managerPinNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Manager PIN needed'**
+  String get managerPinNeeded;
+
+  /// No description provided for @typedCardNeedsManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {number} was typed, not tapped. A manager must confirm clocking in or out.'**
+  String typedCardNeedsManager(String number);
+
+  /// No description provided for @wagesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Wages'**
+  String get wagesShort;
+
+  /// No description provided for @editWorker.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit worker'**
+  String get editWorker;
+
+  /// No description provided for @workerSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} saved'**
+  String workerSaved(String name);
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get saveChanges;
 }
 
 class _AppLocalizationsDelegate

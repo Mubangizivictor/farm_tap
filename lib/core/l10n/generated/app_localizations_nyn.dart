@@ -3063,4 +3063,26 @@ class AppLocalizationsNyn extends AppLocalizations {
   String noOneHasCard(String number) {
     return '[nyn] No one has card $number';
   }
+
+  @override
+  String get managerPinNeeded => '[nyn] Manager PIN needed';
+
+  @override
+  String typedCardNeedsManager(String number) {
+    return '[nyn] Card $number was typed, not tapped. A manager must confirm clocking in or out.';
+  }
+
+  @override
+  String get wagesShort => '[nyn] Wages';
+
+  @override
+  String get editWorker => '[nyn] Edit worker';
+
+  @override
+  String workerSaved(String name) {
+    return '[nyn] $name saved';
+  }
+
+  @override
+  String get saveChanges => '[nyn] Save changes';
 }

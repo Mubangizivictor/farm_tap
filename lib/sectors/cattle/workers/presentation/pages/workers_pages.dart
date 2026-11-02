@@ -8,6 +8,8 @@ import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
+import 'package:farm_tap/core/people/presentation/widgets/manager_pin_dialog.dart';
+import 'package:farm_tap/core/people/presentation/widgets/staff_form_fields.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/clock.dart';
@@ -99,9 +101,12 @@ enum WorkersTarget { attendance, tasks, wages }
 enum _Filter { all, inNow, notIn }
 
 class WorkersPage extends StatefulWidget {
-  const new({required this.repo, required this.onStaff, required this.onOpen, super.key});
+  const new({required this.repo, required this.onStaff, required this.onOpen, required this.onAdd, super.key});
 
   final WorkersRepository repo;
+
+  /// Pushes the add-worker form; completes when it closes.
+  final Future<void> Function() onAdd;
   final ValueChanged<String> onStaff;
   final ValueChanged<WorkersTarget> onOpen;
 
@@ -110,7 +115,7 @@ class WorkersPage extends StatefulWidget {
 }
 
 class _WorkersPageState extends State<WorkersPage> {
-  late final Future<(List<StaffToday>, Map<String, int>)> _load = _fetch();
+  late Future<(List<StaffToday>, Map<String, int>)> _load = _fetch();
   _Filter _filter = _Filter.all;
 
   Future<(List<StaffToday>, Map<String, int>)> _fetch() async {
@@ -137,27 +142,17 @@ class _WorkersPageState extends State<WorkersPage> {
         return AdaptiveScaffold(
           title: l10n.workers,
           subtitle: l10n.peopleCount(all.length),
-          actions: [
-            BarAction(
-              icon: Symbols.schedule_rounded,
-              tooltip: l10n.attendance,
-              onPressed: () => widget.onOpen(WorkersTarget.attendance),
-            ),
-            BarAction(
-              icon: Symbols.checklist_rounded,
-              tooltip: l10n.tasks,
-              onPressed: () => widget.onOpen(WorkersTarget.tasks),
-            ),
-            BarAction(
-              icon: Symbols.payments_rounded,
-              tooltip: l10n.wagesAdvances,
-              onPressed: () => widget.onOpen(WorkersTarget.wages),
-            ),
-          ],
           floatingActionButton: FarmTapFab(
             label: l10n.addWorker,
             icon: Symbols.person_add_rounded,
-            onPressed: () => _comingSoon(context),
+            onPressed: () async {
+              await widget.onAdd();
+              if (mounted) {
+                setState(() {
+                  _load = _fetch();
+                });
+              }
+            },
           ),
           body: data == null
               ? const SizedBox.shrink()
@@ -172,6 +167,20 @@ class _WorkersPageState extends State<WorkersPage> {
                       ],
                       selected: _filter,
                       onSelected: (v) => setState(() => _filter = v),
+                    ),
+                    context.space.gapMd,
+                    // Entry to K04-K06 (not in the mockups; see PROGRESS gaps).
+                    Wrap(
+                      spacing: context.space.sm,
+                      runSpacing: context.space.sm,
+                      children: [
+                        for (final (t, icon, label) in [
+                          (WorkersTarget.attendance, Symbols.schedule_rounded, l10n.attendance),
+                          (WorkersTarget.tasks, Symbols.checklist_rounded, l10n.tasks),
+                          (WorkersTarget.wages, Symbols.payments_rounded, l10n.wagesShort),
+                        ])
+                          FarmTapChip(label: label, icon: icon, selected: false, onTap: () => widget.onOpen(t)),
+                      ],
                     ),
                     context.space.gapLg,
                     RecordCollection<StaffToday>(
@@ -240,12 +249,16 @@ class StaffDetailPage extends StatefulWidget {
     required this.directory,
     required this.staffId,
     required this.onAssignCard,
+    required this.onEdit,
     super.key,
   });
 
   final WorkersRepository repo;
   final StaffDirectory directory;
   final String staffId;
+
+  /// Pushes the edit form; completes when it closes.
+  final Future<void> Function() onEdit;
 
   /// Opens K03; completes when it closes.
   final Future<void> Function() onAssignCard;
@@ -255,15 +268,16 @@ class StaffDetailPage extends StatefulWidget {
 }
 
 class _StaffDetailPageState extends State<StaffDetailPage> {
-  late Future<(StaffMember?, int, WageLine?)> _load = _fetch();
+  late Future<(StaffMember?, int, WageLine?, int)> _load = _fetch();
 
-  Future<(StaffMember?, int, WageLine?)> _fetch() async {
+  Future<(StaffMember?, int, WageLine?, int)> _fetch() async {
     final staff = ((await widget.directory.staff()).data ?? const <StaffMember>[])
         .where((s) => s.id == widget.staffId)
         .firstOrNull;
     final days = (await widget.repo.daysThisMonth(widget.staffId)).data ?? 0;
     final wage = (await widget.repo.wages()).data?.lines.where((l) => l.staff.id == widget.staffId).firstOrNull;
-    return (staff, days, wage);
+    final milk = (await widget.repo.milkRecordsThisMonth(widget.staffId)).data ?? 0;
+    return (staff, days, wage, milk);
   }
 
   Future<void> _resetPin(StaffMember s) async {
@@ -287,11 +301,20 @@ class _StaffDetailPageState extends State<StaffDetailPage> {
     final f = _fmt(context);
     return AdaptiveScaffold(
       title: l10n.workerTitle,
-      actions: [BarAction(icon: Symbols.edit_rounded, tooltip: l10n.edit, onPressed: () => _comingSoon(context))],
-      body: FutureBuilder<(StaffMember?, int, WageLine?)>(
+      actions: [
+        BarAction(
+          icon: Symbols.edit_rounded,
+          tooltip: l10n.editWorker,
+          onPressed: () async {
+            await widget.onEdit();
+            if (mounted) _reload();
+          },
+        ),
+      ],
+      body: FutureBuilder<(StaffMember?, int, WageLine?, int)>(
         future: _load,
         builder: (context, snapshot) {
-          final (s, days, wage) = snapshot.data ?? (null, 0, null);
+          final (s, days, wage, milkRecords) = snapshot.data ?? (null, 0, null, 0);
           if (s == null) return const SizedBox.shrink();
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -341,7 +364,7 @@ class _StaffDetailPageState extends State<StaffDetailPage> {
                   MetricCard(
                     icon: Symbols.water_drop_rounded,
                     label: l10n.milkRecords,
-                    value: '—',
+                    value: f.count(milkRecords),
                     tone: FarmTapTone.info,
                   ),
                   if (wage != null)
@@ -522,9 +545,12 @@ class _AssignCardPageState extends State<AssignCardPage> {
 // ---------------------------------------------------------------- K04
 
 class AttendancePage extends StatefulWidget {
-  const new({required this.repo, super.key, this.now, this.showSimulate = kDebugMode});
+  const new({required this.repo, required this.directory, super.key, this.now, this.showSimulate = kDebugMode});
 
   final WorkersRepository repo;
+
+  /// Checks the manager PIN for typed card numbers (DAIRY-WRK-01).
+  final StaffDirectory directory;
   final DateTime? now;
   final bool showSimulate;
 
@@ -560,9 +586,17 @@ class _AttendancePageState extends State<AttendancePage> {
   }
 
   /// No NFC on this phone (simulator): type the number printed on the card.
+  /// A typed number could be anyone's, so a manager confirms it (P04);
+  /// a card tap needs no PIN.
   Future<void> _tapCard() async {
     final card = await showTypeCardNumber(context);
-    if (card != null && mounted) await _clock(card);
+    if (card == null || !mounted) return;
+    final ok = await showManagerPin(
+      context,
+      message: AppLocalizations.of(context).typedCardNeedsManager(card),
+      verify: (pin) async => (await widget.directory.verifyManagerPin(pin)).data ?? false,
+    );
+    if (ok && mounted) await _clock(card);
   }
 
   @override
@@ -587,6 +621,7 @@ class _AttendancePageState extends State<AttendancePage> {
                 value: l10n.ofInCount(shift.where((t) => t.isIn).length, shift.length),
                 sub: l10n.tapToClock,
                 animation: FarmTapAnimations.attendance,
+                animationLeading: true,
               ),
               context.space.gapLg,
               FarmTapButton(
@@ -986,6 +1021,131 @@ class _AdvanceSheetState extends State<_AdvanceSheet> {
             onPressed: _who == null || _value <= 0 ? null : () => Navigator.of(context).pop((_who!, _value)),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------- Add / edit worker
+
+/// K01 "Add worker" and K02 edit: the B09 first-worker form (no Skip). A new
+/// worker gets a PIN now and a card later (K03).
+class StaffFormPage extends StatefulWidget {
+  const new({required this.directory, required this.onSaved, super.key, this.staffId});
+
+  final StaffDirectory directory;
+
+  /// Null adds a worker; otherwise edits this one.
+  final String? staffId;
+  final ValueChanged<StaffMember> onSaved;
+
+  @override
+  State<StaffFormPage> createState() => _StaffFormPageState();
+}
+
+class _StaffFormPageState extends State<StaffFormPage> {
+  static const List<StaffRole> _roles = [
+    StaffRole.herdsman,
+    StaffRole.clerk,
+    StaffRole.worker,
+    StaffRole.manager,
+    StaffRole.vet,
+  ];
+
+  final _name = TextEditingController();
+  StaffRole _role = StaffRole.herdsman;
+  String _pin = '';
+  String? _nameError;
+  String? _pinError;
+  StaffMember? _editing;
+  bool _edited = false;
+
+  bool get _isEdit => widget.staffId != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isEdit) unawaited(_loadExisting());
+  }
+
+  Future<void> _loadExisting() async {
+    final s = ((await widget.directory.staff()).data ?? const <StaffMember>[])
+        .where((m) => m.id == widget.staffId)
+        .firstOrNull;
+    if (s == null || !mounted) return;
+    setState(() {
+      _editing = s;
+      _name.text = s.name;
+      _role = s.role;
+    });
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
+    setState(() {
+      _nameError = _name.text.trim().isEmpty ? l10n.nameRequired : null;
+      _pinError = _isEdit || _pin.length == 4 ? null : l10n.pinRequired;
+    });
+    if (_nameError != null || _pinError != null) return;
+    final saved = _isEdit
+        ? (await widget.directory.updateStaff(widget.staffId!, name: _name.text.trim(), role: _role)).data
+        : (await widget.directory.addStaff(name: _name.text.trim(), role: _role, pin: _pin)).data;
+    if (saved == null || !mounted) return;
+    setState(() => _edited = false);
+    FarmTapToast.show(context, message: l10n.workerSaved(saved.name));
+    widget.onSaved(saved);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (_isEdit && _editing == null) return AdaptiveScaffold(title: l10n.editWorker, body: const SizedBox.shrink());
+    return DiscardGuard(
+      dirty: _edited,
+      child: AdaptiveScaffold(
+        title: _isEdit ? l10n.editWorker : l10n.addWorker,
+        showNavigation: false,
+        body: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: context.sizes.keypadMaxWidth),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                StaffFormFields<StaffRole>(
+                  name: _name,
+                  roles: _roles,
+                  role: _role,
+                  roleLabel: (r) => staffRoleLabel(l10n, r),
+                  onRole: (r) => setState(() {
+                    _role = r;
+                    _edited = true;
+                  }),
+                  onChanged: () => setState(() => _edited = true),
+                  pin: _isEdit ? null : _pin,
+                  onPin: (p) => setState(() {
+                    _pin = p;
+                    _edited = true;
+                  }),
+                  nameError: _nameError,
+                  pinError: _pinError,
+                  showCardNote: !_isEdit,
+                ),
+                context.space.gapXl,
+                FarmTapButton(
+                  label: _isEdit ? l10n.saveChanges : l10n.saveWorker,
+                  icon: _isEdit ? Symbols.check_rounded : Symbols.person_add_rounded,
+                  onPressed: _save,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

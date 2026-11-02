@@ -6,6 +6,7 @@ import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/utils/clock.dart';
+import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_models.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 
@@ -13,7 +14,7 @@ import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 /// Tom 6:02, Amos 5:45, Joy 6:10 and Rita 6:30 are in (4 of 6). Advances
 /// this month: Amos 120,000, Peter 80,000, Rita 40,000 (wage expenses).
 class FakeWorkersRepository implements WorkersRepository {
-  new(this.clock, this.directory, this.money) {
+  new(this.clock, this.directory, this.money, this.milk) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
     DateTime at(int h, int m, [int daysAgo = 0]) =>
@@ -95,6 +96,9 @@ class FakeWorkersRepository implements WorkersRepository {
   final Clock clock;
   final StaffDirectory directory;
   final MoneyRepository money;
+
+  /// Milk records carry recordedBy (K02 count).
+  final MilkRepository milk;
   final List<AttendanceRecord> _attendance = [];
   final List<FarmTask> _tasks = [];
   final List<StaffPayment> _payments = [];
@@ -128,6 +132,10 @@ class FakeWorkersRepository implements WorkersRepository {
     }
     return Result.success(StaffToday(staff: s, record: _todayRecord(s.id)));
   }
+
+  @override
+  Future<Result<int>> milkRecordsThisMonth(String staffId) =>
+      milk.recordCount(staffId, from: DateTime(_today.year, _today.month));
 
   @override
   Future<Result<int>> daysThisMonth(String staffId) async {

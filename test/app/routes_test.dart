@@ -230,6 +230,8 @@ void main() {
       ('/workers/tasks', 'Tasks'),
       ('/workers/wages', 'Wages & advances'),
       ('/workers/staff-ta', 'Balance owed'),
+      ('/workers/add', 'Save worker'),
+      ('/workers/staff-ta/edit', 'Save changes'),
     ]) {
       testWidgets(route, (tester) async {
         final h = await _Harness.pump(tester, start: AppRoutes.workers, signedIn: true, farm: true);

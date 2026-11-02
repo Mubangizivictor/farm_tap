@@ -30,7 +30,14 @@ void main() {
   }
 
   Widget keypad() => inShell(
-    MilkKeypadPage(repo: repo(), cowId: 'animal-FT-014', recorderName: 'Amos', onDone: (_, _) {}, now: now),
+    MilkKeypadPage(
+      repo: repo(),
+      cowId: 'animal-FT-014',
+      recorderName: 'Amos',
+      recordedBy: 'staff-ta',
+      onDone: (_, _) {},
+      now: now,
+    ),
     current: '/milk',
     parent: '/milk/record',
   );
@@ -87,7 +94,7 @@ void main() {
   screenGoldens(
     'F07_milk_herd_total',
     (_) => inShell(
-      QuickTotalPage(repo: repo(), onSaved: () {}, now: DateTime(2026, 11, 7, 18)),
+      QuickTotalPage(repo: repo(), onSaved: () {}, recordedBy: 'staff-ta', now: DateTime(2026, 11, 7, 18)),
       current: '/milk',
       parent: '/milk',
     ),

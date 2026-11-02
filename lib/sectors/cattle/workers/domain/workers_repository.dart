@@ -11,6 +11,9 @@ abstract interface class WorkersRepository {
   /// one has this card.
   Future<Result<StaffToday?>> clockByCard(String cardNumber);
 
+  /// K02: milk records this worker saved this month.
+  Future<Result<int>> milkRecordsThisMonth(String staffId);
+
   /// K02: days with a clock-in this month.
   Future<Result<int>> daysThisMonth(String staffId);
 

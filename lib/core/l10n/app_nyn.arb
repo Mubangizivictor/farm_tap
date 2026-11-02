@@ -870,5 +870,11 @@
   "colRole": "[nyn] Role",
   "colThisMonth": "[nyn] This month",
   "daysCount": "[nyn] {n} days",
-  "noOneHasCard": "[nyn] No one has card {number}"
+  "noOneHasCard": "[nyn] No one has card {number}",
+  "managerPinNeeded": "[nyn] Manager PIN needed",
+  "typedCardNeedsManager": "[nyn] Card {number} was typed, not tapped. A manager must confirm clocking in or out.",
+  "wagesShort": "[nyn] Wages",
+  "editWorker": "[nyn] Edit worker",
+  "workerSaved": "[nyn] {name} saved",
+  "saveChanges": "[nyn] Save changes"
 }

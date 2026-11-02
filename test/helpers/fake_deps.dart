@@ -46,7 +46,7 @@ Future<AppDependencies> fakeDependencies({
   final breeding = FakeBreedingRepository(c, money);
   final feed = FakeFeedRepository(c, milk, money);
   final staff = FakeStaffAccessRepository();
-  final workers = FakeWorkersRepository(c, staff, money);
+  final workers = FakeWorkersRepository(c, staff, money, milk);
   return AppDependencies(
     session: session,
     places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
@@ -84,7 +84,7 @@ FakeHomeRepository fakeHome(Clock clock, FakeTreatmentRepository treatments) {
     treatments,
     breeding: FakeBreedingRepository(clock, money),
     feed: FakeFeedRepository(clock, FakeMilkRepository(clock, treatments), money),
-    workers: FakeWorkersRepository(clock, FakeStaffAccessRepository(), money),
+    workers: FakeWorkersRepository(clock, FakeStaffAccessRepository(), money, FakeMilkRepository(clock, treatments)),
   );
 }
 

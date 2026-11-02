@@ -160,6 +160,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
   sectionRoots[AppRoutes.workers] = (context, state) => WorkersPage(
     repo: deps.workers,
     onStaff: (id) => context.push(AppRoutes.worker(id)),
+    onAdd: () => context.push(AppRoutes.workersAdd),
     onOpen: (t) => context.push(switch (t) {
       WorkersTarget.attendance => AppRoutes.workersAttendance,
       WorkersTarget.tasks => AppRoutes.workersTasks,
@@ -182,6 +183,9 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       HealthTarget.withdrawal => AppRoutes.healthWithdrawal,
     }),
   );
+
+  /// Who saves a record: the unlocked staff member, else the owner.
+  String recorderId() => session.staff?.id ?? 'owner';
   String recorder() => session.staff?.greetingName ?? (session.auth.currentUser?.name.split(' ').first ?? '');
   final sectionChildren = <String, List<RouteBase>>{
     AppRoutes.milk: [
@@ -202,6 +206,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
               cowId: state.pathParameters['cowId']!,
               notForSale: state.uri.queryParameters['nfs'] == '1',
               recorderName: recorder(),
+              recordedBy: recorderId(),
               // After a save the stack resets to F02, with the next cow on top.
               onDone: (next, nextCow) => context.go(
                 next == MilkSaveNext.nextCow && nextCow != null ? AppRoutes.milkCow(nextCow.id) : AppRoutes.milk,
@@ -213,7 +218,8 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         'herd-total',
         parent: AppRoutes.milk,
-        builder: (context, state) => QuickTotalPage(repo: deps.milk, onSaved: () => popOrGo(context, AppRoutes.milk)),
+        builder: (context, state) =>
+            QuickTotalPage(repo: deps.milk, recordedBy: recorderId(), onSaved: () => popOrGo(context, AppRoutes.milk)),
       ),
       page(
         'use',
@@ -351,7 +357,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         'attendance',
         parent: AppRoutes.workers,
-        builder: (context, state) => AttendancePage(repo: deps.workers),
+        builder: (context, state) => AttendancePage(repo: deps.workers, directory: deps.staffDirectory),
       ),
       page(
         'tasks',
@@ -364,6 +370,12 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) => WagesPage(repo: deps.workers),
       ),
       page(
+        'add',
+        parent: AppRoutes.workers,
+        builder: (context, state) =>
+            StaffFormPage(directory: deps.staffDirectory, onSaved: (_) => popOrGo(context, AppRoutes.workers)),
+      ),
+      page(
         ':staffId',
         parent: AppRoutes.workers,
         builder: (context, state) => StaffDetailPage(
@@ -371,8 +383,18 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           directory: deps.staffDirectory,
           staffId: state.pathParameters['staffId']!,
           onAssignCard: () => context.push(AppRoutes.workerCard(state.pathParameters['staffId']!)),
+          onEdit: () => context.push(AppRoutes.workerEdit(state.pathParameters['staffId']!)),
         ),
         routes: [
+          page(
+            'edit',
+            parent: AppRoutes.workers,
+            builder: (context, state) => StaffFormPage(
+              directory: deps.staffDirectory,
+              staffId: state.pathParameters['staffId'],
+              onSaved: (_) => popOrGo(context, AppRoutes.worker(state.pathParameters['staffId']!)),
+            ),
+          ),
           page(
             'card',
             // Back pops to K02; a deep link falls back to the list.

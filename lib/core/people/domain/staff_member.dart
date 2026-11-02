@@ -24,6 +24,15 @@ class StaffMember extends Equatable {
 
   bool get hasCard => cardNumber != null;
 
+  StaffMember copyWith({String? name, StaffRole? role}) => StaffMember(
+    id: id,
+    name: name ?? this.name,
+    role: role ?? this.role,
+    cardNumber: cardNumber,
+    shortName: name == null ? shortName : null,
+    since: since,
+  );
+
   StaffMember withCard(String? card) =>
       StaffMember(id: id, name: name, role: role, cardNumber: card, shortName: shortName, since: since);
 

@@ -108,6 +108,7 @@ class HeroCard extends StatelessWidget {
     this.sub,
     this.tone = FarmTapTone.primary,
     this.animation,
+    this.animationLeading = false,
     this.trailing,
     this.onTap,
   });
@@ -118,6 +119,10 @@ class HeroCard extends StatelessWidget {
   final String? sub;
   final FarmTapTone tone;
   final FarmTapAnimation? animation;
+
+  /// Illustration on the left with a smaller headline value and a body-size
+  /// sub line (K04 "4 of 5 in / Tap your card to clock in or out").
+  final bool animationLeading;
 
   /// Shown under the sub line (e.g. a progress bar or button).
   final Widget? trailing;
@@ -137,13 +142,19 @@ class HeroCard extends StatelessWidget {
           padding: context.space.card,
           child: Row(
             children: [
+              if (animation != null && animationLeading) ...[
+                FarmTapAnimationView(animation: animation!, size: context.sizes.heroAnimationWidth),
+                context.space.gapLg,
+              ],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(label, style: context.textStyles.metricLabel.copyWith(color: on)),
-                    context.space.gapXs,
+                    if (label.isNotEmpty) ...[
+                      Text(label, style: context.textStyles.metricLabel.copyWith(color: on)),
+                      context.space.gapXs,
+                    ],
                     // One line: long money values scale down instead of wrapping.
                     FittedBox(
                       fit: BoxFit.scaleDown,
@@ -151,7 +162,9 @@ class HeroCard extends StatelessWidget {
                       child: Text.rich(
                         TextSpan(
                           text: value,
-                          style: context.textStyles.hero.copyWith(color: on),
+                          style: (animationLeading ? context.text.headlineMedium! : context.textStyles.hero).copyWith(
+                            color: on,
+                          ),
                           children: [
                             if (unit != null)
                               TextSpan(
@@ -164,13 +177,18 @@ class HeroCard extends StatelessWidget {
                     ),
                     if (sub != null) ...[
                       context.space.gapXs,
-                      Text(sub!, style: context.text.bodySmall?.copyWith(color: on)),
+                      Text(
+                        sub!,
+                        style: (animationLeading ? context.text.bodyLarge : context.text.bodySmall)?.copyWith(
+                          color: on,
+                        ),
+                      ),
                     ],
                     if (trailing != null) ...[context.space.gapMd, trailing!],
                   ],
                 ),
               ),
-              if (animation != null)
+              if (animation != null && !animationLeading)
                 FarmTapAnimationView(animation: animation!, size: context.sizes.heroAnimationWidth),
             ],
           ),

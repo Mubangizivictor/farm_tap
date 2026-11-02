@@ -79,11 +79,41 @@ class FakeMilkRepository implements MilkRepository {
         lastLitres: 6,
       ),
     ];
+    _seedRecords(today);
   }
 
   final Clock clock;
   final TreatmentRepository treatments;
   late List<MilkCow> _cows;
+  final List<MilkRecord> _records = [];
+  var _nextRecord = 1;
+
+  /// Herdsman records the morning milking, the milk clerk the evening.
+  static const _morningBy = 'staff-ta';
+  static const _eveningBy = 'staff-aj';
+  static const _milkingCows = 41;
+
+  /// Earlier this month every milking cow was recorded at both sessions;
+  /// this morning 34 so far (the 31 others plus the 3 sample cows).
+  void _seedRecords(DateTime today) {
+    void add(DateTime at, MilkSession s, String by, {String? cowId, double litres = 7}) => _records.add(
+      MilkRecord(id: 'milk-${_nextRecord++}', cowId: cowId, session: s, litres: litres, at: at, recordedBy: by),
+    );
+    for (var d = today.day - 1; d >= 1; d--) {
+      final day = today.subtract(Duration(days: d));
+      for (var i = 0; i < _milkingCows; i++) {
+        add(day.add(const Duration(hours: 6)), MilkSession.morning, _morningBy, cowId: 'cow-$i');
+        add(day.add(const Duration(hours: 17)), MilkSession.evening, _eveningBy, cowId: 'cow-$i');
+      }
+    }
+    for (var i = 0; i < _otherRecorded; i++) {
+      add(today.add(const Duration(hours: 6)), MilkSession.morning, _morningBy, cowId: 'cow-$i');
+    }
+    for (final c in _cows.where((c) => c.recordedAt != null)) {
+      add(c.recordedAt!, MilkSession.morning, _morningBy, cowId: c.id, litres: c.recordedLitres!);
+    }
+  }
+
   // The other 34 of the 41 milking cows (31 already recorded this morning).
   static const _otherRecorded = 31;
   static const _otherCows = 34;
@@ -122,7 +152,24 @@ class FakeMilkRepository implements MilkRepository {
   }
 
   @override
-  Future<Result<void>> recordCow(String cowId, MilkSession session, double litres, {required bool notForSale}) async {
+  Future<Result<void>> recordCow(
+    String cowId,
+    MilkSession session,
+    double litres, {
+    required bool notForSale,
+    required String recordedBy,
+  }) async {
+    _records.add(
+      MilkRecord(
+        id: 'milk-${_nextRecord++}',
+        cowId: cowId,
+        session: session,
+        litres: litres,
+        at: clock.now(),
+        recordedBy: recordedBy,
+        notForSale: notForSale,
+      ),
+    );
     _cows = [
       for (final c in _cows)
         if (c.id == cowId) c.copyWith(recordedLitres: litres, recordedAt: clock.now()) else c,
@@ -131,7 +178,22 @@ class FakeMilkRepository implements MilkRepository {
   }
 
   @override
-  Future<Result<void>> recordTotal(MilkSession session, double litres) async => const Result.success(null);
+  Future<Result<void>> recordTotal(MilkSession session, double litres, {required String recordedBy}) async {
+    _records.add(
+      MilkRecord(
+        id: 'milk-${_nextRecord++}',
+        session: session,
+        litres: litres,
+        at: clock.now(),
+        recordedBy: recordedBy,
+      ),
+    );
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<int>> recordCount(String recordedBy, {required DateTime from}) async =>
+      Result.success(_records.where((r) => r.recordedBy == recordedBy && !r.at.isBefore(from)).length);
 
   @override
   Future<Result<List<MilkUseLine>>> use() async {

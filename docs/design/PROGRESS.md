@@ -80,12 +80,12 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | J01 | J01_breeding_calendar | Breeding | 95.7 | 96.2 | 96.2 | 96.5 | 97.1 | 97.2 | 95.5 | 96.0 | min 95.5 | ✓ | ✓ | ✓ | ✓ | done. Pregnant/calving/check counts derived from breeding records (herd pregnant count and home calving alert read the same records). To-do lists 3 items (2 checks + Rwemera serve): data has 2 checks due as the metric says. Kasheshe "Served 12 Sep · check from 7 Nov" (mockup 2 Oct/2 Nov conflicts with J02 56-day rule). |
 | J02 | J02_record_service_sheet | Breeding | 87.1 | 89.2 | 89.5 | 93.0 | 89.4 | 94.0 | 87.0 | 89.1 | min 87.0 | ✓ | ✓ | ✓ | ✓ | done. Rules from J02: check +56 d (2 Jan), calving +280 d (14 Aug 2027). Cost read-back; expense recorded in money repository (breeding). Mockup backdrop shows a heat banner; J01 keeps its own mockup. All mockup fields present (Heat seen/Served/AI segmented control, semen/straw, technician, date, cost, check-reminder info box); the sheet is only shorter, so it sits lower on screen, which is the score gap - accepted. |
 | J03 | J03_pregnancy_confirmed | Breeding | 92.5 | 93.6 | 93.2 | 96.0 | 91.3 | 95.7 | 92.3 | 93.6 | min 91.3 | ✓ | ✓ | ✓ | ✓ | done. Data wins: the check due is Kasheshe (calving 19 June, dry off 20 Apr), not Kyasiimire (calves in 6 days). Dry off = 60 d before calving (mockup 15 Sep = 59 d). |
-| K01 | K01_staff_list | Workers | 93.6 | 93.8 | 96.6 | 96.7 | 96.8 | 96.9 | 93.5 | 93.7 | min 93.5 | ✓ | ✓ | ✓ | ✓ | done. In/Not in from attendance; vet visits (not on shift). Attendance/Tasks/Wages icons in the bar (no entry point in any mockup; see Gaps). |
-| K02 | K02_staff_detail | Workers | 96.2 | 96.3 | 96.9 | 97.0 | 97.7 | 97.7 | 96.2 | 96.3 | min 96.2 | ✓ | ✓ | ✓ | ✓ | done. Days this month and balance owed from records. Milk records shows a dash (see Gaps). |
-| K03 | K03_assign_card | Workers | 95.1 | 93.9 | 97.0 | 96.0 | 97.6 | 96.7 | 95.1 | 93.9 | min 93.9 | ✓ | ✓ | ✓ | ✓ | done. Next blank printed card (0207); NFC, debug Simulate tap, and Type card number (decision 0006) - full flow device-checked without NFC. |
-| K04 | K04_attendance | Workers | 92.0 | 92.7 | 93.2 | 94.2 | 95.9 | 96.2 | 92.0 | 92.7 | min 92.0 | ✓ | ✓ | ✓ | ✓ | done. Clock in/out by card or typed number; 4 of 5 on shift. |
+| K01 | K01_staff_list | Workers | 93.9 | 93.9 | 96.0 | 96.1 | 96.3 | 96.4 | 93.8 | 93.8 | min 93.8 | ✓ | ✓ | ✓ | ✓ | done. In/Not in from attendance; vet visits. Attendance/Tasks/Wages chips under the filters (entry not in mockup). Add worker = shared B09 form. |
+| K02 | K02_staff_detail | Workers | 96.2 | 96.3 | 96.9 | 97.0 | 97.7 | 97.7 | 96.2 | 96.3 | min 96.2 | ✓ | ✓ | ✓ | ✓ | done. Days, milk records (recordedBy) and balance owed from records. Edit pushes the shared worker form. |
+| K03 | K03_assign_card | Workers | 95.1 | 93.9 | 97.0 | 96.0 | 97.6 | 96.7 | 95.1 | 93.9 | min 93.9 | ✓ | ✓ | ✓ | ✓ | done. Next blank printed card (0207); NFC, debug Simulate tap, and Type card number (decision 0006). |
+| K04 | K04_attendance | Workers | 92.5 | 93.2 | 93.3 | 94.3 | 96.0 | 96.3 | 92.5 | 93.2 | min 92.5 | ✓ | ✓ | ✓ | ✓ | done. Illustration-left hero (HeroCard.animationLeading). Typed card needs manager PIN (DAIRY-WRK-01); tap does not. |
 | K05 | K05_tasks | Workers | 94.8 | 95.1 | 97.4 | 97.5 | 97.6 | 97.6 | 94.8 | 95.1 | min 94.8 | ✓ | ✓ | ✓ | ✓ | done. Today / This week / Done from task records; Home worker tasks read the same records. |
-| K06 | K06_wages | Workers | 92.5 | 92.5 | 96.4 | 96.5 | 96.6 | 96.6 | 92.5 | 92.5 | min 92.5 | ✓ | ✓ | ✓ | ✓ | done. Totals summed from wages and advance/payment records; pay and advance have read-back and record wage expenses in core/money. |
+| K06 | K06_wages | Workers | 92.5 | 92.5 | 96.4 | 96.5 | 96.6 | 96.6 | 92.5 | 92.5 | min 92.5 | ✓ | ✓ | ✓ | ✓ | done. Totals summed from wages and advance/payment records; read-back; wage expenses in core/money. |
 | L01 | L01_money_overview | Money | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | L02 | L02_add_expense | Money | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | L03 | L03_reports | Money | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
@@ -195,13 +195,14 @@ FarmTapFab, FarmTapPlatform. Still to build with their screens: QR labels (E10).
 
 | Screen | Mockup text | Shown (from data) | Why |
 |---|---|---|---|
+| K04 typed card | (not shown) | Manager PIN (P04 dialog) before clock in/out | DAIRY-WRK-01; a card tap needs none. |
 | K04 / Home D01 | "4 of 6 in" (K04), "5/6" (D01) | "4 of 5 in", "4/5" | One rule from K01: 5 staff on shifts, the vet visits ("Visits Tue"); 4 clocked in today. |
 | K01 phone | Vet row trailing (none) | no In/Out; table "Visits" | Vet has no shift; next visit day is not modelled yet. |
-| K02 | "Days this month 24" | 7 (Amos) | It is 7 November; counted from clock-in records. |
-| K02 | "Card 0201" (Amos) | "Card 0142" | Amos unlocks with 0142 in C01-C04 (same staff records). |
-| K02 | "Milk records 312" | "—" | Milk records do not store who recorded them yet (see Gaps). |
-| K06 | "Wages this month UGX 1.62M" | "UGX 1.52M" | Sum of the five wages listed on the same screen. |
-| K05 | "Done 9:12" | "Done 6:30" | Sample day is 8:41 am (6:52 in goldens); a task cannot be done in the future. |
+| K02 | K02_staff_detail | Workers | 96.2 | 96.3 | 96.9 | 97.0 | 97.7 | 97.7 | 96.2 | 96.3 | min 96.2 | ✓ | ✓ | ✓ | ✓ | done. Days, milk records (recordedBy) and balance owed from records. Edit pushes the shared worker form. |
+| K02 | K02_staff_detail | Workers | 96.2 | 96.3 | 96.9 | 97.0 | 97.7 | 97.7 | 96.2 | 96.3 | min 96.2 | ✓ | ✓ | ✓ | ✓ | done. Days, milk records (recordedBy) and balance owed from records. Edit pushes the shared worker form. |
+| K02 | K02_staff_detail | Workers | 96.2 | 96.3 | 96.9 | 97.0 | 97.7 | 97.7 | 96.2 | 96.3 | min 96.2 | ✓ | ✓ | ✓ | ✓ | done. Days, milk records (recordedBy) and balance owed from records. Edit pushes the shared worker form. |
+| K06 | K06_wages | Workers | 92.5 | 92.5 | 96.4 | 96.5 | 96.6 | 96.6 | 92.5 | 92.5 | min 92.5 | ✓ | ✓ | ✓ | ✓ | done. Totals summed from wages and advance/payment records; read-back; wage expenses in core/money. |
+| K05 | K05_tasks | Workers | 94.8 | 95.1 | 97.4 | 97.5 | 97.6 | 97.6 | 94.8 | 95.1 | min 94.8 | ✓ | ✓ | ✓ | ✓ | done. Today / This week / Done from task records; Home worker tasks read the same records. |
 | D02 worker home | 2 tasks (heifers, clean milking area) | 1 task (heifers) | K05 assigns "Clean milking area" to Rita, not Amos. |
 
 ## Gaps (not built; ask before building)
@@ -212,6 +213,8 @@ FarmTapFab, FarmTapPlatform. Still to build with their screens: QR labels (E10).
 | N01 Profile card target | No mockup/route for a profile screen; opens Settings (N02). Kept by decision. |
 | N01 Cards tile target | No route in ROUTES.md; opens Workers (staff cards are assigned per worker in K03; Section K has no card list). Kept by decision. |
 | N06 sign-out | When Section N is built: show the unsynced count and offer 'Sync, then sign out' / 'Sign out anyway'. Current N01 sign-out is a plain confirm. |
-| K01 entry to K04/K05/K06 | No mockup shows how to reach Attendance, Tasks, Wages; three bar icons on K01 added. |
-| K01 Add worker, K02 Edit, What X can do, Activity log | No mockup screens; show "Coming soon" toast. |
-| K02 Milk records count | Needs recordedBy on milk records (backend phase); shows "—". |
+| K01 entry to K04/K05/K06 | Entry not in mockup: three labelled chips (Attendance, Tasks, Wages) under the filter chips (kit FarmTapChip). |
+| K01 Add worker / K02 Edit worker | No mockup; reuse the B09 first-worker form (shared StaffFormFields), pushed at /workers/add and /workers/:id/edit. |
+| K02 What X can do | No mockup; "Coming soon". |
+| K02 Activity log | P1, needs mockup + decision record. "Coming soon" until then. |
+| K02 Milk records count | Done: MilkRecord.recordedBy (staff id or owner) on every saved record; K02 counts this month's. |

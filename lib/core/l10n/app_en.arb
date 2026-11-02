@@ -2422,5 +2422,25 @@
         "type": "String"
       }
     }
-  }
+  },
+  "managerPinNeeded": "Manager PIN needed",
+  "typedCardNeedsManager": "Card {number} was typed, not tapped. A manager must confirm clocking in or out.",
+  "@typedCardNeedsManager": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "wagesShort": "Wages",
+  "editWorker": "Edit worker",
+  "workerSaved": "{name} saved",
+  "@workerSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "saveChanges": "Save changes"
 }

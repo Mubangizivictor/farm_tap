@@ -3053,4 +3053,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String noOneHasCard(String number) {
     return 'No one has card $number';
   }
+
+  @override
+  String get managerPinNeeded => 'Manager PIN needed';
+
+  @override
+  String typedCardNeedsManager(String number) {
+    return 'Card $number was typed, not tapped. A manager must confirm clocking in or out.';
+  }
+
+  @override
+  String get wagesShort => 'Wages';
+
+  @override
+  String get editWorker => 'Edit worker';
+
+  @override
+  String workerSaved(String name) {
+    return '$name saved';
+  }
+
+  @override
+  String get saveChanges => 'Save changes';
 }

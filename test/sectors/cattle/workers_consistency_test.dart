@@ -3,11 +3,13 @@
 import 'package:farm_tap/core/money/data/fake/fake_money_repository.dart';
 import 'package:farm_tap/core/money/domain/money_models.dart';
 import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
+import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/sectors/cattle/breeding/data/fake/fake_breeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/feeding/data/fake/fake_feed_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
+import 'package:farm_tap/sectors/cattle/milk/domain/milk_models.dart';
 import 'package:farm_tap/sectors/cattle/workers/data/fake/fake_workers_repository.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_models.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,7 +25,7 @@ void main() {
   setUp(() {
     money = FakeMoneyRepository(clock);
     staff = FakeStaffAccessRepository();
-    repo = FakeWorkersRepository(clock, staff, money);
+    repo = FakeWorkersRepository(clock, staff, money, FakeMilkRepository(clock, FakeTreatmentRepository(clock)));
   });
 
   FakeHomeRepository home() {
@@ -96,5 +98,24 @@ void main() {
     final day = (await home().workerDay('staff-ta')).data!;
     expect(day.clockedInAt, DateTime(2026, 11, 7, 5, 45));
     expect(day.tasks.map((t) => (t.title, t.done)), [('Move heifers to paddock 3', true)]);
+  });
+
+  test('K02 milk records: counted from records saved with recordedBy', () async {
+    final milk = FakeMilkRepository(clock, FakeTreatmentRepository(clock));
+    final r = FakeWorkersRepository(clock, staff, money, milk);
+    // 6 earlier mornings x 41 cows + 34 this morning; Joy did the evenings.
+    expect((await r.milkRecordsThisMonth('staff-ta')).data, 6 * 41 + 34);
+    expect((await r.milkRecordsThisMonth('staff-aj')).data, 6 * 41);
+    await milk.recordCow('animal-FT-022', MilkSession.morning, 5, notForSale: true, recordedBy: 'staff-ta');
+    expect((await r.milkRecordsThisMonth('staff-ta')).data, 6 * 41 + 35);
+  });
+
+  test('Add / edit worker: new worker has no card, unlocks with own PIN', () async {
+    final s = (await staff.addStaff(name: 'Byaruhanga Paul', role: StaffRole.worker, pin: '4321')).data!;
+    expect(s.hasCard, isFalse);
+    expect((await repo.today()).data!.any((t) => t.staff.id == s.id), isTrue);
+    expect((await staff.verifyPin(s.id, '4321')).data, isA<PinAccepted>());
+    final e = (await staff.updateStaff(s.id, name: 'Byaruhanga Paul', role: StaffRole.herdsman)).data!;
+    expect(e.role, StaffRole.herdsman);
   });
 }
