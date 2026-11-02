@@ -1,5 +1,9 @@
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/utils/clock.dart';
+import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_models.dart';
+import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
+import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_models.dart';
+import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_models.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_models.dart';
@@ -8,12 +12,18 @@ import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
 /// UI phase: the numbers and alerts shown in the D01-D03 mockups, dated
 /// relative to the clock.
 class FakeHomeRepository implements HomeRepository {
-  new(this.clock, this.treatments);
+  new(this.clock, this.treatments, {required this.breeding, required this.feed});
 
   final Clock clock;
 
   /// Under treatment, not-for-sale counts and alerts come from here.
   final TreatmentRepository treatments;
+
+  /// Calving alerts come from the breeding records.
+  final BreedingRepository breeding;
+
+  /// Low-stock alerts come from the feed records.
+  final FeedRepository feed;
 
   Future<List<TreatmentRecord>> _all() async => (await treatments.treatments()).data ?? const [];
   final _done = <String, bool>{'task-heifers': true};
@@ -54,8 +64,10 @@ class FakeHomeRepository implements HomeRepository {
       if (r.inWithdrawal(clock.now()) && !r.animalDry)
         MilkNotForSale(animal: r.animalName, drug: r.drug.shortName, safeFrom: r.safeFrom),
     const MilkDropped(animal: 'Ngabire', percent: 22, today: 8.1, average: 10.4),
-    CalvingDue(animal: 'Kyasiimire', due: _today.add(const Duration(days: 6))),
-    const StockLow(item: 'Dairy meal', bagsLeft: 3, daysLeft: 4),
+    for (final p in (await breeding.summary()).data?.calvingSoon ?? const <Pregnancy>[])
+      if (p.daysToCalving(clock.now()) <= 7) CalvingDue(animal: p.animal.name, due: p.due),
+    for (final st in (await feed.summary()).data?.stock ?? const <FeedStock>[])
+      if (st.reorder) StockLow(item: _feedNames[st.feed]!, bagsLeft: st.left.round(), daysLeft: st.daysLeft!),
     RecordEdited(person: 'Ahimbisibwe Joy', morning: true, at: _today.add(const Duration(hours: 7, minutes: 42))),
     const TrialEnding(daysLeft: 9),
   ]);
@@ -91,3 +103,11 @@ class FakeHomeRepository implements HomeRepository {
     return const Result.success(null);
   }
 }
+
+// Alert text is English in the UI phase (as the other sample alerts).
+const Map<FeedKind, String> _feedNames = {
+  FeedKind.dairyMeal: 'Dairy meal',
+  FeedKind.maizeBran: 'Maize bran',
+  FeedKind.mineralLick: 'Mineral lick',
+  FeedKind.silage: 'Silage',
+};

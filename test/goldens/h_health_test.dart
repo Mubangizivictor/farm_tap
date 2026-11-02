@@ -35,7 +35,10 @@ void main() {
 
   screenGoldens(
     'H01_health_home',
-    (_) => inShell(HealthHomePage(repo: repo(), onOpen: (_) {}, now: now), current: '/health'),
+    (_) => inShell(
+      HealthHomePage(repo: repo(), onOpen: (_) {}, now: now),
+      current: '/health',
+    ),
   );
 
   screenGoldens('H02_add_treatment', (_) => treatment(), act: (tester, _) => settle(tester));
@@ -56,12 +59,20 @@ void main() {
 
   screenGoldens(
     'H04_drug_stock',
-    (_) => inShell(DrugStockPage(repo: repo()), current: '/health', parent: '/health'),
+    (_) => inShell(
+      DrugStockPage(repo: repo()),
+      current: '/health',
+      parent: '/health',
+    ),
   );
 
   screenGoldens(
     'H05_health_schedule',
-    (_) => inShell(HealthCalendarPage(repo: repo(), now: now), current: '/health', parent: '/health'),
+    (_) => inShell(
+      HealthCalendarPage(repo: repo(), now: now),
+      current: '/health',
+      parent: '/health',
+    ),
   );
 
   screenGoldens(

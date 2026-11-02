@@ -2030,5 +2030,140 @@
         "type": "String"
       }
     }
-  }
+  },
+  "pregnantLabel": "Pregnant",
+  "calvingInDays": "Calving in {days} days",
+  "@calvingInDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "checkPregnancy": "Check pregnancy",
+  "expectedCalvings": "Expected calvings",
+  "toDo": "To do",
+  "inDaysCount": "in {days} days",
+  "@inDaysCount": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "daysShortValue": "{days} d",
+  "@daysShortValue": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "servedCheckFrom": "Served {served} · check from {from}",
+  "@servedCheckFrom": {
+    "placeholders": {
+      "served": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      }
+    }
+  },
+  "heatSeenYesterday": "Heat seen yesterday",
+  "heatSeenToday": "Heat seen today",
+  "checkAction": "Check",
+  "serveAction": "Serve",
+  "tipLabel": "Tip",
+  "breedingTip": "Check heat signs morning and evening. A missed heat costs about 21 days of milk.",
+  "recordHeat": "Record heat",
+  "heatAndService": "Heat & service — {name}",
+  "@heatAndService": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "heiferWord": "heifer",
+  "cowWord": "cow",
+  "heatSeen": "Heat seen",
+  "servedNatural": "Served",
+  "aiLabel": "AI",
+  "semenStraw": "Semen / straw",
+  "bullLabel": "Bull",
+  "technician": "Technician",
+  "dateLabel": "Date",
+  "costLabel": "Cost",
+  "checkReminder": "Pregnancy check reminder: {date}",
+  "@checkReminder": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "calvingIfPregnant": "Expected calving if pregnant: {date}",
+  "@calvingIfPregnant": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceSaved": "Saved for {name}",
+  "@serviceSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "whichAnimal": "Which animal?",
+  "isSheP": "Is {name} pregnant?",
+  "@isSheP": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "checkBody": "Served {date}. Record what the vet found.",
+  "@checkBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "yesPregnant": "Yes, pregnant",
+  "notPregnant": "Not pregnant",
+  "notPregnantSaved": "{name}: not pregnant. Watch for heat.",
+  "@notPregnantSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "isPregnantTitle": "{name} is pregnant!",
+  "@isPregnantTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pregnantBody": "Expected calving: {date}. We'll remind you 30 days and 7 days before.",
+  "@pregnantBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "servedLabel": "Served",
+  "checkedBy": "Checked by",
+  "dryOffFrom": "Dry off from",
+  "checkedByLabel": "Vet"
 }

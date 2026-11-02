@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
+import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_models.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
@@ -13,7 +14,7 @@ import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 /// sample cows from the mockups. The Isar repository (HerdRepositoryImpl)
 /// replaces it in the backend phase without touching the UI.
 class FakeHerdRepository implements HerdRepository {
-  new({required this.clock, required this.tenantProvider, required this.treatments}) {
+  new({required this.clock, required this.tenantProvider, required this.treatments, required this.breeding}) {
     _animals = [for (final s in _seed) _animal(s)];
     _milk = {for (final s in _seed) 'animal-${s.tag}': s.milk};
   }
@@ -23,6 +24,9 @@ class FakeHerdRepository implements HerdRepository {
 
   /// Withdrawal and the Treated status come from the treatment records.
   final TreatmentRepository treatments;
+
+  /// The pregnant count comes from the breeding records.
+  final BreedingRepository breeding;
   late List<Animal> _animals;
   late Map<String, double?> _milk;
   var _nextTag = 49;
@@ -74,7 +78,7 @@ class FakeHerdRepository implements HerdRepository {
       milking: 41,
       dry: 7,
       treated: ((await treatments.withdrawals(clock.now())).data ?? const <TreatmentRecord>[]).length,
-      pregnant: 9,
+      pregnant: (await breeding.summary()).data?.pregnancies.length ?? 0,
       heifers: 6,
       calves: 6,
       bulls: 1,

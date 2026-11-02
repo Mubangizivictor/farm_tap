@@ -5,6 +5,7 @@ import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
+import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_repository.dart';
 import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
@@ -28,6 +29,7 @@ class AppDependencies {
     required this.treatments,
     required this.feed,
     required this.money,
+    required this.breeding,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -43,6 +45,7 @@ class AppDependencies {
     treatments: getIt<TreatmentRepository>(),
     feed: getIt<FeedRepository>(),
     money: getIt<MoneyRepository>(),
+    breeding: getIt<BreedingRepository>(),
   );
 
   final SessionController session;
@@ -57,4 +60,5 @@ class AppDependencies {
   final TreatmentRepository treatments;
   final FeedRepository feed;
   final MoneyRepository money;
+  final BreedingRepository breeding;
 }

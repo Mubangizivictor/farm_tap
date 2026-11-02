@@ -17,8 +17,11 @@ class _Opener extends StatelessWidget {
   final void Function(BuildContext) open;
 
   @override
-  Widget build(BuildContext context) =>
-      Scaffold(body: Center(child: TextButton(onPressed: () => open(context), child: const Text('open'))));
+  Widget build(BuildContext context) => Scaffold(
+    body: Center(
+      child: TextButton(onPressed: () => open(context), child: const Text('open')),
+    ),
+  );
 }
 
 void _openPage(BuildContext context) => Navigator.of(context).push(

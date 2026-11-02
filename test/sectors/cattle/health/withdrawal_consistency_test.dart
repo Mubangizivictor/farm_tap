@@ -24,8 +24,8 @@ void main() {
   setUp(() {
     treatments = FakeTreatmentRepository(clock);
     milk = FakeMilkRepository(clock, treatments);
-    herd = FakeHerdRepository(clock: clock, tenantProvider: InMemoryTenantProvider(), treatments: treatments);
-    home = FakeHomeRepository(clock, treatments);
+    herd = fakeHerd(clock, InMemoryTenantProvider(), treatments);
+    home = fakeHome(clock, treatments);
   });
 
   test('Kasheshe: Penicillin 8 Nov + 4 days -> safe from Thu 12 Nov', () async {

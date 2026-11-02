@@ -16,11 +16,7 @@ import '../helpers/shell_wrap.dart';
 void main() {
   final clock = FixedClock();
   final today = clock.now();
-  FakeHerdRepository repo() => FakeHerdRepository(
-    clock: clock,
-    tenantProvider: InMemoryTenantProvider(),
-    treatments: FakeTreatmentRepository(clock),
-  );
+  FakeHerdRepository repo() => fakeHerd(clock, InMemoryTenantProvider(), FakeTreatmentRepository(clock));
 
   Widget list() => inShell(
     HerdListPage(repo: repo(), onAnimal: (_) {}, onAdd: () {}, onScan: () {}, today: today),

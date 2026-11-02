@@ -17,6 +17,8 @@ import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/id_generator.dart';
 import 'package:farm_tap/core/utils/logger.dart';
+import 'package:farm_tap/sectors/cattle/breeding/data/fake/fake_breeding_repository.dart';
+import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/data/fake/fake_centre_repository.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_repository.dart';
 import 'package:farm_tap/sectors/cattle/feeding/data/fake/fake_feed_repository.dart';
@@ -60,10 +62,20 @@ Future<void> configureDependencies(Flavor flavor) async {
       ..registerLazySingleton<OnboardingRepository>(() => FakeOnboardingRepository(getIt<Clock>()))
       ..registerLazySingleton<StaffAccessRepository>(FakeStaffAccessRepository.new)
       ..registerLazySingleton<TreatmentRepository>(() => FakeTreatmentRepository(getIt<Clock>()))
-      ..registerLazySingleton<HomeRepository>(() => FakeHomeRepository(getIt<Clock>(), getIt<TreatmentRepository>()))
+      ..registerLazySingleton<HomeRepository>(
+        () => FakeHomeRepository(
+          getIt<Clock>(),
+          getIt<TreatmentRepository>(),
+          breeding: getIt<BreedingRepository>(),
+          feed: getIt<FeedRepository>(),
+        ),
+      )
       ..registerLazySingleton<MilkRepository>(() => FakeMilkRepository(getIt<Clock>(), getIt<TreatmentRepository>()))
       ..registerLazySingleton<CentreRepository>(() => FakeCentreRepository(getIt<Clock>()))
       ..registerLazySingleton<MoneyRepository>(() => FakeMoneyRepository(getIt<Clock>()))
+      ..registerLazySingleton<BreedingRepository>(
+        () => FakeBreedingRepository(getIt<Clock>(), getIt<MoneyRepository>()),
+      )
       ..registerLazySingleton<FeedRepository>(
         () => FakeFeedRepository(getIt<Clock>(), getIt<MilkRepository>(), getIt<MoneyRepository>()),
       )
@@ -72,6 +84,7 @@ Future<void> configureDependencies(Flavor flavor) async {
           clock: getIt<Clock>(),
           tenantProvider: tenants,
           treatments: getIt<TreatmentRepository>(),
+          breeding: getIt<BreedingRepository>(),
         ),
       );
   } else {

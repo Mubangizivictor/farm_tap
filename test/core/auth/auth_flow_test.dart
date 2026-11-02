@@ -5,19 +5,16 @@ import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
-import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../helpers/fake_deps.dart';
 
 import '../../helpers/pump_app.dart';
 
 void main() {
   test('fake herd is seeded with the 8 sample cows', () async {
-    final repo = FakeHerdRepository(
-      clock: FakeClock(),
-      tenantProvider: InMemoryTenantProvider(),
-      treatments: FakeTreatmentRepository(FakeClock()),
-    );
+    final repo = fakeHerd(FakeClock(), InMemoryTenantProvider(), FakeTreatmentRepository(FakeClock()));
     final first = await repo.watchAnimals().first;
     expect(first.data!.map((a) => a.tagNumber), contains('FT-014'));
     expect(first.data, hasLength(8));

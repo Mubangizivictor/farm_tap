@@ -25,6 +25,7 @@ import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/sectors/cattle/breeding/presentation/pages/breeding_pages.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_collect_pages.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_farmers_pay_pages.dart';
 import 'package:farm_tap/sectors/cattle/feeding/presentation/pages/feeding_pages.dart';
@@ -133,6 +134,11 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     onSendSms: () => context.push(AppRoutes.paySms),
     onPaymentSheet: () => context.push(AppRoutes.payFarmers),
     onFarmer: (farmer) => context.go(AppRoutes.centreFarmer(farmer.id)),
+  );
+  sectionRoots[AppRoutes.breeding] = (context, state) => BreedingPage(
+    repo: deps.breeding,
+    onAnimal: (id) => context.go(AppRoutes.herdAnimal(id)),
+    onCalendar: () => context.go(AppRoutes.healthSchedule),
   );
   sectionRoots[AppRoutes.feeding] = (context, state) =>
       FeedStockPage(repo: deps.feed, onRecord: () => context.push(AppRoutes.feedingRecord));

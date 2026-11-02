@@ -44,6 +44,13 @@ class FarmTapFormat {
   /// "13 Nov".
   String dayMonth(DateTime d) => DateFormat('d MMM', _l).format(d);
 
+  /// "13 November".
+  String dayMonthLong(DateTime d) => DateFormat('d MMMM', _l).format(d);
+
+  /// "2 Jan", or "14 Aug 2027" when not this year.
+  String dayMonthMaybeYear(DateTime d, DateTime now) =>
+      d.year == now.year ? dayMonth(d) : DateFormat('d MMM y', _l).format(d);
+
   /// "Oct".
   String monthShort(DateTime d) => DateFormat('MMM', _l).format(d);
 

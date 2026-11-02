@@ -62,7 +62,8 @@ import 'app_localizations_nyn.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,15 +84,19 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('en'), Locale('nyn')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('nyn'),
+  ];
 
   /// No description provided for @appName.
   ///
@@ -3762,7 +3768,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'FarmTap: {name}, {period} you delivered {litres} L. Amount so far {amount}. Pay day {payDay}. Thank you!'**
-  String smsStatementText(String name, String period, String litres, String amount, String payDay);
+  String smsStatementText(
+    String name,
+    String period,
+    String litres,
+    String amount,
+    String payDay,
+  );
 
   /// No description provided for @smsReceiptText.
   ///
@@ -4573,9 +4585,256 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only {stock} in stock'**
   String moreThanInStock(String stock);
+
+  /// No description provided for @pregnantLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Pregnant'**
+  String get pregnantLabel;
+
+  /// No description provided for @calvingInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Calving in {days} days'**
+  String calvingInDays(int days);
+
+  /// No description provided for @checkPregnancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Check pregnancy'**
+  String get checkPregnancy;
+
+  /// No description provided for @expectedCalvings.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected calvings'**
+  String get expectedCalvings;
+
+  /// No description provided for @toDo.
+  ///
+  /// In en, this message translates to:
+  /// **'To do'**
+  String get toDo;
+
+  /// No description provided for @inDaysCount.
+  ///
+  /// In en, this message translates to:
+  /// **'in {days} days'**
+  String inDaysCount(int days);
+
+  /// No description provided for @daysShortValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} d'**
+  String daysShortValue(int days);
+
+  /// No description provided for @servedCheckFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Served {served} · check from {from}'**
+  String servedCheckFrom(String served, String from);
+
+  /// No description provided for @heatSeenYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Heat seen yesterday'**
+  String get heatSeenYesterday;
+
+  /// No description provided for @heatSeenToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Heat seen today'**
+  String get heatSeenToday;
+
+  /// No description provided for @checkAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Check'**
+  String get checkAction;
+
+  /// No description provided for @serveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Serve'**
+  String get serveAction;
+
+  /// No description provided for @tipLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip'**
+  String get tipLabel;
+
+  /// No description provided for @breedingTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Check heat signs morning and evening. A missed heat costs about 21 days of milk.'**
+  String get breedingTip;
+
+  /// No description provided for @recordHeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Record heat'**
+  String get recordHeat;
+
+  /// No description provided for @heatAndService.
+  ///
+  /// In en, this message translates to:
+  /// **'Heat & service — {name}'**
+  String heatAndService(String name);
+
+  /// No description provided for @heiferWord.
+  ///
+  /// In en, this message translates to:
+  /// **'heifer'**
+  String get heiferWord;
+
+  /// No description provided for @cowWord.
+  ///
+  /// In en, this message translates to:
+  /// **'cow'**
+  String get cowWord;
+
+  /// No description provided for @heatSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Heat seen'**
+  String get heatSeen;
+
+  /// No description provided for @servedNatural.
+  ///
+  /// In en, this message translates to:
+  /// **'Served'**
+  String get servedNatural;
+
+  /// No description provided for @aiLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'AI'**
+  String get aiLabel;
+
+  /// No description provided for @semenStraw.
+  ///
+  /// In en, this message translates to:
+  /// **'Semen / straw'**
+  String get semenStraw;
+
+  /// No description provided for @bullLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bull'**
+  String get bullLabel;
+
+  /// No description provided for @technician.
+  ///
+  /// In en, this message translates to:
+  /// **'Technician'**
+  String get technician;
+
+  /// No description provided for @dateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get dateLabel;
+
+  /// No description provided for @costLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost'**
+  String get costLabel;
+
+  /// No description provided for @checkReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Pregnancy check reminder: {date}'**
+  String checkReminder(String date);
+
+  /// No description provided for @calvingIfPregnant.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected calving if pregnant: {date}'**
+  String calvingIfPregnant(String date);
+
+  /// No description provided for @serviceSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved for {name}'**
+  String serviceSaved(String name);
+
+  /// No description provided for @whichAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Which animal?'**
+  String get whichAnimal;
+
+  /// No description provided for @isSheP.
+  ///
+  /// In en, this message translates to:
+  /// **'Is {name} pregnant?'**
+  String isSheP(String name);
+
+  /// No description provided for @checkBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Served {date}. Record what the vet found.'**
+  String checkBody(String date);
+
+  /// No description provided for @yesPregnant.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, pregnant'**
+  String get yesPregnant;
+
+  /// No description provided for @notPregnant.
+  ///
+  /// In en, this message translates to:
+  /// **'Not pregnant'**
+  String get notPregnant;
+
+  /// No description provided for @notPregnantSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: not pregnant. Watch for heat.'**
+  String notPregnantSaved(String name);
+
+  /// No description provided for @isPregnantTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is pregnant!'**
+  String isPregnantTitle(String name);
+
+  /// No description provided for @pregnantBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected calving: {date}. We\'ll remind you 30 days and 7 days before.'**
+  String pregnantBody(String date);
+
+  /// No description provided for @servedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Served'**
+  String get servedLabel;
+
+  /// No description provided for @checkedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked by'**
+  String get checkedBy;
+
+  /// No description provided for @dryOffFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Dry off from'**
+  String get dryOffFrom;
+
+  /// No description provided for @checkedByLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Vet'**
+  String get checkedByLabel;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -4584,7 +4843,8 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'nyn'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'nyn'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;

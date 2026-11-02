@@ -1,7 +1,7 @@
 // Money (CORE-18): expenses are the single source for every cost the app
 // shows (feed cost on I01, L01 overview, L02 add expense, P&L).
 
-enum ExpenseCategory { feed, vet, wages, transport, equipment, other }
+enum ExpenseCategory { feed, vet, breeding, wages, transport, equipment, other }
 
 class Expense {
   const new({

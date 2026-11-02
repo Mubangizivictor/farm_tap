@@ -4,7 +4,6 @@ import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart
 import 'package:farm_tap/core/sync/presentation/sync_status_sheet.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
-import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/alerts_page.dart';
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/home_page.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +19,7 @@ void main() {
 
   Widget owner({bool online = true}) => inShell(
     HomePage(
-      repo: FakeHomeRepository(clock, FakeTreatmentRepository(clock)),
+      repo: fakeHome(clock, FakeTreatmentRepository(clock)),
       farmName: 'Rwemera Dairy Farm',
       ownerName: 'Muhwezi Robert',
       trialDaysLeft: demoTrialDaysLeft(),
@@ -44,7 +43,7 @@ void main() {
     'D02_home_worker',
     (_) => inShell(
       HomePage(
-        repo: FakeHomeRepository(clock, FakeTreatmentRepository(clock)),
+        repo: fakeHome(clock, FakeTreatmentRepository(clock)),
         farmName: 'Rwemera Dairy Farm',
         ownerName: 'Muhwezi Robert',
         staff: FakeStaffAccessRepository.staff[1],
@@ -59,7 +58,7 @@ void main() {
   screenGoldens(
     'D03_alerts',
     (_) => inShell(
-      AlertsPage(repo: FakeHomeRepository(clock, FakeTreatmentRepository(clock)), today: today),
+      AlertsPage(repo: fakeHome(clock, FakeTreatmentRepository(clock)), today: today),
       parent: '/home',
     ),
   );

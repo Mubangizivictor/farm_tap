@@ -9,6 +9,7 @@ import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
+import 'package:farm_tap/sectors/cattle/breeding/data/fake/fake_breeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/data/fake/fake_centre_repository.dart';
 import 'package:farm_tap/sectors/cattle/feeding/data/fake/fake_feed_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
@@ -41,19 +42,27 @@ Future<AppDependencies> fakeDependencies({
   final treatments = FakeTreatmentRepository(c);
   final milk = FakeMilkRepository(c, treatments);
   final money = FakeMoneyRepository(c);
+  final breeding = FakeBreedingRepository(c, money);
+  final feed = FakeFeedRepository(c, milk, money);
   return AppDependencies(
     session: session,
     places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
     onboarding: FakeOnboardingRepository(c),
     staffAccess: FakeStaffAccessRepository(),
     sync: FakeSyncService(),
-    home: FakeHomeRepository(c, treatments),
-    herd: FakeHerdRepository(clock: c, tenantProvider: InMemoryTenantProvider(), treatments: treatments),
+    home: FakeHomeRepository(c, treatments, breeding: breeding, feed: feed),
+    herd: FakeHerdRepository(
+      clock: c,
+      tenantProvider: InMemoryTenantProvider(),
+      treatments: treatments,
+      breeding: breeding,
+    ),
     milk: milk,
     centre: FakeCentreRepository(c),
     treatments: treatments,
-    feed: FakeFeedRepository(c, milk, money),
+    feed: feed,
     money: money,
+    breeding: breeding,
   );
 }
 
@@ -61,3 +70,23 @@ Future<AppDependencies> fakeDependencies({
 /// Subscription calculation the app uses (never a hard-coded number).
 int? demoTrialDaysLeft([DateTime? today]) =>
     FakeFarmMembershipRepository.places.first.subscription.trialBanner(today ?? FixedClock().today());
+
+/// Home fake wired to the same sample breeding and feed records the app uses.
+FakeHomeRepository fakeHome(Clock clock, FakeTreatmentRepository treatments) {
+  final money = FakeMoneyRepository(clock);
+  return FakeHomeRepository(
+    clock,
+    treatments,
+    breeding: FakeBreedingRepository(clock, money),
+    feed: FakeFeedRepository(clock, FakeMilkRepository(clock, treatments), money),
+  );
+}
+
+/// Herd fake with the sample breeding records (pregnant count).
+FakeHerdRepository fakeHerd(Clock clock, TenantProvider tenants, FakeTreatmentRepository treatments) =>
+    FakeHerdRepository(
+      clock: clock,
+      tenantProvider: tenants,
+      treatments: treatments,
+      breeding: FakeBreedingRepository(clock, FakeMoneyRepository(clock)),
+    );
