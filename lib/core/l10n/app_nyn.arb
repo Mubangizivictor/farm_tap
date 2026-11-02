@@ -787,5 +787,14 @@
   "servedLabel": "[nyn] Served",
   "checkedBy": "[nyn] Checked by",
   "dryOffFrom": "[nyn] Dry off from",
-  "checkedByLabel": "[nyn] Vet"
+  "checkedByLabel": "[nyn] Vet",
+  "cardsLabel": "[nyn] Cards",
+  "subscriptionLabel": "[nyn] Subscription",
+  "helpSupport": "[nyn] Help & support",
+  "lockPhone": "[nyn] Lock phone",
+  "lockPhoneSub": "[nyn] Next person taps their card",
+  "signOutLabel": "[nyn] Sign out",
+  "signOutTitle": "[nyn] Sign out?",
+  "signOutBody": "[nyn] Records on this phone stay saved. Sign in again to see them.",
+  "comingSoonBody": "[nyn] This part of FarmTap is being built."
 }

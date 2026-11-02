@@ -23,5 +23,8 @@ abstract interface class BreedingRepository {
   /// J03 when [pregnant].
   Future<Result<Pregnancy?>> recordCheck({required String serviceId, required bool pregnant, String? by});
 
+  /// E07 (herd): the calf is born; ends the pregnancy.
+  Future<Result<void>> recordCalving(String animalId, {required DateTime at});
+
   List<String> get technicians;
 }

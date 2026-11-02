@@ -2165,5 +2165,14 @@
   "servedLabel": "Served",
   "checkedBy": "Checked by",
   "dryOffFrom": "Dry off from",
-  "checkedByLabel": "Vet"
+  "checkedByLabel": "Vet",
+  "cardsLabel": "Cards",
+  "subscriptionLabel": "Subscription",
+  "helpSupport": "Help & support",
+  "lockPhone": "Lock phone",
+  "lockPhoneSub": "Next person taps their card",
+  "signOutLabel": "Sign out",
+  "signOutTitle": "Sign out?",
+  "signOutBody": "Records on this phone stay saved. Sign in again to see them.",
+  "comingSoonBody": "This part of FarmTap is being built."
 }

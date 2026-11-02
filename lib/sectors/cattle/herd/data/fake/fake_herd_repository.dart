@@ -186,6 +186,8 @@ class FakeHerdRepository implements HerdRepository {
       motherTag: mother.tagNumber,
     );
     await addAnimal(calf);
+    // Closes her pregnancy (DAIRY-BRD-05): breeding counts stay in step.
+    await breeding.recordCalving(motherId, at: at);
     return Result.success(calf);
   }
 

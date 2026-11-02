@@ -106,7 +106,7 @@ Source of truth for navigation (go_router). Overlays (sheets, dialogs, toasts, c
 | M03 | celebration on M02 | /settings/subscription/pay | overlay | Done → go /home |
 | M04 | dialog on /home | /home | overlay (day 13-14) | back closes dialog |
 | M05 | read-only state of /home | /home | state (trial ended) | — |
-| N01 | /more | — | tab (phones) | root tab |
+| N01 | /more | — | tab (phones) | root tab. Profile card -> push /settings; Cards -> push /workers (no mockup route); Lock phone -> /unlock; Sign out -> confirm, go /sign-in |
 | N02 | /settings | /more (phones) | branch / push from More | phones: pop → /more |
 | N03 | /settings/farm | /settings | push | pop; Discard changes? if edited |
 | N04 | sheet on N02 | /settings | overlay | back closes sheet |

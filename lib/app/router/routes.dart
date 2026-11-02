@@ -64,6 +64,8 @@ abstract final class AppRoutes {
   static const money = '/money';
   static const reports = '/reports';
   static const settings = '/settings';
+  static const settingsSubscription = '/settings/subscription';
+  static const settingsHelp = '/settings/help';
 
   // Dev
   static const uiGallery = '/dev/gallery';

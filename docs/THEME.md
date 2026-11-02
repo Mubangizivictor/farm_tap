@@ -84,6 +84,7 @@ class MilkTotalCard extends StatelessWidget {
 | `context.radii.xs/sm/md/lg/xl/pill` | 6 / 10 / 14 / 16 / 24 / 999 |
 | `context.radii.button / input / card / dialog / sheet / chip / keypadKey` | ready `BorderRadius` |
 | `context.sizes.touchTarget / buttonHeight / keypadKey / fab` | 48 / 56 / 72 / 64 |
+| `context.sizes.backSwipeEdge` | 20 (iOS back-swipe strip on dirty forms, `DiscardGuard`) |
 | `context.sizes.iconXs/Sm/Md/Lg/Xl/Hero` | 16 / 20 / 24 / 28 / 40 / 64 |
 | `context.sizes.borderThin/Medium/Thick` | 1 / 1.5 / 2 |
 | `context.colors.*` | Material roles: primary, onPrimary, surface, onSurface, outline, error... |

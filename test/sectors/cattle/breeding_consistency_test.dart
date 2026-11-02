@@ -6,6 +6,7 @@ import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/sectors/cattle/breeding/data/fake/fake_breeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_models.dart';
 import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
+import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -75,5 +76,20 @@ void main() {
     expect((calving.animal, calving.due), ('Kyasiimire', DateTime(2026, 11, 13)));
     final low = alerts.whereType<StockLow>().single;
     expect((low.item, low.bagsLeft, low.daysLeft), ('Dairy meal', 2, 3));
+  });
+
+  test('E07 calving (herd) ends the pregnancy in breeding and herd counts', () async {
+    final breeding = FakeBreedingRepository(clock, FakeMoneyRepository(clock));
+    final herd = FakeHerdRepository(
+      clock: clock,
+      tenantProvider: InMemoryTenantProvider(),
+      treatments: FakeTreatmentRepository(clock),
+      breeding: breeding,
+    );
+    final calf = (await herd.recordCalving('animal-FT-031', at: clock.now())).data!;
+    expect(calf.motherTag, 'FT-031');
+    final s = (await breeding.summary()).data!;
+    expect(s.pregnancies.any((p) => p.animal.name == 'Kyasiimire'), isFalse);
+    expect((await herd.counts()).data!.pregnant, 8);
   });
 }

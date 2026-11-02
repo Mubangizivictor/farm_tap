@@ -21,7 +21,10 @@ void main() {
 
   screenGoldens(
     'J01_breeding_calendar',
-    (_) => inShell(BreedingPage(repo: repo(), onAnimal: (_) {}, now: now), current: '/breeding'),
+    (_) => inShell(
+      BreedingPage(repo: repo(), onAnimal: (_) {}, now: now),
+      current: '/breeding',
+    ),
   );
 
   screenGoldens(

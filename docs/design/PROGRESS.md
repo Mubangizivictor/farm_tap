@@ -77,9 +77,9 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | I01 | I01_feed_stock | Feeding | 94.5 | 94.9 | 97.0 | 96.7 | 97.4 | 97.4 | 94.3 | 94.8 | min 94.3 | ✓ | ✓ | ✓ | ✓ | done. Stock, days left and cost per litre derived from records. |
 | I02 | I02_record_feeding | Feeding | 94.1 | 94.1 | 97.3 | 97.0 | 97.1 | 96.9 | 94.1 | 94.1 | min 94.1 | ✓ | ✓ | ✓ | ✓ | done. Golden types 1.5 as in mockup. Back arrow asks Discard changes?. |
 | I03 | I03_feed_purchase_sheet | Feeding | 89.2 | 91.1 | 90.0 | 93.5 | 89.9 | 94.5 | 89.1 | 91.1 | min 89.1 | ✓ | ✓ | ✓ | ✓ | done. Backdrop differs: the I03 mockup shows a low-stock banner behind the sheet, while I01's own mockup shows the feed-cost card; I01's own mockup wins (main cause of the lower score). Save has read-back (money); purchase creates its expense in the money repository (DAIRY-FEED-02). Dirty sheet asks Discard changes? on drag/scrim/back. |
-| J01 | J01_breeding_calendar | Breeding | 95.7 | 96.2 | 96.2 | 96.5 | 97.1 | 97.2 | 95.5 | 96.0 | min 95.5 | ✓ | pending N01 | ✓ | ✓ | done. Pregnant/calving/check counts derived from breeding records (herd pregnant count and home calving alert read the same records). To-do lists 3 items (2 checks + Rwemera serve): data has 2 checks due as the metric says. Kasheshe "Served 12 Sep · check from 7 Nov" (mockup 2 Oct/2 Nov conflicts with J02 56-day rule). |
-| J02 | J02_record_service_sheet | Breeding | 87.1 | 89.2 | 89.5 | 93.0 | 89.4 | 94.0 | 87.0 | 89.1 | min 87.0 | ✓ | pending N01 | ✓ | ✓ | done. Rules from J02: check +56 d (2 Jan), calving +280 d (14 Aug 2027). Cost read-back; expense recorded in money repository (breeding). Mockup backdrop shows a heat banner; J01 keeps its own mockup. Sheet shorter than mockup so it sits lower (score). |
-| J03 | J03_pregnancy_confirmed | Breeding | 92.5 | 93.6 | 93.2 | 96.0 | 91.3 | 95.7 | 92.3 | 93.6 | min 91.3 | ✓ | pending N01 | ✓ | ✓ | done. Data wins: the check due is Kasheshe (calving 19 June, dry off 20 Apr), not Kyasiimire (calves in 6 days). Dry off = 60 d before calving (mockup 15 Sep = 59 d). |
+| J01 | J01_breeding_calendar | Breeding | 95.7 | 96.2 | 96.2 | 96.5 | 97.1 | 97.2 | 95.5 | 96.0 | min 95.5 | ✓ | ✓ | ✓ | ✓ | done. Pregnant/calving/check counts derived from breeding records (herd pregnant count and home calving alert read the same records). To-do lists 3 items (2 checks + Rwemera serve): data has 2 checks due as the metric says. Kasheshe "Served 12 Sep · check from 7 Nov" (mockup 2 Oct/2 Nov conflicts with J02 56-day rule). |
+| J02 | J02_record_service_sheet | Breeding | 87.1 | 89.2 | 89.5 | 93.0 | 89.4 | 94.0 | 87.0 | 89.1 | min 87.0 | ✓ | ✓ | ✓ | ✓ | done. Rules from J02: check +56 d (2 Jan), calving +280 d (14 Aug 2027). Cost read-back; expense recorded in money repository (breeding). Mockup backdrop shows a heat banner; J01 keeps its own mockup. All mockup fields present (Heat seen/Served/AI segmented control, semen/straw, technician, date, cost, check-reminder info box); the sheet is only shorter, so it sits lower on screen, which is the score gap - accepted. |
+| J03 | J03_pregnancy_confirmed | Breeding | 92.5 | 93.6 | 93.2 | 96.0 | 91.3 | 95.7 | 92.3 | 93.6 | min 91.3 | ✓ | ✓ | ✓ | ✓ | done. Data wins: the check due is Kasheshe (calving 19 June, dry off 20 Apr), not Kyasiimire (calves in 6 days). Dry off = 60 d before calving (mockup 15 Sep = 59 d). |
 | K01 | K01_staff_list | Workers | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | K02 | K02_staff_detail | Workers | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | K03 | K03_assign_card | Workers | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
@@ -95,7 +95,7 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | M03 | M03_payment_confirmed | Subscription | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | M04 | M04_trial_ending_popup | Subscription | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | M05 | M05_read_only_locked | Subscription | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| N01 | N01_more_menu | Settings | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| N01 | N01_more_menu | Settings | 95.2 | 95.2 | 97.0 | 97.0 | 97.8 | 97.8 | 95.0 | 95.1 | min 95.0 | ✓ | ✓ | ✓ | ✓ | done. Feeding/Breeding/Workers/Money/Reports/Settings/Subscription/Help push from /more with back arrow; unbuilt ones show Coming soon. Lock phone -> /unlock; Sign out asks first (N06 styles it later). Profile -> Settings, Cards -> Workers (no route in ROUTES.md; see Gaps). |
 | N02 | N02_settings | Settings | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | N03 | N03_farm_profile | Settings | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | N04 | N04_language_sheet | Settings | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
@@ -177,3 +177,24 @@ FarmTapFab, FarmTapPlatform. Still to build with their screens: QR labels (E10).
 | tablet | 93.5 | 92.6 | Sidebar shown: 1194 dp is "expanded" in UX_SPEC; the tablet mockups show the rail. **Open question.** |
 | web_desktop | 96.2 | 96.2 | |
 | web_mobile | 96.5 | 96.5 | Same as phone (mockup keeps the bottom bar). |
+
+## Data over mockup — Section J
+
+| Screen | Mockup text | Shown (from data) | Why |
+|---|---|---|---|
+| J01 To do | Kasheshe "Served 2 Oct · check from 2 Nov" | "Served 12 Sep · check from 7 Nov" | One check rule (56 days after service, from J02's 7 Nov -> 2 Jan). 2 Oct + 56 d would not be due yet. |
+| J01 To do | 2 rows (Kasheshe, Rwemera) | 3 rows (Kasheshe, Nyakato, Rwemera) | The "Check pregnancy 2" card needs two checks due; the list shows both. |
+| J02 Date | "Today 7:30 am" | "Today 8:41 am" (device) / "6:52 am" (golden clock) | Date defaults to now from the injected Clock. |
+| J02 backdrop | "Rwemera showed heat yesterday" banner | J01 as in its own mockup | J01's own mockup wins (as I03). |
+| J03 | "Kyasiimire is pregnant! Expected calving: 13 November" | "Kasheshe is pregnant! Expected calving: 19 June" | Kyasiimire calves in 6 days, so she cannot be the cow getting a pregnancy check; Kasheshe is the check due. |
+| J03 Served | "6 Feb · AI · Jersey 1180" | "12 Sep · AI · Friesian 4421" | Kasheshe's service record. |
+| J03 Checked by | "Dr. Kamugisha" | "Dr. Kamugisha Ivan" | Full name from the vet list (same vet as H02). |
+| J03 Dry off | "15 Sep" (59 d before 13 Nov) | 60 days before calving ("20 Apr" for Kasheshe) | One dry-off rule (60 d). |
+
+## Gaps (not built; ask before building)
+
+| Item | Status |
+|---|---|
+| DAIRY-BRD-05 Calving creates calf linked to dam | Covered by E07 (calf born): calf created with motherTag; since Section J it also ends the pregnancy in breeding (test). No separate breeding screen needed. |
+| N01 Profile card target | No mockup/route for a profile screen; opens Settings (N02) for now. |
+| N01 Cards tile target | No route in ROUTES.md; opens Workers (staff cards are assigned in K03). |

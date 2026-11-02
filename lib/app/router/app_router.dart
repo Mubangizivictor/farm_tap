@@ -16,6 +16,7 @@ import 'package:farm_tap/core/auth/presentation/pages/farm_picker_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/forgot_password_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/sign_in_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/splash_page.dart';
+import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
 import 'package:farm_tap/core/onboarding/presentation/cubit/onboarding_cubit.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/choice_steps.dart';
@@ -23,6 +24,8 @@ import 'package:farm_tap/core/onboarding/presentation/pages/form_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/waitlist_and_done.dart';
 import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
+import 'package:farm_tap/core/settings/presentation/pages/more_page.dart';
+import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/sectors/cattle/breeding/presentation/pages/breeding_pages.dart';
@@ -40,6 +43,7 @@ import 'package:farm_tap/sectors/cattle/milk/presentation/pages/milk_pages.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 typedef PageBuilder = Widget Function(BuildContext context, GoRouterState state);
 
@@ -135,6 +139,23 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     onPaymentSheet: () => context.push(AppRoutes.payFarmers),
     onFarmer: (farmer) => context.go(AppRoutes.centreFarmer(farmer.id)),
   );
+  sectionRoots[AppRoutes.more] = (context, state) {
+    final l10n = AppLocalizations.of(context);
+    final user = session.auth.currentUser;
+    return MorePage(
+      name: session.staff?.name ?? user?.name ?? '',
+      role: switch (session.farm?.role) {
+        PlaceRole.owner => l10n.roleOwner,
+        PlaceRole.manager => l10n.roleManager,
+        PlaceRole.clerk => l10n.roleClerk,
+        PlaceRole.worker => l10n.roleWorker,
+        null => '',
+      },
+      email: user?.email ?? '',
+      trialDaysLeft: session.trialDaysLeft,
+      onOpen: (t) => _openMore(context, session, t),
+    );
+  };
   sectionRoots[AppRoutes.breeding] = (context, state) => BreedingPage(
     repo: deps.breeding,
     onAnimal: (id) => context.go(AppRoutes.herdAnimal(id)),
@@ -316,6 +337,18 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
             RecordFeedingPage(repo: deps.feed, onSaved: () => popOrGo(context, AppRoutes.feeding)),
       ),
     ],
+    AppRoutes.settings: [
+      page(
+        'subscription',
+        parent: AppRoutes.settings,
+        builder: (context, state) => const PendingSection(path: AppRoutes.settingsSubscription),
+      ),
+      page(
+        'help',
+        parent: AppRoutes.settings,
+        builder: (context, state) => const PendingSection(path: AppRoutes.settingsHelp),
+      ),
+    ],
     AppRoutes.home: [
       page(
         'reconcile',
@@ -337,7 +370,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       Builder(
         builder: (context) => RouteInfo(
           parent: sectionParent(context, path),
-          child: (sectionRoots[path] ?? (c, _) => PendingSection(title: path.substring(1)))(context, state),
+          child: (sectionRoots[path] ?? (c, _) => PendingSection(path: path))(context, state),
         ),
       ),
     ),
@@ -602,4 +635,42 @@ String? _guard(SessionController session, String location) {
   final unlocking = location.startsWith(AppRoutes.unlock) || location.startsWith(AppRoutes.farmPicker);
   if (session.locked && !unlocking) return AppRoutes.unlock;
   return null;
+}
+
+/// N01: More-sections push from /more (back arrow returns to More).
+Future<void> _openMore(BuildContext context, SessionController session, MoreTarget t) async {
+  final l10n = AppLocalizations.of(context);
+  switch (t) {
+    case MoreTarget.feeding:
+      await context.push(AppRoutes.feeding);
+    case MoreTarget.breeding:
+      await context.push(AppRoutes.breeding);
+    // Staff NFC cards are assigned under Workers (K03).
+    case MoreTarget.workers || MoreTarget.cards:
+      await context.push(AppRoutes.workers);
+    case MoreTarget.money:
+      await context.push(AppRoutes.money);
+    case MoreTarget.reports:
+      await context.push(AppRoutes.reports);
+    case MoreTarget.settings || MoreTarget.profile:
+      await context.push(AppRoutes.settings);
+    case MoreTarget.subscription:
+      await context.push(AppRoutes.settingsSubscription);
+    case MoreTarget.help:
+      await context.push(AppRoutes.settingsHelp);
+    case MoreTarget.lock:
+      session.lock();
+    case MoreTarget.signOut:
+      final ok = await showFarmTapDialog(
+        context,
+        icon: Symbols.logout_rounded,
+        title: l10n.signOutTitle,
+        message: l10n.signOutBody,
+        primaryLabel: l10n.signOutLabel,
+        primaryKind: ButtonKind.danger,
+        secondaryLabel: l10n.cancel,
+        tone: FarmTapTone.danger,
+      );
+      if (ok) await session.signOut();
+  }
 }

@@ -200,4 +200,27 @@ void main() {
     await _settle(tester);
     expect(h.location, AppRoutes.feeding);
   });
+
+  group('N01 More: sections push from /more, back returns to More', () {
+    for (final (label, location, ready) in [
+      ('Feeding', '/feeding', 'Feed cost this month'),
+      ('Breeding', '/breeding', 'Expected calvings'),
+      ('Workers', '/workers', 'Coming soon'),
+      ('Money', '/money', 'Coming soon'),
+      ('Reports', '/reports', 'Coming soon'),
+      ('Settings', '/settings', 'Coming soon'),
+      ('Help & support', '/settings/help', 'Coming soon'),
+    ]) {
+      testWidgets(label, (tester) async {
+        final h = await _Harness.pump(tester, start: AppRoutes.more, signedIn: true, farm: true);
+        await tester.ensureVisible(find.text(label).last);
+        await tester.tap(find.text(label).last);
+        await _settle(tester);
+        expect(h.location, location);
+        expect(find.text(ready), findsWidgets);
+        await _tapBack(tester);
+        expect(h.location, AppRoutes.more);
+      });
+    }
+  });
 }

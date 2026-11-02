@@ -181,6 +181,9 @@ NavItem _item(AppLocalizations l10n, String path) => switch (path) {
   _ => NavItem(id: path, icon: Symbols.settings_rounded, label: l10n.settings),
 };
 
+/// The section name as on the nav bar (Workers).
+String sectionLabel(AppLocalizations l10n, String path) => _item(l10n, path).label;
+
 /// Parent of a section root: on phones the More-sections are pushed from
 /// More; everywhere else sections are roots.
 String? sectionParent(BuildContext context, String path) =>

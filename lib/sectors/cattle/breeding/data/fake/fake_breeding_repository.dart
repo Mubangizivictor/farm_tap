@@ -180,5 +180,11 @@ class FakeBreedingRepository implements BreedingRepository {
   }
 
   @override
+  Future<Result<void>> recordCalving(String animalId, {required DateTime at}) async {
+    _calvings.add(CalvingRecord(animalId: animalId, at: at));
+    return const Result.success(null);
+  }
+
+  @override
   List<String> get technicians => const [_technician, _vet];
 }

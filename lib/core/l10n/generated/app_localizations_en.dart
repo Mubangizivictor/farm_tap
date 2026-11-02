@@ -2760,4 +2760,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkedByLabel => 'Vet';
+
+  @override
+  String get cardsLabel => 'Cards';
+
+  @override
+  String get subscriptionLabel => 'Subscription';
+
+  @override
+  String get helpSupport => 'Help & support';
+
+  @override
+  String get lockPhone => 'Lock phone';
+
+  @override
+  String get lockPhoneSub => 'Next person taps their card';
+
+  @override
+  String get signOutLabel => 'Sign out';
+
+  @override
+  String get signOutTitle => 'Sign out?';
+
+  @override
+  String get signOutBody =>
+      'Records on this phone stay saved. Sign in again to see them.';
+
+  @override
+  String get comingSoonBody => 'This part of FarmTap is being built.';
 }

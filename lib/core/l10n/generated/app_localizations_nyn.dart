@@ -2770,4 +2770,32 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String get checkedByLabel => '[nyn] Vet';
+
+  @override
+  String get cardsLabel => '[nyn] Cards';
+
+  @override
+  String get subscriptionLabel => '[nyn] Subscription';
+
+  @override
+  String get helpSupport => '[nyn] Help & support';
+
+  @override
+  String get lockPhone => '[nyn] Lock phone';
+
+  @override
+  String get lockPhoneSub => '[nyn] Next person taps their card';
+
+  @override
+  String get signOutLabel => '[nyn] Sign out';
+
+  @override
+  String get signOutTitle => '[nyn] Sign out?';
+
+  @override
+  String get signOutBody =>
+      '[nyn] Records on this phone stay saved. Sign in again to see them.';
+
+  @override
+  String get comingSoonBody => '[nyn] This part of FarmTap is being built.';
 }

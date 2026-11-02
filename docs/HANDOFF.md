@@ -57,10 +57,9 @@ docs/design/screens/{phone,tablet,web_desktop,web_mobile}/{light,dark}/<ID>_<nam
     unpaid period) / read-only computed from the clock (80841dd).
     Rwemera Dairy Farm and Kashari Milk Centre trials: 2 Nov → 16 Nov 2026
     (9 days left on 7 Nov). New farms: trialEndsAt = today + 14 (0cdc19e)
-- Last known state: 964 passing, 0 skipped; flutter analyze clean; latest
-  commit: feat(ui): section J J01-J03 (after 67d4a72). Update this line at
-  every section commit. Open item: J01-J03 device check on iPhone waits
-  for N01 (More menu is the phone entry point).
+- Last known state: 983 passing, 0 skipped; flutter analyze clean; latest
+  commit: feat(ui): N01 more menu (after bfc72cf). Update this line at every
+  section commit. I and J device-checked on iPhone 16 Pro Max via More.
 
 ## Decisions to keep (from review)
 - Data wins over mockup when mockups disagree (e.g. E03 "5 days left",

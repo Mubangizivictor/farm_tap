@@ -4831,6 +4831,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Vet'**
   String get checkedByLabel;
+
+  /// No description provided for @cardsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards'**
+  String get cardsLabel;
+
+  /// No description provided for @subscriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription'**
+  String get subscriptionLabel;
+
+  /// No description provided for @helpSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & support'**
+  String get helpSupport;
+
+  /// No description provided for @lockPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock phone'**
+  String get lockPhone;
+
+  /// No description provided for @lockPhoneSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Next person taps their card'**
+  String get lockPhoneSub;
+
+  /// No description provided for @signOutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get signOutLabel;
+
+  /// No description provided for @signOutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out?'**
+  String get signOutTitle;
+
+  /// No description provided for @signOutBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Records on this phone stay saved. Sign in again to see them.'**
+  String get signOutBody;
+
+  /// No description provided for @comingSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This part of FarmTap is being built.'**
+  String get comingSoonBody;
 }
 
 class _AppLocalizationsDelegate
