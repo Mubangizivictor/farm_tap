@@ -22,6 +22,7 @@ import 'package:farm_tap/core/onboarding/presentation/cubit/onboarding_cubit.dar
 import 'package:farm_tap/core/onboarding/presentation/pages/choice_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/form_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/waitlist_and_done.dart';
+import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/settings/presentation/pages/more_page.dart';
@@ -83,6 +84,14 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
   final staffAccess = deps.staffAccess;
   final rootKey = GlobalKey<NavigatorState>();
   final auth = session.auth;
+
+  /// ROADMAP 7.4: only the owner and managers add, edit or reset staff.
+  bool canManageStaff() => switch (session.staff?.role) {
+    StaffRole.manager => true,
+    null => session.farm?.role == PlaceRole.owner || session.farm?.role == PlaceRole.manager,
+    _ => false,
+  };
+
   final setup = OnboardingCubit();
 
   // Roots of the shell branches; filled in section by section.
@@ -161,6 +170,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     repo: deps.workers,
     onStaff: (id) => context.push(AppRoutes.worker(id)),
     onAdd: () => context.push(AppRoutes.workersAdd),
+    canManageStaff: canManageStaff(),
     onOpen: (t) => context.push(switch (t) {
       WorkersTarget.attendance => AppRoutes.workersAttendance,
       WorkersTarget.tasks => AppRoutes.workersTasks,
@@ -384,6 +394,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           staffId: state.pathParameters['staffId']!,
           onAssignCard: () => context.push(AppRoutes.workerCard(state.pathParameters['staffId']!)),
           onEdit: () => context.push(AppRoutes.workerEdit(state.pathParameters['staffId']!)),
+          canManageStaff: canManageStaff(),
         ),
         routes: [
           page(

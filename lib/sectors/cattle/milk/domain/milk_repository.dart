@@ -17,6 +17,9 @@ abstract interface class MilkRepository {
   /// F07 quick mode: one total for the whole herd.
   Future<Result<void>> recordTotal(MilkSession session, double litres, {required String recordedBy});
 
+  /// Every saved record since [from] (audit trail; sums by recorder).
+  Future<Result<List<MilkRecord>>> records({required DateTime from});
+
   /// Records saved by [recordedBy] since [from] (K02 "Milk records").
   Future<Result<int>> recordCount(String recordedBy, {required DateTime from});
 

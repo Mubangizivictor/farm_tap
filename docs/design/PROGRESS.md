@@ -216,5 +216,8 @@ FarmTapFab, FarmTapPlatform. Still to build with their screens: QR labels (E10).
 | K01 entry to K04/K05/K06 | Entry not in mockup: three labelled chips (Attendance, Tasks, Wages) under the filter chips (kit FarmTapChip). |
 | K01 Add worker / K02 Edit worker | No mockup; reuse the B09 first-worker form (shared StaffFormFields), pushed at /workers/add and /workers/:id/edit. |
 | K02 What X can do | No mockup; "Coming soon". |
+| Staff limit | Plan includes 10 staff: block the 11th at Add worker (backend phase). |
+| Manager PIN lockout | Lock out after repeated wrong manager PINs (backend phase). |
+| Staff management roles | Done: Add worker, Edit worker, Reset PIN shown to owner and manager only (ROADMAP 7.4); tests. |
 | K02 Activity log | P1, needs mockup + decision record. "Coming soon" until then. |
 | K02 Milk records count | Done: MilkRecord.recordedBy (staff id or owner) on every saved record; K02 counts this month's. |

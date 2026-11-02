@@ -192,6 +192,10 @@ class FakeMilkRepository implements MilkRepository {
   }
 
   @override
+  Future<Result<List<MilkRecord>>> records({required DateTime from}) async =>
+      Result.success(_records.where((r) => !r.at.isBefore(from)).toList());
+
+  @override
   Future<Result<int>> recordCount(String recordedBy, {required DateTime from}) async =>
       Result.success(_records.where((r) => r.recordedBy == recordedBy && !r.at.isBefore(from)).length);
 

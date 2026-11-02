@@ -101,9 +101,19 @@ enum WorkersTarget { attendance, tasks, wages }
 enum _Filter { all, inNow, notIn }
 
 class WorkersPage extends StatefulWidget {
-  const new({required this.repo, required this.onStaff, required this.onOpen, required this.onAdd, super.key});
+  const new({
+    required this.repo,
+    required this.onStaff,
+    required this.onOpen,
+    required this.onAdd,
+    super.key,
+    this.canManageStaff = true,
+  });
 
   final WorkersRepository repo;
+
+  /// Owner and managers only (ROADMAP 7.4): Add worker.
+  final bool canManageStaff;
 
   /// Pushes the add-worker form; completes when it closes.
   final Future<void> Function() onAdd;
@@ -142,18 +152,20 @@ class _WorkersPageState extends State<WorkersPage> {
         return AdaptiveScaffold(
           title: l10n.workers,
           subtitle: l10n.peopleCount(all.length),
-          floatingActionButton: FarmTapFab(
-            label: l10n.addWorker,
-            icon: Symbols.person_add_rounded,
-            onPressed: () async {
-              await widget.onAdd();
-              if (mounted) {
-                setState(() {
-                  _load = _fetch();
-                });
-              }
-            },
-          ),
+          floatingActionButton: !widget.canManageStaff
+              ? null
+              : FarmTapFab(
+                  label: l10n.addWorker,
+                  icon: Symbols.person_add_rounded,
+                  onPressed: () async {
+                    await widget.onAdd();
+                    if (mounted) {
+                      setState(() {
+                        _load = _fetch();
+                      });
+                    }
+                  },
+                ),
           body: data == null
               ? const SizedBox.shrink()
               : Column(
@@ -251,7 +263,11 @@ class StaffDetailPage extends StatefulWidget {
     required this.onAssignCard,
     required this.onEdit,
     super.key,
+    this.canManageStaff = true,
   });
+
+  /// Owner and managers only (ROADMAP 7.4): edit, reset PIN.
+  final bool canManageStaff;
 
   final WorkersRepository repo;
   final StaffDirectory directory;
@@ -302,14 +318,15 @@ class _StaffDetailPageState extends State<StaffDetailPage> {
     return AdaptiveScaffold(
       title: l10n.workerTitle,
       actions: [
-        BarAction(
-          icon: Symbols.edit_rounded,
-          tooltip: l10n.editWorker,
-          onPressed: () async {
-            await widget.onEdit();
-            if (mounted) _reload();
-          },
-        ),
+        if (widget.canManageStaff)
+          BarAction(
+            icon: Symbols.edit_rounded,
+            tooltip: l10n.editWorker,
+            onPressed: () async {
+              await widget.onEdit();
+              if (mounted) _reload();
+            },
+          ),
       ],
       body: FutureBuilder<(StaffMember?, int, WageLine?, int)>(
         future: _load,
@@ -379,15 +396,16 @@ class _StaffDetailPageState extends State<StaffDetailPage> {
               context.space.gapLg,
               ListCard(
                 children: [
-                  RecordTile(
-                    leading: IconBubble(
-                      icon: Symbols.pin_rounded,
-                      tone: FarmTapTone.neutral,
-                      size: context.sizes.bubbleMd,
+                  if (widget.canManageStaff)
+                    RecordTile(
+                      leading: IconBubble(
+                        icon: Symbols.pin_rounded,
+                        tone: FarmTapTone.neutral,
+                        size: context.sizes.bubbleMd,
+                      ),
+                      title: l10n.resetPin,
+                      onTap: () => _resetPin(s),
                     ),
-                    title: l10n.resetPin,
-                    onTap: () => _resetPin(s),
-                  ),
                   RecordTile(
                     leading: IconBubble(
                       icon: Symbols.contactless_rounded,

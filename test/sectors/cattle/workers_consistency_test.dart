@@ -118,4 +118,20 @@ void main() {
     final e = (await staff.updateStaff(s.id, name: 'Byaruhanga Paul', role: StaffRole.herdsman)).data!;
     expect(e.role, StaffRole.herdsman);
   });
+
+  test('milk: every record has a recorder; per-staff counts sum to the month total', () async {
+    final milk = FakeMilkRepository(clock, FakeTreatmentRepository(clock));
+    await milk.recordTotal(MilkSession.evening, 120, recordedBy: 'owner');
+    final from = DateTime(clock.now().year, clock.now().month);
+    final all = (await milk.records(from: from)).data!;
+    expect(all.every((r) => r.recordedBy.isNotEmpty), isTrue);
+    expect(all.where((r) => r.session == MilkSession.evening).map((r) => r.recordedBy).toSet(), {'staff-aj', 'owner'});
+    var sum = 0;
+    for (final who in all.map((r) => r.recordedBy).toSet()) {
+      sum += (await milk.recordCount(who, from: from)).data!;
+    }
+    expect(sum, all.length);
+    expect((await milk.recordCount('staff-ta', from: from)).data, 280);
+    expect((await milk.recordCount('staff-aj', from: from)).data, 246);
+  });
 }
