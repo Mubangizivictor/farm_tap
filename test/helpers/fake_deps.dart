@@ -16,6 +16,7 @@ import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_reposito
 import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
+import 'package:farm_tap/sectors/cattle/workers/data/fake/fake_workers_repository.dart';
 
 /// The mockups' "today": Saturday 7 Nov 2026, 6:52 am.
 class FixedClock extends Clock {
@@ -44,13 +45,15 @@ Future<AppDependencies> fakeDependencies({
   final money = FakeMoneyRepository(c);
   final breeding = FakeBreedingRepository(c, money);
   final feed = FakeFeedRepository(c, milk, money);
+  final staff = FakeStaffAccessRepository();
+  final workers = FakeWorkersRepository(c, staff, money);
   return AppDependencies(
     session: session,
     places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
     onboarding: FakeOnboardingRepository(c),
-    staffAccess: FakeStaffAccessRepository(),
+    staffAccess: staff,
     sync: FakeSyncService(),
-    home: FakeHomeRepository(c, treatments, breeding: breeding, feed: feed),
+    home: FakeHomeRepository(c, treatments, breeding: breeding, feed: feed, workers: workers),
     herd: FakeHerdRepository(
       clock: c,
       tenantProvider: InMemoryTenantProvider(),
@@ -63,6 +66,8 @@ Future<AppDependencies> fakeDependencies({
     feed: feed,
     money: money,
     breeding: breeding,
+    workers: workers,
+    staffDirectory: staff,
   );
 }
 
@@ -79,6 +84,7 @@ FakeHomeRepository fakeHome(Clock clock, FakeTreatmentRepository treatments) {
     treatments,
     breeding: FakeBreedingRepository(clock, money),
     feed: FakeFeedRepository(clock, FakeMilkRepository(clock, treatments), money),
+    workers: FakeWorkersRepository(clock, FakeStaffAccessRepository(), money),
   );
 }
 

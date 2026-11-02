@@ -91,7 +91,7 @@ Source of truth for navigation (go_router). Overlays (sheets, dialogs, toasts, c
 | J01 | /breeding | /more (phones) | branch / push from More | phones: pop → /more |
 | J02 | sheet on J01 | /breeding | overlay | back closes sheet |
 | J03 | celebration on J01 | /breeding | overlay | closes to J01 |
-| K01 | /workers | /more (phones) | branch (rail, sidebar) / push from More | phones: pop → /more |
+| K01 | /workers | /more (phones) | branch (rail, sidebar) / push from More | phones: pop → /more. Bar icons push K04/K05/K06 |
 | K02 | /workers/:staffId | /workers | push | pop |
 | K03 | /workers/:staffId/card | /workers/:staffId | push | pop |
 | K04 | /workers/attendance | /workers | push | pop |

@@ -2798,4 +2798,269 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String get comingSoonBody => '[nyn] This part of FarmTap is being built.';
+
+  @override
+  String peopleCount(int n) {
+    return '[nyn] $n people';
+  }
+
+  @override
+  String get filterInNow => '[nyn] In now';
+
+  @override
+  String get filterNotIn => '[nyn] Not in';
+
+  @override
+  String get inLabel => '[nyn] In';
+
+  @override
+  String get outLabel => '[nyn] Out';
+
+  @override
+  String get notInLabel => '[nyn] Not in';
+
+  @override
+  String inAt(String time) {
+    return '[nyn] In $time';
+  }
+
+  @override
+  String outAt(String time) {
+    return '[nyn] Out $time';
+  }
+
+  @override
+  String get cardBadge => '[nyn] Card';
+
+  @override
+  String get noCardBadge => '[nyn] No card';
+
+  @override
+  String cardNumberBadge(String number) {
+    return '[nyn] Card $number';
+  }
+
+  @override
+  String get addWorker => '[nyn] Add worker';
+
+  @override
+  String get workerTitle => '[nyn] Worker';
+
+  @override
+  String roleSince(String role, String date) {
+    return '[nyn] $role · since $date';
+  }
+
+  @override
+  String get daysThisMonth => '[nyn] Days this month';
+
+  @override
+  String get milkRecords => '[nyn] Milk records';
+
+  @override
+  String get balanceOwed => '[nyn] Balance owed';
+
+  @override
+  String get resetPin => '[nyn] Reset PIN';
+
+  @override
+  String get replaceLostCard => '[nyn] Replace lost card';
+
+  @override
+  String get assignCardRow => '[nyn] Assign card';
+
+  @override
+  String whatCanDo(String name) {
+    return '[nyn] What $name can do';
+  }
+
+  @override
+  String get canDoManager => '[nyn] Everything except money settings';
+
+  @override
+  String get canDoHerdsman => '[nyn] Milk, feeding, treatments';
+
+  @override
+  String get canDoClerk => '[nyn] Milk, collection, payments';
+
+  @override
+  String get canDoWorker => '[nyn] Milk, feeding';
+
+  @override
+  String get canDoVet => '[nyn] Treatments, breeding';
+
+  @override
+  String get activityLog => '[nyn] Activity log';
+
+  @override
+  String resetPinTitle(String name) {
+    return '[nyn] Reset $name\'s PIN?';
+  }
+
+  @override
+  String get resetPinBody =>
+      '[nyn] They choose a new 4-digit PIN the next time they tap their card.';
+
+  @override
+  String resetPinDone(String name) {
+    return '[nyn] $name will choose a new PIN';
+  }
+
+  @override
+  String get assignCard => '[nyn] Assign card';
+
+  @override
+  String get tapNewCardNow => '[nyn] Tap the new card now';
+
+  @override
+  String holdBlankCard(String name) {
+    return '[nyn] Hold $name\'s blank card on the back of the phone.';
+  }
+
+  @override
+  String cardAssigned(String number, String name) {
+    return '[nyn] Card $number is now $name\'s';
+  }
+
+  @override
+  String cardTaken(String number, String name) {
+    return '[nyn] Card $number belongs to $name';
+  }
+
+  @override
+  String get typeTheCardNumber => '[nyn] Type the number printed on the card';
+
+  @override
+  String get useCard => '[nyn] Use this card';
+
+  @override
+  String get attendance => '[nyn] Attendance';
+
+  @override
+  String ofInCount(int n, int total) {
+    return '[nyn] $n of $total in';
+  }
+
+  @override
+  String get tapToClock => '[nyn] Tap your card to clock in or out';
+
+  @override
+  String get clockInOut => '[nyn] Clock in / out — tap card';
+
+  @override
+  String clockedInToast(String name, String time) {
+    return '[nyn] $name clocked in $time';
+  }
+
+  @override
+  String clockedOutToast(String name, String time) {
+    return '[nyn] $name clocked out $time';
+  }
+
+  @override
+  String get tasks => '[nyn] Tasks';
+
+  @override
+  String get tabToday => '[nyn] Today';
+
+  @override
+  String get tabThisWeek => '[nyn] This week';
+
+  @override
+  String get tabDone => '[nyn] Done';
+
+  @override
+  String doneAt(String time) {
+    return '[nyn] Done $time';
+  }
+
+  @override
+  String get photoNeeded => '[nyn] Photo needed';
+
+  @override
+  String get overdueBadge => '[nyn] Overdue';
+
+  @override
+  String get newTask => '[nyn] New task';
+
+  @override
+  String get whoDoesIt => '[nyn] Who does it?';
+
+  @override
+  String get whenLabel => '[nyn] When';
+
+  @override
+  String get taskSaved => '[nyn] Task saved';
+
+  @override
+  String get noTasks => '[nyn] Nothing here';
+
+  @override
+  String get wagesAdvances => '[nyn] Wages & advances';
+
+  @override
+  String get wagesThisMonth => '[nyn] Wages this month';
+
+  @override
+  String get advancesGiven => '[nyn] Advances given';
+
+  @override
+  String wageLine(String wage, String advance) {
+    return '[nyn] Wage $wage · advance $advance';
+  }
+
+  @override
+  String get toPayLabel => '[nyn] to pay';
+
+  @override
+  String get paidBadge => '[nyn] Paid';
+
+  @override
+  String get recordAdvance => '[nyn] Record advance';
+
+  @override
+  String get amountLabel => '[nyn] Amount';
+
+  @override
+  String payWage(String name) {
+    return '[nyn] Pay $name';
+  }
+
+  @override
+  String wagePaid(String name, String amount) {
+    return '[nyn] Paid $name $amount';
+  }
+
+  @override
+  String advanceSaved(String amount, String name) {
+    return '[nyn] Advance $amount to $name';
+  }
+
+  @override
+  String get advanceKind => '[nyn] Advance';
+
+  @override
+  String get wageKind => '[nyn] Wage';
+
+  @override
+  String get visitingVet => '[nyn] Visits';
+
+  @override
+  String get colName => '[nyn] Name';
+
+  @override
+  String get colRole => '[nyn] Role';
+
+  @override
+  String get colThisMonth => '[nyn] This month';
+
+  @override
+  String daysCount(int n) {
+    return '[nyn] $n days';
+  }
+
+  @override
+  String noOneHasCard(String number) {
+    return '[nyn] No one has card $number';
+  }
 }

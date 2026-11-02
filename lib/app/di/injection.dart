@@ -10,6 +10,7 @@ import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.da
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
+import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
@@ -35,6 +36,8 @@ import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
+import 'package:farm_tap/sectors/cattle/workers/data/fake/fake_workers_repository.dart';
+import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 import 'package:get_it/get_it.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -60,7 +63,9 @@ Future<void> configureDependencies(Flavor flavor) async {
       ..registerLazySingleton<AuthRepository>(FakeAuthRepository.new)
       ..registerLazySingleton<FarmMembershipRepository>(() => FakeFarmMembershipRepository(tenants))
       ..registerLazySingleton<OnboardingRepository>(() => FakeOnboardingRepository(getIt<Clock>()))
-      ..registerLazySingleton<StaffAccessRepository>(FakeStaffAccessRepository.new)
+      ..registerLazySingleton<FakeStaffAccessRepository>(FakeStaffAccessRepository.new)
+      ..registerLazySingleton<StaffAccessRepository>(getIt.call<FakeStaffAccessRepository>)
+      ..registerLazySingleton<StaffDirectory>(getIt.call<FakeStaffAccessRepository>)
       ..registerLazySingleton<TreatmentRepository>(() => FakeTreatmentRepository(getIt<Clock>()))
       ..registerLazySingleton<HomeRepository>(
         () => FakeHomeRepository(
@@ -68,11 +73,15 @@ Future<void> configureDependencies(Flavor flavor) async {
           getIt<TreatmentRepository>(),
           breeding: getIt<BreedingRepository>(),
           feed: getIt<FeedRepository>(),
+          workers: getIt<WorkersRepository>(),
         ),
       )
       ..registerLazySingleton<MilkRepository>(() => FakeMilkRepository(getIt<Clock>(), getIt<TreatmentRepository>()))
       ..registerLazySingleton<CentreRepository>(() => FakeCentreRepository(getIt<Clock>()))
       ..registerLazySingleton<MoneyRepository>(() => FakeMoneyRepository(getIt<Clock>()))
+      ..registerLazySingleton<WorkersRepository>(
+        () => FakeWorkersRepository(getIt<Clock>(), getIt<StaffDirectory>(), getIt<MoneyRepository>()),
+      )
       ..registerLazySingleton<BreedingRepository>(
         () => FakeBreedingRepository(getIt<Clock>(), getIt<MoneyRepository>()),
       )

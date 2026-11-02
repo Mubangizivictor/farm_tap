@@ -162,7 +162,8 @@ class WorkerDay extends Equatable {
     required this.tasks,
   });
 
-  final DateTime clockedInAt;
+  /// Null when they have not clocked in today.
+  final DateTime? clockedInAt;
   final bool morningSession;
   final int feedingGroupsLeft;
   final int treatmentsDue;

@@ -272,17 +272,23 @@ class MetricCard extends StatelessWidget {
           context.space.gapMd,
           Text(label, style: context.textStyles.metricLabel, maxLines: 1, overflow: TextOverflow.ellipsis),
           context.space.gapXs,
-          Text.rich(
-            TextSpan(
-              text: value,
-              style: context.textStyles.metricValue,
-              children: [
-                if (unit != null)
-                  TextSpan(
-                    text: ' $unit',
-                    style: context.text.titleSmall?.copyWith(color: context.colors.onSurfaceVariant),
-                  ),
-              ],
+          // One line: long money values ("UGX 1.52M") shrink to fit.
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: AlignmentDirectional.centerStart,
+            child: Text.rich(
+              TextSpan(
+                text: value,
+                style: context.textStyles.metricValue,
+                children: [
+                  if (unit != null)
+                    TextSpan(
+                      text: ' $unit',
+                      style: context.text.titleSmall?.copyWith(color: context.colors.onSurfaceVariant),
+                    ),
+                ],
+              ),
+              maxLines: 1,
             ),
           ),
           if (caption != null) ...[

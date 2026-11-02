@@ -61,6 +61,11 @@ abstract final class AppRoutes {
   static const feedingRecord = '/feeding/record';
   static const breeding = '/breeding';
   static const workers = '/workers';
+  static const workersAttendance = '/workers/attendance';
+  static const workersTasks = '/workers/tasks';
+  static const workersWages = '/workers/wages';
+  static String worker(String staffId) => '/workers/$staffId';
+  static String workerCard(String staffId) => '/workers/$staffId/card';
   static const money = '/money';
   static const reports = '/reports';
   static const settings = '/settings';

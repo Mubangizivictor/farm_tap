@@ -4885,6 +4885,450 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This part of FarmTap is being built.'**
   String get comingSoonBody;
+
+  /// No description provided for @peopleCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} people'**
+  String peopleCount(int n);
+
+  /// No description provided for @filterInNow.
+  ///
+  /// In en, this message translates to:
+  /// **'In now'**
+  String get filterInNow;
+
+  /// No description provided for @filterNotIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in'**
+  String get filterNotIn;
+
+  /// No description provided for @inLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'In'**
+  String get inLabel;
+
+  /// No description provided for @outLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Out'**
+  String get outLabel;
+
+  /// No description provided for @notInLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in'**
+  String get notInLabel;
+
+  /// No description provided for @inAt.
+  ///
+  /// In en, this message translates to:
+  /// **'In {time}'**
+  String inAt(String time);
+
+  /// No description provided for @outAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Out {time}'**
+  String outAt(String time);
+
+  /// No description provided for @cardBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Card'**
+  String get cardBadge;
+
+  /// No description provided for @noCardBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'No card'**
+  String get noCardBadge;
+
+  /// No description provided for @cardNumberBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {number}'**
+  String cardNumberBadge(String number);
+
+  /// No description provided for @addWorker.
+  ///
+  /// In en, this message translates to:
+  /// **'Add worker'**
+  String get addWorker;
+
+  /// No description provided for @workerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Worker'**
+  String get workerTitle;
+
+  /// No description provided for @roleSince.
+  ///
+  /// In en, this message translates to:
+  /// **'{role} · since {date}'**
+  String roleSince(String role, String date);
+
+  /// No description provided for @daysThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Days this month'**
+  String get daysThisMonth;
+
+  /// No description provided for @milkRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk records'**
+  String get milkRecords;
+
+  /// No description provided for @balanceOwed.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance owed'**
+  String get balanceOwed;
+
+  /// No description provided for @resetPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset PIN'**
+  String get resetPin;
+
+  /// No description provided for @replaceLostCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace lost card'**
+  String get replaceLostCard;
+
+  /// No description provided for @assignCardRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign card'**
+  String get assignCardRow;
+
+  /// No description provided for @whatCanDo.
+  ///
+  /// In en, this message translates to:
+  /// **'What {name} can do'**
+  String whatCanDo(String name);
+
+  /// No description provided for @canDoManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything except money settings'**
+  String get canDoManager;
+
+  /// No description provided for @canDoHerdsman.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk, feeding, treatments'**
+  String get canDoHerdsman;
+
+  /// No description provided for @canDoClerk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk, collection, payments'**
+  String get canDoClerk;
+
+  /// No description provided for @canDoWorker.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk, feeding'**
+  String get canDoWorker;
+
+  /// No description provided for @canDoVet.
+  ///
+  /// In en, this message translates to:
+  /// **'Treatments, breeding'**
+  String get canDoVet;
+
+  /// No description provided for @activityLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity log'**
+  String get activityLog;
+
+  /// No description provided for @resetPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset {name}\'s PIN?'**
+  String resetPinTitle(String name);
+
+  /// No description provided for @resetPinBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They choose a new 4-digit PIN the next time they tap their card.'**
+  String get resetPinBody;
+
+  /// No description provided for @resetPinDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will choose a new PIN'**
+  String resetPinDone(String name);
+
+  /// No description provided for @assignCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign card'**
+  String get assignCard;
+
+  /// No description provided for @tapNewCardNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the new card now'**
+  String get tapNewCardNow;
+
+  /// No description provided for @holdBlankCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold {name}\'s blank card on the back of the phone.'**
+  String holdBlankCard(String name);
+
+  /// No description provided for @cardAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {number} is now {name}\'s'**
+  String cardAssigned(String number, String name);
+
+  /// No description provided for @cardTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {number} belongs to {name}'**
+  String cardTaken(String number, String name);
+
+  /// No description provided for @typeTheCardNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the number printed on the card'**
+  String get typeTheCardNumber;
+
+  /// No description provided for @useCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this card'**
+  String get useCard;
+
+  /// No description provided for @attendance.
+  ///
+  /// In en, this message translates to:
+  /// **'Attendance'**
+  String get attendance;
+
+  /// No description provided for @ofInCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} of {total} in'**
+  String ofInCount(int n, int total);
+
+  /// No description provided for @tapToClock.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap your card to clock in or out'**
+  String get tapToClock;
+
+  /// No description provided for @clockInOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Clock in / out — tap card'**
+  String get clockInOut;
+
+  /// No description provided for @clockedInToast.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} clocked in {time}'**
+  String clockedInToast(String name, String time);
+
+  /// No description provided for @clockedOutToast.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} clocked out {time}'**
+  String clockedOutToast(String name, String time);
+
+  /// No description provided for @tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get tasks;
+
+  /// No description provided for @tabToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get tabToday;
+
+  /// No description provided for @tabThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get tabThisWeek;
+
+  /// No description provided for @tabDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get tabDone;
+
+  /// No description provided for @doneAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Done {time}'**
+  String doneAt(String time);
+
+  /// No description provided for @photoNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo needed'**
+  String get photoNeeded;
+
+  /// No description provided for @overdueBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get overdueBadge;
+
+  /// No description provided for @newTask.
+  ///
+  /// In en, this message translates to:
+  /// **'New task'**
+  String get newTask;
+
+  /// No description provided for @whoDoesIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Who does it?'**
+  String get whoDoesIt;
+
+  /// No description provided for @whenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'When'**
+  String get whenLabel;
+
+  /// No description provided for @taskSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Task saved'**
+  String get taskSaved;
+
+  /// No description provided for @noTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here'**
+  String get noTasks;
+
+  /// No description provided for @wagesAdvances.
+  ///
+  /// In en, this message translates to:
+  /// **'Wages & advances'**
+  String get wagesAdvances;
+
+  /// No description provided for @wagesThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Wages this month'**
+  String get wagesThisMonth;
+
+  /// No description provided for @advancesGiven.
+  ///
+  /// In en, this message translates to:
+  /// **'Advances given'**
+  String get advancesGiven;
+
+  /// No description provided for @wageLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Wage {wage} · advance {advance}'**
+  String wageLine(String wage, String advance);
+
+  /// No description provided for @toPayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'to pay'**
+  String get toPayLabel;
+
+  /// No description provided for @paidBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get paidBadge;
+
+  /// No description provided for @recordAdvance.
+  ///
+  /// In en, this message translates to:
+  /// **'Record advance'**
+  String get recordAdvance;
+
+  /// No description provided for @amountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amountLabel;
+
+  /// No description provided for @payWage.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay {name}'**
+  String payWage(String name);
+
+  /// No description provided for @wagePaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid {name} {amount}'**
+  String wagePaid(String name, String amount);
+
+  /// No description provided for @advanceSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Advance {amount} to {name}'**
+  String advanceSaved(String amount, String name);
+
+  /// No description provided for @advanceKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Advance'**
+  String get advanceKind;
+
+  /// No description provided for @wageKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Wage'**
+  String get wageKind;
+
+  /// No description provided for @visitingVet.
+  ///
+  /// In en, this message translates to:
+  /// **'Visits'**
+  String get visitingVet;
+
+  /// No description provided for @colName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get colName;
+
+  /// No description provided for @colRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get colRole;
+
+  /// No description provided for @colThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get colThisMonth;
+
+  /// No description provided for @daysCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} days'**
+  String daysCount(int n);
+
+  /// No description provided for @noOneHasCard.
+  ///
+  /// In en, this message translates to:
+  /// **'No one has card {number}'**
+  String noOneHasCard(String number);
 }
 
 class _AppLocalizationsDelegate

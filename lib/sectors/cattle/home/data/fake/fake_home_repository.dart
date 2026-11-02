@@ -8,11 +8,13 @@ import 'package:farm_tap/sectors/cattle/health/domain/health_models.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_models.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
+import 'package:farm_tap/sectors/cattle/workers/domain/workers_models.dart';
+import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 
 /// UI phase: the numbers and alerts shown in the D01-D03 mockups, dated
 /// relative to the clock.
 class FakeHomeRepository implements HomeRepository {
-  new(this.clock, this.treatments, {required this.breeding, required this.feed});
+  new(this.clock, this.treatments, {required this.breeding, required this.feed, required this.workers});
 
   final Clock clock;
 
@@ -25,8 +27,10 @@ class FakeHomeRepository implements HomeRepository {
   /// Low-stock alerts come from the feed records.
   final FeedRepository feed;
 
+  /// Who is in, clock-in times and a worker's tasks come from here.
+  final WorkersRepository workers;
+
   Future<List<TreatmentRecord>> _all() async => (await treatments.treatments()).data ?? const [];
-  final _done = <String, bool>{'task-heifers': true};
 
   DateTime get _today {
     final n = clock.now();
@@ -37,6 +41,7 @@ class FakeHomeRepository implements HomeRepository {
   Future<Result<HomeSummary>> summary() async {
     final now = clock.now();
     final records = await _all();
+    final staffToday = (await workers.today()).data ?? const <StaffToday>[];
     const litres = [296.0, 300.0, 293.0, 302.0, 305.0, 301.0, 312.0];
     return Result.success(
       HomeSummary(
@@ -47,8 +52,8 @@ class FakeHomeRepository implements HomeRepository {
         dry: 7,
         underTreatment: records.where((r) => r.active(now)).length,
         notForSale: records.where((r) => r.inWithdrawal(now)).length,
-        workersIn: 5,
-        workersTotal: 6,
+        workersIn: staffToday.where((s) => s.onShift && s.isIn).length,
+        workersTotal: staffToday.where((s) => s.onShift).length,
         week: [
           for (var i = 0; i < litres.length; i++)
             DayLitres(_today.subtract(Duration(days: litres.length - 1 - i)), litres[i]),
@@ -73,35 +78,26 @@ class FakeHomeRepository implements HomeRepository {
   ]);
 
   @override
-  Future<Result<WorkerDay>> workerDay(String staffId) async => Result.success(
-    WorkerDay(
-      clockedInAt: _today.add(const Duration(hours: 5, minutes: 45)),
-      morningSession: true,
-      feedingGroupsLeft: 2,
-      treatmentsDue: 1,
-      dippingDue: _today.add(const Duration(days: 6)),
-      tasks: [
-        WorkerTask(
-          id: 'task-heifers',
-          title: 'Move heifers to paddock 3',
-          when: 'Before 10:00',
-          done: _done['task-heifers'] ?? false,
-        ),
-        WorkerTask(
-          id: 'task-clean',
-          title: 'Clean milking area',
-          when: 'After evening milking',
-          done: _done['task-clean'] ?? false,
-        ),
-      ],
-    ),
-  );
+  Future<Result<WorkerDay>> workerDay(String staffId) async {
+    final me = ((await workers.today()).data ?? const <StaffToday>[]).where((s) => s.staff.id == staffId).firstOrNull;
+    final tomorrow = _today.add(const Duration(days: 1));
+    final tasks = ((await workers.tasks()).data ?? const <FarmTask>[]).where(
+      (t) => t.staffId == staffId && t.due.isBefore(tomorrow) && (!t.done || !t.doneAt!.isBefore(_today)),
+    );
+    return Result.success(
+      WorkerDay(
+        clockedInAt: me?.record?.inAt,
+        morningSession: true,
+        feedingGroupsLeft: 2,
+        treatmentsDue: 1,
+        dippingDue: _today.add(const Duration(days: 6)),
+        tasks: [for (final t in tasks) WorkerTask(id: t.id, title: t.title, when: _capitalise(t.when), done: t.done)],
+      ),
+    );
+  }
 
   @override
-  Future<Result<void>> setTaskDone(String taskId, {required bool done}) async {
-    _done[taskId] = done;
-    return const Result.success(null);
-  }
+  Future<Result<void>> setTaskDone(String taskId, {required bool done}) => workers.setTaskDone(taskId, done: done);
 }
 
 // Alert text is English in the UI phase (as the other sample alerts).
@@ -111,3 +107,5 @@ const Map<FeedKind, String> _feedNames = {
   FeedKind.mineralLick: 'Mineral lick',
   FeedKind.silage: 'Silage',
 };
+
+String _capitalise(String s) => s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';

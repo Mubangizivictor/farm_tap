@@ -40,6 +40,7 @@ import 'package:farm_tap/sectors/cattle/herd/presentation/pages/herd_tools_pages
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/alerts_page.dart';
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/home_page.dart';
 import 'package:farm_tap/sectors/cattle/milk/presentation/pages/milk_pages.dart';
+import 'package:farm_tap/sectors/cattle/workers/presentation/pages/workers_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -156,6 +157,15 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       onOpen: (t) => _openMore(context, session, t),
     );
   };
+  sectionRoots[AppRoutes.workers] = (context, state) => WorkersPage(
+    repo: deps.workers,
+    onStaff: (id) => context.push(AppRoutes.worker(id)),
+    onOpen: (t) => context.push(switch (t) {
+      WorkersTarget.attendance => AppRoutes.workersAttendance,
+      WorkersTarget.tasks => AppRoutes.workersTasks,
+      WorkersTarget.wages => AppRoutes.workersWages,
+    }),
+  );
   sectionRoots[AppRoutes.breeding] = (context, state) => BreedingPage(
     repo: deps.breeding,
     onAnimal: (id) => context.go(AppRoutes.herdAnimal(id)),
@@ -335,6 +345,46 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         parent: AppRoutes.feeding,
         builder: (context, state) =>
             RecordFeedingPage(repo: deps.feed, onSaved: () => popOrGo(context, AppRoutes.feeding)),
+      ),
+    ],
+    AppRoutes.workers: [
+      page(
+        'attendance',
+        parent: AppRoutes.workers,
+        builder: (context, state) => AttendancePage(repo: deps.workers),
+      ),
+      page(
+        'tasks',
+        parent: AppRoutes.workers,
+        builder: (context, state) => TasksPage(repo: deps.workers, directory: deps.staffDirectory),
+      ),
+      page(
+        'wages',
+        parent: AppRoutes.workers,
+        builder: (context, state) => WagesPage(repo: deps.workers),
+      ),
+      page(
+        ':staffId',
+        parent: AppRoutes.workers,
+        builder: (context, state) => StaffDetailPage(
+          repo: deps.workers,
+          directory: deps.staffDirectory,
+          staffId: state.pathParameters['staffId']!,
+          onAssignCard: () => context.push(AppRoutes.workerCard(state.pathParameters['staffId']!)),
+        ),
+        routes: [
+          page(
+            'card',
+            // Back pops to K02; a deep link falls back to the list.
+            parent: AppRoutes.workers,
+            builder: (context, state) => AssignCardPage(
+              directory: deps.staffDirectory,
+              staffId: state.pathParameters['staffId']!,
+              farmName: session.farm?.name ?? '',
+              onDone: () => popOrGo(context, AppRoutes.worker(state.pathParameters['staffId']!)),
+            ),
+          ),
+        ],
       ),
     ],
     AppRoutes.settings: [

@@ -2788,4 +2788,269 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get comingSoonBody => 'This part of FarmTap is being built.';
+
+  @override
+  String peopleCount(int n) {
+    return '$n people';
+  }
+
+  @override
+  String get filterInNow => 'In now';
+
+  @override
+  String get filterNotIn => 'Not in';
+
+  @override
+  String get inLabel => 'In';
+
+  @override
+  String get outLabel => 'Out';
+
+  @override
+  String get notInLabel => 'Not in';
+
+  @override
+  String inAt(String time) {
+    return 'In $time';
+  }
+
+  @override
+  String outAt(String time) {
+    return 'Out $time';
+  }
+
+  @override
+  String get cardBadge => 'Card';
+
+  @override
+  String get noCardBadge => 'No card';
+
+  @override
+  String cardNumberBadge(String number) {
+    return 'Card $number';
+  }
+
+  @override
+  String get addWorker => 'Add worker';
+
+  @override
+  String get workerTitle => 'Worker';
+
+  @override
+  String roleSince(String role, String date) {
+    return '$role · since $date';
+  }
+
+  @override
+  String get daysThisMonth => 'Days this month';
+
+  @override
+  String get milkRecords => 'Milk records';
+
+  @override
+  String get balanceOwed => 'Balance owed';
+
+  @override
+  String get resetPin => 'Reset PIN';
+
+  @override
+  String get replaceLostCard => 'Replace lost card';
+
+  @override
+  String get assignCardRow => 'Assign card';
+
+  @override
+  String whatCanDo(String name) {
+    return 'What $name can do';
+  }
+
+  @override
+  String get canDoManager => 'Everything except money settings';
+
+  @override
+  String get canDoHerdsman => 'Milk, feeding, treatments';
+
+  @override
+  String get canDoClerk => 'Milk, collection, payments';
+
+  @override
+  String get canDoWorker => 'Milk, feeding';
+
+  @override
+  String get canDoVet => 'Treatments, breeding';
+
+  @override
+  String get activityLog => 'Activity log';
+
+  @override
+  String resetPinTitle(String name) {
+    return 'Reset $name\'s PIN?';
+  }
+
+  @override
+  String get resetPinBody =>
+      'They choose a new 4-digit PIN the next time they tap their card.';
+
+  @override
+  String resetPinDone(String name) {
+    return '$name will choose a new PIN';
+  }
+
+  @override
+  String get assignCard => 'Assign card';
+
+  @override
+  String get tapNewCardNow => 'Tap the new card now';
+
+  @override
+  String holdBlankCard(String name) {
+    return 'Hold $name\'s blank card on the back of the phone.';
+  }
+
+  @override
+  String cardAssigned(String number, String name) {
+    return 'Card $number is now $name\'s';
+  }
+
+  @override
+  String cardTaken(String number, String name) {
+    return 'Card $number belongs to $name';
+  }
+
+  @override
+  String get typeTheCardNumber => 'Type the number printed on the card';
+
+  @override
+  String get useCard => 'Use this card';
+
+  @override
+  String get attendance => 'Attendance';
+
+  @override
+  String ofInCount(int n, int total) {
+    return '$n of $total in';
+  }
+
+  @override
+  String get tapToClock => 'Tap your card to clock in or out';
+
+  @override
+  String get clockInOut => 'Clock in / out — tap card';
+
+  @override
+  String clockedInToast(String name, String time) {
+    return '$name clocked in $time';
+  }
+
+  @override
+  String clockedOutToast(String name, String time) {
+    return '$name clocked out $time';
+  }
+
+  @override
+  String get tasks => 'Tasks';
+
+  @override
+  String get tabToday => 'Today';
+
+  @override
+  String get tabThisWeek => 'This week';
+
+  @override
+  String get tabDone => 'Done';
+
+  @override
+  String doneAt(String time) {
+    return 'Done $time';
+  }
+
+  @override
+  String get photoNeeded => 'Photo needed';
+
+  @override
+  String get overdueBadge => 'Overdue';
+
+  @override
+  String get newTask => 'New task';
+
+  @override
+  String get whoDoesIt => 'Who does it?';
+
+  @override
+  String get whenLabel => 'When';
+
+  @override
+  String get taskSaved => 'Task saved';
+
+  @override
+  String get noTasks => 'Nothing here';
+
+  @override
+  String get wagesAdvances => 'Wages & advances';
+
+  @override
+  String get wagesThisMonth => 'Wages this month';
+
+  @override
+  String get advancesGiven => 'Advances given';
+
+  @override
+  String wageLine(String wage, String advance) {
+    return 'Wage $wage · advance $advance';
+  }
+
+  @override
+  String get toPayLabel => 'to pay';
+
+  @override
+  String get paidBadge => 'Paid';
+
+  @override
+  String get recordAdvance => 'Record advance';
+
+  @override
+  String get amountLabel => 'Amount';
+
+  @override
+  String payWage(String name) {
+    return 'Pay $name';
+  }
+
+  @override
+  String wagePaid(String name, String amount) {
+    return 'Paid $name $amount';
+  }
+
+  @override
+  String advanceSaved(String amount, String name) {
+    return 'Advance $amount to $name';
+  }
+
+  @override
+  String get advanceKind => 'Advance';
+
+  @override
+  String get wageKind => 'Wage';
+
+  @override
+  String get visitingVet => 'Visits';
+
+  @override
+  String get colName => 'Name';
+
+  @override
+  String get colRole => 'Role';
+
+  @override
+  String get colThisMonth => 'This month';
+
+  @override
+  String daysCount(int n) {
+    return '$n days';
+  }
+
+  @override
+  String noOneHasCard(String number) {
+    return 'No one has card $number';
+  }
 }

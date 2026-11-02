@@ -205,7 +205,7 @@ void main() {
     for (final (label, location, ready) in [
       ('Feeding', '/feeding', 'Feed cost this month'),
       ('Breeding', '/breeding', 'Expected calvings'),
-      ('Workers', '/workers', 'Coming soon'),
+      ('Workers', '/workers', '6 people'),
       ('Money', '/money', 'Coming soon'),
       ('Reports', '/reports', 'Coming soon'),
       ('Settings', '/settings', 'Coming soon'),
@@ -222,5 +222,42 @@ void main() {
         expect(h.location, AppRoutes.more);
       });
     }
+  });
+
+  group('K: workers pages push from /workers and back returns', () {
+    for (final (route, ready) in [
+      ('/workers/attendance', 'Attendance'),
+      ('/workers/tasks', 'Tasks'),
+      ('/workers/wages', 'Wages & advances'),
+      ('/workers/staff-ta', 'Balance owed'),
+    ]) {
+      testWidgets(route, (tester) async {
+        final h = await _Harness.pump(tester, start: AppRoutes.workers, signedIn: true, farm: true);
+        unawaited(h.router.push(route));
+        await _settle(tester);
+        expect(h.location, route);
+        expect(find.text(ready), findsWidgets);
+        await _tapBack(tester);
+        expect(h.location, AppRoutes.workers);
+      });
+    }
+
+    testWidgets('K03 assign card by typed number returns to K02', (tester) async {
+      final h = await _Harness.pump(tester, start: AppRoutes.workers, signedIn: true, farm: true);
+      unawaited(h.router.push('/workers/staff-np'));
+      await _settle(tester);
+      unawaited(h.router.push('/workers/staff-np/card'));
+      await _settle(tester);
+      await tester.tap(find.text('Type card number'));
+      await _settle(tester);
+      for (final d in ['2', '0', '7']) {
+        await tester.tap(find.text(d).last);
+        await tester.pump();
+      }
+      await tester.tap(find.text('Use this card'));
+      await _settle(tester);
+      expect(h.location, '/workers/staff-np');
+      await tester.pump(const Duration(seconds: 4));
+    });
   });
 }

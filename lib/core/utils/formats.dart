@@ -51,6 +51,9 @@ class FarmTapFormat {
   String dayMonthMaybeYear(DateTime d, DateTime now) =>
       d.year == now.year ? dayMonth(d) : DateFormat('d MMM y', _l).format(d);
 
+  /// "November".
+  String monthLong(DateTime d) => DateFormat('MMMM', _l).format(d);
+
   /// "Oct".
   String monthShort(DateTime d) => DateFormat('MMM', _l).format(d);
 

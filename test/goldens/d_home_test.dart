@@ -46,7 +46,7 @@ void main() {
         repo: fakeHome(clock, FakeTreatmentRepository(clock)),
         farmName: 'Rwemera Dairy Farm',
         ownerName: 'Muhwezi Robert',
-        staff: FakeStaffAccessRepository.staff[1],
+        staff: FakeStaffAccessRepository.sample[1],
         today: today,
         onOpen: (_) {},
         onLock: () {},

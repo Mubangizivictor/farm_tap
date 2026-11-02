@@ -270,7 +270,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           if (day != null)
                             Text(
-                              l10n.clockedIn(f.time(day.clockedInAt), role),
+                              day.clockedInAt == null ? role : l10n.clockedIn(f.time(day.clockedInAt!), role),
                               style: context.text.bodySmall?.copyWith(color: context.colors.onPrimaryContainer),
                             ),
                         ],

@@ -42,7 +42,7 @@ docs/design/screens/{phone,tablet,web_desktop,web_mobile}/{light,dark}/<ID>_<nam
     "Discard changes?" on forms, ROUTES.md, route back tests
   - Breakpoints (decision 0012): compact < 600 bottom bar; medium 600–1279
     navigation rail (7 items); expanded ≥ 1280 sidebar (11 items)
-  - Sections A–J built, goldens ~91–97, device-checked on
+  - Sections A–K and N01 built, goldens ~91–97, device-checked on
     iPhone 16 Pro Max simulator (idb) in light and dark
   - Single-source fake data: farmer totals derived from one record per
     farmer (Muhwezi Robert 512.0 L → UGX 538,200 everywhere); treatments
@@ -57,9 +57,10 @@ docs/design/screens/{phone,tablet,web_desktop,web_mobile}/{light,dark}/<ID>_<nam
     unpaid period) / read-only computed from the clock (80841dd).
     Rwemera Dairy Farm and Kashari Milk Centre trials: 2 Nov → 16 Nov 2026
     (9 days left on 7 Nov). New farms: trialEndsAt = today + 14 (0cdc19e)
-- Last known state: 983 passing, 0 skipped; flutter analyze clean; latest
-  commit: feat(ui): N01 more menu (after bfc72cf). Update this line at every
-  section commit. I and J device-checked on iPhone 16 Pro Max via More.
+- Last known state: 1061 passing, 0 skipped; flutter analyze clean; latest
+  commit: feat(ui): section K K01-K06 (after 4714b00). Update this line at
+  every section commit. Sections I, J, K and N01 device-checked on iPhone 16
+  Pro Max (K fully without NFC, typed card numbers).
 
 ## Decisions to keep (from review)
 - Data wins over mockup when mockups disagree (e.g. E03 "5 days left",

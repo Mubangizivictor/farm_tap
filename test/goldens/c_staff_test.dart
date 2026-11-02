@@ -15,7 +15,7 @@ Future<void> _keys(WidgetTester tester, String digits) async {
 }
 
 void main() {
-  final amos = FakeStaffAccessRepository.staff[1];
+  final amos = FakeStaffAccessRepository.sample[1];
 
   screenGoldens(
     'C01_staff_tap_card',

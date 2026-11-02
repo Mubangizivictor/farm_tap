@@ -3,6 +3,7 @@ import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
+import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
 import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
@@ -12,6 +13,7 @@ import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
+import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 
 /// Everything the router hands to pages (repositories behind domain
 /// interfaces). Built from get_it in the app, from fakes in tests.
@@ -30,6 +32,8 @@ class AppDependencies {
     required this.feed,
     required this.money,
     required this.breeding,
+    required this.workers,
+    required this.staffDirectory,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -46,6 +50,8 @@ class AppDependencies {
     feed: getIt<FeedRepository>(),
     money: getIt<MoneyRepository>(),
     breeding: getIt<BreedingRepository>(),
+    workers: getIt<WorkersRepository>(),
+    staffDirectory: getIt<StaffDirectory>(),
   );
 
   final SessionController session;
@@ -61,4 +67,6 @@ class AppDependencies {
   final FeedRepository feed;
   final MoneyRepository money;
   final BreedingRepository breeding;
+  final WorkersRepository workers;
+  final StaffDirectory staffDirectory;
 }

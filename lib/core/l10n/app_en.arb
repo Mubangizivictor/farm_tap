@@ -2174,5 +2174,253 @@
   "signOutLabel": "Sign out",
   "signOutTitle": "Sign out?",
   "signOutBody": "Records on this phone stay saved. Sign in again to see them.",
-  "comingSoonBody": "This part of FarmTap is being built."
+  "comingSoonBody": "This part of FarmTap is being built.",
+  "peopleCount": "{n} people",
+  "@peopleCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "filterInNow": "In now",
+  "filterNotIn": "Not in",
+  "inLabel": "In",
+  "outLabel": "Out",
+  "notInLabel": "Not in",
+  "inAt": "In {time}",
+  "@inAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "outAt": "Out {time}",
+  "@outAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "cardBadge": "Card",
+  "noCardBadge": "No card",
+  "cardNumberBadge": "Card {number}",
+  "@cardNumberBadge": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "addWorker": "Add worker",
+  "workerTitle": "Worker",
+  "roleSince": "{role} · since {date}",
+  "@roleSince": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "daysThisMonth": "Days this month",
+  "milkRecords": "Milk records",
+  "balanceOwed": "Balance owed",
+  "resetPin": "Reset PIN",
+  "replaceLostCard": "Replace lost card",
+  "assignCardRow": "Assign card",
+  "whatCanDo": "What {name} can do",
+  "@whatCanDo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "canDoManager": "Everything except money settings",
+  "canDoHerdsman": "Milk, feeding, treatments",
+  "canDoClerk": "Milk, collection, payments",
+  "canDoWorker": "Milk, feeding",
+  "canDoVet": "Treatments, breeding",
+  "activityLog": "Activity log",
+  "resetPinTitle": "Reset {name}'s PIN?",
+  "@resetPinTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "resetPinBody": "They choose a new 4-digit PIN the next time they tap their card.",
+  "resetPinDone": "{name} will choose a new PIN",
+  "@resetPinDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assignCard": "Assign card",
+  "tapNewCardNow": "Tap the new card now",
+  "holdBlankCard": "Hold {name}'s blank card on the back of the phone.",
+  "@holdBlankCard": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cardAssigned": "Card {number} is now {name}'s",
+  "@cardAssigned": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cardTaken": "Card {number} belongs to {name}",
+  "@cardTaken": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "typeTheCardNumber": "Type the number printed on the card",
+  "useCard": "Use this card",
+  "attendance": "Attendance",
+  "ofInCount": "{n} of {total} in",
+  "@ofInCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tapToClock": "Tap your card to clock in or out",
+  "clockInOut": "Clock in / out — tap card",
+  "clockedInToast": "{name} clocked in {time}",
+  "@clockedInToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "clockedOutToast": "{name} clocked out {time}",
+  "@clockedOutToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "tasks": "Tasks",
+  "tabToday": "Today",
+  "tabThisWeek": "This week",
+  "tabDone": "Done",
+  "doneAt": "Done {time}",
+  "@doneAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "photoNeeded": "Photo needed",
+  "overdueBadge": "Overdue",
+  "newTask": "New task",
+  "whoDoesIt": "Who does it?",
+  "whenLabel": "When",
+  "taskSaved": "Task saved",
+  "noTasks": "Nothing here",
+  "wagesAdvances": "Wages & advances",
+  "wagesThisMonth": "Wages this month",
+  "advancesGiven": "Advances given",
+  "wageLine": "Wage {wage} · advance {advance}",
+  "@wageLine": {
+    "placeholders": {
+      "wage": {
+        "type": "String"
+      },
+      "advance": {
+        "type": "String"
+      }
+    }
+  },
+  "toPayLabel": "to pay",
+  "paidBadge": "Paid",
+  "recordAdvance": "Record advance",
+  "amountLabel": "Amount",
+  "payWage": "Pay {name}",
+  "@payWage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "wagePaid": "Paid {name} {amount}",
+  "@wagePaid": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "advanceSaved": "Advance {amount} to {name}",
+  "@advanceSaved": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "advanceKind": "Advance",
+  "wageKind": "Wage",
+  "visitingVet": "Visits",
+  "colName": "Name",
+  "colRole": "Role",
+  "colThisMonth": "This month",
+  "daysCount": "{n} days",
+  "@daysCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "noOneHasCard": "No one has card {number}",
+  "@noOneHasCard": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  }
 }
