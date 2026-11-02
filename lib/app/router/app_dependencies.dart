@@ -13,6 +13,8 @@ import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
+import 'package:farm_tap/sectors/cattle/money/domain/farm_money_repository.dart';
+import 'package:farm_tap/sectors/cattle/owner_reports/domain/daily_report.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 
 /// Everything the router hands to pages (repositories behind domain
@@ -34,6 +36,8 @@ class AppDependencies {
     required this.breeding,
     required this.workers,
     required this.staffDirectory,
+    required this.farmMoney,
+    required this.dailyReport,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -52,6 +56,8 @@ class AppDependencies {
     breeding: getIt<BreedingRepository>(),
     workers: getIt<WorkersRepository>(),
     staffDirectory: getIt<StaffDirectory>(),
+    farmMoney: getIt<FarmMoneyRepository>(),
+    dailyReport: getIt<DailyReportRepository>(),
   );
 
   final SessionController session;
@@ -69,4 +75,6 @@ class AppDependencies {
   final BreedingRepository breeding;
   final WorkersRepository workers;
   final StaffDirectory staffDirectory;
+  final FarmMoneyRepository farmMoney;
+  final DailyReportRepository dailyReport;
 }

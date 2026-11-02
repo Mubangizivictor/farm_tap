@@ -207,8 +207,8 @@ void main() {
       ('Feeding', '/feeding', 'Feed cost this month'),
       ('Breeding', '/breeding', 'Expected calvings'),
       ('Workers', '/workers', '6 people'),
-      ('Money', '/money', 'Coming soon'),
-      ('Reports', '/reports', 'Coming soon'),
+      ('Money', '/money', 'Cost per litre'),
+      ('Reports', '/reports', 'Monthly farm report'),
       ('Settings', '/settings', 'Coming soon'),
       ('Help & support', '/settings/help', 'Coming soon'),
     ]) {
@@ -285,5 +285,21 @@ void main() {
       expect(h.session.staff, isNull);
       expect(find.text('Add worker'), findsOneWidget);
     });
+  });
+
+  group('L: money and reports push and back', () {
+    for (final (start, route, ready) in [
+      ('/money', '/money/expense', 'Category'),
+      ('/reports', '/reports/whatsapp', 'Send time'),
+    ]) {
+      testWidgets(route, (tester) async {
+        final h = await _Harness.pump(tester, start: start, signedIn: true, farm: true);
+        unawaited(h.router.push(route));
+        await _settle(tester);
+        expect(find.text(ready), findsWidgets);
+        await _tapBack(tester);
+        expect(h.location, start);
+      });
+    }
   });
 }

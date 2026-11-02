@@ -69,7 +69,9 @@ abstract final class AppRoutes {
   static String workerEdit(String staffId) => '/workers/$staffId/edit';
   static String workerCard(String staffId) => '/workers/$staffId/card';
   static const money = '/money';
+  static const moneyExpense = '/money/expense';
   static const reports = '/reports';
+  static const reportsWhatsapp = '/reports/whatsapp';
   static const settings = '/settings';
   static const settingsSubscription = '/settings/subscription';
   static const settingsHelp = '/settings/help';

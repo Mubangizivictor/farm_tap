@@ -1,5 +1,6 @@
 // Charts use fl_chart; all colours and sizes come from the theme.
 import 'package:farm_tap/core/theme/theme.dart';
+import 'package:farm_tap/core/ui/tone.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -137,7 +138,22 @@ class MilkLineChart extends StatelessWidget {
 /// Bars for sales / expenses / litres per day. [highlightIndex] bar is
 /// drawn in the primary colour, the rest softer.
 class FarmTapBarChart extends StatelessWidget {
-  const new({required this.values, required this.labels, super.key, this.highlightIndex, this.height, this.barWidth});
+  const new({
+    required this.values,
+    required this.labels,
+    super.key,
+    this.highlightIndex,
+    this.height,
+    this.barWidth,
+    this.tones,
+    this.showAxis = true,
+  });
+
+  /// One colour per bar (L01 expenses by category); overrides the highlight.
+  final List<FarmTapTone>? tones;
+
+  /// False hides the y labels and grid lines (category charts).
+  final bool showAxis;
 
   /// At most `context.sizes.chartBarMaxWidth` (36); defaults to 24.
   final double? barWidth;
@@ -164,6 +180,7 @@ class FarmTapBarChart extends StatelessWidget {
             borderData: FlBorderData(show: false),
             barTouchData: const BarTouchData(enabled: false),
             gridData: FlGridData(
+              show: showAxis,
               drawVerticalLine: false,
               horizontalInterval: maxY / 3,
               getDrawingHorizontalLine: (_) => FlLine(
@@ -177,7 +194,7 @@ class FarmTapBarChart extends StatelessWidget {
               rightTitles: const AxisTitles(),
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
-                  showTitles: true,
+                  showTitles: showAxis,
                   reservedSize: context.sizes.avatarMd,
                   interval: maxY / 3,
                   getTitlesWidget: (v, meta) => Text(v.round().toString(), style: label),
@@ -206,7 +223,11 @@ class FarmTapBarChart extends StatelessWidget {
                     BarChartRodData(
                       toY: values[i],
                       width: barWidth ?? context.space.xl,
-                      color: i == hi ? context.colors.primary : context.colors.primary.withValues(alpha: 0.35),
+                      color: tones != null
+                          ? tones![i % tones!.length].of(context).accent
+                          : i == hi
+                          ? context.colors.primary
+                          : context.colors.primary.withValues(alpha: 0.35),
                       borderRadius: BorderRadius.vertical(top: Radius.circular(context.radii.xs)),
                     ),
                   ],

@@ -3,10 +3,30 @@ import 'package:farm_tap/core/money/domain/money_models.dart';
 import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 
-/// UI phase: in-memory expenses. Feature fakes (feed purchases) add their
-/// sample expenses through [addExpense], so every total has one source.
+/// UI phase: in-memory expenses. Feature fakes (feed purchases, AI services,
+/// wages) add theirs through [addExpense], so every total has one source.
+/// Two expenses entered directly on L02 are seeded here.
 class FakeMoneyRepository implements MoneyRepository {
-  new(this.clock);
+  new(this.clock) {
+    final now = clock.now();
+    final today = DateTime(now.year, now.month, now.day);
+    _expenses.addAll([
+      Expense(
+        id: 'expense-${_next++}',
+        category: ExpenseCategory.fuel,
+        amount: 45000,
+        at: today.subtract(const Duration(days: 3, hours: -10)),
+        note: 'Diesel — generator',
+      ),
+      Expense(
+        id: 'expense-${_next++}',
+        category: ExpenseCategory.vet,
+        amount: 60000,
+        at: today.subtract(const Duration(days: 1, hours: -11)),
+        note: 'Vet visit — Kasheshe',
+      ),
+    ]);
+  }
 
   final Clock clock;
   final List<Expense> _expenses = [];

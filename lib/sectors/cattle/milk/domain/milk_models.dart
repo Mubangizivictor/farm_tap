@@ -151,9 +151,13 @@ class MilkSale extends Equatable {
     required this.pricePerLitre,
     required this.paid,
     this.kind = BuyerKind.centre,
+    this.at,
   });
 
   final String buyer;
+
+  /// When it was sold (the sales ledger; L01 income).
+  final DateTime? at;
   final double litres;
   final int pricePerLitre;
   final bool paid;
@@ -162,7 +166,7 @@ class MilkSale extends Equatable {
   int get amount => (litres * pricePerLitre).round();
 
   @override
-  List<Object?> get props => [buyer, litres, pricePerLitre, paid, kind];
+  List<Object?> get props => [buyer, litres, pricePerLitre, paid, kind, at];
 }
 
 enum BuyerKind { centre, shop, neighbours }

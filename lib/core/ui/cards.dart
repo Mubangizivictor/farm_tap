@@ -417,6 +417,7 @@ class ActionTile extends StatelessWidget {
     this.tone = FarmTapTone.primary,
     this.onTap,
     this.locked = false,
+    this.selected = false,
   });
 
   final IconData icon;
@@ -426,16 +427,22 @@ class ActionTile extends StatelessWidget {
   final VoidCallback? onTap;
   final bool locked;
 
+  /// Picked from a set (L02 category): primary border and a check.
+  final bool selected;
+
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null && !locked;
     final shape = RoundedRectangleBorder(
       borderRadius: context.radii.tile,
-      side: BorderSide(color: context.colors.outlineVariant, width: context.sizes.borderThin),
+      side: selected
+          ? BorderSide(color: context.colors.primary, width: context.sizes.borderThick)
+          : BorderSide(color: context.colors.outlineVariant, width: context.sizes.borderThin),
     );
     return Semantics(
       button: true,
       enabled: enabled,
+      selected: selected,
       child: Material(
         color: context.status.card,
         shape: shape,
@@ -456,6 +463,13 @@ class ActionTile extends StatelessWidget {
                   children: [
                     IconBubble(icon: icon, tone: locked ? FarmTapTone.neutral : tone, size: context.sizes.bubbleLg),
                     const Spacer(),
+                    if (selected)
+                      Icon(
+                        Symbols.check_circle_rounded,
+                        fill: 1,
+                        size: context.sizes.iconMd,
+                        color: context.colors.primary,
+                      ),
                     if (locked)
                       Icon(
                         Symbols.lock_rounded,

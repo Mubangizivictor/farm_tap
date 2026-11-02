@@ -26,5 +26,8 @@ abstract interface class MilkRepository {
   Future<Result<List<MilkUseLine>>> use();
   Future<Result<void>> saveUse(List<MilkUseLine> lines);
   Future<Result<MilkSalesSummary>> sales();
+
+  /// Every sale since [from] (income for L01 and reports).
+  Future<Result<List<MilkSale>>> salesSince(DateTime from);
   Future<Result<MilkTrend>> trend(TrendRange range);
 }

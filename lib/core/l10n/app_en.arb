@@ -1132,7 +1132,7 @@
   "download": "Download",
   "soldThisWeek": "Sold this week",
   "owedToYou": "Owed to you",
-  "buyersCount": "{count} buyers",
+  "buyersCount": "{count, plural, =1{1 buyer} other{{count} buyers}}",
   "@buyersCount": {
     "placeholders": {
       "count": {
@@ -2442,5 +2442,174 @@
       }
     }
   },
-  "saveChanges": "Save changes"
+  "saveChanges": "Save changes",
+  "incomeLabel": "Income",
+  "expensesLabel": "Expenses",
+  "profitLabel": "Profit",
+  "lossLabel": "Loss",
+  "costPerLitre": "Cost per litre",
+  "milkIncomeCaption": "Milk {amount}",
+  "@milkIncomeCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "expenseShare": "{group} {percent}%",
+  "@expenseShare": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "expensesByCategory": "Expenses by category",
+  "latestLabel": "Latest",
+  "addExpense": "Add expense",
+  "exportLabel": "Export",
+  "categoryLabel": "Category",
+  "groupFeed": "Feed",
+  "groupDrugsVet": "Drugs & vet",
+  "groupWages": "Wages",
+  "groupTransport": "Transport",
+  "groupFuel": "Fuel & power",
+  "groupOther": "Other",
+  "groupDrugsShort": "Drugs",
+  "noteLabel": "Note",
+  "receiptPhoto": "Receipt photo",
+  "expenseSaved": "Expense saved: {amount}",
+  "@expenseSaved": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseCategory": "Choose a category",
+  "monthlyFarmReport": "Monthly farm report",
+  "monthlyFarmReportSub": "Milk, herd, health, money · PDF",
+  "milkRecordsReport": "Milk records",
+  "milkRecordsReportSub": "Per cow, per day · Excel / CSV",
+  "farmerStatements": "Farmer statements",
+  "farmerStatementsSub": "Collection centre · PDF",
+  "treatmentsReport": "Treatments & withdrawals",
+  "treatmentsReportSub": "For buyers and inspections · PDF",
+  "exportAll": "Export all my data",
+  "exportAllSub": "Everything you have recorded",
+  "dailyWhatsapp": "Daily WhatsApp report",
+  "dailyWhatsappSub": "Every day at {time}",
+  "@dailyWhatsappSub": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "previewReport": "Preview · {month} report",
+  "@previewReport": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "shareLabel": "Share",
+  "reportTitle": "{farm} — {month}",
+  "@reportTitle": {
+    "placeholders": {
+      "farm": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "milkProduced": "Milk produced",
+  "milkSold": "Milk sold",
+  "sentToEveryDay": "Sent to {phone} every day at {time}",
+  "@sentToEveryDay": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sendTime": "Send time",
+  "includeMoney": "Include money",
+  "includeMoneySub": "Income and expenses",
+  "smsIfWhatsappFails": "SMS if WhatsApp fails",
+  "rpMilk": "Milk: {litres} L ({trend})",
+  "@rpMilk": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "trend": {
+        "type": "String"
+      }
+    }
+  },
+  "rpNotForSale": "Not for sale: {litres} L ({who}, treated)",
+  "@rpNotForSale": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "rpTreatmentsFeed": "Treatments: {n} · Feed used: {bags} bags",
+  "@rpTreatmentsFeed": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "bags": {
+        "type": "String"
+      }
+    }
+  },
+  "rpWorkers": "Workers in: {n} of {total}",
+  "@rpWorkers": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "rpAlert": "Alert: {item}: {n} bags left",
+  "@rpAlert": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "rpMoney": "Money this month: in {income}, out {expenses}",
+  "@rpMoney": {
+    "placeholders": {
+      "income": {
+        "type": "String"
+      },
+      "expenses": {
+        "type": "String"
+      }
+    }
+  }
 }

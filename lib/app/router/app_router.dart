@@ -41,6 +41,7 @@ import 'package:farm_tap/sectors/cattle/herd/presentation/pages/herd_tools_pages
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/alerts_page.dart';
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/home_page.dart';
 import 'package:farm_tap/sectors/cattle/milk/presentation/pages/milk_pages.dart';
+import 'package:farm_tap/sectors/cattle/money/presentation/pages/money_pages.dart';
 import 'package:farm_tap/sectors/cattle/workers/presentation/pages/workers_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -176,6 +177,13 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       WorkersTarget.tasks => AppRoutes.workersTasks,
       WorkersTarget.wages => AppRoutes.workersWages,
     }),
+  );
+  sectionRoots[AppRoutes.money] = (context, state) =>
+      MoneyPage(repo: deps.farmMoney, onAddExpense: () => context.push(AppRoutes.moneyExpense));
+  sectionRoots[AppRoutes.reports] = (context, state) => ReportsPage(
+    money: deps.farmMoney,
+    farmName: session.farm?.name ?? '',
+    onDaily: () => context.push(AppRoutes.reportsWhatsapp),
   );
   sectionRoots[AppRoutes.breeding] = (context, state) => BreedingPage(
     repo: deps.breeding,
@@ -418,6 +426,21 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
             ),
           ),
         ],
+      ),
+    ],
+    AppRoutes.money: [
+      page(
+        'expense',
+        parent: AppRoutes.money,
+        builder: (context, state) =>
+            AddExpensePage(repo: deps.farmMoney, onSaved: (_) => popOrGo(context, AppRoutes.money)),
+      ),
+    ],
+    AppRoutes.reports: [
+      page(
+        'whatsapp',
+        parent: AppRoutes.reports,
+        builder: (context, state) => DailyReportPage(repo: deps.dailyReport),
       ),
     ],
     AppRoutes.settings: [

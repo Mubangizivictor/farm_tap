@@ -62,7 +62,8 @@ import 'app_localizations_nyn.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,15 +84,19 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('en'), Locale('nyn')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('nyn'),
+  ];
 
   /// No description provided for @appName.
   ///
@@ -2891,7 +2897,7 @@ abstract class AppLocalizations {
   /// No description provided for @buyersCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} buyers'**
+  /// **'{count, plural, =1{1 buyer} other{{count} buyers}}'**
   String buyersCount(int count);
 
   /// No description provided for @litresTimesPrice.
@@ -3762,7 +3768,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'FarmTap: {name}, {period} you delivered {litres} L. Amount so far {amount}. Pay day {payDay}. Thank you!'**
-  String smsStatementText(String name, String period, String litres, String amount, String payDay);
+  String smsStatementText(
+    String name,
+    String period,
+    String litres,
+    String amount,
+    String payDay,
+  );
 
   /// No description provided for @smsReceiptText.
   ///
@@ -5353,9 +5365,316 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save changes'**
   String get saveChanges;
+
+  /// No description provided for @incomeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get incomeLabel;
+
+  /// No description provided for @expensesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get expensesLabel;
+
+  /// No description provided for @profitLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Profit'**
+  String get profitLabel;
+
+  /// No description provided for @lossLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Loss'**
+  String get lossLabel;
+
+  /// No description provided for @costPerLitre.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost per litre'**
+  String get costPerLitre;
+
+  /// No description provided for @milkIncomeCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk {amount}'**
+  String milkIncomeCaption(String amount);
+
+  /// No description provided for @expenseShare.
+  ///
+  /// In en, this message translates to:
+  /// **'{group} {percent}%'**
+  String expenseShare(String group, int percent);
+
+  /// No description provided for @expensesByCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses by category'**
+  String get expensesByCategory;
+
+  /// No description provided for @latestLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get latestLabel;
+
+  /// No description provided for @addExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Add expense'**
+  String get addExpense;
+
+  /// No description provided for @exportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get exportLabel;
+
+  /// No description provided for @categoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get categoryLabel;
+
+  /// No description provided for @groupFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Feed'**
+  String get groupFeed;
+
+  /// No description provided for @groupDrugsVet.
+  ///
+  /// In en, this message translates to:
+  /// **'Drugs & vet'**
+  String get groupDrugsVet;
+
+  /// No description provided for @groupWages.
+  ///
+  /// In en, this message translates to:
+  /// **'Wages'**
+  String get groupWages;
+
+  /// No description provided for @groupTransport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get groupTransport;
+
+  /// No description provided for @groupFuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel & power'**
+  String get groupFuel;
+
+  /// No description provided for @groupOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get groupOther;
+
+  /// No description provided for @groupDrugsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Drugs'**
+  String get groupDrugsShort;
+
+  /// No description provided for @noteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get noteLabel;
+
+  /// No description provided for @receiptPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt photo'**
+  String get receiptPhoto;
+
+  /// No description provided for @expenseSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense saved: {amount}'**
+  String expenseSaved(String amount);
+
+  /// No description provided for @chooseCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a category'**
+  String get chooseCategory;
+
+  /// No description provided for @monthlyFarmReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly farm report'**
+  String get monthlyFarmReport;
+
+  /// No description provided for @monthlyFarmReportSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk, herd, health, money · PDF'**
+  String get monthlyFarmReportSub;
+
+  /// No description provided for @milkRecordsReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk records'**
+  String get milkRecordsReport;
+
+  /// No description provided for @milkRecordsReportSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Per cow, per day · Excel / CSV'**
+  String get milkRecordsReportSub;
+
+  /// No description provided for @farmerStatements.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmer statements'**
+  String get farmerStatements;
+
+  /// No description provided for @farmerStatementsSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection centre · PDF'**
+  String get farmerStatementsSub;
+
+  /// No description provided for @treatmentsReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Treatments & withdrawals'**
+  String get treatmentsReport;
+
+  /// No description provided for @treatmentsReportSub.
+  ///
+  /// In en, this message translates to:
+  /// **'For buyers and inspections · PDF'**
+  String get treatmentsReportSub;
+
+  /// No description provided for @exportAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Export all my data'**
+  String get exportAll;
+
+  /// No description provided for @exportAllSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything you have recorded'**
+  String get exportAllSub;
+
+  /// No description provided for @dailyWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily WhatsApp report'**
+  String get dailyWhatsapp;
+
+  /// No description provided for @dailyWhatsappSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day at {time}'**
+  String dailyWhatsappSub(String time);
+
+  /// No description provided for @previewReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview · {month} report'**
+  String previewReport(String month);
+
+  /// No description provided for @shareLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareLabel;
+
+  /// No description provided for @reportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{farm} — {month}'**
+  String reportTitle(String farm, String month);
+
+  /// No description provided for @milkProduced.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk produced'**
+  String get milkProduced;
+
+  /// No description provided for @milkSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk sold'**
+  String get milkSold;
+
+  /// No description provided for @sentToEveryDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to {phone} every day at {time}'**
+  String sentToEveryDay(String phone, String time);
+
+  /// No description provided for @sendTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Send time'**
+  String get sendTime;
+
+  /// No description provided for @includeMoney.
+  ///
+  /// In en, this message translates to:
+  /// **'Include money'**
+  String get includeMoney;
+
+  /// No description provided for @includeMoneySub.
+  ///
+  /// In en, this message translates to:
+  /// **'Income and expenses'**
+  String get includeMoneySub;
+
+  /// No description provided for @smsIfWhatsappFails.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS if WhatsApp fails'**
+  String get smsIfWhatsappFails;
+
+  /// No description provided for @rpMilk.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk: {litres} L ({trend})'**
+  String rpMilk(String litres, String trend);
+
+  /// No description provided for @rpNotForSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Not for sale: {litres} L ({who}, treated)'**
+  String rpNotForSale(String litres, String who);
+
+  /// No description provided for @rpTreatmentsFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Treatments: {n} · Feed used: {bags} bags'**
+  String rpTreatmentsFeed(int n, String bags);
+
+  /// No description provided for @rpWorkers.
+  ///
+  /// In en, this message translates to:
+  /// **'Workers in: {n} of {total}'**
+  String rpWorkers(int n, int total);
+
+  /// No description provided for @rpAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert: {item}: {n} bags left'**
+  String rpAlert(String item, int n);
+
+  /// No description provided for @rpMoney.
+  ///
+  /// In en, this message translates to:
+  /// **'Money this month: in {income}, out {expenses}'**
+  String rpMoney(String income, String expenses);
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -5364,7 +5683,8 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'nyn'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'nyn'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;

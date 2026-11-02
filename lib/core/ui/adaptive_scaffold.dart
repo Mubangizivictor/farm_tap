@@ -60,6 +60,9 @@ class FarmTapFab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => FloatingActionButton.extended(
+    // No hero flight: with shell branches and pushed pages several FABs can
+    // sit in one route subtree, and a shared default tag throws.
+    heroTag: null,
     onPressed: onPressed,
     icon: Icon(icon, size: context.sizes.iconLg),
     label: Text(label),

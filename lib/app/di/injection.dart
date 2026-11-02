@@ -36,6 +36,10 @@ import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
+import 'package:farm_tap/sectors/cattle/money/data/fake/fake_farm_money_repository.dart';
+import 'package:farm_tap/sectors/cattle/money/domain/farm_money_repository.dart';
+import 'package:farm_tap/sectors/cattle/owner_reports/data/fake/fake_daily_report_repository.dart';
+import 'package:farm_tap/sectors/cattle/owner_reports/domain/daily_report.dart';
 import 'package:farm_tap/sectors/cattle/workers/data/fake/fake_workers_repository.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 import 'package:get_it/get_it.dart';
@@ -85,6 +89,20 @@ Future<void> configureDependencies(Flavor flavor) async {
           getIt<StaffDirectory>(),
           getIt<MoneyRepository>(),
           getIt<MilkRepository>(),
+        ),
+      )
+      ..registerLazySingleton<FarmMoneyRepository>(
+        () => FakeFarmMoneyRepository(getIt<Clock>(), getIt<MoneyRepository>(), getIt<MilkRepository>()),
+      )
+      ..registerLazySingleton<DailyReportRepository>(
+        () => FakeDailyReportRepository(
+          clock: getIt<Clock>(),
+          farmName: () => getIt<SessionController>().farm?.name ?? '',
+          home: getIt<HomeRepository>(),
+          milk: getIt<MilkRepository>(),
+          treatments: getIt<TreatmentRepository>(),
+          feed: getIt<FeedRepository>(),
+          money: getIt<FarmMoneyRepository>(),
         ),
       )
       ..registerLazySingleton<BreedingRepository>(

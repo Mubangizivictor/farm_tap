@@ -42,7 +42,7 @@ docs/design/screens/{phone,tablet,web_desktop,web_mobile}/{light,dark}/<ID>_<nam
     "Discard changes?" on forms, ROUTES.md, route back tests
   - Breakpoints (decision 0012): compact < 600 bottom bar; medium 600–1279
     navigation rail (7 items); expanded ≥ 1280 sidebar (11 items)
-  - Sections A–K and N01 built, goldens ~91–97, device-checked on
+  - Sections A–L and N01 built, goldens ~91–97, device-checked on
     iPhone 16 Pro Max simulator (idb) in light and dark
   - Single-source fake data: farmer totals derived from one record per
     farmer (Muhwezi Robert 512.0 L → UGX 538,200 everywhere); treatments
@@ -57,10 +57,10 @@ docs/design/screens/{phone,tablet,web_desktop,web_mobile}/{light,dark}/<ID>_<nam
     unpaid period) / read-only computed from the clock (80841dd).
     Rwemera Dairy Farm and Kashari Milk Centre trials: 2 Nov → 16 Nov 2026
     (9 days left on 7 Nov). New farms: trialEndsAt = today + 14 (0cdc19e)
-- Last known state: 1068 passing, 0 skipped; flutter analyze clean; latest
-  commit: fix(ui): K follow-ups (after fb16f85). Update this line at every
-  section commit. Sections I, J, K and N01 device-checked on iPhone 16 Pro
-  Max (K fully without NFC; typed card at K04 needs manager PIN).
+- Last known state: 1125 passing, 0 skipped; flutter analyze clean; latest
+  commit: feat(ui): section L L01-L04 (after 89369e3). Update this line at
+  every section commit. "This month" = calendar month everywhere (owner
+  decision in Section L): F10 1,965.5 L, I01 UGX 938/L.
 
 ## Decisions to keep (from review)
 - Data wins over mockup when mockups disagree (e.g. E03 "5 days left",

@@ -53,8 +53,8 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | F06 | F06_treated_cow_warning | Milk | 95.2 | 96.0 | 95.8 | 97.2 | 94.6 | 96.7 | 95.2 | 96.0 | min 94.6 | ✓ | ✓ | ✓ | ✓ | done. |
 | F07 | F07_milk_herd_total | Milk | 96.9 | 97.2 | 96.5 | 96.5 | 98.2 | 98.2 | 96.9 | 97.2 | min 96.5 | ✓ | ✓ | ✓ | ✓ | done. |
 | F08 | F08_milk_use_split | Milk | 96.2 | 96.6 | 93.5 | 94.3 | 97.3 | 97.5 | 96.2 | 96.6 | min 93.5 | ✓ | ✓ | ✓ | ✓ | done. |
-| F09 | F09_milk_sales | Milk | 94.7 | 95.0 | 97.5 | 97.6 | 98.1 | 98.1 | 94.7 | 95.0 | min 94.7 | ✓ | ✓ | ✓ | ✓ | done. |
-| F10 | F10_milk_trends | Milk | 96.0 | 96.2 | 96.8 | 97.0 | 97.5 | 97.6 | 96.0 | 96.2 | min 96.0 | ✓ | ✓ | ✓ | ✓ | done. |
+| F09 | F09_milk_sales | Milk | 94.7 | 95.0 | 97.5 | 97.6 | 98.1 | 98.1 | 94.7 | 95.0 | min 94.7 | ✓ | ✓ | ✓ | ✓ | done. Calendar month since Section L (see Data over mockup — Section L). |
+| F10 | F10_milk_trends | Milk | 96.0 | 96.2 | 96.8 | 97.0 | 97.5 | 97.6 | 96.0 | 96.2 | min 96.0 | ✓ | ✓ | ✓ | ✓ | done. Calendar month since Section L (see Data over mockup — Section L). |
 | G01 | G01_centre_home | Collection centre | 95.6 | 96.0 | 93.0 | 93.8 | 96.2 | 96.5 | 95.6 | 96.0 | min 93.0 | ✓ | ✓ | ✓ | ✓ | done. |
 | G02 | G02_centre_tap_card | Collection centre | 95.9 | 96.3 | 98.3 | 98.5 | 98.0 | 98.0 | 95.9 | 96.3 | min 95.9 | ✓ | ✓ | ✓ | ✓ | done. |
 | G03 | G03_centre_delivery_keypad | Collection centre | 95.9 | 96.3 | 95.8 | 96.2 | 97.0 | 97.0 | 95.9 | 96.3 | min 95.8 | ✓ | ✓ | ✓ | ✓ | done. |
@@ -74,7 +74,7 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | H04 | H04_drug_stock | Health | 96.3 | 96.3 | 97.5 | 97.2 | 98.0 | 98.0 | 96.3 | 96.3 | min 96.3 | ✓ | ✓ | ✓ | ✓ | done. |
 | H05 | H05_health_schedule | Health | 96.7 | 96.7 | 97.7 | 97.7 | 98.0 | 97.9 | 96.7 | 96.7 | min 96.7 | ✓ | ✓ | ✓ | ✓ | done. |
 | H06 | H06_withdrawal_list | Health | 94.3 | 94.2 | 97.2 | 97.0 | 97.6 | 97.5 | 94.3 | 94.2 | min 94.2 | ✓ | ✓ | ✓ | ✓ | done. |
-| I01 | I01_feed_stock | Feeding | 94.5 | 94.9 | 97.0 | 96.7 | 97.4 | 97.4 | 94.3 | 94.8 | min 94.3 | ✓ | ✓ | ✓ | ✓ | done. Stock, days left and cost per litre derived from records. |
+| I01 | I01_feed_stock | Feeding | 94.5 | 94.9 | 97.0 | 96.7 | 97.4 | 97.4 | 94.3 | 94.8 | min 94.3 | ✓ | ✓ | ✓ | ✓ | done. Stock, days left and cost per litre derived from records. Calendar month since Section L (see Data over mockup — Section L). |
 | I02 | I02_record_feeding | Feeding | 94.1 | 94.1 | 97.3 | 97.0 | 97.1 | 96.9 | 94.1 | 94.1 | min 94.1 | ✓ | ✓ | ✓ | ✓ | done. Golden types 1.5 as in mockup. Back arrow asks Discard changes?. |
 | I03 | I03_feed_purchase_sheet | Feeding | 89.2 | 91.1 | 90.0 | 93.5 | 89.9 | 94.5 | 89.1 | 91.1 | min 89.1 | ✓ | ✓ | ✓ | ✓ | done. Backdrop differs: the I03 mockup shows a low-stock banner behind the sheet, while I01's own mockup shows the feed-cost card; I01's own mockup wins (main cause of the lower score). Save has read-back (money); purchase creates its expense in the money repository (DAIRY-FEED-02). Dirty sheet asks Discard changes? on drag/scrim/back. |
 | J01 | J01_breeding_calendar | Breeding | 95.7 | 96.2 | 96.2 | 96.5 | 97.1 | 97.2 | 95.5 | 96.0 | min 95.5 | ✓ | ✓ | ✓ | ✓ | done. Pregnant/calving/check counts derived from breeding records (herd pregnant count and home calving alert read the same records). To-do lists 3 items (2 checks + Rwemera serve): data has 2 checks due as the metric says. Kasheshe "Served 12 Sep · check from 7 Nov" (mockup 2 Oct/2 Nov conflicts with J02 56-day rule). |
@@ -86,10 +86,10 @@ Columns: P = phone, T = tablet, D = web_desktop, M = web_mobile; L = light, K = 
 | K04 | K04_attendance | Workers | 92.5 | 93.2 | 93.3 | 94.3 | 96.0 | 96.3 | 92.5 | 93.2 | min 92.5 | ✓ | ✓ | ✓ | ✓ | done. Illustration-left hero (HeroCard.animationLeading). Typed card needs manager PIN (DAIRY-WRK-01); tap does not. |
 | K05 | K05_tasks | Workers | 94.8 | 95.1 | 97.4 | 97.5 | 97.6 | 97.6 | 94.8 | 95.1 | min 94.8 | ✓ | ✓ | ✓ | ✓ | done. Today / This week / Done from task records; Home worker tasks read the same records. |
 | K06 | K06_wages | Workers | 92.5 | 92.5 | 96.4 | 96.5 | 96.6 | 96.6 | 92.5 | 92.5 | min 92.5 | ✓ | ✓ | ✓ | ✓ | done. Totals summed from wages and advance/payment records; read-back; wage expenses in core/money. |
-| L01 | L01_money_overview | Money | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| L02 | L02_add_expense | Money | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| L03 | L03_reports | Money | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
-| L04 | L04_whatsapp_report_preview | Money | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
+| L01 | L01_money_overview | Money | 92.8 | 93.3 | 94.3 | 94.3 | 95.5 | 95.4 | 92.7 | 93.2 | min 92.7 | ✓ | ✓ | ✓ | ✓ | done. Income = milk sales ledger; expenses only from core/money; profit, cost/litre and feed/litre calculated (feed/litre = I01). Kit: bar chart tones + no axis. |
+| L02 | L02_add_expense | Money | 96.2 | 96.4 | 95.3 | 95.9 | 97.2 | 97.3 | 96.2 | 96.4 | min 95.3 | ✓ | ✓ | ✓ | ✓ | done. Category tiles (ActionTile.selected), read-back before save, saved in core/money. |
+| L03 | L03_reports | Reports | 88.0 | 88.0 | 91.0 | 87.7 | 92.2 | 88.6 | 87.8 | 87.9 | min 87.7 | ✓ | ✓ | ✓ | ✓ | done. Preview from this month's records (always-light ReportPreviewCard). Exports/Share "Coming soon". Daily WhatsApp row = entry to L04 (not in mockup). |
+| L04 | L04_whatsapp_report_preview | Reports | 94.0 | 94.8 | 96.8 | 96.0 | 96.8 | 96.1 | 94.0 | 94.8 | min 94.0 | ✓ | ✓ | ✓ | ✓ | done. Every line read from home, milk use, treatments, feed, money; settings stored. |
 | M01 | M01_subscription | Subscription | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | M02 | M02_pay_mobile_money | Subscription | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
 | M03 | M03_payment_confirmed | Subscription | — | — | — | — | — | — | — | — |  | — | — | — | — |  |
@@ -205,6 +205,21 @@ FarmTapFab, FarmTapPlatform. Still to build with their screens: QR labels (E10).
 | K05 | K05_tasks | Workers | 94.8 | 95.1 | 97.4 | 97.5 | 97.6 | 97.6 | 94.8 | 95.1 | min 94.8 | ✓ | ✓ | ✓ | ✓ | done. Today / This week / Done from task records; Home worker tasks read the same records. |
 | D02 worker home | 2 tasks (heifers, clean milking area) | 1 task (heifers) | K05 assigns "Clean milking area" to Rita, not Amos. |
 
+## Data over mockup — Section L (decision: "this month" = calendar month)
+
+| Screen | Mockup text | Shown (from data) | Why |
+|---|---|---|---|
+| F10 | "Total this month 8,742 L" | "1,965.5 L" | Sum of 1-7 Nov milk records (owner chose calendar month). |
+| I01 | "UGX 211 per litre of milk" | "UGX 938" | 1,844,000 feed / 1,965.5 L, same month. L01 feed per litre equals it (test). |
+| F09 | "Sold this week 1,960 L", "Owed UGX 412k · 2 buyers", Kashari 280 L | 1,632 L, UGX 168K · 1 buyer, Kashari 220 L | Read from the dated sales ledger; daily sales fit daily production (300 L - home - calves). |
+| L01 | Income 9.6M, Expenses 4.1M, Profit 5.5M (+12%), Cost per litre 469 | Income 1.9M, Expenses 2.19M, Loss -293k, Cost per litre 1,114 | 1-7 Nov records only; the big feed purchase lands early in the month. No October records, so no "vs last month" chip. |
+| L01 | "Milk 9.3M · sales 0.3M" | "Milk UGX 1.9M" | No other income records (animal sales not priced yet). |
+| L01 | "Feed 45% · wages 40%" | "Feed 84% · Wages 11%" | Wages so far are the three advances; wages are expensed when paid. |
+| L03 | "Preview · October report", 8,402 L / 7,690 L / 8.9M | "Preview · November report" from this month's records | There are no October records in the sample data. |
+| L04 | "Born: 1 heifer (Kyasiimire)" | (line left out) | Kyasiimire is due 13 Nov; no calving today. |
+| L04 | "Treatments: 1 · Feed used: 3 bags" | "Treatments: 0 · Feed used: 0 bags" | Read for today at 8:41 am; today's feedings are not recorded yet. |
+| L04 | "Workers in: 5 of 6" | "4 of 5" | Same rule as K04/Home. |
+
 ## Gaps (not built; ask before building)
 
 | Item | Status |
@@ -216,6 +231,9 @@ FarmTapFab, FarmTapPlatform. Still to build with their screens: QR labels (E10).
 | K01 entry to K04/K05/K06 | Entry not in mockup: three labelled chips (Attendance, Tasks, Wages) under the filter chips (kit FarmTapChip). |
 | K01 Add worker / K02 Edit worker | No mockup; reuse the B09 first-worker form (shared StaffFormFields), pushed at /workers/add and /workers/:id/edit. |
 | K02 What X can do | No mockup; "Coming soon". |
+| L03 entry to L04 | Entry not in mockup: "Daily WhatsApp report" row in the L03 list. |
+| L01 Export, L02 Receipt photo, L03 report exports and Share | "Coming soon" (PDF/CSV/camera are backend phase). |
+| Other income | Animal sales and other income need priced records (CORE-18 income) before L01 can show "sales". |
 | Staff limit | Plan includes 10 staff: block the 11th at Add worker (backend phase). |
 | Manager PIN lockout | Lock out after repeated wrong manager PINs (backend phase). |
 | Staff management roles | Done: Add worker, Edit worker, Reset PIN shown to owner and manager only (ROADMAP 7.4); tests. |

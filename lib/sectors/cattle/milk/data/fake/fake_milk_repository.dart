@@ -96,25 +96,59 @@ class FakeMilkRepository implements MilkRepository {
   /// Earlier this month every milking cow was recorded at both sessions;
   /// this morning 34 so far (the 31 others plus the 3 sample cows).
   void _seedRecords(DateTime today) {
-    void add(DateTime at, MilkSession s, String by, {String? cowId, double litres = 7}) => _records.add(
+    void add(DateTime at, MilkSession s, String by, double litres, {String? cowId}) => _records.add(
       MilkRecord(id: 'milk-${_nextRecord++}', cowId: cowId, session: s, litres: litres, at: at, recordedBy: by),
     );
+    // Earlier days this month: morning 55% / evening 45% of the day's milk.
     for (var d = today.day - 1; d >= 1; d--) {
       final day = today.subtract(Duration(days: d));
+      final total = dailyLitres[(dailyLitres.length - 1 - d).clamp(0, dailyLitres.length - 1)];
       for (var i = 0; i < _milkingCows; i++) {
-        add(day.add(const Duration(hours: 6)), MilkSession.morning, _morningBy, cowId: 'cow-$i');
-        add(day.add(const Duration(hours: 17)), MilkSession.evening, _eveningBy, cowId: 'cow-$i');
+        add(
+          day.add(const Duration(hours: 6)),
+          MilkSession.morning,
+          _morningBy,
+          total * 0.55 / _milkingCows,
+          cowId: 'cow-$i',
+        );
+        add(
+          day.add(const Duration(hours: 17)),
+          MilkSession.evening,
+          _eveningBy,
+          total * 0.45 / _milkingCows,
+          cowId: 'cow-$i',
+        );
       }
+      // Sold after the evening milking (F09, L01 income).
+      final at = day.add(const Duration(hours: 18));
+      _sales.addAll([
+        MilkSale(buyer: _centre, litres: 220, pricePerLitre: 1100, paid: true, at: at),
+        MilkSale(buyer: _shop, litres: 40, pricePerLitre: 1400, paid: d > 3, kind: BuyerKind.shop, at: at),
+        MilkSale(buyer: _neighbours, litres: 12, pricePerLitre: 1500, paid: true, kind: BuyerKind.neighbours, at: at),
+      ]);
     }
     for (var i = 0; i < _otherRecorded; i++) {
-      add(today.add(const Duration(hours: 6)), MilkSession.morning, _morningBy, cowId: 'cow-$i');
+      add(
+        today.add(const Duration(hours: 6)),
+        MilkSession.morning,
+        _morningBy,
+        _otherLitres / _otherRecorded,
+        cowId: 'cow-$i',
+      );
     }
     for (final c in _cows.where((c) => c.recordedAt != null)) {
-      add(c.recordedAt!, MilkSession.morning, _morningBy, cowId: c.id, litres: c.recordedLitres!);
+      add(c.recordedAt!, MilkSession.morning, _morningBy, c.recordedLitres!, cowId: c.id);
     }
   }
 
-  // The other 34 of the 41 milking cows (31 already recorded this morning).
+  /// Litres per day for the last 7 days, today last (same as Home's week).
+  static const dailyLitres = [296.0, 300.0, 293.0, 302.0, 305.0, 301.0, 312.0];
+
+  static const _centre = 'Kashari Milk Centre';
+  static const _shop = 'Mbarara Dairy Shop';
+  static const _neighbours = 'Neighbours';
+  final List<MilkSale> _sales = [];
+
   static const _otherRecorded = 31;
   static const _otherCows = 34;
   static const _otherLitres = 142.8;
@@ -218,18 +252,26 @@ class FakeMilkRepository implements MilkRepository {
   Future<Result<void>> saveUse(List<MilkUseLine> lines) async => const Result.success(null);
 
   @override
-  Future<Result<MilkSalesSummary>> sales() async => const Result.success(
-    MilkSalesSummary(
-      soldThisWeek: 1960,
-      owed: 412000,
-      buyersOwing: 2,
-      sales: [
-        MilkSale(buyer: 'Kashari Milk Centre', litres: 280, pricePerLitre: 1100, paid: true),
-        MilkSale(buyer: 'Mbarara Dairy Shop', litres: 40, pricePerLitre: 1400, paid: false, kind: BuyerKind.shop),
-        MilkSale(buyer: 'Neighbours', litres: 12, pricePerLitre: 1500, paid: true, kind: BuyerKind.neighbours),
-      ],
-    ),
-  );
+  Future<Result<MilkSalesSummary>> sales() async {
+    final weekStart = DateTime(clock.now().year, clock.now().month, clock.now().day - 6);
+    final unpaid = _sales.where((x) => !x.paid);
+    final latest = <String, MilkSale>{for (final x in _sales) x.buyer: x};
+    return Result.success(
+      MilkSalesSummary(
+        soldThisWeek: _sales.where((x) => !x.at!.isBefore(weekStart)).fold(0, (t, x) => t + x.litres),
+        owed: unpaid.fold(0, (t, x) => t + x.amount),
+        buyersOwing: unpaid.map((x) => x.buyer).toSet().length,
+        sales: latest.values.toList(),
+      ),
+    );
+  }
+
+  @override
+  Future<Result<List<MilkSale>>> salesSince(DateTime from) async =>
+      Result.success(_sales.where((x) => !x.at!.isBefore(from)).toList());
+
+  /// Litres recorded since [from] (sum of the milk records).
+  double _litresSince(DateTime from) => _records.where((r) => !r.at.isBefore(from)).fold(0, (t, r) => t + r.litres);
 
   @override
   Future<Result<MilkTrend>> trend(TrendRange range) async {
@@ -237,7 +279,12 @@ class FakeMilkRepository implements MilkRepository {
     return Result.success(
       MilkTrend(
         range: range,
-        total: 8742,
+        total: switch (range) {
+          TrendRange.week => _litresSince(DateTime(clock.now().year, clock.now().month, clock.now().day - 6)),
+          TrendRange.month => _litresSince(DateTime(clock.now().year, clock.now().month)),
+          // Only this month is recorded in the UI phase.
+          TrendRange.year => _litresSince(DateTime(clock.now().year)),
+        },
         changePercent: 4,
         points: points,
         labels: [for (var i = 1; i <= points.length; i++) '$i'],

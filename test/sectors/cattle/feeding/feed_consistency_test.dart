@@ -40,7 +40,8 @@ void main() {
     final litres = (await milk.trend(TrendRange.month)).data!.total;
     expect(s.costThisMonth, 1844000);
     expect(s.costPerLitre, (1844000 / litres).round());
-    expect(s.costPerLitre, 211);
+    // Calendar month: 1,844,000 / 1,965.5 L (1-7 Nov milk records).
+    expect(s.costPerLitre, 938);
   });
 
   test('a purchase adds stock and cost; a feeding takes stock away', () async {

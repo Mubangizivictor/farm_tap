@@ -164,5 +164,18 @@ class FakeFeedRepository implements FeedRepository {
       money.addExpense(category: ExpenseCategory.feed, amount: p.total, at: p.at, note: p.supplier, sourceId: p.id);
 
   @override
+  Future<Result<double>> usedOn(DateTime day, FeedKind feed) async {
+    final start = DateTime(day.year, day.month, day.day);
+    final end = start.add(const Duration(days: 1));
+    return Result.success(
+      _round(
+        _feedings
+            .where((r) => r.feed == feed && !r.at.isBefore(start) && r.at.isBefore(end))
+            .fold<double>(0, (s, r) => s + r.amount),
+      ),
+    );
+  }
+
+  @override
   List<String> get suppliers => const [_agroVet, _silageSupplier];
 }

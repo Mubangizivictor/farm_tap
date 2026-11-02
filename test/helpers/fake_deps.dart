@@ -16,6 +16,8 @@ import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_reposito
 import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
+import 'package:farm_tap/sectors/cattle/money/data/fake/fake_farm_money_repository.dart';
+import 'package:farm_tap/sectors/cattle/owner_reports/data/fake/fake_daily_report_repository.dart';
 import 'package:farm_tap/sectors/cattle/workers/data/fake/fake_workers_repository.dart';
 
 /// The mockups' "today": Saturday 7 Nov 2026, 6:52 am.
@@ -47,13 +49,15 @@ Future<AppDependencies> fakeDependencies({
   final feed = FakeFeedRepository(c, milk, money);
   final staff = FakeStaffAccessRepository();
   final workers = FakeWorkersRepository(c, staff, money, milk);
+  final farmMoney = FakeFarmMoneyRepository(c, money, milk);
+  final home = FakeHomeRepository(c, treatments, breeding: breeding, feed: feed, workers: workers);
   return AppDependencies(
     session: session,
     places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
     onboarding: FakeOnboardingRepository(c),
     staffAccess: staff,
     sync: FakeSyncService(),
-    home: FakeHomeRepository(c, treatments, breeding: breeding, feed: feed, workers: workers),
+    home: home,
     herd: FakeHerdRepository(
       clock: c,
       tenantProvider: InMemoryTenantProvider(),
@@ -68,6 +72,16 @@ Future<AppDependencies> fakeDependencies({
     breeding: breeding,
     workers: workers,
     staffDirectory: staff,
+    farmMoney: farmMoney,
+    dailyReport: FakeDailyReportRepository(
+      clock: c,
+      farmName: () => session.farm?.name ?? '',
+      home: home,
+      milk: milk,
+      treatments: treatments,
+      feed: feed,
+      money: farmMoney,
+    ),
   );
 }
 

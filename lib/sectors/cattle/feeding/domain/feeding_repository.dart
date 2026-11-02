@@ -20,6 +20,9 @@ abstract interface class FeedRepository {
     String? supplier,
   });
 
+  /// Amount of [feed] given on [day] (L04 daily report).
+  Future<Result<double>> usedOn(DateTime day, FeedKind feed);
+
   /// Suppliers used before, newest first (I03 default).
   List<String> get suppliers;
 }

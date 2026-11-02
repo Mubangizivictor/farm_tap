@@ -109,18 +109,29 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String trialDaysLeft(int days) {
-    String _temp0 = intl.Intl.pluralLogic(days, locale: localeName, other: '$days days', one: '1 day');
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
     return '[nyn] Free trial: $_temp0 left';
   }
 
   @override
   String trialDaysLeftShort(int days) {
-    String _temp0 = intl.Intl.pluralLogic(days, locale: localeName, other: '$days days', one: '1 day');
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
     return '[nyn] Free trial · $_temp0 left';
   }
 
   @override
-  String get trialThenPrice => '[nyn] Then UGX 70,000 a month. Pay anytime with Mobile Money.';
+  String get trialThenPrice =>
+      '[nyn] Then UGX 70,000 a month. Pay anytime with Mobile Money.';
 
   @override
   String get trialUpgradeLine => '[nyn] Upgrade · UGX 70,000/mo';
@@ -129,7 +140,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get offlineBannerTitle => '[nyn] You are offline';
 
   @override
-  String get offlineBannerBody => '[nyn] Records are saved on this phone and will sync when you are online.';
+  String get offlineBannerBody =>
+      '[nyn] Records are saved on this phone and will sync when you are online.';
 
   @override
   String get emptyDefaultTitle => '[nyn] Nothing here yet';
@@ -235,7 +247,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get welcomeTitle => '[nyn] Welcome to FarmTap';
 
   @override
-  String get welcomeBody => '[nyn] Records for your farm and milk centre — even without network.';
+  String get welcomeBody =>
+      '[nyn] Records for your farm and milk centre — even without network.';
 
   @override
   String get continueGoogle => '[nyn] Continue with Google';
@@ -296,7 +309,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get signUpTitle => '[nyn] Create your account';
 
   @override
-  String get signUpSubtitle => '[nyn] You\'ll set up your farm next. 14 days free.';
+  String get signUpSubtitle =>
+      '[nyn] You\'ll set up your farm next. 14 days free.';
 
   @override
   String get fullNameLabel => '[nyn] Full name';
@@ -326,7 +340,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get resetTitle => '[nyn] Reset your password';
 
   @override
-  String get resetSubtitle => '[nyn] We\'ll email you a link to set a new password.';
+  String get resetSubtitle =>
+      '[nyn] We\'ll email you a link to set a new password.';
 
   @override
   String get sendResetLink => '[nyn] Send reset link';
@@ -384,7 +399,12 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String trialDaysShort(int days) {
-    String _temp0 = intl.Intl.pluralLogic(days, locale: localeName, other: '$days days', one: '1 day');
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
     return '[nyn] Trial $_temp0';
   }
 
@@ -410,7 +430,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get chooseLanguageTitle => '[nyn] Choose your language';
 
   @override
-  String get chooseLanguageSubtitle => '[nyn] Hitamu orurimi. You can change it later.';
+  String get chooseLanguageSubtitle =>
+      '[nyn] Hitamu orurimi. You can change it later.';
 
   @override
   String get runyankoreSubtitle => '[nyn] Orurimi rw\'Ankole';
@@ -460,7 +481,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   }
 
   @override
-  String get waitlistBody => '[nyn] Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
+  String get waitlistBody =>
+      '[nyn] Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
 
   @override
   String get yourNameLabel => '[nyn] Your name';
@@ -486,13 +508,15 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get dairyTypeTitle => '[nyn] What kind of dairy?';
 
   @override
-  String get dairyTypeSubtitle => '[nyn] This decides your home screen. You can add the other later.';
+  String get dairyTypeSubtitle =>
+      '[nyn] This decides your home screen. You can add the other later.';
 
   @override
   String get dairyFarm => '[nyn] Dairy farm';
 
   @override
-  String get dairyFarmSub => '[nyn] I keep cows and record milk, health, feeding';
+  String get dairyFarmSub =>
+      '[nyn] I keep cows and record milk, health, feeding';
 
   @override
   String get centreOption => '[nyn] Milk collection centre';
@@ -528,7 +552,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get contactsTitle => '[nyn] Where should we send reports?';
 
   @override
-  String get contactsSubtitle => '[nyn] Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
+  String get contactsSubtitle =>
+      '[nyn] Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
 
   @override
   String get dailyReportTime => '[nyn] Daily report at 7:00 pm';
@@ -543,7 +568,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get sendDailyWhatsapp => '[nyn] Send me the daily report on WhatsApp';
 
   @override
-  String get sendSmsAlerts => '[nyn] Send me SMS alerts (sick cows, low stock, trial)';
+  String get sendSmsAlerts =>
+      '[nyn] Send me SMS alerts (sick cows, low stock, trial)';
 
   @override
   String get roleTitle => '[nyn] What is your role?';
@@ -558,7 +584,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get firstStaffTitle => '[nyn] Add your first worker';
 
   @override
-  String get firstStaffSubtitle => '[nyn] Workers use a card and a 4-digit PIN — no email needed.';
+  String get firstStaffSubtitle =>
+      '[nyn] Workers use a card and a 4-digit PIN — no email needed.';
 
   @override
   String get nameLabel => '[nyn] Name';
@@ -582,7 +609,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get nfcLaterTitle => '[nyn] Add an NFC card later';
 
   @override
-  String get nfcLaterBody => '[nyn] Tap \'Assign card\' on the worker\'s page when cards arrive.';
+  String get nfcLaterBody =>
+      '[nyn] Tap \'Assign card\' on the worker\'s page when cards arrive.';
 
   @override
   String get saveWorker => '[nyn] Save worker';
@@ -614,7 +642,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get choose => '[nyn] Choose';
 
   @override
-  String get phoneIncomplete => '[nyn] Check the number — it needs 9 digits after +256.';
+  String get phoneIncomplete =>
+      '[nyn] Check the number — it needs 9 digits after +256.';
 
   @override
   String get farmNameRequired => '[nyn] Enter the farm name.';
@@ -647,7 +676,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get tapYourCard => '[nyn] Tap your card';
 
   @override
-  String get tapYourCardBody => '[nyn] Hold your FarmTap card on the back of the phone.';
+  String get tapYourCardBody =>
+      '[nyn] Hold your FarmTap card on the back of the phone.';
 
   @override
   String get enterCardInstead => '[nyn] Enter card number instead';
@@ -665,7 +695,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get cardNumberTitle => '[nyn] Enter your card number';
 
   @override
-  String get cardNumberSubtitle => '[nyn] It\'s printed on the front of your card.';
+  String get cardNumberSubtitle =>
+      '[nyn] It\'s printed on the front of your card.';
 
   @override
   String get next => '[nyn] Next';
@@ -687,7 +718,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   }
 
   @override
-  String get cardLocked => '[nyn] Too many tries. This card is locked for 5 minutes.';
+  String get cardLocked =>
+      '[nyn] Too many tries. This card is locked for 5 minutes.';
 
   @override
   String notYou(String name) {
@@ -701,7 +733,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get nfcOffTitle => '[nyn] NFC is turned off';
 
   @override
-  String get nfcOffBody => '[nyn] Turn on NFC in your phone settings to use cards, or type the card number.';
+  String get nfcOffBody =>
+      '[nyn] Turn on NFC in your phone settings to use cards, or type the card number.';
 
   @override
   String get openSettings => '[nyn] Open settings';
@@ -852,7 +885,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get syncStatusTitle => '[nyn] Sync status';
 
   @override
-  String get syncStatusBody => '[nyn] Records are saved on this phone first, then sent to the cloud.';
+  String get syncStatusBody =>
+      '[nyn] Records are saved on this phone first, then sent to the cloud.';
 
   @override
   String get syncedLabel => '[nyn] Synced';
@@ -1356,7 +1390,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   }
 
   @override
-  String get labelsHint => '[nyn] Print on sticker paper and fix to the ear tags.';
+  String get labelsHint =>
+      '[nyn] Print on sticker paper and fix to the ear tags.';
 
   @override
   String get sharePdf => '[nyn] Share PDF';
@@ -1368,7 +1403,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get emptyHerdTitle => '[nyn] No cows yet';
 
   @override
-  String get emptyHerdBody => '[nyn] Add your first cow to start recording milk.';
+  String get emptyHerdBody =>
+      '[nyn] Add your first cow to start recording milk.';
 
   @override
   String get noMatches => '[nyn] No animals match this filter.';
@@ -1523,7 +1559,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get quickMode => '[nyn] Quick mode';
 
   @override
-  String get quickModeBody => '[nyn] Use this when you can\'t record each cow. Per-cow records give better alerts.';
+  String get quickModeBody =>
+      '[nyn] Use this when you can\'t record each cow. Per-cow records give better alerts.';
 
   @override
   String totalFromAllCows(String session) {
@@ -1578,7 +1615,13 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String buyersCount(int count) {
-    return '[nyn] $count buyers';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count buyers',
+      one: '1 buyer',
+    );
+    return '[nyn] $_temp0';
   }
 
   @override
@@ -1926,7 +1969,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get mobileMoneyPayouts => '[nyn] Mobile Money payouts';
 
   @override
-  String get mobileMoneyBody => '[nyn] Each farmer receives an SMS when paid. Fees are shown before you confirm.';
+  String get mobileMoneyBody =>
+      '[nyn] Each farmer receives an SMS when paid. Fees are shown before you confirm.';
 
   @override
   String get sent => '[nyn] Sent';
@@ -1959,7 +2003,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get smsStatements => '[nyn] SMS statements';
 
   @override
-  String get previewWhatFarmersGet => '[nyn] Preview of what each farmer receives:';
+  String get previewWhatFarmersGet =>
+      '[nyn] Preview of what each farmer receives:';
 
   @override
   String get messages => '[nyn] Messages';
@@ -2024,7 +2069,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   }
 
   @override
-  String get rejectedBody => '[nyn] Not paid. The farmer gets an SMS explaining why.';
+  String get rejectedBody =>
+      '[nyn] Not paid. The farmer gets an SMS explaining why.';
 
   @override
   String get rejectMilk => '[nyn] Reject milk';
@@ -2060,7 +2106,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   }
 
   @override
-  String get diffAboveBody => '[nyn] Check spillage and the cooler dipstick. The owner is notified.';
+  String get diffAboveBody =>
+      '[nyn] Check spillage and the cooler dipstick. The owner is notified.';
 
   @override
   String get truck => '[nyn] Truck';
@@ -2084,7 +2131,13 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get reconciliationSaved => '[nyn] Reconciliation saved';
 
   @override
-  String smsStatementText(String name, String period, String litres, String amount, String payDay) {
+  String smsStatementText(
+    String name,
+    String period,
+    String litres,
+    String amount,
+    String payDay,
+  ) {
     return '[nyn] FarmTap: $name, $period you delivered $litres L. Amount so far $amount. Pay day $payDay. Thank you!';
   }
 
@@ -2113,7 +2166,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get ugxUnit => '[nyn] UGX';
 
   @override
-  String get farmerCardNotFound => '[nyn] No farmer has this card. Check the number.';
+  String get farmerCardNotFound =>
+      '[nyn] No farmer has this card. Check the number.';
 
   @override
   String get findFarmer => '[nyn] Find farmer';
@@ -2127,7 +2181,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get cashSheetInfo => '[nyn] Cash sheet';
 
   @override
-  String get cashSheetBody => '[nyn] Print the sheet. Each farmer signs when paid in cash.';
+  String get cashSheetBody =>
+      '[nyn] Print the sheet. Each farmer signs when paid in cash.';
 
   @override
   String get printCashSheet => '[nyn] Print cash sheet';
@@ -2261,7 +2316,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get noWithdrawal => '[nyn] No milk withdrawal';
 
   @override
-  String get blockMilkBody => '[nyn] FarmTap will block her milk and remind you when it\'s safe.';
+  String get blockMilkBody =>
+      '[nyn] FarmTap will block her milk and remind you when it\'s safe.';
 
   @override
   String get treatmentSaved => '[nyn] Treatment saved';
@@ -2306,7 +2362,12 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String bottlesCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count bottles', one: '1 bottle');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bottles',
+      one: '1 bottle',
+    );
     return '[nyn] $_temp0';
   }
 
@@ -2375,7 +2436,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   }
 
   @override
-  String get keepMilkSeparateBody => '[nyn] Do not sell or mix this milk until the date shown.';
+  String get keepMilkSeparateBody =>
+      '[nyn] Do not sell or mix this milk until the date shown.';
 
   @override
   String drugSince(String drug, String date) {
@@ -2613,7 +2675,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get tipLabel => '[nyn] Tip';
 
   @override
-  String get breedingTip => '[nyn] Check heat signs morning and evening. A missed heat costs about 21 days of milk.';
+  String get breedingTip =>
+      '[nyn] Check heat signs morning and evening. A missed heat costs about 21 days of milk.';
 
   @override
   String get recordHeat => '[nyn] Record heat';
@@ -2736,7 +2799,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   String get signOutTitle => '[nyn] Sign out?';
 
   @override
-  String get signOutBody => '[nyn] Records on this phone stay saved. Sign in again to see them.';
+  String get signOutBody =>
+      '[nyn] Records on this phone stay saved. Sign in again to see them.';
 
   @override
   String get comingSoonBody => '[nyn] This part of FarmTap is being built.';
@@ -2840,7 +2904,8 @@ class AppLocalizationsNyn extends AppLocalizations {
   }
 
   @override
-  String get resetPinBody => '[nyn] They choose a new 4-digit PIN the next time they tap their card.';
+  String get resetPinBody =>
+      '[nyn] They choose a new 4-digit PIN the next time they tap their card.';
 
   @override
   String resetPinDone(String name) {
@@ -3026,4 +3091,183 @@ class AppLocalizationsNyn extends AppLocalizations {
 
   @override
   String get saveChanges => '[nyn] Save changes';
+
+  @override
+  String get incomeLabel => '[nyn] Income';
+
+  @override
+  String get expensesLabel => '[nyn] Expenses';
+
+  @override
+  String get profitLabel => '[nyn] Profit';
+
+  @override
+  String get lossLabel => '[nyn] Loss';
+
+  @override
+  String get costPerLitre => '[nyn] Cost per litre';
+
+  @override
+  String milkIncomeCaption(String amount) {
+    return '[nyn] Milk $amount';
+  }
+
+  @override
+  String expenseShare(String group, int percent) {
+    return '[nyn] $group $percent%';
+  }
+
+  @override
+  String get expensesByCategory => '[nyn] Expenses by category';
+
+  @override
+  String get latestLabel => '[nyn] Latest';
+
+  @override
+  String get addExpense => '[nyn] Add expense';
+
+  @override
+  String get exportLabel => '[nyn] Export';
+
+  @override
+  String get categoryLabel => '[nyn] Category';
+
+  @override
+  String get groupFeed => '[nyn] Feed';
+
+  @override
+  String get groupDrugsVet => '[nyn] Drugs & vet';
+
+  @override
+  String get groupWages => '[nyn] Wages';
+
+  @override
+  String get groupTransport => '[nyn] Transport';
+
+  @override
+  String get groupFuel => '[nyn] Fuel & power';
+
+  @override
+  String get groupOther => '[nyn] Other';
+
+  @override
+  String get groupDrugsShort => '[nyn] Drugs';
+
+  @override
+  String get noteLabel => '[nyn] Note';
+
+  @override
+  String get receiptPhoto => '[nyn] Receipt photo';
+
+  @override
+  String expenseSaved(String amount) {
+    return '[nyn] Expense saved: $amount';
+  }
+
+  @override
+  String get chooseCategory => '[nyn] Choose a category';
+
+  @override
+  String get monthlyFarmReport => '[nyn] Monthly farm report';
+
+  @override
+  String get monthlyFarmReportSub => '[nyn] Milk, herd, health, money · PDF';
+
+  @override
+  String get milkRecordsReport => '[nyn] Milk records';
+
+  @override
+  String get milkRecordsReportSub => '[nyn] Per cow, per day · Excel / CSV';
+
+  @override
+  String get farmerStatements => '[nyn] Farmer statements';
+
+  @override
+  String get farmerStatementsSub => '[nyn] Collection centre · PDF';
+
+  @override
+  String get treatmentsReport => '[nyn] Treatments & withdrawals';
+
+  @override
+  String get treatmentsReportSub => '[nyn] For buyers and inspections · PDF';
+
+  @override
+  String get exportAll => '[nyn] Export all my data';
+
+  @override
+  String get exportAllSub => '[nyn] Everything you have recorded';
+
+  @override
+  String get dailyWhatsapp => '[nyn] Daily WhatsApp report';
+
+  @override
+  String dailyWhatsappSub(String time) {
+    return '[nyn] Every day at $time';
+  }
+
+  @override
+  String previewReport(String month) {
+    return '[nyn] Preview · $month report';
+  }
+
+  @override
+  String get shareLabel => '[nyn] Share';
+
+  @override
+  String reportTitle(String farm, String month) {
+    return '[nyn] $farm — $month';
+  }
+
+  @override
+  String get milkProduced => '[nyn] Milk produced';
+
+  @override
+  String get milkSold => '[nyn] Milk sold';
+
+  @override
+  String sentToEveryDay(String phone, String time) {
+    return '[nyn] Sent to $phone every day at $time';
+  }
+
+  @override
+  String get sendTime => '[nyn] Send time';
+
+  @override
+  String get includeMoney => '[nyn] Include money';
+
+  @override
+  String get includeMoneySub => '[nyn] Income and expenses';
+
+  @override
+  String get smsIfWhatsappFails => '[nyn] SMS if WhatsApp fails';
+
+  @override
+  String rpMilk(String litres, String trend) {
+    return '[nyn] Milk: $litres L ($trend)';
+  }
+
+  @override
+  String rpNotForSale(String litres, String who) {
+    return '[nyn] Not for sale: $litres L ($who, treated)';
+  }
+
+  @override
+  String rpTreatmentsFeed(int n, String bags) {
+    return '[nyn] Treatments: $n · Feed used: $bags bags';
+  }
+
+  @override
+  String rpWorkers(int n, int total) {
+    return '[nyn] Workers in: $n of $total';
+  }
+
+  @override
+  String rpAlert(String item, int n) {
+    return '[nyn] Alert: $item: $n bags left';
+  }
+
+  @override
+  String rpMoney(String income, String expenses) {
+    return '[nyn] Money this month: in $income, out $expenses';
+  }
 }
