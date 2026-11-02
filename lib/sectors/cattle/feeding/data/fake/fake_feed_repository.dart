@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/money/domain/money_models.dart';
+import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_models.dart';
 import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_repository.dart';
@@ -9,8 +13,10 @@ import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 /// month's purchases and a week of daily feedings. On Sat 7 Nov that leaves
 /// dairy meal 2 bags (0.7 a day -> about 3 days), maize bran 14, mineral
 /// lick 6 blocks, silage 3 t; UGX 1,844,000 bought / 8,742 L = UGX 211 a litre.
+/// Each purchase records its expense in [money]; the month's feed cost is
+/// read back from there (the same expenses L01/L02 show).
 class FakeFeedRepository implements FeedRepository {
-  new(this.clock, this.milk) {
+  new(this.clock, this.milk, this.money) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
     final monthStart = DateTime(today.year, today.month);
@@ -55,6 +61,9 @@ class FakeFeedRepository implements FeedRepository {
         supplier: _agroVet,
       ),
     ];
+    for (final p in _purchases) {
+      unawaited(_recordExpense(p));
+    }
     // One feeding per feed for each of the 7 full days before today.
     const daily = {FeedKind.dairyMeal: 0.7, FeedKind.maizeBran: 1.0, FeedKind.mineralLick: 0.2, FeedKind.silage: 250.0};
     _feedings = [
@@ -78,6 +87,7 @@ class FakeFeedRepository implements FeedRepository {
 
   final Clock clock;
   final MilkRepository milk;
+  final MoneyRepository money;
   late List<FeedCount> _counts;
   late List<FeedPurchase> _purchases;
   late List<FeedingRecord> _feedings;
@@ -102,7 +112,8 @@ class FakeFeedRepository implements FeedRepository {
           ),
         ),
     ];
-    final cost = _purchases.where((p) => !p.at.isBefore(monthStart)).fold<int>(0, (s, p) => s + p.total);
+    final expenses = (await money.expenses(from: monthStart, category: ExpenseCategory.feed)).data ?? const [];
+    final cost = expenses.fold<int>(0, (s, e) => s + e.amount);
     final litres = (await milk.trend(TrendRange.month)).data?.total ?? 0;
     return Result.success(
       FeedSummary(stock: stock, costThisMonth: cost, costPerLitre: litres > 0 ? (cost / litres).round() : null),
@@ -145,8 +156,12 @@ class FakeFeedRepository implements FeedRepository {
       supplier: supplier,
     );
     _purchases = [..._purchases, p];
+    await _recordExpense(p);
     return Result.success(p);
   }
+
+  Future<void> _recordExpense(FeedPurchase p) =>
+      money.addExpense(category: ExpenseCategory.feed, amount: p.total, at: p.at, note: p.supplier, sourceId: p.id);
 
   @override
   List<String> get suppliers => const [_agroVet, _silageSupplier];

@@ -1,5 +1,6 @@
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
+import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
@@ -26,6 +27,7 @@ class AppDependencies {
     required this.centre,
     required this.treatments,
     required this.feed,
+    required this.money,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -40,6 +42,7 @@ class AppDependencies {
     centre: getIt<CentreRepository>(),
     treatments: getIt<TreatmentRepository>(),
     feed: getIt<FeedRepository>(),
+    money: getIt<MoneyRepository>(),
   );
 
   final SessionController session;
@@ -53,4 +56,5 @@ class AppDependencies {
   final CentreRepository centre;
   final TreatmentRepository treatments;
   final FeedRepository feed;
+  final MoneyRepository money;
 }

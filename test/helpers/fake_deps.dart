@@ -1,6 +1,7 @@
 import 'package:farm_tap/app/router/app_dependencies.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
+import 'package:farm_tap/core/money/data/fake/fake_money_repository.dart';
 import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
 import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
@@ -39,6 +40,7 @@ Future<AppDependencies> fakeDependencies({
   }
   final treatments = FakeTreatmentRepository(c);
   final milk = FakeMilkRepository(c, treatments);
+  final money = FakeMoneyRepository(c);
   return AppDependencies(
     session: session,
     places: FakeFarmMembershipRepository(InMemoryTenantProvider()),
@@ -50,7 +52,8 @@ Future<AppDependencies> fakeDependencies({
     milk: milk,
     centre: FakeCentreRepository(c),
     treatments: treatments,
-    feed: FakeFeedRepository(c, milk),
+    feed: FakeFeedRepository(c, milk, money),
+    money: money,
   );
 }
 

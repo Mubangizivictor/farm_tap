@@ -4,6 +4,8 @@ import 'package:farm_tap/core/audit/audit_logger.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
 import 'package:farm_tap/core/database/isar_service.dart';
+import 'package:farm_tap/core/money/data/fake/fake_money_repository.dart';
+import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
@@ -61,7 +63,10 @@ Future<void> configureDependencies(Flavor flavor) async {
       ..registerLazySingleton<HomeRepository>(() => FakeHomeRepository(getIt<Clock>(), getIt<TreatmentRepository>()))
       ..registerLazySingleton<MilkRepository>(() => FakeMilkRepository(getIt<Clock>(), getIt<TreatmentRepository>()))
       ..registerLazySingleton<CentreRepository>(() => FakeCentreRepository(getIt<Clock>()))
-      ..registerLazySingleton<FeedRepository>(() => FakeFeedRepository(getIt<Clock>(), getIt<MilkRepository>()))
+      ..registerLazySingleton<MoneyRepository>(() => FakeMoneyRepository(getIt<Clock>()))
+      ..registerLazySingleton<FeedRepository>(
+        () => FakeFeedRepository(getIt<Clock>(), getIt<MilkRepository>(), getIt<MoneyRepository>()),
+      )
       ..registerLazySingleton<HerdRepository>(
         () => FakeHerdRepository(
           clock: getIt<Clock>(),

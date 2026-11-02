@@ -17,6 +17,9 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
   // ---- Touch targets (low-literacy: bigger than Material defaults) ----
   double get touchTarget => 48 * scale;
 
+  /// iOS back-swipe strip on the left edge (as Cupertino's gesture).
+  double get backSwipeEdge => 20 * scale;
+
   double get buttonHeight => 56 * scale;
   double get buttonHeightLarge => 64 * scale;
   double get buttonMinWidth => 64 * scale;

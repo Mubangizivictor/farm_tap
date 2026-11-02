@@ -12,6 +12,7 @@ abstract interface class FeedRepository {
     required double amount,
   });
 
+  /// I03: adds stock and records the expense in the money repository.
   Future<Result<FeedPurchase>> addPurchase({
     required FeedKind feed,
     required double amount,

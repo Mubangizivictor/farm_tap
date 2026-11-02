@@ -1,5 +1,6 @@
 // Navigation helpers shared by every screen (docs/design/ROUTES.md).
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
+import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/adaptive_scaffold.dart';
 import 'package:farm_tap/core/ui/adaptive_sheet.dart';
 import 'package:farm_tap/core/ui/buttons.dart';
@@ -134,6 +135,10 @@ class DiscardGuard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // iOS turns its edge swipe off while PopScope says no; a dirty form
+    // gets its own edge strip so the swipe still asks.
+    final ios = Theme.of(context).platform == TargetPlatform.iOS;
+    var dragged = 0.0;
     return PopScope(
       canPop: !dirty,
       onPopInvokedWithResult: (didPop, _) async {
@@ -141,7 +146,27 @@ class DiscardGuard extends StatelessWidget {
         final leave = await confirm(context);
         if (leave && context.mounted) Navigator.of(context).pop();
       },
-      child: child,
+      child: !(dirty && ios && (ModalRoute.of(context)?.canPop ?? false))
+          ? child
+          : Stack(
+              children: [
+                child,
+                PositionedDirectional(
+                  start: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: context.sizes.backSwipeEdge,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onHorizontalDragStart: (_) => dragged = 0,
+                    onHorizontalDragUpdate: (d) => dragged += d.delta.dx,
+                    onHorizontalDragEnd: (_) {
+                      if (dragged > context.sizes.touchTarget) Navigator.maybePop(context);
+                    },
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

@@ -183,8 +183,10 @@ class _BuyFeedSheet extends StatefulWidget {
 
 class _BuyFeedSheetState extends State<_BuyFeedSheet> {
   late FeedKind _feed = widget.feed;
-  final _amount = TextEditingController(text: '10');
-  final _price = TextEditingController(text: '52,000');
+  static const _defaultAmount = '10';
+  static const _defaultPrice = '52,000';
+  final _amount = TextEditingController(text: _defaultAmount);
+  final _price = TextEditingController(text: _defaultPrice);
   late final _supplier = TextEditingController(text: widget.repo.suppliers.first);
 
   @override
@@ -198,6 +200,13 @@ class _BuyFeedSheetState extends State<_BuyFeedSheet> {
   double get _qty => double.tryParse(_amount.text.replaceAll(',', '')) ?? 0;
   int get _unitPrice => int.tryParse(_price.text.replaceAll(',', '')) ?? 0;
   int get _total => (_qty * _unitPrice).round();
+
+  /// Changed from the suggested purchase (I03 opens pre-filled).
+  bool get _dirty =>
+      _feed != widget.feed ||
+      _amount.text != _defaultAmount ||
+      _price.text != _defaultPrice ||
+      _supplier.text != widget.repo.suppliers.first;
 
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context);
@@ -231,52 +240,60 @@ class _BuyFeedSheetState extends State<_BuyFeedSheet> {
       FeedUnit.blocks => (l10n.unitBlocksLabel, l10n.pricePerBlock),
       FeedUnit.kg => (l10n.unitTonnes, l10n.pricePerTonne),
     };
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SheetTitle(l10n.buyFeed, subtitle: l10n.buyFeedSub),
-        context.space.gapLg,
-        FarmTapSelectField<FeedKind>(
-          label: l10n.colFeed,
-          icon: Symbols.inventory_2_rounded,
-          options: FeedKind.values,
-          value: _feed,
-          labelOf: (k) => feedLabel(l10n, k),
-          onChanged: (k) => setState(() => _feed = k),
-        ),
-        context.space.gapLg,
-        FarmTapTextField(
-          label: amountLabel,
-          icon: Symbols.inventory_2_rounded,
-          controller: _amount,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          onChanged: (_) => setState(() {}),
-        ),
-        context.space.gapLg,
-        FarmTapTextField(
-          label: priceLabel,
-          prefixText: 'UGX ',
-          controller: _price,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9,]'))],
-          onChanged: (_) => setState(() {}),
-        ),
-        context.space.gapLg,
-        FarmTapTextField(label: l10n.supplier, icon: Symbols.storefront_rounded, controller: _supplier),
-        context.space.gapLg,
-        FarmTapCard(
-          child: Column(
-            children: [
-              const Divider(height: 0),
-              context.space.gapLg,
-              SummaryRow(label: l10n.total, value: f.money(_total), emphasis: true),
-            ],
+    return DiscardGuard(
+      dirty: _dirty,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SheetTitle(l10n.buyFeed, subtitle: l10n.buyFeedSub),
+          context.space.gapLg,
+          FarmTapSelectField<FeedKind>(
+            label: l10n.colFeed,
+            icon: Symbols.inventory_2_rounded,
+            options: FeedKind.values,
+            value: _feed,
+            labelOf: (k) => feedLabel(l10n, k),
+            onChanged: (k) => setState(() => _feed = k),
           ),
-        ),
-        context.space.gapXl,
-        FarmTapButton(label: l10n.savePurchase, icon: Symbols.check_rounded, onPressed: _total > 0 ? _save : null),
-      ],
+          context.space.gapLg,
+          FarmTapTextField(
+            label: amountLabel,
+            icon: Symbols.inventory_2_rounded,
+            controller: _amount,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            onChanged: (_) => setState(() {}),
+          ),
+          context.space.gapLg,
+          FarmTapTextField(
+            label: priceLabel,
+            prefixText: 'UGX ',
+            controller: _price,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9,]'))],
+            onChanged: (_) => setState(() {}),
+          ),
+          context.space.gapLg,
+          FarmTapTextField(
+            label: l10n.supplier,
+            icon: Symbols.storefront_rounded,
+            controller: _supplier,
+            onChanged: (_) => setState(() {}),
+          ),
+          context.space.gapLg,
+          FarmTapCard(
+            child: Column(
+              children: [
+                const Divider(height: 0),
+                context.space.gapLg,
+                SummaryRow(label: l10n.total, value: f.money(_total), emphasis: true),
+              ],
+            ),
+          ),
+          context.space.gapXl,
+          FarmTapButton(label: l10n.savePurchase, icon: Symbols.check_rounded, onPressed: _total > 0 ? _save : null),
+        ],
+      ),
     );
   }
 }
@@ -297,7 +314,12 @@ class RecordFeedingPage extends StatefulWidget {
 }
 
 class _RecordFeedingPageState extends State<RecordFeedingPage> {
-  static const List<FeedKind> _chipOrder = [FeedKind.dairyMeal, FeedKind.maizeBran, FeedKind.silage, FeedKind.mineralLick];
+  static const List<FeedKind> _chipOrder = [
+    FeedKind.dairyMeal,
+    FeedKind.maizeBran,
+    FeedKind.silage,
+    FeedKind.mineralLick,
+  ];
 
   FeedGroup _group = FeedGroup.milkingCows;
   FeedKind _feed = FeedKind.dairyMeal;

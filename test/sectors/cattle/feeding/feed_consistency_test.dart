@@ -1,4 +1,6 @@
 // Feed numbers come from the count, purchase and feeding records only.
+import 'package:farm_tap/core/money/data/fake/fake_money_repository.dart';
+import 'package:farm_tap/core/money/domain/money_models.dart';
 import 'package:farm_tap/sectors/cattle/feeding/data/fake/fake_feed_repository.dart';
 import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_models.dart';
 import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
@@ -11,11 +13,13 @@ import '../../../helpers/fake_deps.dart';
 void main() {
   final clock = FixedClock();
   late FakeMilkRepository milk;
+  late FakeMoneyRepository money;
   late FakeFeedRepository repo;
 
   setUp(() {
     milk = FakeMilkRepository(clock, FakeTreatmentRepository(clock));
-    repo = FakeFeedRepository(clock, milk);
+    money = FakeMoneyRepository(clock);
+    repo = FakeFeedRepository(clock, milk, money);
   });
 
   Future<FeedStock> row(FeedKind k) async => (await repo.summary()).data!.stock.firstWhere((s) => s.feed == k);
@@ -45,5 +49,18 @@ void main() {
     expect((await repo.summary()).data!.costThisMonth, 1844000 + 520000);
     await repo.recordFeeding(feed: FeedKind.dairyMeal, group: FeedGroup.milkingCows, amount: 1.5);
     expect((await row(FeedKind.dairyMeal)).left, 10.5);
+  });
+
+  test('DAIRY-FEED-02: each purchase is one feed expense in the money repository', () async {
+    final feed = (await money.expenses(category: ExpenseCategory.feed)).data!;
+    expect(feed.length, 4);
+    expect(feed.every((e) => e.sourceId != null), isTrue);
+    final p = (await repo.addPurchase(feed: FeedKind.dairyMeal, amount: 10, pricePerUnit: 52000)).data!;
+    final after = (await money.expenses(category: ExpenseCategory.feed)).data!;
+    expect(after.where((e) => e.sourceId == p.id).single.amount, 520000);
+    // I01's cost is read back from those expenses, not kept separately.
+    final monthStart = DateTime(clock.now().year, clock.now().month);
+    final month = (await money.expenses(from: monthStart, category: ExpenseCategory.feed)).data!;
+    expect((await repo.summary()).data!.costThisMonth, month.fold<int>(0, (s, e) => s + e.amount));
   });
 }

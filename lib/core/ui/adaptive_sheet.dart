@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/buttons.dart';
@@ -17,16 +19,23 @@ Future<T?> showAdaptiveSheet<T>(
   AlignmentGeometry? dialogAlignment,
 }) {
   if (context.isCompact) {
-    return showModalBottomSheet<T>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      showDragHandle: false,
-      isDismissible: dismissible,
-      enableDrag: dismissible,
-      builder: (sheetContext) => PopScope(
-        canPop: dismissible,
-        child: SheetFrame(child: builder(sheetContext)),
+    final navigator = Navigator.of(context);
+    final localizations = MaterialLocalizations.of(context);
+    return navigator.push(
+      _GuardedSheetRoute<T>(
+        capturedThemes: InheritedTheme.capture(from: context, to: navigator.context),
+        barrierLabel: localizations.scrimLabel,
+        barrierOnTapHint: localizations.scrimOnTapHint(localizations.bottomSheetLabel),
+        modalBarrierColor: Theme.of(context).bottomSheetTheme.modalBarrierColor,
+        isScrollControlled: true,
+        useSafeArea: true,
+        showDragHandle: false,
+        isDismissible: dismissible,
+        enableDrag: dismissible,
+        builder: (sheetContext) => PopScope(
+          canPop: dismissible,
+          child: SheetFrame(child: builder(sheetContext)),
+        ),
       ),
     );
   }
@@ -276,4 +285,35 @@ Future<bool> showFarmTapDialog(
     ),
   );
   return result ?? false;
+}
+
+/// A dragged-down sheet closes with Navigator.pop, which skips PopScope.
+/// While a PopScope inside says no (a dirty DiscardGuard), refuse that
+/// pop: slide the sheet back up and let the guard ask "Discard changes?".
+/// Pops with the sheet fully open (Discard, Save) go through as normal.
+class _GuardedSheetRoute<T> extends ModalBottomSheetRoute<T> {
+  new({
+    required super.builder,
+    required super.isScrollControlled,
+    super.capturedThemes,
+    super.barrierLabel,
+    super.barrierOnTapHint,
+    super.modalBarrierColor,
+    super.isDismissible,
+    super.enableDrag,
+    super.showDragHandle,
+    super.useSafeArea,
+  });
+
+  @override
+  bool didPop(T? result) {
+    final dragged = controller != null && controller!.status != AnimationStatus.completed;
+    if (dragged && popDisposition == RoutePopDisposition.doNotPop) {
+      controller!.forward();
+      // The navigator is locked during didPop; ask once it is free.
+      scheduleMicrotask(() => onPopInvokedWithResult(false, result));
+      return false;
+    }
+    return super.didPop(result);
+  }
 }

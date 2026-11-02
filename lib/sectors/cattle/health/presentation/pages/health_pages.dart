@@ -584,39 +584,44 @@ class _AddDrugSheetState extends State<_AddDrugSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SheetTitle(l10n.addDrug),
-        context.space.gapLg,
-        FarmTapTextField(
-          label: l10n.drugName,
-          icon: Symbols.medication_rounded,
-          controller: _name,
-          onChanged: (_) => setState(() {}),
-        ),
-        context.space.gapLg,
-        FarmTapTextField(
-          label: l10n.stockLabel,
-          icon: Symbols.inventory_2_rounded,
-          controller: _stock,
-          keyboardType: TextInputType.number,
-        ),
-        context.space.gapLg,
-        FarmTapTextField(
-          label: l10n.withdrawalDaysLabel,
-          icon: Symbols.water_drop_rounded,
-          controller: _days,
-          keyboardType: TextInputType.number,
-        ),
-        context.space.gapXl,
-        FarmTapButton(
-          label: l10n.saveDrug,
-          icon: Symbols.check_rounded,
-          onPressed: _name.text.trim().isEmpty ? null : _save,
-        ),
-      ],
+    return DiscardGuard(
+      dirty: [_name, _stock, _days].any((c) => c.text.trim().isNotEmpty),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SheetTitle(l10n.addDrug),
+          context.space.gapLg,
+          FarmTapTextField(
+            label: l10n.drugName,
+            icon: Symbols.medication_rounded,
+            controller: _name,
+            onChanged: (_) => setState(() {}),
+          ),
+          context.space.gapLg,
+          FarmTapTextField(
+            label: l10n.stockLabel,
+            icon: Symbols.inventory_2_rounded,
+            controller: _stock,
+            keyboardType: TextInputType.number,
+            onChanged: (_) => setState(() {}),
+          ),
+          context.space.gapLg,
+          FarmTapTextField(
+            label: l10n.withdrawalDaysLabel,
+            icon: Symbols.water_drop_rounded,
+            controller: _days,
+            keyboardType: TextInputType.number,
+            onChanged: (_) => setState(() {}),
+          ),
+          context.space.gapXl,
+          FarmTapButton(
+            label: l10n.saveDrug,
+            icon: Symbols.check_rounded,
+            onPressed: _name.text.trim().isEmpty ? null : _save,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -810,48 +815,51 @@ class _AddTaskSheetState extends State<_AddTaskSheet> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final f = _fmt(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SheetTitle(l10n.addToCalendar),
-        context.space.gapLg,
-        FarmTapTextField(
-          label: l10n.taskTitle,
-          icon: Symbols.event_rounded,
-          controller: _title,
-          onChanged: (_) => setState(() {}),
-        ),
-        context.space.gapLg,
-        SegmentedTabs<HealthTaskKind>(
-          options: [
-            TabOption(value: HealthTaskKind.vaccination, label: l10n.kindVaccination),
-            TabOption(value: HealthTaskKind.dipping, label: l10n.kindDipping),
-            TabOption(value: HealthTaskKind.deworming, label: l10n.kindDeworming),
-          ],
-          selected: _kind,
-          onChanged: (k) => setState(() => _kind = k),
-        ),
-        context.space.gapLg,
-        FarmTapSelectField<int>(
-          label: l10n.taskDate,
-          icon: Symbols.calendar_month_rounded,
-          options: const [1, 2, 3, 7, 14, 30],
-          value: _date.difference(DateTime(widget.now.year, widget.now.month, widget.now.day)).inDays,
-          labelOf: (d) => f.day(DateTime(widget.now.year, widget.now.month, widget.now.day + d)),
-          onChanged: (d) => setState(() => _date = DateTime(widget.now.year, widget.now.month, widget.now.day + d)),
-        ),
-        context.space.gapXl,
-        FarmTapButton(
-          label: l10n.saveTask,
-          icon: Symbols.check_rounded,
-          onPressed: _title.text.trim().isEmpty
-              ? null
-              : () =>
-                    Navigator.of(context)
-                        .pop(HealthTask(kind: _kind, title: _title.text.trim(), detail: '', due: _date)),
-        ),
-      ],
+    return DiscardGuard(
+      dirty: _title.text.trim().isNotEmpty,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SheetTitle(l10n.addToCalendar),
+          context.space.gapLg,
+          FarmTapTextField(
+            label: l10n.taskTitle,
+            icon: Symbols.event_rounded,
+            controller: _title,
+            onChanged: (_) => setState(() {}),
+          ),
+          context.space.gapLg,
+          SegmentedTabs<HealthTaskKind>(
+            options: [
+              TabOption(value: HealthTaskKind.vaccination, label: l10n.kindVaccination),
+              TabOption(value: HealthTaskKind.dipping, label: l10n.kindDipping),
+              TabOption(value: HealthTaskKind.deworming, label: l10n.kindDeworming),
+            ],
+            selected: _kind,
+            onChanged: (k) => setState(() => _kind = k),
+          ),
+          context.space.gapLg,
+          FarmTapSelectField<int>(
+            label: l10n.taskDate,
+            icon: Symbols.calendar_month_rounded,
+            options: const [1, 2, 3, 7, 14, 30],
+            value: _date.difference(DateTime(widget.now.year, widget.now.month, widget.now.day)).inDays,
+            labelOf: (d) => f.day(DateTime(widget.now.year, widget.now.month, widget.now.day + d)),
+            onChanged: (d) => setState(() => _date = DateTime(widget.now.year, widget.now.month, widget.now.day + d)),
+          ),
+          context.space.gapXl,
+          FarmTapButton(
+            label: l10n.saveTask,
+            icon: Symbols.check_rounded,
+            onPressed: _title.text.trim().isEmpty
+                ? null
+                : () =>
+                      Navigator.of(context)
+                          .pop(HealthTask(kind: _kind, title: _title.text.trim(), detail: '', due: _date)),
+          ),
+        ],
+      ),
     );
   }
 }
