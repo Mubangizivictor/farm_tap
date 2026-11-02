@@ -169,8 +169,7 @@ void main() {
       expect(h.location, AppRoutes.home);
     });
 
-    testWidgets('locked farm phone -> unlock', skip: true, (tester) async {
-      // Section C adds /unlock
+    testWidgets('locked farm phone -> unlock', (tester) async {
       final h = await _Harness.pump(tester, start: AppRoutes.farmPicker, signedIn: true, farm: true);
       h.session.lock();
       h.router.go(AppRoutes.herd);
