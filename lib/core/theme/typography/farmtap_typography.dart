@@ -15,8 +15,8 @@ abstract final class FarmTapWeights {
 }
 
 abstract final class FarmTapTypography {
-  /// Base font sizes before FarmTapDesign.textScale. Slightly larger than
-  /// Material defaults for low-literacy readability.
+  /// Base font sizes before FarmTapDesign.textScale. Compact scale from
+  /// decision 0013 (CONC-style density): 18 page titles, 14 body, 12 captions.
   static TextTheme textTheme(FarmTapDesign d, ColorScheme cs) {
     TextStyle s(double size, FontWeight w, double h) => TextStyle(
       fontFamily: d.fontFamily,
@@ -26,21 +26,21 @@ abstract final class FarmTapTypography {
       color: cs.onSurface,
     );
     return TextTheme(
-      displayLarge: s(52, FarmTapWeights.bold, 1.1),
-      displayMedium: s(44, FarmTapWeights.bold, 1.1),
-      displaySmall: s(38, FarmTapWeights.bold, 1.15),
-      headlineLarge: s(32, FarmTapWeights.bold, 1.2),
-      headlineMedium: s(28, FarmTapWeights.bold, 1.2),
-      headlineSmall: s(24, FarmTapWeights.semiBold, 1.25),
-      titleLarge: s(22, FarmTapWeights.semiBold, 1.3),
-      titleMedium: s(18, FarmTapWeights.semiBold, 1.35),
-      titleSmall: s(16, FarmTapWeights.semiBold, 1.35),
-      bodyLarge: s(18, FarmTapWeights.regular, 1.45),
-      bodyMedium: s(16, FarmTapWeights.regular, 1.45),
-      bodySmall: s(14, FarmTapWeights.regular, 1.4).copyWith(color: cs.onSurfaceVariant),
-      labelLarge: s(17, FarmTapWeights.semiBold, 1.2),
-      labelMedium: s(15, FarmTapWeights.medium, 1.2),
-      labelSmall: s(13, FarmTapWeights.medium, 1.2).copyWith(color: cs.onSurfaceVariant),
+      displayLarge: s(40, FarmTapWeights.bold, 1.1),
+      displayMedium: s(34, FarmTapWeights.bold, 1.1),
+      displaySmall: s(30, FarmTapWeights.bold, 1.15),
+      headlineLarge: s(26, FarmTapWeights.bold, 1.2),
+      headlineMedium: s(22, FarmTapWeights.bold, 1.2),
+      headlineSmall: s(20, FarmTapWeights.semiBold, 1.25),
+      titleLarge: s(18, FarmTapWeights.semiBold, 1.3),
+      titleMedium: s(16, FarmTapWeights.semiBold, 1.35),
+      titleSmall: s(14, FarmTapWeights.semiBold, 1.35),
+      bodyLarge: s(15, FarmTapWeights.regular, 1.4),
+      bodyMedium: s(14, FarmTapWeights.regular, 1.4),
+      bodySmall: s(12, FarmTapWeights.regular, 1.35).copyWith(color: cs.onSurfaceVariant),
+      labelLarge: s(14, FarmTapWeights.semiBold, 1.2),
+      labelMedium: s(13, FarmTapWeights.medium, 1.2),
+      labelSmall: s(11, FarmTapWeights.medium, 1.2).copyWith(color: cs.onSurfaceVariant),
     );
   }
 }
@@ -73,18 +73,18 @@ class FarmTapTextStyles extends ThemeExtension<FarmTapTextStyles> {
       color: c ?? cs.onSurface,
     );
     return FarmTapTextStyles(
-      keypadDigit: s(32, FarmTapWeights.semiBold),
-      keypadDisplay: s(48, FarmTapWeights.bold, h: 1.1),
-      readBackValue: s(36, FarmTapWeights.bold, h: 1.15),
-      readBackLabel: s(18, FarmTapWeights.medium, c: cs.onSurfaceVariant),
-      metricValue: s(32, FarmTapWeights.bold, h: 1.1),
-      metricLabel: s(14, FarmTapWeights.medium, c: cs.onSurfaceVariant),
-      sectionLabel: s(13, FarmTapWeights.semiBold, c: cs.onSurfaceVariant, ls: 0.6),
-      tagNumber: s(20, FarmTapWeights.bold, ls: 0.5),
-      button: s(17, FarmTapWeights.semiBold),
-      buttonLarge: s(20, FarmTapWeights.semiBold),
-      hero: s(44, FarmTapWeights.bold, h: 1.1),
-      micro: s(12, FarmTapWeights.medium, c: cs.onSurfaceVariant),
+      keypadDigit: s(26, FarmTapWeights.semiBold),
+      keypadDisplay: s(36, FarmTapWeights.bold, h: 1.1),
+      readBackValue: s(28, FarmTapWeights.bold, h: 1.15),
+      readBackLabel: s(15, FarmTapWeights.medium, c: cs.onSurfaceVariant),
+      metricValue: s(20, FarmTapWeights.bold, h: 1.1),
+      metricLabel: s(12, FarmTapWeights.regular, c: cs.onSurfaceVariant),
+      sectionLabel: s(13, FarmTapWeights.semiBold),
+      tagNumber: s(16, FarmTapWeights.bold, ls: 0.5),
+      button: s(14, FarmTapWeights.semiBold),
+      buttonLarge: s(16, FarmTapWeights.semiBold),
+      hero: s(30, FarmTapWeights.bold, h: 1.1),
+      micro: s(11, FarmTapWeights.medium, c: cs.onSurfaceVariant),
     );
   }
 

@@ -78,14 +78,14 @@ class MilkTotalCard extends StatelessWidget {
 
 | Access | Values (default design) |
 |---|---|
-| `context.space.xxs/xs/sm/md/lg/xl/xxl/xxxl` | 2 / 4 / 8 / 12 / 16 / 24 / 32 / 48 |
+| `context.space.xxs/xs/sm/md/lg/xl/xxl/xxxl` | 2 / 4 / 6 / 8 / 12 / 16 / 24 / 32 (compact, decision 0013) |
 | `context.space.gapXs ... gapXxxl` | ready `SizedBox` gaps |
 | `context.space.screen / card / listItem / input / button / sheet` | ready `EdgeInsets` |
-| `context.radii.xs/sm/md/lg/xl/pill` | 6 / 10 / 14 / 16 / 24 / 999 |
+| `context.radii.xs/sm/md/lg/xl/pill` | 6 / 8 / 12 / 14 / 18 / 999 |
 | `context.radii.button / input / card / dialog / sheet / chip / keypadKey` | ready `BorderRadius` |
-| `context.sizes.touchTarget / buttonHeight / keypadKey / fab` | 48 / 56 / 72 / 64 |
+| `context.sizes.touchTarget / buttonHeight / keypadKey / fab` | 48 / 48 / 56 / 48 |
 | `context.sizes.backSwipeEdge` | 20 (iOS back-swipe strip on dirty forms, `DiscardGuard`) |
-| `context.sizes.iconXs/Sm/Md/Lg/Xl/Hero` | 16 / 20 / 24 / 28 / 40 / 64 |
+| `context.sizes.iconXs/Sm/Md/Lg/Xl/Hero` | 14 / 18 / 20 / 22 / 32 / 48 |
 | `context.sizes.borderThin/Medium/Thick` | 1 / 1.5 / 2 |
 | `context.colors.*` | Material roles: primary, onPrimary, surface, onSurface, outline, error... |
 | `context.status.*` | success, warning, danger, info (+ on / container), synced, syncPending, syncFailed, withdrawal, nfcActive, keypadKey, brandGreen, brandGold |

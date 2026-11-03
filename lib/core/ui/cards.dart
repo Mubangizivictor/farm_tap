@@ -76,10 +76,10 @@ class SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: context.space.xl,
+      height: context.space.xxl,
       child: Row(
         children: [
-          Expanded(child: Text(label.toUpperCase(), style: context.textStyles.sectionLabel)),
+          Expanded(child: Text(label, style: context.textStyles.sectionLabel)),
           if (actionLabel != null)
             InkWell(
               onTap: onAction,
@@ -289,7 +289,7 @@ class MetricCard extends StatelessWidget {
           ),
           context.space.gapMd,
           Text(label, style: context.textStyles.metricLabel, maxLines: 1, overflow: TextOverflow.ellipsis),
-          context.space.gapXs,
+          context.space.gapXxs,
           // One line: long money values ("UGX 1.52M") shrink to fit.
           FittedBox(
             fit: BoxFit.scaleDown,
@@ -310,7 +310,7 @@ class MetricCard extends StatelessWidget {
             ),
           ),
           if (caption != null) ...[
-            context.space.gapSm,
+            context.space.gapXxs,
             Text(caption!, style: context.text.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
           ],
         ],
@@ -360,8 +360,8 @@ class RecordTile extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: dense ? context.sizes.listTileDense : context.sizes.listTile),
         child: Padding(
-          // Rows in lists sit about 76 apart (D03, D04); dense rows 8.
-          padding: EdgeInsets.symmetric(vertical: dense ? context.space.sm : context.space.lg),
+          // Compact rows (decision 0013): 8 above and below, dense 6.
+          padding: EdgeInsets.symmetric(vertical: dense ? context.space.sm : context.space.md),
           child: Row(
             children: [
               if (leading != null)
@@ -374,10 +374,18 @@ class RecordTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: context.text.titleSmall),
+                    // Badge sits on the title line (decision 0013), wrapping under it when narrow.
+                    Wrap(
+                      spacing: context.space.md,
+                      runSpacing: context.space.xxs,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: context.text.titleSmall),
+                        ?badge,
+                      ],
+                    ),
                     if (subtitle != null)
                       Text(subtitle!, maxLines: 2, overflow: TextOverflow.ellipsis, style: context.text.bodySmall),
-                    if (badge != null) ...[SizedBox(height: context.space.xs + context.space.xxs), badge!],
                   ],
                 ),
               ),
@@ -405,7 +413,7 @@ class RecordTile extends StatelessWidget {
   }
 }
 
-/// Quick-action tile: 110 tall (124 with subtitle), radius 18, card + border,
+/// Quick-action tile (decision 0013): compact row, min 56 (60 with subtitle), bubble 32, label titleSmall, optional subtitle bodySmall.
 /// IconBubble 52, label titleSmall, optional subtitle bodySmall.
 /// When [locked] (read-only after the trial) it shows a lock and ignores taps.
 class ActionTile extends StatelessWidget {
@@ -453,41 +461,44 @@ class ActionTile extends StatelessWidget {
             constraints: BoxConstraints(
               minHeight: subtitle == null ? context.sizes.actionTile : context.sizes.actionTileWithSubtitle,
             ),
-            padding: EdgeInsets.fromLTRB(context.space.lg, context.space.lg, context.space.lg, context.space.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+            padding: EdgeInsets.symmetric(horizontal: context.space.lg, vertical: context.space.md),
+            // Decision 0013: compact row tile (bubble, label, subtitle).
+            child: Row(
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    IconBubble(icon: icon, tone: locked ? FarmTapTone.neutral : tone, size: context.sizes.bubbleLg),
-                    const Spacer(),
-                    if (selected)
-                      Icon(
-                        Symbols.check_circle_rounded,
-                        fill: 1,
-                        size: context.sizes.iconMd,
-                        color: context.colors.primary,
+                IconBubble(icon: icon, tone: locked ? FarmTapTone.neutral : tone, size: context.sizes.bubbleSm),
+                context.space.gapMd,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        label,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.text.titleSmall?.copyWith(
+                          color: locked ? context.colors.onSurfaceVariant : null,
+                        ),
                       ),
-                    if (locked)
-                      Icon(
-                        Symbols.lock_rounded,
-                        fill: 1,
-                        size: context.sizes.iconSm,
-                        color: context.colors.onSurfaceVariant,
-                      ),
-                  ],
+                      if (subtitle != null)
+                        Text(subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.bodySmall),
+                    ],
+                  ),
                 ),
-                context.space.gapSm,
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.text.titleSmall?.copyWith(color: locked ? context.colors.onSurfaceVariant : null),
-                ),
-                if (subtitle != null)
-                  Text(subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.bodySmall),
+                if (selected)
+                  Icon(
+                    Symbols.check_circle_rounded,
+                    fill: 1,
+                    size: context.sizes.iconMd,
+                    color: context.colors.primary,
+                  ),
+                if (locked)
+                  Icon(
+                    Symbols.lock_rounded,
+                    fill: 1,
+                    size: context.sizes.iconSm,
+                    color: context.colors.onSurfaceVariant,
+                  ),
               ],
             ),
           ),

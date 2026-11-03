@@ -1,5 +1,13 @@
 # FarmTap UI rebuild — progress
 
+> **Decision 0013 (3 Nov 2026): compact redesign.** Layout and sizing now follow
+> `docs/decisions/0013-compact-ui-redesign.md`, not the mockups. The mockup
+> scores below are from before 0013 and no longer apply. All sections A–L were
+> re-rendered on the compact tokens with no overflow at 375x667, 360x640 and
+> 1.3x text. Goldens must be regenerated on the owner's Mac
+> (`flutter test --update-goldens test/goldens`). Device pass on the iPhone
+> simulator is still to do for the new layout.
+
 Tracks every screen against its mockups (see `docs/UI_REBUILD_PROMPT.md`).
 Cell legend: `—` not started · `wip` built, not matched · score (from `tool/compare_mockups.py`) once the compare image has been reviewed.
 A screen is DONE only when Nav (ROUTES.md behaviour: button, iOS swipe, Android/browser back), Device (iPhone 16 Pro Max simulator, light + dark, via `tool/device_qa.py`), Small (375x667, 360x640, 1.3x text: no overflow) and A11y (labels, 48 dp targets) are ticked and the compare images look alike.

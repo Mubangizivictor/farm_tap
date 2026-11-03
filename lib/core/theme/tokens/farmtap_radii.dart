@@ -15,30 +15,30 @@ class FarmTapRadii extends ThemeExtension<FarmTapRadii> {
 
   // ---- Scale (doubles) ----
   double get xs => 6 * scale;
-  double get sm => 10 * scale;
-  double get smd => 12 * scale;
-  double get md => 14 * scale;
-  double get lg => 16 * scale;
-  double get lg2 => 18 * scale;
-  double get xl => 24 * scale;
-  double get xxl => 28 * scale;
+  double get sm => 8 * scale;
+  double get smd => 10 * scale;
+  double get md => 12 * scale;
+  double get lg => 14 * scale;
+  double get lg2 => 14 * scale;
+  double get xl => 18 * scale;
+  double get xxl => 20 * scale;
   double get pill => 999;
 
   // ---- Component radii (BorderRadius) ----
-  BorderRadius get button => BorderRadius.circular(md);
-  BorderRadius get input => BorderRadius.circular(md);
+  BorderRadius get button => BorderRadius.circular(smd);
+  BorderRadius get input => BorderRadius.circular(smd);
   BorderRadius get card => BorderRadius.circular(lg);
-  BorderRadius get chip => BorderRadius.circular(smd);
+  BorderRadius get chip => BorderRadius.circular(pill);
   BorderRadius get dialog => BorderRadius.circular(xxl);
   BorderRadius get banner => BorderRadius.circular(md);
   BorderRadius get tile => BorderRadius.circular(lg2);
   BorderRadius get keypadDisplay => BorderRadius.circular(lg2);
   BorderRadius get tooltip => BorderRadius.circular(8 * scale);
   BorderRadius get tableHeader => BorderRadius.circular(smd);
-  BorderRadius get segmentedThumb => BorderRadius.circular(20 * scale);
+  BorderRadius get segmentedThumb => BorderRadius.circular(smd);
   BorderRadius get snackBar => BorderRadius.circular(md);
-  BorderRadius get fab => BorderRadius.circular(xl - xs);
-  BorderRadius get keypadKey => BorderRadius.circular(lg);
+  BorderRadius get fab => BorderRadius.circular(lg);
+  BorderRadius get keypadKey => BorderRadius.circular(md);
   BorderRadius get image => BorderRadius.circular(sm);
   BorderRadius get badge => BorderRadius.circular(pill);
 
