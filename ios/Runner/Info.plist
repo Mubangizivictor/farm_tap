@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NFCReaderUsageDescription</key>
+	<string>FarmTap reads staff and farmer cards.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>FarmTap scans ear tags and takes photos of animals and receipts.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>FarmTap attaches photos of animals and receipts.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

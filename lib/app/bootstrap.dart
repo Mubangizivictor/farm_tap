@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:farm_tap/app/app.dart';
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/app/flavor.dart';
+import 'package:farm_tap/core/nfc/card_reader.dart';
 import 'package:farm_tap/core/sound/sound_service.dart';
 import 'package:farm_tap/core/sync/sync_engine.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
@@ -16,6 +17,7 @@ Future<void> bootstrap(Flavor flavor) async {
   final config = AppConfig.forFlavor(flavor);
 
   SoundService.instance = JustAudioSoundService();
+  CardReader.instance = NfcCardReader();
   await configureDependencies(flavor);
 
   await restoreSavedRecords();

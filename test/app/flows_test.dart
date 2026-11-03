@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:farm_tap/app/router/app_router.dart';
 import 'package:farm_tap/app/router/routes.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
+import 'package:farm_tap/core/nfc/card_reader.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/formats.dart';
@@ -28,6 +29,9 @@ String _location(GoRouter router) {
 }
 
 void main() {
+  setUp(() => CardReader.instance = TestCardReader());
+  tearDown(() => CardReader.instance = NoCardReader());
+
   testWidgets('onboarding: Continue goes forward, back returns, Start opens Home', (tester) async {
     tester.view
       ..physicalSize = const Size(390, 1200)
@@ -170,7 +174,8 @@ void main() {
     expect(_location(router), AppRoutes.collect);
     expect(find.text("Tap the farmer's card"), findsOneWidget);
 
-    await tester.tap(find.text('Simulate tap (debug)'));
+    // The farmer taps card 0142 on the phone.
+    (CardReader.instance as TestCardReader).tap('0142');
     await _settle(tester);
     expect(_location(router), '/collect/farmer-0142');
     expect(find.text('Card OK'), findsOneWidget);
@@ -178,7 +183,7 @@ void main() {
     await _settle(tester);
     expect(_location(router), AppRoutes.collect);
 
-    await tester.tap(find.text('Simulate tap (debug)'));
+    (CardReader.instance as TestCardReader).tap('0142');
     await _settle(tester);
     for (final k in ['3', '8']) {
       await tester.tap(find.text(k).last);

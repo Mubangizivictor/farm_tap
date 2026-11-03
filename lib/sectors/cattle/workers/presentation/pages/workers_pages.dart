@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:farm_tap/core/error/failure.dart';
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
+import 'package:farm_tap/core/nfc/card_tap_listener.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/people/presentation/widgets/manager_pin_dialog.dart';
@@ -16,7 +17,6 @@ import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_models.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -454,7 +454,7 @@ class AssignCardPage extends StatefulWidget {
     required this.onDone,
     super.key,
     this.nfcAvailable,
-    this.showSimulate = kDebugMode,
+    this.showSimulate = false,
   });
 
   final StaffDirectory directory;
@@ -516,6 +516,11 @@ class _AssignCardPageState extends State<AssignCardPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  CardTapListener(
+                    onCard: (card) => _assign(s, card),
+                    prompt: l10n.tapNewCardNow,
+                    child: const SizedBox.shrink(),
+                  ),
                   PrintedCardPreview(
                     name: s.name,
                     cardNumber: blank == null ? '' : l10n.cardNumberBadge(blank),
@@ -560,7 +565,7 @@ class _AssignCardPageState extends State<AssignCardPage> {
 // ---------------------------------------------------------------- K04
 
 class AttendancePage extends StatefulWidget {
-  const new({required this.repo, required this.directory, super.key, this.now, this.showSimulate = kDebugMode});
+  const new({required this.repo, required this.directory, super.key, this.now, this.showSimulate = false});
 
   final WorkersRepository repo;
 
@@ -631,6 +636,8 @@ class _AttendancePageState extends State<AttendancePage> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // A real card tap needs no manager PIN.
+              CardTapListener(onCard: _clock, prompt: l10n.tapToClock, child: const SizedBox.shrink()),
               HeroCard(
                 label: '',
                 value: l10n.ofInCount(shift.where((t) => t.isIn).length, shift.length),

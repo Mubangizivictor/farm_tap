@@ -24,7 +24,6 @@ void main() {
       access: FakeStaffAccessRepository(),
       onCard: (_) {},
       onTypeNumber: () {},
-      showSimulate: false,
     ),
   );
 
@@ -57,7 +56,6 @@ void main() {
       access: FakeStaffAccessRepository(nfc: false),
       onCard: (_) {},
       onTypeNumber: () {},
-      showSimulate: false,
     ),
   );
 }

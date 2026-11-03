@@ -1,6 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Staff and farmer cards (NFC), ear-tag scanning and photos (camera). -->
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
-        android:label="farm_tap"
+        android:label="FarmTap"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

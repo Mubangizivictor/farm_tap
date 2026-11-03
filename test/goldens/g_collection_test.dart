@@ -53,7 +53,7 @@ void main() {
   screenGoldens(
     'G02_centre_tap_card',
     (_) => shell(
-      ReceiveMilkPage(repo: repo(), onFarmer: (_) {}, now: now, showSimulate: false),
+      ReceiveMilkPage(repo: repo(), onFarmer: (_) {}, now: now),
       '/collect',
       parent: '/home',
     ),
@@ -73,7 +73,7 @@ void main() {
   screenGoldens(
     'G05_centre_delivery_saved',
     (_) => shell(
-      ReceiveMilkPage(repo: repo(), onFarmer: (_) {}, now: now, showSimulate: false, savedDeliveryId: 'd-4'),
+      ReceiveMilkPage(repo: repo(), onFarmer: (_) {}, now: now, savedDeliveryId: 'd-4'),
       '/collect',
       parent: '/home',
     ),

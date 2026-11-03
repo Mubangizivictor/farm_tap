@@ -4,13 +4,13 @@
 import 'dart:async';
 
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
+import 'package:farm_tap/core/nfc/card_tap_listener.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_models.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_repository.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -339,7 +339,7 @@ class ReceiveMilkPage extends StatefulWidget {
     required this.onFarmer,
     super.key,
     this.savedDeliveryId,
-    this.showSimulate = kDebugMode,
+    this.showSimulate = false,
     this.now,
     this.showToast = true,
   });
@@ -445,6 +445,7 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              CardTapListener(onCard: _byCard, prompt: l10n.tapFarmersCard, child: const SizedBox.shrink()),
               context.space.gapXxxl,
               Center(
                 child: FarmTapAnimationView(
