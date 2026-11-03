@@ -2,7 +2,7 @@
   "name": "farmtap-web",
   "version": "0.1.0",
   "private": true,
-  "description": "FarmTap for Chrome and other browsers (decision 0015). Online only.",
+  "description": "FarmTap for Chrome and other browsers (decision 0017). Online only.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

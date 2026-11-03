@@ -43,7 +43,7 @@ export interface Live<T> {
 }
 
 /**
- * Live list of a farm collection (online only, decision 0015). [since]
+ * Live list of a farm collection (online only, decision 0017). [since]
  * limits it to records made on or after that local ISO day, by createdAt.
  */
 export function useRecords<B>(tenantId: string | null, name: string, since?: string): Live<FarmRecord<B>> {

@@ -1,5 +1,5 @@
 /* ============================================================================
-   FarmTap web design tokens (decision 0015, binding rule 6 for the web).
+   FarmTap web design tokens (decision 0017, binding rule 6 for the web).
    The ONLY file in webapp/ allowed to hold colours, sizes, fonts, radii and
    durations. Mirrors lib/core/theme/ (Kraal palette, compact scale 0013).
    Everything else uses var(--…). `npm run check:tokens` enforces it.

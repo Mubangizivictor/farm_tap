@@ -1,4 +1,4 @@
-# 0015 — FarmTap on the web (Chrome) is a Next.js app, online only
+# 0017 — FarmTap on the web (Chrome) is a Next.js app, online only
 
 - Status: accepted (2026-11-03): Victor asked for it in the project chat ("we are using next js for the web version not flutter web because flutter web is slow, and web version there shouldn't be offline access")
 - Date: 2026-11-03
@@ -38,5 +38,9 @@
 ## What Victor sets up once (Firebase console, free)
 1. Project settings → Your apps → Add app → Web. Copy the config into `webapp/.env.local` (see `webapp/.env.example`).
 2. Authentication → Settings → Authorized domains: add `localhost` (there by default) and `farm-tap-1dd15.web.app`.
-3. Apple on the web needs an Apple **Services ID** + key (Apple Developer account, which Victor has). Until then the Apple button shows "Apple sign-in is not set up for the web yet".
-4. Hosting: `firebase deploy --only hosting` (free Spark plan).
+3. Google Cloud → Credentials → Web client → Authorized redirect URIs: add `https://farm-tap-1dd15.web.app/__/auth/handler` (so the Google window names our site, not firebaseapp.com).
+4. Apple on the web needs an Apple **Services ID** + key (Apple Developer account, which Victor has). Until then the Apple button shows "Apple sign-in is not set up for the web yet".
+5. Hosting: `firebase deploy --only hosting` (free Spark plan). `firebase.json` now has a `hosting` block pointing at `webapp/out`.
+
+## Testing
+Tested in Chrome against the Firebase emulators with the real `firestore.rules`: account creation, farm setup, record milk, add expense, add animal, add supplier (duplicate card refused), offline banner, light/dark, phone and desktop widths.

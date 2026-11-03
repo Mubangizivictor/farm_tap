@@ -91,6 +91,7 @@ h3 { font-size: var(--fs-title); font-weight: var(--fw-semibold); }
 .stat { display: flex; flex-direction: column; gap: var(--s-xs); }
 .stat .value { font-size: var(--fs-metric); font-weight: var(--fw-bold); line-height: var(--lh-tight); font-variant-numeric: tabular-nums; }
 .stat .value small { font-size: var(--fs-title-sm); font-weight: var(--fw-medium); color: var(--c-on-surface-variant); margin-left: var(--s-xxs); }
+.stat .value.money { font-size: var(--fs-headline); white-space: nowrap; }
 .stat .hint { font-size: var(--fs-body-sm); color: var(--c-on-surface-variant); }
 .stat .icon-chip { width: var(--z-avatar); height: var(--z-avatar); border-radius: var(--r-sm); display: grid; place-items: center; background: var(--c-primary-container); color: var(--c-on-primary-container); }
 .stat.warn .icon-chip { background: var(--c-warning-container); color: var(--c-on-warning-container); }

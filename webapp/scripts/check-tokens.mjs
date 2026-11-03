@@ -1,4 +1,4 @@
-// Binding rule 6 on the web (decision 0015): colours, sizes, fonts and
+// Binding rule 6 on the web (decision 0017): colours, sizes, fonts and
 // durations live only in src/theme/. Fails the check if any other source
 // file hard-codes one. Media-query widths are allowed (CSS can't use vars).
 import { readdirSync, readFileSync, statSync } from 'node:fs';

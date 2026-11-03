@@ -26,7 +26,7 @@ export function Stat({
           <Icon name={icon} />
         </div>
       </div>
-      <div className="value">
+      <div className={`value ${typeof value === 'string' && value.startsWith('UGX') ? 'money' : ''}`}>
         {value}
         {unit && <small>{unit}</small>}
       </div>
