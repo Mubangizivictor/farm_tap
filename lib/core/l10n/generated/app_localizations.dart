@@ -6525,6 +6525,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save sale'**
   String get saveSale;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get takePhoto;
+
+  /// No description provided for @choosePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from phone'**
+  String get choosePhoto;
+
+  /// No description provided for @removePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get removePhoto;
+
+  /// No description provided for @changePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get changePhoto;
+
+  /// No description provided for @photoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the photo. Try again.'**
+  String get photoFailed;
+
+  /// No description provided for @cameraPermissionNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap needs the camera to scan. Allow it in your phone settings.'**
+  String get cameraPermissionNeeded;
+
+  /// No description provided for @cameraNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The camera is not available. Type the number instead.'**
+  String get cameraNotAvailable;
+
+  /// No description provided for @noAnimalWithTag.
+  ///
+  /// In en, this message translates to:
+  /// **'No animal with tag {tag} on this farm'**
+  String noAnimalWithTag(String tag);
+
+  /// No description provided for @tagTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Another animal already has tag {tag}'**
+  String tagTaken(String tag);
+
+  /// No description provided for @editAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit animal'**
+  String get editAnimal;
+
+  /// No description provided for @statusNow.
+  ///
+  /// In en, this message translates to:
+  /// **'What is she doing now?'**
+  String get statusNow;
+
+  /// No description provided for @animalSoldSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} recorded as sold'**
+  String animalSoldSaved(String name);
+
+  /// No description provided for @sellAnimalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell {name}'**
+  String sellAnimalTitle(String name);
+
+  /// No description provided for @sellAnimalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'She moves to past animals. The price is added to this month\'s income.'**
+  String get sellAnimalBody;
+
+  /// No description provided for @salePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get salePrice;
+
+  /// No description provided for @boughtByOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought by (optional)'**
+  String get boughtByOptional;
+
+  /// No description provided for @recordSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Record sale'**
+  String get recordSale;
 }
 
 class _AppLocalizationsDelegate

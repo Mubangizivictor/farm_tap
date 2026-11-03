@@ -12,8 +12,7 @@ import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 
 /// In-memory herd for the UI phase (useFakeData = true), seeded with the
-/// sample cows from the mockups. The Isar repository (HerdRepositoryImpl)
-/// replaces it in the backend phase without touching the UI.
+/// sample cows from the mockups. LocalHerdRepository is the real-data one.
 class FakeHerdRepository implements HerdRepository, Restorable {
   new({
     required this.clock,
@@ -163,6 +162,36 @@ class FakeHerdRepository implements HerdRepository, Restorable {
   Future<Result<String>> nextTag() async => Result.success('FT-${_nextTag.toString().padLeft(3, '0')}');
 
   @override
+  Future<Result<bool>> updateAnimal(Animal animal) async {
+    final tag = animal.tagNumber.trim().toLowerCase();
+    if (_alive.any((a) => a.id != animal.id && a.tagNumber.toLowerCase() == tag)) return const Result.success(false);
+    _animals = [
+      for (final a in _animals)
+        if (a.id == animal.id) animal else a,
+    ];
+    await journal?.put('animals', animal.id, _animalBody(animal));
+    _controller.add(Result.success(List.unmodifiable(_alive)));
+    return const Result.success(true);
+  }
+
+  @override
+  Future<Result<void>> recordSale(String animalId, {required int price, String? buyer}) async {
+    _animals = [
+      for (final a in _animals)
+        if (a.id == animalId) a.copyWith(status: AnimalStatus.sold, isDeleted: true) else a,
+    ];
+    await journal?.add('animalEvents', {'type': 'sold', 'animalId': animalId, 'price': price, 'buyer': buyer});
+    _controller.add(Result.success(List.unmodifiable(_alive)));
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<List<Animal>>> pastAnimals() async => Result.success([
+    for (final a in _animals)
+      if (a.isDeleted) a,
+  ]);
+
+  @override
   Future<Result<void>> recordDeath(String animalId, {String? cause}) async {
     _animals = [
       for (final a in _animals)
@@ -280,6 +309,7 @@ class FakeHerdRepository implements HerdRepository, Restorable {
     avatarIndex: a.avatarIndex,
     group: a.group,
     motherTag: a.motherTag,
+    photo: a.photo,
   );
 
   // The timeline is English sample data in the UI phase.

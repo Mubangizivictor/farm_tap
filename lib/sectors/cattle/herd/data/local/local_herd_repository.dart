@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/media/photo_store.dart';
+import 'package:farm_tap/core/money/domain/money_models.dart';
+import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
@@ -22,7 +25,11 @@ class LocalHerdRepository implements HerdRepository {
     required this.treatments,
     required this.breeding,
     required this.milk,
+    this.money,
   });
+
+  /// Where the price of a sold animal is recorded as income.
+  final MoneyRepository Function()? money;
 
   final RecordJournal journal;
   final Clock clock;
@@ -51,18 +58,24 @@ class LocalHerdRepository implements HerdRepository {
         updatedBy: r.updatedBy,
         deviceId: r.deviceId,
         syncStatus: SyncStatus.values.byName(r.syncStatus.name),
-        isDeleted: r.isDeleted || r.body['status'] == AnimalStatus.deceased.name,
+        isDeleted:
+            r.isDeleted || r.body['status'] == AnimalStatus.deceased.name || r.body['status'] == AnimalStatus.sold.name,
         dairyStatus: DairyStatus.values.asNameMap()[r.body['dairyStatus']] ?? DairyStatus.milking,
         avatarIndex: r.body['avatarIndex'] as int? ?? 1 + r.id.hashCode.abs() % 6,
         group: r.body['group'] as String?,
         motherTag: r.body['motherTag'] as String?,
+        photo: r.body['photo'] as String?,
       ),
   ];
 
-  Future<List<Animal>> _alive() async => [
-    for (final a in await _all())
-      if (!a.isDeleted) a,
-  ];
+  Future<List<Animal>> _alive() async {
+    final all = await _all();
+    _remember(all);
+    return [
+      for (final a in all)
+        if (!a.isDeleted) a,
+    ];
+  }
 
   static Map<String, Object?> _body(Animal a) => {
     'tagNumber': a.tagNumber,
@@ -76,6 +89,7 @@ class LocalHerdRepository implements HerdRepository {
     'avatarIndex': a.avatarIndex,
     'group': a.group,
     'motherTag': a.motherTag,
+    'photo': a.photo,
   };
 
   Future<void> _changed() async => _controller.add(Result.success(List.unmodifiable(await _alive())));
@@ -118,6 +132,7 @@ class LocalHerdRepository implements HerdRepository {
       avatarIndex: a.avatarIndex,
       group: a.group,
       motherTag: a.motherTag,
+      photo: a.photo,
     );
   }
 
@@ -235,10 +250,10 @@ class LocalHerdRepository implements HerdRepository {
 
   /// Paddocks and pens already used on this farm, plus the usual ones.
   @override
-  List<String> get groups => const ['Paddock 1', 'Paddock 2', 'Paddock 3', 'Calf pen'];
+  List<String> get groups => {..._usedGroups, 'Paddock 1', 'Paddock 2', 'Paddock 3', 'Calf pen'}.toList();
 
   @override
-  List<String> get breeds => const [
+  List<String> get breeds => {
     'Friesian',
     'Friesian cross',
     'Jersey',
@@ -246,7 +261,77 @@ class LocalHerdRepository implements HerdRepository {
     'Ankole',
     'Ankole cross',
     'Guernsey',
-  ];
+    'Ayrshire',
+    'Boran',
+    'Zebu',
+    ..._usedBreeds,
+  }.toList();
+
+  // Filled from the saved animals each time the herd changes.
+  Set<String> _usedGroups = {};
+  Set<String> _usedBreeds = {};
+
+  void _remember(List<Animal> all) {
+    PhotoStore.instance.animalPhotos
+      ..clear()
+      ..addAll({
+        for (final a in all)
+          if ((a.photo ?? '').isNotEmpty) a.id: a.photo!,
+      });
+    _usedGroups = {
+      for (final a in all)
+        if ((a.group ?? '').isNotEmpty) a.group!,
+    };
+    _usedBreeds = {
+      for (final a in all)
+        if (a.breed.isNotEmpty) a.breed,
+    };
+  }
+
+  @override
+  Future<Result<bool>> updateAnimal(Animal animal) async {
+    final all = await _all();
+    final tag = animal.tagNumber.trim().toLowerCase();
+    if (all.any((a) => a.id != animal.id && !a.isDeleted && a.tagNumber.toLowerCase() == tag)) {
+      return const Result.success(false);
+    }
+    final r = await journal.store.get(_collection, animal.id);
+    await journal.put(_collection, animal.id, {...?r?.body, ..._body(animal)});
+    await _changed();
+    return const Result.success(true);
+  }
+
+  @override
+  Future<Result<void>> recordSale(String animalId, {required int price, String? buyer}) async {
+    final r = await journal.store.get(_collection, animalId);
+    if (r == null) return const Result.success(null);
+    await journal.put(_collection, animalId, {...r.body, 'status': AnimalStatus.sold.name});
+    final eventId = await journal.add('animalEvents', {
+      'type': 'sold',
+      'animalId': animalId,
+      'price': price,
+      'buyer': buyer,
+    });
+    if (price > 0) {
+      final label = [r.body['tagNumber'], r.body['name']].whereType<String>().where((s) => s.isNotEmpty).join(' ');
+      await money?.call().addIncome(
+        source: IncomeSource.animalSale,
+        amount: price,
+        note: [label, if (buyer != null && buyer.isNotEmpty) buyer].join(' · '),
+        sourceId: eventId,
+      );
+    }
+    await _changed();
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<List<Animal>>> pastAnimals() async => Result.success(
+    [
+      for (final a in await _all())
+        if (a.status == AnimalStatus.sold || a.status == AnimalStatus.deceased) a,
+    ]..sort((a, b) => b.updatedAt.compareTo(a.updatedAt)),
+  );
 
   @override
   Future<Result<String>> nextTag() async {

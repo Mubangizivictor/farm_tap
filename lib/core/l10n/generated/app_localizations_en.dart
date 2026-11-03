@@ -3798,4 +3798,66 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveSale => 'Save sale';
+
+  @override
+  String get takePhoto => 'Take photo';
+
+  @override
+  String get choosePhoto => 'Choose from phone';
+
+  @override
+  String get removePhoto => 'Remove photo';
+
+  @override
+  String get changePhoto => 'Change photo';
+
+  @override
+  String get photoFailed => 'Could not save the photo. Try again.';
+
+  @override
+  String get cameraPermissionNeeded =>
+      'FarmTap needs the camera to scan. Allow it in your phone settings.';
+
+  @override
+  String get cameraNotAvailable =>
+      'The camera is not available. Type the number instead.';
+
+  @override
+  String noAnimalWithTag(String tag) {
+    return 'No animal with tag $tag on this farm';
+  }
+
+  @override
+  String tagTaken(String tag) {
+    return 'Another animal already has tag $tag';
+  }
+
+  @override
+  String get editAnimal => 'Edit animal';
+
+  @override
+  String get statusNow => 'What is she doing now?';
+
+  @override
+  String animalSoldSaved(String name) {
+    return '$name recorded as sold';
+  }
+
+  @override
+  String sellAnimalTitle(String name) {
+    return 'Sell $name';
+  }
+
+  @override
+  String get sellAnimalBody =>
+      'She moves to past animals. The price is added to this month\'s income.';
+
+  @override
+  String get salePrice => 'Price';
+
+  @override
+  String get boughtByOptional => 'Bought by (optional)';
+
+  @override
+  String get recordSale => 'Record sale';
 }

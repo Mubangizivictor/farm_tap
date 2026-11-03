@@ -2939,5 +2939,50 @@
   "enterPrice": "Enter the price",
   "notPaidYet": "Not paid yet",
   "paidNow": "Paid now",
-  "saveSale": "Save sale"
+  "saveSale": "Save sale",
+  "takePhoto": "Take photo",
+  "choosePhoto": "Choose from phone",
+  "removePhoto": "Remove photo",
+  "changePhoto": "Change photo",
+  "photoFailed": "Could not save the photo. Try again.",
+  "cameraPermissionNeeded": "FarmTap needs the camera to scan. Allow it in your phone settings.",
+  "cameraNotAvailable": "The camera is not available. Type the number instead.",
+  "noAnimalWithTag": "No animal with tag {tag} on this farm",
+  "@noAnimalWithTag": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "tagTaken": "Another animal already has tag {tag}",
+  "@tagTaken": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "editAnimal": "Edit animal",
+  "statusNow": "What is she doing now?",
+  "animalSoldSaved": "{name} recorded as sold",
+  "@animalSoldSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sellAnimalTitle": "Sell {name}",
+  "@sellAnimalTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sellAnimalBody": "She moves to past animals. The price is added to this month's income.",
+  "salePrice": "Price",
+  "boughtByOptional": "Bought by (optional)",
+  "recordSale": "Record sale"
 }

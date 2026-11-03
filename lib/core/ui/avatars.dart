@@ -1,4 +1,6 @@
+import 'package:farm_tap/core/media/photo_store.dart';
 import 'package:farm_tap/core/theme/theme.dart';
+import 'package:farm_tap/core/ui/photo_widgets.dart';
 import 'package:farm_tap/core/ui/tone.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -33,7 +35,7 @@ class CowAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dimension = size ?? context.sizes.avatarMd;
-    final url = photoUrl;
+    final url = photoUrl ?? (animalId == null ? null : PhotoStore.instance.animalPhotos[animalId]);
     final index = avatarIndex;
     final cartoon = isCalf
         ? FarmTapAssets.calfAvatar
@@ -60,7 +62,7 @@ class CowAvatar extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(shape: BoxShape.circle, color: context.colors.surfaceContainer),
           clipBehavior: Clip.antiAlias,
-          child: url == null ? fallback : Image.network(url, fit: BoxFit.cover, errorBuilder: (_, _, _) => fallback),
+          child: url == null || url.isEmpty ? fallback : StoredPhoto(photoKey: url, placeholder: fallback),
         ),
       ),
     );

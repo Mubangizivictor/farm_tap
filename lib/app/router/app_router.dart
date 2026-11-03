@@ -37,6 +37,7 @@ import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/cen
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_farmers_pay_pages.dart';
 import 'package:farm_tap/sectors/cattle/feeding/presentation/pages/feeding_pages.dart';
 import 'package:farm_tap/sectors/cattle/health/presentation/pages/health_pages.dart';
+import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/animal_detail_page.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/herd_list_page.dart';
@@ -223,7 +224,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) => PickCowPage(
           repo: deps.milk,
           onCow: (cow, {required notForSale}) => context.push(AppRoutes.milkCow(cow.id, notForSale: notForSale)),
-          onScan: () => context.go(AppRoutes.herdScan),
+          onScan: () => context.go('${AppRoutes.herdScan}?for=milk'),
         ),
         routes: [
           page(
@@ -278,14 +279,29 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         'scan',
         parent: AppRoutes.herd,
-        builder: (context, state) => ScanTagPage(
-          onTypeTag: () async {
-            final animal = await showTypeTagSheet(context, deps.herd);
-            if (animal != null && context.mounted) {
-              context.pushReplacement(AppRoutes.herdAnimal(animal.id));
+        builder: (context, state) {
+          // ?for=milk opens the cow's milk keypad, ?for=health a treatment
+          // for her; otherwise her page.
+          void open(Animal animal) {
+            switch (state.uri.queryParameters['for']) {
+              case 'milk':
+                context.go(AppRoutes.milkCow(animal.id));
+              case 'health':
+                context.go('${AppRoutes.healthTreatment}?animal=${animal.id}');
+              default:
+                context.pushReplacement(AppRoutes.herdAnimal(animal.id));
             }
-          },
-        ),
+          }
+
+          return ScanTagPage(
+            repo: deps.herd,
+            onAnimal: open,
+            onTypeTag: () async {
+              final animal = await showTypeTagSheet(context, deps.herd);
+              if (animal != null && context.mounted) open(animal);
+            },
+          );
+        },
       ),
       page(
         'count',
@@ -304,14 +320,33 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           repo: deps.herd,
           animalId: state.pathParameters['animalId']!,
           onLabels: () => context.push(AppRoutes.herdLabels),
+          onEdit: () => context.push('${AppRoutes.herdAnimal(state.pathParameters['animalId']!)}/edit'),
           onGone: () => popOrGo(context, AppRoutes.herd),
           onEvent: (kind) => context.go(switch (kind) {
-            HerdEventKind.milk => AppRoutes.milk,
+            HerdEventKind.milk => AppRoutes.milkCow(state.pathParameters['animalId']!),
             HerdEventKind.treatment => '${AppRoutes.healthTreatment}?animal=${state.pathParameters['animalId']}',
             HerdEventKind.heat => AppRoutes.breeding,
             _ => AppRoutes.money,
           }),
         ),
+        routes: [
+          page(
+            'edit',
+            parent: AppRoutes.herd,
+            builder: (context, state) => FutureBuilder(
+              future: deps.herd.detail(state.pathParameters['animalId']!),
+              builder: (context, snapshot) {
+                final animal = snapshot.data?.data?.animal;
+                if (animal == null) return const FarmTapPageLoader();
+                return AddAnimalPage(
+                  repo: deps.herd,
+                  initial: animal,
+                  onSaved: (a) => popOrGo(context, AppRoutes.herdAnimal(a.id)),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     ],
     AppRoutes.collect: [
@@ -354,7 +389,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) => AddTreatmentPage(
           repo: deps.treatments,
           animalId: state.uri.queryParameters['animal'],
-          onScan: () => context.go(AppRoutes.herdScan),
+          onScan: () => context.go('${AppRoutes.herdScan}?for=health'),
           // "Add another" starts a fresh form; Done returns to Health.
           onDone: (another) =>
               another ? context.pushReplacement(AppRoutes.healthTreatment) : popOrGo(context, AppRoutes.health),

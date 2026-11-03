@@ -32,6 +32,7 @@ class Animal extends Equatable {
     this.avatarIndex = 1,
     this.group,
     this.motherTag,
+    this.photo,
   });
 
   final String id;
@@ -59,6 +60,47 @@ class Animal extends Equatable {
   /// Paddock or pen: "Paddock 1", "Calf pen".
   final String? group;
   final String? motherTag;
+
+  /// Photo key from PhotoStore (null: the cartoon avatar).
+  final String? photo;
+
+  Animal copyWith({
+    String? tagNumber,
+    String? name,
+    AnimalSex? sex,
+    String? breed,
+    DateTime? dateOfBirth,
+    AnimalStatus? status,
+    String? govIdTag,
+    bool? isDeleted,
+    DairyStatus? dairyStatus,
+    String? group,
+    String? motherTag,
+    String? photo,
+    bool clearPhoto = false,
+  }) => Animal(
+    id: id,
+    tenantId: tenantId,
+    tagNumber: tagNumber ?? this.tagNumber,
+    name: name ?? this.name,
+    sex: sex ?? this.sex,
+    breed: breed ?? this.breed,
+    dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+    status: status ?? this.status,
+    govIdTag: govIdTag ?? this.govIdTag,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+    createdBy: createdBy,
+    updatedBy: updatedBy,
+    deviceId: deviceId,
+    syncStatus: syncStatus,
+    isDeleted: isDeleted ?? this.isDeleted,
+    dairyStatus: dairyStatus ?? this.dairyStatus,
+    avatarIndex: avatarIndex,
+    group: group ?? this.group,
+    motherTag: motherTag ?? this.motherTag,
+    photo: clearPhoto ? null : photo ?? this.photo,
+  );
 
   /// Whole years old on [today].
   int ageYears(DateTime today) {
@@ -91,5 +133,6 @@ class Animal extends Equatable {
     avatarIndex,
     group,
     motherTag,
+    photo,
   ];
 }

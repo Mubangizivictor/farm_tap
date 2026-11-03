@@ -8,6 +8,7 @@ import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
 import 'package:farm_tap/core/auth/data/firebase/firebase_auth_repository.dart';
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
 import 'package:farm_tap/core/database/isar_service.dart';
+import 'package:farm_tap/core/media/photo_store.dart';
 import 'package:farm_tap/core/money/data/fake/fake_money_repository.dart';
 import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
@@ -163,6 +164,7 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
           treatments: getIt<TreatmentRepository>(),
           breeding: getIt<BreedingRepository>(),
           milk: getIt.call<MilkRepository>,
+          money: getIt.call<MoneyRepository>,
         ),
       );
   }
@@ -313,9 +315,15 @@ void _followOpenFarm(InMemoryTenantProvider tenants) {
     tenants.currentTenantId = id;
     unawaited(restoreSavedRecords().then((_) => sync.sync()));
   });
+  // Photos upload under the open farm once Firebase Storage is switched on.
+  PhotoStore.instance.tenantId = () => tenants.currentTenantId;
+  unawaited(PhotoStore.instance.uploadPending());
   var wasSyncing = false;
   sync.watch().listen((s) {
-    if (wasSyncing && !s.syncing && tenants.currentTenantId.isNotEmpty) unawaited(restoreSavedRecords());
+    if (wasSyncing && !s.syncing && tenants.currentTenantId.isNotEmpty) {
+      unawaited(restoreSavedRecords());
+      unawaited(PhotoStore.instance.uploadPending());
+    }
     wasSyncing = s.syncing;
   });
 }
