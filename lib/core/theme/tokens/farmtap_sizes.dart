@@ -174,14 +174,12 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
   double get brandPanelLogoInset => 28 * scale;
   double get brandPanelInset => 32 * scale;
 
-  /// A02 brand panel: logo mark, its faint watermark (and how far the
-  /// watermark hangs off the top-right corner), and the wordmark above the
-  /// sign-in buttons.
-  double get signInHeroMark => 64 * scale;
-  double get signInHeroMarkWide => 88 * scale;
-  double get signInWatermark => 420 * scale;
-  double get signInWatermarkOffset => 140 * scale;
-  double get signInWordmarkHeight => 30 * scale;
+  /// A02: the spinning logo mark, the soft glow behind it, the wordmark
+  /// under it, and the minimum height of the three small feature cards.
+  double get signInMark => 104 * scale;
+  double get signInHalo => 180 * scale;
+  double get signInWordmarkHeight => 34 * scale;
+  double get signInFeatureCard => 76 * scale;
 
   // ---- Charts ----
   double get chartHeight => 170 * scale;

@@ -39,9 +39,6 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     required this.viewfinder,
     required this.onViewfinder,
     required this.viewfinderAccent,
-    required this.authHero,
-    required this.onAuthHero,
-    required this.authHeroWatermark,
   });
 
   /// Saved, paid, healthy, synced.
@@ -114,13 +111,6 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
   /// Scan-frame corners on the viewfinder.
   final Color viewfinderAccent;
 
-  /// Sign-in brand panel (green in light mode, deep green in dark) and its text.
-  final Color authHero;
-  final Color onAuthHero;
-
-  /// Faint logo watermark on the sign-in brand panel.
-  final Color authHeroWatermark;
-
   static const light = FarmTapSemanticColors(
     success: FarmTapPalette.success600,
     onSuccess: FarmTapPalette.white,
@@ -154,9 +144,6 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     viewfinder: FarmTapPalette.night100,
     onViewfinder: FarmTapPalette.mistSoft,
     viewfinderAccent: FarmTapPalette.green400,
-    authHero: FarmTapPalette.green700,
-    onAuthHero: FarmTapPalette.white,
-    authHeroWatermark: FarmTapPalette.veilLight,
   );
 
   static const dark = FarmTapSemanticColors(
@@ -192,9 +179,6 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     viewfinder: FarmTapPalette.night0,
     onViewfinder: FarmTapPalette.mist,
     viewfinderAccent: FarmTapPalette.green400,
-    authHero: FarmTapPalette.green900,
-    onAuthHero: FarmTapPalette.mist,
-    authHeroWatermark: FarmTapPalette.veilDark,
   );
 
   @override
@@ -231,9 +215,6 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     Color? viewfinder,
     Color? onViewfinder,
     Color? viewfinderAccent,
-    Color? authHero,
-    Color? onAuthHero,
-    Color? authHeroWatermark,
   }) => FarmTapSemanticColors(
     success: success ?? this.success,
     onSuccess: onSuccess ?? this.onSuccess,
@@ -267,9 +248,6 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
     viewfinder: viewfinder ?? this.viewfinder,
     onViewfinder: onViewfinder ?? this.onViewfinder,
     viewfinderAccent: viewfinderAccent ?? this.viewfinderAccent,
-    authHero: authHero ?? this.authHero,
-    onAuthHero: onAuthHero ?? this.onAuthHero,
-    authHeroWatermark: authHeroWatermark ?? this.authHeroWatermark,
   );
 
   @override
@@ -308,9 +286,6 @@ class FarmTapSemanticColors extends ThemeExtension<FarmTapSemanticColors> {
       viewfinder: Color.lerp(viewfinder, other.viewfinder, t)!,
       onViewfinder: Color.lerp(onViewfinder, other.onViewfinder, t)!,
       viewfinderAccent: Color.lerp(viewfinderAccent, other.viewfinderAccent, t)!,
-      authHero: Color.lerp(authHero, other.authHero, t)!,
-      onAuthHero: Color.lerp(onAuthHero, other.onAuthHero, t)!,
-      authHeroWatermark: Color.lerp(authHeroWatermark, other.authHeroWatermark, t)!,
     );
   }
 }

@@ -3474,11 +3474,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'Alerts go here. It can be a different line from WhatsApp.';
 
   @override
-  String get signInHeroTitle => 'Your records,\nalways with you.';
+  String get signInTagline =>
+      'Simple records for your business.\nWorks even without network.';
 
   @override
-  String get signInHeroBody =>
-      'Tap a card, save the work. It syncs when the network comes back.';
+  String get signInCardOffline => 'Works offline';
+
+  @override
+  String get signInCardTap => 'Tap cards';
+
+  @override
+  String get signInCardBackup => 'Safe backup';
 
   @override
   String get orLabel => 'or';

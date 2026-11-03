@@ -6046,17 +6046,29 @@ abstract class AppLocalizations {
   /// **'Alerts go here. It can be a different line from WhatsApp.'**
   String get smsNumberHelp;
 
-  /// No description provided for @signInHeroTitle.
+  /// No description provided for @signInTagline.
   ///
   /// In en, this message translates to:
-  /// **'Your records,\nalways with you.'**
-  String get signInHeroTitle;
+  /// **'Simple records for your business.\nWorks even without network.'**
+  String get signInTagline;
 
-  /// No description provided for @signInHeroBody.
+  /// No description provided for @signInCardOffline.
   ///
   /// In en, this message translates to:
-  /// **'Tap a card, save the work. It syncs when the network comes back.'**
-  String get signInHeroBody;
+  /// **'Works offline'**
+  String get signInCardOffline;
+
+  /// No description provided for @signInCardTap.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap cards'**
+  String get signInCardTap;
+
+  /// No description provided for @signInCardBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe backup'**
+  String get signInCardBackup;
 
   /// No description provided for @orLabel.
   ///
