@@ -62,10 +62,23 @@ service cloud.firestore {
       return c != 'payments' || request.resource.data.body.get('status', '') == 'submitted';
     }
 
-    // An SMS is only ever queued from the app; the server sends it and
-    // records the result.
+    // An SMS is queued from the app, or sent by the user from this phone's
+    // WhatsApp / SMS app (decision 0015). Only the server writes sending,
+    // sent or failed.
     function smsOk(c) {
-      return c != 'smsOutbox' || request.resource.data.body.get('status', '') == 'queued';
+      return c != 'smsOutbox' || request.resource.data.body.get('status', '') in ['queued', 'sentFromPhone'];
+    }
+
+    // The one change the app may make to a queued SMS: mark it sent from
+    // the phone, with the number and words unchanged.
+    function smsSentFromPhone(c) {
+      let before = resource.data.body;
+      let after = request.resource.data.body;
+      return c == 'smsOutbox' && before.get('status', '') == 'queued'
+        && after.get('status', '') == 'sentFromPhone'
+        && after.get('to', '') == before.get('to', '') && after.get('text', '') == before.get('text', '')
+        && request.resource.data.version == resource.data.version + 1
+        && request.resource.data.isDeleted == resource.data.isDeleted;
     }
 
     // Written only by Cloud Functions (admin SDK skips these rules).
@@ -105,9 +118,10 @@ service cloud.firestore {
         && request.resource.data.subscription.trialEndsAt <= request.time + duration.value(8, 'd')
         // Every new farm waits for Victorbee's review (admin panel).
         && request.resource.data.review == {'status': 'pending'};
-      // Profile edits only; subscription and review stay server-side.
+      // Profile edits only; subscription, review and paid automatic SMS
+      // (messaging, decision 0015) stay server-side.
       allow update: if manages(t)
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'ownerUid', 'review', 'owner']);
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'ownerUid', 'review', 'owner', 'messaging']);
 
       match /members/{uid} {
         allow read: if member(t);
@@ -131,7 +145,8 @@ service cloud.firestore {
           && request.resource.data.createdBy == resource.data.createdBy
           // Append-only: only the same version again (a retried send), or
           // the one soft delete (Undo on a delivery), with nothing else changed.
-          && (!appendOnly(c) || request.resource.data.version == resource.data.version || softDelete());
+          && (!appendOnly(c) || request.resource.data.version == resource.data.version || softDelete()
+            || smsSentFromPhone(c));
         allow delete: if false;
       }
     }

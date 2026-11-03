@@ -4,6 +4,7 @@ import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
+import 'package:farm_tap/core/sms/sms_outbox.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
 import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
@@ -39,6 +40,7 @@ class AppDependencies {
     required this.farmMoney,
     required this.dailyReport,
     this.prepareFarm,
+    this.outbox,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -60,6 +62,7 @@ class AppDependencies {
     farmMoney: getIt<FarmMoneyRepository>(),
     dailyReport: getIt<DailyReportRepository>(),
     prepareFarm: prepareFarmRecords,
+    outbox: getIt.isRegistered<SmsOutbox>() ? getIt<SmsOutbox>() : null,
   );
 
   /// Loads (or first downloads) a farm's records before it opens.
@@ -82,4 +85,7 @@ class AppDependencies {
   final StaffDirectory staffDirectory;
   final FarmMoneyRepository farmMoney;
   final DailyReportRepository dailyReport;
+
+  /// Messages waiting to be sent (decision 0015); null in the demo.
+  final SmsOutbox? outbox;
 }

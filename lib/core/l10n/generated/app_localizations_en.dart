@@ -3539,4 +3539,101 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get gettingFarmReadySub =>
       'Bringing back your animals, workers and records.';
+
+  @override
+  String get sendOnWhatsapp => 'WhatsApp';
+
+  @override
+  String get sendBySms => 'SMS';
+
+  @override
+  String get smsAppOpenFailed => 'Couldn\'t open the SMS app on this phone.';
+
+  @override
+  String get whatsappOpenFailed =>
+      'Couldn\'t open WhatsApp. Is it installed? Try SMS.';
+
+  @override
+  String get messagesToSend => 'Messages to send';
+
+  @override
+  String get messagesFreeNote =>
+      'Messages go out from this phone\'s WhatsApp or SMS app with the words already typed. Tap Send there. FarmTap charges nothing; SMS uses your own airtime or bundle.';
+
+  @override
+  String get noMessagesWaiting => 'No messages waiting';
+
+  @override
+  String get noMessagesWaitingSub =>
+      'Milk receipts and weekly statements appear here, ready to send.';
+
+  @override
+  String messagesWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count messages waiting',
+      one: '1 message waiting',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sendNextTo(String name) {
+    return 'Next: $name';
+  }
+
+  @override
+  String get sendNextOnWhatsapp => 'Send next · WhatsApp';
+
+  @override
+  String get sendNextBySms => 'Send next · SMS';
+
+  @override
+  String get recentlySent => 'Recently sent';
+
+  @override
+  String get sentFromThisPhone => 'Sent from this phone';
+
+  @override
+  String get msgSentAutomatically => 'Sent automatically';
+
+  @override
+  String get msgKindReceipt => 'Receipt';
+
+  @override
+  String get msgKindStatement => 'Statement';
+
+  @override
+  String get removeMessage => 'Don\'t send';
+
+  @override
+  String statementsQueued(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count statements are ready to send.',
+      one: '1 statement is ready to send.',
+      zero: 'No farmer delivered this week, so there is nothing to send.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get statementsReady => 'Statements ready';
+
+  @override
+  String get sendNow => 'Send now';
+
+  @override
+  String get statementsFreeNote =>
+      'Sent one by one from this phone\'s WhatsApp or SMS. FarmTap charges nothing.';
+
+  @override
+  String readyEveryDay(String phone, String time) {
+    return 'Ready every day at $time. Tap a button to send it to $phone.';
+  }
+
+  @override
+  String get receiptWaiting => 'Receipt ready to send';
 }

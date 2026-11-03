@@ -58,6 +58,15 @@
             <action android:name="android.intent.action.SENDTO"/>
             <data android:scheme="smsto"/>
         </intent>
+        <!-- Messages sent from the phone's own SMS app (decision 0015). -->
+        <intent>
+            <action android:name="android.intent.action.SENDTO"/>
+            <data android:scheme="sms"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="sms"/>
+        </intent>
         <intent>
             <action android:name="android.intent.action.VIEW"/>
             <data android:scheme="https"/>

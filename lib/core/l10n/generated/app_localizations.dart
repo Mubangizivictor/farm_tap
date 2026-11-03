@@ -6153,6 +6153,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bringing back your animals, workers and records.'**
   String get gettingFarmReadySub;
+
+  /// No description provided for @sendOnWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get sendOnWhatsapp;
+
+  /// No description provided for @sendBySms.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS'**
+  String get sendBySms;
+
+  /// No description provided for @smsAppOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the SMS app on this phone.'**
+  String get smsAppOpenFailed;
+
+  /// No description provided for @whatsappOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open WhatsApp. Is it installed? Try SMS.'**
+  String get whatsappOpenFailed;
+
+  /// No description provided for @messagesToSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages to send'**
+  String get messagesToSend;
+
+  /// No description provided for @messagesFreeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages go out from this phone\'s WhatsApp or SMS app with the words already typed. Tap Send there. FarmTap charges nothing; SMS uses your own airtime or bundle.'**
+  String get messagesFreeNote;
+
+  /// No description provided for @noMessagesWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages waiting'**
+  String get noMessagesWaiting;
+
+  /// No description provided for @noMessagesWaitingSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk receipts and weekly statements appear here, ready to send.'**
+  String get noMessagesWaitingSub;
+
+  /// No description provided for @messagesWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 message waiting} other{{count} messages waiting}}'**
+  String messagesWaiting(int count);
+
+  /// No description provided for @sendNextTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {name}'**
+  String sendNextTo(String name);
+
+  /// No description provided for @sendNextOnWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'Send next · WhatsApp'**
+  String get sendNextOnWhatsapp;
+
+  /// No description provided for @sendNextBySms.
+  ///
+  /// In en, this message translates to:
+  /// **'Send next · SMS'**
+  String get sendNextBySms;
+
+  /// No description provided for @recentlySent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently sent'**
+  String get recentlySent;
+
+  /// No description provided for @sentFromThisPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent from this phone'**
+  String get sentFromThisPhone;
+
+  /// No description provided for @msgSentAutomatically.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent automatically'**
+  String get msgSentAutomatically;
+
+  /// No description provided for @msgKindReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get msgKindReceipt;
+
+  /// No description provided for @msgKindStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement'**
+  String get msgKindStatement;
+
+  /// No description provided for @removeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t send'**
+  String get removeMessage;
+
+  /// No description provided for @statementsQueued.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No farmer delivered this week, so there is nothing to send.} =1{1 statement is ready to send.} other{{count} statements are ready to send.}}'**
+  String statementsQueued(int count);
+
+  /// No description provided for @statementsReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Statements ready'**
+  String get statementsReady;
+
+  /// No description provided for @sendNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Send now'**
+  String get sendNow;
+
+  /// No description provided for @statementsFreeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent one by one from this phone\'s WhatsApp or SMS. FarmTap charges nothing.'**
+  String get statementsFreeNote;
+
+  /// No description provided for @readyEveryDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready every day at {time}. Tap a button to send it to {phone}.'**
+  String readyEveryDay(String phone, String time);
+
+  /// No description provided for @receiptWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt ready to send'**
+  String get receiptWaiting;
 }
 
 class _AppLocalizationsDelegate

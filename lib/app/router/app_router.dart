@@ -29,6 +29,7 @@ import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
 import 'package:farm_tap/core/settings/presentation/pages/help_page.dart';
 import 'package:farm_tap/core/settings/presentation/pages/more_page.dart';
 import 'package:farm_tap/core/settings/presentation/pages/settings_page.dart';
+import 'package:farm_tap/core/sms/presentation/messages_page.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
@@ -143,6 +144,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     workerByCard: (card) async => (await staffAccess.findByCard(card)).data?.name,
     onAddFarmer: (card) => showAddFarmerSheet(context, deps.centre, card: card),
     onWorkerCard: () => unawaited(context.push(AppRoutes.workersAttendance)),
+    outbox: deps.outbox,
   );
   sectionRoots[AppRoutes.farmers] = (context, state) => CentreFarmersPage(
     repo: deps.centre,
@@ -339,7 +341,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         'sms',
         parent: AppRoutes.pay,
         builder: (context, state) =>
-            SmsStatementsPage(repo: deps.centre, onSent: () => popOrGo(context, AppRoutes.pay)),
+            SmsStatementsPage(repo: deps.centre, onQueued: () => context.pushReplacement(AppRoutes.settingsMessages)),
       ),
     ],
     AppRoutes.health: [
@@ -454,7 +456,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         'whatsapp',
         parent: AppRoutes.reports,
-        builder: (context, state) => DailyReportPage(repo: deps.dailyReport),
+        builder: (context, state) => DailyReportPage(repo: deps.dailyReport, outbox: deps.outbox),
       ),
     ],
     AppRoutes.settings: [
@@ -464,6 +466,11 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) => const PendingSection(path: AppRoutes.settingsSubscription),
       ),
       page('help', parent: AppRoutes.settings, builder: (context, state) => const HelpPage()),
+      page(
+        'messages',
+        parent: AppRoutes.settings,
+        builder: (context, state) => MessagesPage(outbox: deps.outbox),
+      ),
     ],
     AppRoutes.home: [
       page(
@@ -766,6 +773,8 @@ Future<void> _openMore(BuildContext context, SessionController session, MoreTarg
       await context.push(AppRoutes.settingsSubscription);
     case MoreTarget.help:
       await context.push(AppRoutes.settingsHelp);
+    case MoreTarget.messages:
+      await context.push(AppRoutes.settingsMessages);
     case MoreTarget.lock:
       session.lock();
     case MoreTarget.signOut:

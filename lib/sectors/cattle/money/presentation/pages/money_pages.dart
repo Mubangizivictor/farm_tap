@@ -5,6 +5,9 @@ import 'dart:async';
 
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/money/domain/money_models.dart';
+import 'package:farm_tap/core/sms/phone_messenger.dart';
+import 'package:farm_tap/core/sms/presentation/send_from_phone.dart';
+import 'package:farm_tap/core/sms/sms_outbox.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/formats.dart';
@@ -14,6 +17,7 @@ import 'package:farm_tap/sectors/cattle/owner_reports/domain/daily_report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:share_plus/share_plus.dart';
 
 FarmTapFormat _fmt(BuildContext context) => FarmTapFormat(Localizations.localeOf(context).toLanguageTag());
 
@@ -441,20 +445,22 @@ class _ReportsPageState extends State<ReportsPage> {
                         icon: Symbols.share_rounded,
                         kind: ButtonKind.tonal,
                         expand: false,
-                        onPressed: () => _comingSoon(context),
+                        // Any app the phone has (WhatsApp, SMS, email): free.
+                        onPressed: () => unawaited(
+                          SharePlus.instance.share(
+                            ShareParams(
+                              subject: l10n.reportTitle(widget.farmName, month),
+                              text: [
+                                l10n.reportTitle(widget.farmName, month),
+                                for (final (label, value) in _monthRows(l10n, f, m)) '$label: $value',
+                              ].join('\n'),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     context.space.gapMd,
-                    ReportPreviewCard(
-                      title: l10n.reportTitle(widget.farmName, month),
-                      rows: [
-                        (l10n.milkProduced, '${f.count(m.litresProduced.round())} L'),
-                        (l10n.milkSold, '${f.count(m.litresSold.round())} L'),
-                        (l10n.incomeLabel, _short(f, m.income)),
-                        (l10n.expensesLabel, _short(f, m.totalExpenses)),
-                        (m.profit < 0 ? l10n.lossLabel : l10n.profitLabel, _short(f, m.profit)),
-                      ],
-                    ),
+                    ReportPreviewCard(title: l10n.reportTitle(widget.farmName, month), rows: _monthRows(l10n, f, m)),
                   ],
                 ),
               );
@@ -466,12 +472,24 @@ class _ReportsPageState extends State<ReportsPage> {
   }
 }
 
+List<(String, String)> _monthRows(AppLocalizations l10n, FarmTapFormat f, MonthMoney m) => [
+  (l10n.milkProduced, '${f.count(m.litresProduced.round())} L'),
+  (l10n.milkSold, '${f.count(m.litresSold.round())} L'),
+  (l10n.incomeLabel, _short(f, m.income)),
+  (l10n.expensesLabel, _short(f, m.totalExpenses)),
+  (m.profit < 0 ? l10n.lossLabel : l10n.profitLabel, _short(f, m.profit)),
+];
+
 // ---------------------------------------------------------------- L04
 
 class DailyReportPage extends StatefulWidget {
-  const new({required this.repo, super.key});
+  const new({required this.repo, super.key, this.outbox, this.messenger = const PhoneMessenger()});
 
   final DailyReportRepository repo;
+
+  /// Records what was sent (decision 0015); null in the demo.
+  final SmsOutbox? outbox;
+  final PhoneMessenger messenger;
 
   @override
   State<DailyReportPage> createState() => _DailyReportPageState();
@@ -496,6 +514,20 @@ class _DailyReportPageState extends State<DailyReportPage> {
         _settings = s;
       });
     }
+  }
+
+  /// Opens WhatsApp or the SMS app with today's report typed in, and keeps
+  /// a copy in the messages list as sent from this phone.
+  Future<bool> _send(MessageRoute route, String text, String phone) async {
+    final ok = await widget.messenger.open(route, to: phone, text: text);
+    final outbox = widget.outbox;
+    if (ok && outbox != null) {
+      final id = outbox.journal.newId();
+      await outbox.queue(id: id, to: phone, text: text, kind: 'dailyReport');
+      final m = await outbox.find(id);
+      if (m != null) await outbox.markSentFromPhone(m, route);
+    }
+    return ok;
   }
 
   Future<void> _update(DailyReportSettings s) async {
@@ -536,7 +568,7 @@ class _DailyReportPageState extends State<DailyReportPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  l10n.sentToEveryDay(s.phone, f.time(sendAt!)),
+                  l10n.readyEveryDay(s.phone, f.time(sendAt!)),
                   style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                 ),
                 context.space.gapLg,
@@ -547,6 +579,8 @@ class _DailyReportPageState extends State<DailyReportPage> {
                     tone: FarmTapTone.success,
                   ),
                 ),
+                context.space.gapLg,
+                SendFromPhoneButtons(onSend: (route) => _send(route, _message(l10n, f, r, s), s.phone)),
                 context.space.gapLg,
                 ListCard(
                   children: [
@@ -570,20 +604,6 @@ class _DailyReportPageState extends State<DailyReportPage> {
                         onChanged: (v) => _update(s.copyWith(includeMoney: v)),
                       ),
                       onTap: () => _update(s.copyWith(includeMoney: !s.includeMoney)),
-                    ),
-                    RecordTile(
-                      leading: IconBubble(
-                        icon: Symbols.sms_rounded,
-                        tone: FarmTapTone.info,
-                        size: context.sizes.bubbleMd,
-                      ),
-                      title: l10n.smsIfWhatsappFails,
-                      showChevron: false,
-                      trailing: Switch(
-                        value: s.smsFallback,
-                        onChanged: (v) => _update(s.copyWith(smsFallback: v)),
-                      ),
-                      onTap: () => _update(s.copyWith(smsFallback: !s.smsFallback)),
                     ),
                   ],
                 ),

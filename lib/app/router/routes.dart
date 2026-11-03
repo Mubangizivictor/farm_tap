@@ -74,6 +74,7 @@ abstract final class AppRoutes {
   static const settings = '/settings';
   static const settingsSubscription = '/settings/subscription';
   static const settingsHelp = '/settings/help';
+  static const settingsMessages = '/settings/messages';
 
   // Dev
   static const uiGallery = '/dev/gallery';

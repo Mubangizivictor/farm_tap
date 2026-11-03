@@ -631,24 +631,26 @@ class _PayoutBadge extends StatelessWidget {
 // ---------------------------------------------------------------- G11
 
 class SmsStatementsPage extends StatelessWidget {
-  const new({required this.repo, required this.onSent, super.key});
+  const new({required this.repo, required this.onQueued, super.key});
 
   final CentreRepository repo;
-  final VoidCallback onSent;
 
-  Future<void> _send(BuildContext context, SmsPreview p) async {
+  /// Statements were queued: open the messages waiting to be sent.
+  final VoidCallback onQueued;
+
+  Future<void> _send(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
-    await repo.sendStatements();
+    final count = (await repo.sendStatements()).data ?? 0;
     if (!context.mounted) return;
-    await showCelebration(
+    final go = await showCelebration(
       context,
       animation: FarmTapAnimations.smsSent,
       sound: FarmTapSound.success,
-      title: l10n.smsSent,
-      message: l10n.sendToFarmers(p.messages),
-      primaryLabel: l10n.done,
+      title: l10n.statementsReady,
+      message: l10n.statementsQueued(count),
+      primaryLabel: count == 0 ? l10n.done : l10n.sendNow,
     );
-    onSent();
+    if (count > 0 && go == CelebrationAction.primary) onQueued();
   }
 
   @override
@@ -713,8 +715,11 @@ class SmsStatementsPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           SummaryRow(label: l10n.messages, value: f.count(p.messages)),
-                          SummaryRow(label: l10n.smsLeftThisMonth, value: l10n.countOfTotal(p.smsLeft, p.smsMonthly)),
-                          SummaryRow(label: l10n.extraSmsNeeded, value: f.count(p.extraNeeded)),
+                          context.space.gapXs,
+                          Text(
+                            l10n.statementsFreeNote,
+                            style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+                          ),
                         ],
                       ),
                     ),
@@ -722,7 +727,7 @@ class SmsStatementsPage extends StatelessWidget {
                     FarmTapButton(
                       label: l10n.sendToFarmers(p.messages),
                       icon: Symbols.sms_rounded,
-                      onPressed: () => unawaited(_send(context, p)),
+                      onPressed: () => unawaited(_send(context)),
                     ),
                   ],
                 ),

@@ -5,6 +5,9 @@ import 'dart:async';
 
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/nfc/card_tap_listener.dart';
+import 'package:farm_tap/core/sms/phone_messenger.dart';
+import 'package:farm_tap/core/sms/presentation/send_from_phone.dart';
+import 'package:farm_tap/core/sms/sms_outbox.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/clock.dart';
@@ -345,9 +348,15 @@ class ReceiveMilkPage extends StatefulWidget {
     this.workerByCard,
     this.onAddFarmer,
     this.onWorkerCard,
+    this.outbox,
+    this.messenger = const PhoneMessenger(),
   });
 
   final CentreRepository repo;
+
+  /// Where the farmer's SMS receipt waits; null in the demo (decision 0015).
+  final SmsOutbox? outbox;
+  final PhoneMessenger messenger;
 
   /// The worker whose card this is, if any (a worker card tapped here).
   final Future<String?> Function(String card)? workerByCard;
@@ -377,6 +386,18 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
   /// The farmer of [_saved] gets an SMS receipt.
   bool _savedSms = false;
 
+  /// The receipt of [_saved] went out from this phone.
+  bool _receiptSent = false;
+
+  Future<bool> _sendReceipt(Delivery saved, MessageRoute route) async {
+    final outbox = widget.outbox;
+    final message = await outbox?.find(SmsOutbox.receiptId(saved.id));
+    if (outbox == null || message == null) return false;
+    final ok = await outbox.sendFromPhone(message, route, messenger: widget.messenger);
+    if (ok && mounted) setState(() => _receiptSent = true);
+    return ok;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -403,6 +424,7 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
     if (!mounted) return;
     setState(() {
       _saved = saved;
+      _receiptSent = false;
       _savedSms = (farmer?.smsReceipts ?? false) && (farmer?.phone.isNotEmpty ?? false);
     });
     if (!widget.showToast) return;
@@ -533,9 +555,21 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
                       if (_savedSms) ...[
                         context.space.gapMd,
                         Text(
-                          l10n.smsQueuedPrintSlip,
+                          widget.outbox == null
+                              ? l10n.smsQueuedPrintSlip
+                              : _receiptSent
+                              ? l10n.sentFromThisPhone
+                              : l10n.receiptWaiting,
                           style: context.text.bodyMedium?.copyWith(color: context.colors.primary),
                         ),
+                        if (widget.outbox != null && !_receiptSent) ...[
+                          context.space.gapMd,
+                          SendFromPhoneButtons(
+                            key: ValueKey(saved.id),
+                            forceRow: true,
+                            onSend: (route) => _sendReceipt(saved, route),
+                          ),
+                        ],
                       ],
                     ],
                   ),
