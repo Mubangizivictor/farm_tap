@@ -50,3 +50,13 @@ Unit tests for outbox, backoff, merge rules, PIN hashing and lockout; a "flaky 2
 - The normal build now signs in with Firebase and starts every farm empty. Herd, milk and health are calculated straight from the farm's records (`data/local/`); the other sections start empty and reload from the records when a farm opens and after each sync.
 - The demo build with the mockup samples: `flutter run --dart-define=FARMTAP_DEMO=true`. Widget and golden tests use the demo data.
 - Known limit: switching to a second farm without restarting the app can show the first farm's feeding, money and staff lists until restart (saving still goes to the right farm).
+
+## SMS outbox
+
+The app never holds an SMS provider key. Messages (today: delivery receipts
+to centre farmers who have SMS receipts on) are saved as `smsOutbox`
+records with `status: 'queued'` and sync like any other record, so a receipt
+saved offline goes out once the phone reconnects. Undo soft-deletes the
+queued message. The rules only accept `queued` from the app. A server job
+(Twilio, Africa's Talking, ...) will send queued, non-deleted messages and
+record the result; until it exists, messages wait in the outbox.

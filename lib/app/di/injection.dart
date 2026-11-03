@@ -16,6 +16,7 @@ import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
+import 'package:farm_tap/core/sms/sms_outbox.dart';
 import 'package:farm_tap/core/sync/connectivity_monitor.dart';
 import 'package:farm_tap/core/sync/data/fake/fake_remote_store.dart';
 import 'package:farm_tap/core/sync/data/firestore_remote_store.dart';
@@ -192,7 +193,12 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
       ),
     )
     ..registerLazySingleton<CentreRepository>(
-      () => FakeCentreRepository(getIt<Clock>(), journal: getIt<RecordJournal>(), withSamples: samples),
+      () => FakeCentreRepository(
+        getIt<Clock>(),
+        journal: getIt<RecordJournal>(),
+        sms: samples ? null : SmsOutbox(getIt<RecordJournal>()),
+        withSamples: samples,
+      ),
     )
     ..registerLazySingleton<MoneyRepository>(
       () => FakeMoneyRepository(getIt<Clock>(), journal: getIt<RecordJournal>(), withSamples: samples),

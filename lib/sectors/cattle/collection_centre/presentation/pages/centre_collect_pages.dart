@@ -362,6 +362,9 @@ class ReceiveMilkPage extends StatefulWidget {
 class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
   Delivery? _saved;
 
+  /// The farmer of [_saved] gets an SMS receipt.
+  bool _savedSms = false;
+
   @override
   void initState() {
     super.initState();
@@ -384,7 +387,12 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
     final day = (await widget.repo.today()).data;
     final saved = day?.latest.where((d) => d.id == widget.savedDeliveryId).firstOrNull;
     if (!mounted || saved == null) return;
-    setState(() => _saved = saved);
+    final farmer = (await widget.repo.farmer(saved.farmerId)).data;
+    if (!mounted) return;
+    setState(() {
+      _saved = saved;
+      _savedSms = (farmer?.smsReceipts ?? false) && (farmer?.phone.isNotEmpty ?? false);
+    });
     if (!widget.showToast) return;
     final l10n = AppLocalizations.of(context);
     final f = _fmt(context);
@@ -480,11 +488,13 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
                           Text(f.litres(saved.litres), style: context.text.titleSmall),
                         ],
                       ),
-                      context.space.gapMd,
-                      Text(
-                        l10n.smsQueuedPrintSlip,
-                        style: context.text.bodyMedium?.copyWith(color: context.colors.primary),
-                      ),
+                      if (_savedSms) ...[
+                        context.space.gapMd,
+                        Text(
+                          l10n.smsQueuedPrintSlip,
+                          style: context.text.bodyMedium?.copyWith(color: context.colors.primary),
+                        ),
+                      ],
                     ],
                   ),
                 )

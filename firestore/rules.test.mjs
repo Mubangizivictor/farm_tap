@@ -114,6 +114,14 @@ describe('roles and money', () => {
       rec('payments', 'p2', { body: { status: 'confirmed', amount: 70000 } })));
   });
 
+  test('an SMS can only be queued, never marked sent from the app', async () => {
+    const db = as('worker');
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/smsOutbox/s1`),
+      rec('smsOutbox', 's1', { body: { status: 'queued', to: '+256772451908', text: 'Hi' } })));
+    await assertFails(setDoc(doc(db, `tenants/${T}/smsOutbox/s2`),
+      rec('smsOutbox', 's2', { body: { status: 'sent', to: '+256772451908', text: 'Hi' } })));
+  });
+
   test('subscription cannot be changed from the app', async () => {
     await assertFails(updateDoc(doc(as('owner'), `tenants/${T}`), { 'subscription.paidUntil': days(365) }));
     await assertSucceeds(updateDoc(doc(as('owner'), `tenants/${T}`), { name: 'Rwemera Dairy' }));

@@ -1,5 +1,6 @@
 import 'package:farm_tap/core/error/failure.dart';
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/sms/sms_outbox.dart';
 import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_models.dart';
@@ -10,7 +11,7 @@ import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_reposito
 /// With [withSamples] false (real data) the centre starts with no farmers and
 /// every total comes from its own records.
 class FakeCentreRepository implements CentreRepository, Restorable {
-  new(this.clock, {this.journal, this.withSamples = true}) {
+  new(this.clock, {this.journal, this.sms, this.withSamples = true}) {
     final now = clock.now();
     _day = DateTime(now.year, now.month, now.day);
     if (!withSamples) {
@@ -140,6 +141,9 @@ class FakeCentreRepository implements CentreRepository, Restorable {
 
   /// Saves records on the phone for sync (decision 0014); null in tests.
   final RecordJournal? journal;
+
+  /// Where SMS receipts to farmers are queued (none in demo builds).
+  final SmsOutbox? sms;
   late final DateTime _day;
   late final Map<String, List<Deduction>> _deductions;
   static const double _price = 1100;
@@ -275,8 +279,19 @@ class FakeCentreRepository implements CentreRepository, Restorable {
         if (x.id == farmerId) x.withToday((x.todayLitres ?? 0) + litres) else x,
     ];
     await journal?.add('deliveries', _deliveryBody(d), id: d.id);
+    if (f.smsReceipts) {
+      final at = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+      await sms?.queue(
+        id: _receiptId(d.id),
+        to: f.phone,
+        kind: 'deliveryReceipt',
+        text: 'FarmTap: received ${litres.toStringAsFixed(1)} L of milk from ${f.name} at $at. Thank you.',
+      );
+    }
     return Result.success(d);
   }
+
+  static String _receiptId(String deliveryId) => 'receipt-$deliveryId';
 
   @override
   Future<Result<void>> undoDelivery(String deliveryId) async {
@@ -285,6 +300,8 @@ class FakeCentreRepository implements CentreRepository, Restorable {
     _deliveries = [..._deliveries]..remove(d);
     // Undo is a soft delete: the record stays, marked deleted.
     await journal?.remove('deliveries', d.id);
+    final f = _farmers.where((x) => x.id == d.farmerId).firstOrNull;
+    if (f != null && f.smsReceipts) await sms?.cancel(_receiptId(d.id));
     _farmers = [
       for (final x in _farmers)
         if (x.id == d.farmerId) _less(x, d.litres) else x,

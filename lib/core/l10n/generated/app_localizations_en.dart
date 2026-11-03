@@ -109,29 +109,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String trialDaysLeft(int days) {
-    String _temp0 = intl.Intl.pluralLogic(
-      days,
-      locale: localeName,
-      other: '$days days',
-      one: '1 day',
-    );
+    String _temp0 = intl.Intl.pluralLogic(days, locale: localeName, other: '$days days', one: '1 day');
     return 'Free trial: $_temp0 left';
   }
 
   @override
   String trialDaysLeftShort(int days) {
-    String _temp0 = intl.Intl.pluralLogic(
-      days,
-      locale: localeName,
-      other: '$days days',
-      one: '1 day',
-    );
+    String _temp0 = intl.Intl.pluralLogic(days, locale: localeName, other: '$days days', one: '1 day');
     return 'Free trial · $_temp0 left';
   }
 
   @override
-  String get trialThenPrice =>
-      'Then UGX 70,000 a month. Pay anytime with Mobile Money.';
+  String get trialThenPrice => 'Then UGX 70,000 a month. Pay anytime with Mobile Money.';
 
   @override
   String get trialUpgradeLine => 'Upgrade · UGX 70,000/mo';
@@ -140,8 +129,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get offlineBannerTitle => 'You are offline';
 
   @override
-  String get offlineBannerBody =>
-      'Records are saved on this phone and will sync when you are online.';
+  String get offlineBannerBody => 'Records are saved on this phone and will sync when you are online.';
 
   @override
   String get emptyDefaultTitle => 'Nothing here yet';
@@ -247,8 +235,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeTitle => 'Welcome to FarmTap';
 
   @override
-  String get welcomeBody =>
-      'Records for your farm and milk centre — even without network.';
+  String get welcomeBody => 'Records for your farm and milk centre — even without network.';
 
   @override
   String get continueGoogle => 'Continue with Google';
@@ -269,8 +256,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get brandTagline => 'Tap the card, record the work.';
 
   @override
-  String get brandBody =>
-      'Records for farms and milk centres in Western Uganda — offline, in Runyankore and English.';
+  String get brandBody => 'Records for farms and milk centres in Western Uganda — offline, in Runyankore and English.';
 
   @override
   String get emailSignInTitle => 'Sign in with email';
@@ -391,12 +377,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String trialDaysShort(int days) {
-    String _temp0 = intl.Intl.pluralLogic(
-      days,
-      locale: localeName,
-      other: '$days days',
-      one: '1 day',
-    );
+    String _temp0 = intl.Intl.pluralLogic(days, locale: localeName, other: '$days days', one: '1 day');
     return 'Trial $_temp0';
   }
 
@@ -460,8 +441,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get waitlistBody =>
-      'Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
+  String get waitlistBody => 'Join the waitlist and we\'ll message you the day it\'s ready. No payment needed.';
 
   @override
   String get yourNameLabel => 'Your name';
@@ -487,8 +467,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dairyTypeTitle => 'What kind of dairy?';
 
   @override
-  String get dairyTypeSubtitle =>
-      'This decides your home screen. You can add the other later.';
+  String get dairyTypeSubtitle => 'This decides your home screen. You can add the other later.';
 
   @override
   String get dairyFarm => 'Dairy farm';
@@ -530,8 +509,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contactsTitle => 'Where should we send reports?';
 
   @override
-  String get contactsSubtitle =>
-      'Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
+  String get contactsSubtitle => 'Daily farm reports go to WhatsApp. Alerts and reminders go by SMS.';
 
   @override
   String get dailyReportTime => 'Daily report at 7:00 pm';
@@ -546,8 +524,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendDailyWhatsapp => 'Send me the daily report on WhatsApp';
 
   @override
-  String get sendSmsAlerts =>
-      'Send me SMS alerts (sick cows, low stock, trial)';
+  String get sendSmsAlerts => 'Send me SMS alerts (sick cows, low stock, trial)';
 
   @override
   String get roleTitle => 'What is your role?';
@@ -562,8 +539,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get firstStaffTitle => 'Add your first worker';
 
   @override
-  String get firstStaffSubtitle =>
-      'Workers use a card and a 4-digit PIN — no email needed.';
+  String get firstStaffSubtitle => 'Workers use a card and a 4-digit PIN — no email needed.';
 
   @override
   String get nameLabel => 'Name';
@@ -587,8 +563,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nfcLaterTitle => 'Add an NFC card later';
 
   @override
-  String get nfcLaterBody =>
-      'Tap \'Assign card\' on the worker\'s page when cards arrive.';
+  String get nfcLaterBody => 'Tap \'Assign card\' on the worker\'s page when cards arrive.';
 
   @override
   String get saveWorker => 'Save worker';
@@ -620,8 +595,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get choose => 'Choose';
 
   @override
-  String get phoneIncomplete =>
-      'Check the number — it needs 9 digits after +256.';
+  String get phoneIncomplete => 'Check the number — it needs 9 digits after +256.';
 
   @override
   String get farmNameRequired => 'Enter the farm name.';
@@ -654,8 +628,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tapYourCard => 'Tap your card';
 
   @override
-  String get tapYourCardBody =>
-      'Hold your FarmTap card on the back of the phone.';
+  String get tapYourCardBody => 'Hold your FarmTap card on the back of the phone.';
 
   @override
   String get enterCardInstead => 'Enter card number instead';
@@ -709,8 +682,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nfcOffTitle => 'NFC is turned off';
 
   @override
-  String get nfcOffBody =>
-      'Turn on NFC in your phone settings to use cards, or type the card number.';
+  String get nfcOffBody => 'Turn on NFC in your phone settings to use cards, or type the card number.';
 
   @override
   String get openSettings => 'Open settings';
@@ -861,8 +833,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncStatusTitle => 'Sync status';
 
   @override
-  String get syncStatusBody =>
-      'Records are saved on this phone first, then sent to the cloud.';
+  String get syncStatusBody => 'Records are saved on this phone first, then sent to the cloud.';
 
   @override
   String get syncedLabel => 'Synced';
@@ -1533,8 +1504,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickMode => 'Quick mode';
 
   @override
-  String get quickModeBody =>
-      'Use this when you can\'t record each cow. Per-cow records give better alerts.';
+  String get quickModeBody => 'Use this when you can\'t record each cow. Per-cow records give better alerts.';
 
   @override
   String totalFromAllCows(String session) {
@@ -1589,12 +1559,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String buyersCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count buyers',
-      one: '1 buyer',
-    );
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count buyers', one: '1 buyer');
     return '$_temp0';
   }
 
@@ -1753,7 +1718,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lastSaved => 'Last saved';
 
   @override
-  String get smsQueuedPrintSlip => 'SMS receipt queued · Print slip';
+  String get smsQueuedPrintSlip => 'SMS receipt queued';
 
   @override
   String savedForFarmer(String litres, String name) {
@@ -1943,8 +1908,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mobileMoneyPayouts => 'Mobile Money payouts';
 
   @override
-  String get mobileMoneyBody =>
-      'Each farmer receives an SMS when paid. Fees are shown before you confirm.';
+  String get mobileMoneyBody => 'Each farmer receives an SMS when paid. Fees are shown before you confirm.';
 
   @override
   String get sent => 'Sent';
@@ -2078,8 +2042,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get diffAboveBody =>
-      'Check spillage and the cooler dipstick. The owner is notified.';
+  String get diffAboveBody => 'Check spillage and the cooler dipstick. The owner is notified.';
 
   @override
   String get truck => 'Truck';
@@ -2103,13 +2066,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reconciliationSaved => 'Reconciliation saved';
 
   @override
-  String smsStatementText(
-    String name,
-    String period,
-    String litres,
-    String amount,
-    String payDay,
-  ) {
+  String smsStatementText(String name, String period, String litres, String amount, String payDay) {
     return 'FarmTap: $name, $period you delivered $litres L. Amount so far $amount. Pay day $payDay. Thank you!';
   }
 
@@ -2152,8 +2109,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cashSheetInfo => 'Cash sheet';
 
   @override
-  String get cashSheetBody =>
-      'Print the sheet. Each farmer signs when paid in cash.';
+  String get cashSheetBody => 'Print the sheet. Each farmer signs when paid in cash.';
 
   @override
   String get printCashSheet => 'Print cash sheet';
@@ -2287,8 +2243,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noWithdrawal => 'No milk withdrawal';
 
   @override
-  String get blockMilkBody =>
-      'FarmTap will block her milk and remind you when it\'s safe.';
+  String get blockMilkBody => 'FarmTap will block her milk and remind you when it\'s safe.';
 
   @override
   String get treatmentSaved => 'Treatment saved';
@@ -2333,12 +2288,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String bottlesCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count bottles',
-      one: '1 bottle',
-    );
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count bottles', one: '1 bottle');
     return '$_temp0';
   }
 
@@ -2407,8 +2357,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get keepMilkSeparateBody =>
-      'Do not sell or mix this milk until the date shown.';
+  String get keepMilkSeparateBody => 'Do not sell or mix this milk until the date shown.';
 
   @override
   String drugSince(String drug, String date) {
@@ -2646,8 +2595,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tipLabel => 'Tip';
 
   @override
-  String get breedingTip =>
-      'Check heat signs morning and evening. A missed heat costs about 21 days of milk.';
+  String get breedingTip => 'Check heat signs morning and evening. A missed heat costs about 21 days of milk.';
 
   @override
   String get recordHeat => 'Record heat';
@@ -2770,8 +2718,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signOutTitle => 'Sign out?';
 
   @override
-  String get signOutBody =>
-      'Records on this phone stay saved. Sign in again to see them.';
+  String get signOutBody => 'Records on this phone stay saved. Sign in again to see them.';
 
   @override
   String get comingSoonBody => 'This part of FarmTap is being built.';
@@ -2875,8 +2822,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get resetPinBody =>
-      'They choose a new 4-digit PIN the next time they tap their card.';
+  String get resetPinBody => 'They choose a new 4-digit PIN the next time they tap their card.';
 
   @override
   String resetPinDone(String name) {
@@ -3254,16 +3200,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nothingFound => 'Nothing found. Type the full name to use it.';
 
   @override
-  String get locationOff =>
-      'Turn on location in your phone settings, or pick the district.';
+  String get locationOff => 'Turn on location in your phone settings, or pick the district.';
 
   @override
-  String get locationDenied =>
-      'Location is not allowed. Pick the district from the list.';
+  String get locationDenied => 'Location is not allowed. Pick the district from the list.';
 
   @override
-  String get locationNotFound =>
-      'Could not find your district. Pick it from the list.';
+  String get locationNotFound => 'Could not find your district. Pick it from the list.';
 
   @override
   String get findingLocation => 'Finding your location…';
@@ -3308,8 +3251,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jobLabel => 'Job';
 
   @override
-  String get jobHelper =>
-      'Pick one or type your own, e.g. “Farmer\'s daughter”';
+  String get jobHelper => 'Pick one or type your own, e.g. “Farmer\'s daughter”';
 
   @override
   String get accessLabel => 'What they can do in FarmTap';
@@ -3324,8 +3266,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cardForWorker => 'Their card';
 
   @override
-  String get cardForWorkerHelp =>
-      'Hold their FarmTap card to the back of the phone, or type the number printed on it.';
+  String get cardForWorkerHelp => 'Hold their FarmTap card to the back of the phone, or type the number printed on it.';
 
   @override
   String cardReadNumber(String number) {
@@ -3336,8 +3277,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changeCard => 'Change';
 
   @override
-  String get noCardYet =>
-      'No card yet: give one later from the worker\'s page.';
+  String get noCardYet => 'No card yet: give one later from the worker\'s page.';
 
   @override
   String get yourRoleLabel => 'Your role';
@@ -3360,8 +3300,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get farmCreateFailed =>
-      'Could not create the farm. Check the internet and try again.';
+  String get farmCreateFailed => 'Could not create the farm. Check the internet and try again.';
 
   @override
   String get creatingFarm => 'Creating your farm…';

@@ -47,7 +47,7 @@ service cloud.firestore {
     function appendOnly(c) {
       return c in ['milkRecords', 'milkSales', 'deliveries', 'qualityTests', 'treatments',
         'vaccinations', 'attendance', 'payments', 'payouts', 'expenses', 'income', 'wages',
-        'feedUsage', 'stockMovements', 'animalEvents', 'breedingEvents', 'auditLog'];
+        'feedUsage', 'stockMovements', 'animalEvents', 'breedingEvents', 'auditLog', 'smsOutbox'];
     }
 
     // Only an owner or manager may write these.
@@ -60,6 +60,12 @@ service cloud.firestore {
     // confirms it on the server.
     function paymentOk(c) {
       return c != 'payments' || request.resource.data.body.get('status', '') == 'submitted';
+    }
+
+    // An SMS is only ever queued from the app; the server sends it and
+    // records the result.
+    function smsOk(c) {
+      return c != 'smsOutbox' || request.resource.data.body.get('status', '') == 'queued';
     }
 
     // Written only by Cloud Functions (admin SDK skips these rules).
@@ -117,6 +123,7 @@ service cloud.firestore {
         allow create: if member(t) && !serverOnly(c) && canWrite(t)
           && (!managerOnly(c) || manages(t))
           && paymentOk(c)
+          && smsOk(c)
           && validRecord(t, c, id);
         allow update: if member(t) && !serverOnly(c) && canWrite(t)
           && (!managerOnly(c) || manages(t))

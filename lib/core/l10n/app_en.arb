@@ -1285,7 +1285,7 @@
   "tapNextCard": "Tap the next card",
   "readyNextFarmer": "Ready for the next farmer.",
   "lastSaved": "Last saved",
-  "smsQueuedPrintSlip": "SMS receipt queued · Print slip",
+  "smsQueuedPrintSlip": "SMS receipt queued",
   "savedForFarmer": "Saved {litres} L for {name}",
   "@savedForFarmer": {
     "placeholders": {
