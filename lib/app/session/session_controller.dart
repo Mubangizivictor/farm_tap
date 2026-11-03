@@ -9,7 +9,9 @@ import 'package:flutter/foundation.dart';
 /// What the router guards look at (docs/design/ROUTES.md, "Guards"):
 /// signed in? which farm is open? is the farm phone locked? trial ended?
 class SessionController extends ChangeNotifier {
-  new({required this.auth, required this.clock}) {
+  /// [trialClock]: never goes back in time (decision 0014 §7); defaults to
+  /// [clock].
+  new({required this.auth, required this.clock, Clock? trialClock}) : trialClock = trialClock ?? clock {
     _sub = auth.userChanges.listen((user) {
       if (user == null) _farm = null;
       notifyListeners();
@@ -18,6 +20,7 @@ class SessionController extends ChangeNotifier {
 
   final AuthRepository auth;
   final Clock clock;
+  final Clock trialClock;
   late final StreamSubscription<Object?> _sub;
   FarmMembership? _farm;
   bool _locked = false;
@@ -37,12 +40,12 @@ class SessionController extends ChangeNotifier {
   StaffMember? get staff => _staff;
 
   /// Trial ended (or grace ran out) and not paid: read-only state (M05).
-  bool get readOnly => _farm?.subscription.readOnly(clock.today()) ?? false;
+  bool get readOnly => _farm?.subscription.readOnly(trialClock.today()) ?? false;
 
   /// Calculated against the clock; null when not trialing (no banner).
-  int? get trialDaysLeft => _farm?.subscription.trialBanner(clock.today());
+  int? get trialDaysLeft => _farm?.subscription.trialBanner(trialClock.today());
 
-  SubscriptionState? get subscriptionState => _farm?.subscription.state(clock.today());
+  SubscriptionState? get subscriptionState => _farm?.subscription.state(trialClock.today());
 
   void openFarm(FarmMembership farm) {
     _farm = farm;

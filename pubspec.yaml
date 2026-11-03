@@ -38,9 +38,8 @@ dependencies:
   go_router: ^18.1.2
   image_picker: ^1.2.4
   intl: any
-  isar: ^3.1.0+1
   isar_community: ^3.4.1
-  isar_flutter_libs: ^3.1.0+1
+  isar_community_flutter_libs: ^3.4.1
   json_annotation: any
   just_audio: ^0.10.6
   logger: ^2.3.0

@@ -4,6 +4,8 @@ import 'package:farm_tap/app/app.dart';
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/app/flavor.dart';
 import 'package:farm_tap/core/sound/sound_service.dart';
+import 'package:farm_tap/core/sync/sync_engine.dart';
+import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/utils/logger.dart';
 import 'package:flutter/widgets.dart';
 
@@ -21,6 +23,14 @@ Future<void> bootstrap(Flavor flavor) async {
   FlutterError.onError = (details) {
     logger.e(details.exceptionAsString(), details.exception, details.stack);
   };
+
+  // Decision 0014: start sending saved records, and again on every return
+  // to the app.
+  final sync = getIt<SyncService>();
+  if (sync is SyncEngine) {
+    unawaited(sync.start());
+    AppLifecycleListener(onResume: () => unawaited(sync.onResume()));
+  }
 
   runApp(FarmTapApp(config: config));
 }

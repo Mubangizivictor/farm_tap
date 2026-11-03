@@ -1,5 +1,6 @@
 import 'package:farm_tap/core/error/failure.dart';
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/people/data/pin_security.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
@@ -7,16 +8,24 @@ import 'package:farm_tap/core/people/domain/staff_member.dart';
 /// Sample staff from the mockups. Every PIN is 1234 in the UI phase.
 /// Peter has no card yet (K01 "No card"); blank cards 0207-0215 are in stock.
 class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory {
-  new({this.nfc = true, this.today});
+  new({this.nfc = true, this.today, DateTime Function()? now, this._hasher = const PinHasher(iterations: 2000)})
+    : _lockout = PinLockout(now: now ?? _never);
 
   /// The simulator and web have no NFC; set false to show C05.
   final bool nfc;
 
   /// Start date for new staff ("since").
   final DateTime Function()? today;
-  final _pins = <String, String>{};
+  /// PIN hashes by staff id (decision 0014 §6); never the typed PIN.
+  final _pinHashes = <String, String>{};
+  final PinHasher _hasher;
+  final PinLockout _lockout;
   var _nextId = 1;
-  final _wrongTries = <String, int>{};
+
+  /// Without a clock a lock never ends (tests that only count tries).
+  static DateTime _never() => DateTime(2000);
+  String? _sampleHash;
+  String _hashFor(String staffId) => _pinHashes[staffId] ?? (_sampleHash ??= _hasher.hash(pin));
   final List<StaffMember> _staff = [...sample];
   final List<String> _blankCards = [for (var n = 207; n <= 215; n++) n.toString().padLeft(4, '0')];
 
@@ -78,14 +87,14 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
 
   @override
   Future<Result<PinCheck>> verifyPin(String staffId, String entered) async {
-    if (entered == (_pins[staffId] ?? pin)) {
-      _wrongTries.remove(staffId);
+    if (_lockout.isLocked(staffId)) return const Result.success(PinLocked());
+    if (_hasher.verify(entered, _hashFor(staffId))) {
+      _lockout.reset(staffId);
       return const Result.success(PinAccepted());
     }
-    final wrong = (_wrongTries[staffId] ?? 0) + 1;
-    _wrongTries[staffId] = wrong;
-    if (wrong >= maxTries) return const Result.success(PinLocked());
-    return Result.success(PinRejected(maxTries - wrong));
+    final left = _lockout.recordWrong(staffId);
+    if (left == 0) return const Result.success(PinLocked());
+    return Result.success(PinRejected(left));
   }
 
   @override
@@ -95,7 +104,7 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
   Future<Result<StaffMember>> addStaff({required String name, required StaffRole role, required String pin}) async {
     final s = StaffMember(id: 'staff-new-${_nextId++}', name: name, role: role, since: today?.call());
     _staff.add(s);
-    _pins[s.id] = pin;
+    _pinHashes[s.id] = _hasher.hash(pin);
     return Result.success(s);
   }
 
@@ -122,11 +131,13 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
 
   @override
   Future<Result<bool>> verifyManagerPin(String entered) async =>
-      Result.success(entered == pin && _staff.any((s) => s.role == StaffRole.manager));
+      Result.success(
+        _staff.any((s) => s.role == StaffRole.manager && _hasher.verify(entered, _hashFor(s.id))),
+      );
 
   @override
   Future<Result<void>> resetPin(String staffId) async {
-    _wrongTries.remove(staffId);
+    _lockout.reset(staffId);
     return const Result.success(null);
   }
 }
