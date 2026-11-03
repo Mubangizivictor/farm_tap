@@ -10,11 +10,14 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// A07 — choose which farm or collection centre to open.
 class FarmPickerPage extends StatefulWidget {
-  const new({required this.places, required this.onOpened, super.key, this.onAddFarm});
+  const new({required this.places, required this.onOpened, super.key, this.onAddFarm, this.onSignOut});
 
   final FarmMembershipRepository places;
   final ValueChanged<FarmMembership> onOpened;
   final VoidCallback? onAddFarm;
+
+  /// Back to sign-in, e.g. to use another account.
+  final VoidCallback? onSignOut;
 
   @override
   State<FarmPickerPage> createState() => _FarmPickerPageState();
@@ -55,6 +58,15 @@ class _FarmPickerPageState extends State<FarmPickerPage> {
                 kind: ButtonKind.outlined,
                 onPressed: widget.onAddFarm,
               ),
+              if (widget.onSignOut != null) ...[
+                context.space.gapSm,
+                FarmTapButton(
+                  label: l10n.signOutLabel,
+                  icon: Symbols.logout_rounded,
+                  kind: ButtonKind.text,
+                  onPressed: widget.onSignOut,
+                ),
+              ],
             ],
           ),
         );

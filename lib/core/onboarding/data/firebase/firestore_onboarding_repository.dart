@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:farm_tap/core/auth/domain/entities/account_user.dart';
 import 'package:farm_tap/core/error/failure.dart';
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
@@ -11,12 +12,15 @@ import 'package:farm_tap/core/utils/id_generator.dart';
 /// B01–B10 on Firestore. Creating the farm needs the internet once (like
 /// the first sign-in); everything after works offline.
 class FirestoreOnboardingRepository implements OnboardingRepository {
-  new({required this.db, required this.clock, required this.ids, required this.uid});
+  new({required this.db, required this.clock, required this.ids, required this.uid, this.account});
 
   final FirebaseFirestore db;
   final Clock clock;
   final IdGenerator ids;
   final String? Function() uid;
+
+  /// Who signed up (name and email for the admin panel's tenant list).
+  final AccountUser? Function()? account;
 
   static const _wait = Duration(seconds: 10); // theme-guard: ignore (network timing, not UI)
 
@@ -59,6 +63,10 @@ class FirestoreOnboardingRepository implements OnboardingRepository {
         'settings': {'language': setup.languageCode},
         'subscription': {'trialStartedAt': Timestamp.fromDate(start), 'trialEndsAt': Timestamp.fromDate(end)},
         'createdAt': FieldValue.serverTimestamp(),
+        'owner': {'uid': me, 'name': account?.call()?.name ?? '', 'email': account?.call()?.email ?? ''},
+        // Victorbee reviews every new farm in the admin panel; the farm
+        // works on its trial meanwhile. Only the server changes this.
+        'review': {'status': 'pending'},
       });
       await tenant.collection('members').doc(me).set({'role': role.name});
       await db.collection('users').doc(me).set({

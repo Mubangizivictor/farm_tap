@@ -96,10 +96,12 @@ service cloud.firestore {
       allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.subscription.keys().hasOnly(['trialStartedAt', 'trialEndsAt'])
         && request.resource.data.subscription.trialEndsAt is timestamp
-        && request.resource.data.subscription.trialEndsAt <= request.time + duration.value(15, 'd');
-      // Profile edits only; subscription stays server-side.
+        && request.resource.data.subscription.trialEndsAt <= request.time + duration.value(15, 'd')
+        // Every new farm waits for Victorbee's review (admin panel).
+        && request.resource.data.review == {'status': 'pending'};
+      // Profile edits only; subscription and review stay server-side.
       allow update: if manages(t)
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'ownerUid']);
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'ownerUid', 'review', 'owner']);
 
       match /members/{uid} {
         allow read: if member(t);

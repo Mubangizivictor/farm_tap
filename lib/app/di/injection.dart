@@ -130,7 +130,13 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
         () => FirestoreFarmMembershipRepository(db: db, uid: uid, prefs: prefs, tenants: tenants),
       )
       ..registerLazySingleton<OnboardingRepository>(
-        () => FirestoreOnboardingRepository(db: db, clock: getIt<Clock>(), ids: getIt<IdGenerator>(), uid: uid),
+        () => FirestoreOnboardingRepository(
+          db: db,
+          clock: getIt<Clock>(),
+          ids: getIt<IdGenerator>(),
+          uid: uid,
+          account: () => auth.currentUser,
+        ),
       )
       // Real data: calculated from the farm's records, no samples.
       ..registerLazySingleton<TreatmentRepository>(
@@ -261,7 +267,12 @@ void _followOpenFarm(InMemoryTenantProvider tenants) {
   final sync = getIt<SyncService>();
   session.addListener(() {
     final id = session.farm?.tenantId;
-    if (id == null || id == tenants.currentTenantId) return;
+    if (id == null) {
+      // Signed out or back at the farm list: nothing to sync until one opens.
+      tenants.currentTenantId = '';
+      return;
+    }
+    if (id == tenants.currentTenantId) return;
     tenants.currentTenantId = id;
     unawaited(restoreSavedRecords().then((_) => sync.sync()));
   });

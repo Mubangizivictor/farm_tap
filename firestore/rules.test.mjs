@@ -150,8 +150,20 @@ describe('onboarding', () => {
   test('a new user creates their farm on trial and becomes its owner', async () => {
     const db = as('newbie');
     await assertSucceeds(setDoc(doc(db, 'tenants/new-farm'),
-      { ownerUid: 'newbie', name: 'New', subscription: { trialStartedAt: days(0), trialEndsAt: days(14) } }));
+      { ownerUid: 'newbie', name: 'New', subscription: { trialStartedAt: days(0), trialEndsAt: days(14) },
+        review: { status: 'pending' } }));
     await assertSucceeds(setDoc(doc(db, 'tenants/new-farm/members/newbie'), { role: 'owner' }));
+  });
+
+  test('a new farm waits for review; the owner cannot approve it', async () => {
+    const db = as('newbie');
+    const farm = { ownerUid: 'newbie', name: 'New', subscription: { trialEndsAt: days(14) } };
+    await assertFails(setDoc(doc(db, 'tenants/f5'), farm));
+    await assertFails(setDoc(doc(db, 'tenants/f5'), { ...farm, review: { status: 'approved' } }));
+    await assertSucceeds(setDoc(doc(db, 'tenants/f5'), { ...farm, review: { status: 'pending' } }));
+    await assertSucceeds(setDoc(doc(db, 'tenants/f5/members/newbie'), { role: 'owner' }));
+    await assertFails(updateDoc(doc(db, 'tenants/f5'), { review: { status: 'approved' } }));
+    await assertSucceeds(updateDoc(doc(db, 'tenants/f5'), { name: 'New name' }));
   });
 
   test('cannot create a farm already paid, or for someone else', async () => {

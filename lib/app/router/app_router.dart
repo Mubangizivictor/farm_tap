@@ -555,6 +555,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
             setup.reset();
             unawaited(context.push(AppRoutes.setupLanguage));
           },
+          onSignOut: () => unawaited(session.signOut()),
         ),
       ),
 
