@@ -21,6 +21,9 @@ class LocalMilkRepository implements MilkRepository {
   static const _sales = 'milkSales';
   static const _use = 'milkUse';
 
+  /// Paid / unpaid marks on sales (milkSales never change once saved).
+  static const _payments = 'milkSalePayments';
+
   /// Adult females that are not dry (a heifer counts once she is milked).
   Future<List<Animal>> _milkers() async {
     final animals = (await herd().watchAnimals().first).data ?? const <Animal>[];
@@ -49,8 +52,8 @@ class LocalMilkRepository implements MilkRepository {
 
   static bool _sameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
 
-  Future<MilkCow> _cow(Animal a, MilkSession session, List<MilkRecord> all) async {
-    final today = clock.today();
+  Future<MilkCow> _cow(Animal a, MilkSession session, List<MilkRecord> all, {DateTime? day}) async {
+    final today = day ?? clock.today();
     final mine = [
       for (final r in all)
         if (r.cowId == a.id && r.session == session) r,
@@ -73,10 +76,10 @@ class LocalMilkRepository implements MilkRepository {
   }
 
   @override
-  Future<Result<MilkSessionSummary>> session(MilkSession session) async {
+  Future<Result<MilkSessionSummary>> session(MilkSession session, {DateTime? day}) async {
     final all = await _all();
-    final cows = [for (final a in await _milkers()) await _cow(a, session, all)];
-    final today = clock.today();
+    final today = day == null ? clock.today() : DateTime(day.year, day.month, day.day);
+    final cows = [for (final a in await _milkers()) await _cow(a, session, all, day: today)];
     final litres = all
         .where((r) => r.session == session && _sameDay(r.at, today))
         .fold<double>(0, (t, r) => t + r.litres);
@@ -185,32 +188,105 @@ class LocalMilkRepository implements MilkRepository {
     return const Result.success(null);
   }
 
-  Future<List<MilkSale>> _allSales() async => [
-    for (final r in await journal.store.all(journal.tenantId(), _sales))
-      MilkSale(
-        buyer: r.body['buyer']! as String,
-        litres: (r.body['litres']! as num).toDouble(),
-        pricePerLitre: r.body['pricePerLitre']! as int,
-        paid: r.body['paid'] as bool? ?? false,
-        kind: BuyerKind.values.asNameMap()[r.body['kind']] ?? BuyerKind.centre,
-        at: r.createdAt,
-      ),
-  ]..sort((a, b) => a.at!.compareTo(b.at!));
+  Future<List<MilkSale>> _allSales() async {
+    final store = journal.store;
+    final tenant = journal.tenantId();
+    // The latest mark per sale wins (a mistake can be undone).
+    final marks = <String, (bool, DateTime)>{};
+    final payments = (await store.all(tenant, _payments))..sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
+    for (final p in payments) {
+      marks[p.body['saleId']! as String] = (p.body['paid'] as bool? ?? true, p.updatedAt);
+    }
+    final out = <MilkSale>[];
+    for (final r in await store.all(tenant, _sales)) {
+      final mark = marks[r.id];
+      final paid = mark?.$1 ?? r.body['paid'] as bool? ?? false;
+      out.add(
+        MilkSale(
+          id: r.id,
+          buyer: r.body['buyer']! as String,
+          litres: (r.body['litres']! as num).toDouble(),
+          pricePerLitre: (r.body['pricePerLitre']! as num).round(),
+          paid: paid,
+          paidAt: paid ? mark?.$2 ?? r.createdAt : null,
+          kind: BuyerKind.values.asNameMap()[r.body['kind']] ?? BuyerKind.centre,
+          at: r.createdAt,
+        ),
+      );
+    }
+    return out..sort((a, b) => a.at!.compareTo(b.at!));
+  }
 
   @override
   Future<Result<MilkSalesSummary>> sales() async {
     final all = await _allSales();
-    final weekStart = clock.today().subtract(const Duration(days: 6));
+    final today = clock.today();
+    final weekStart = today.subtract(const Duration(days: 6));
+    final listFrom = today.subtract(const Duration(days: 29));
     final unpaid = all.where((x) => !x.paid);
-    final latest = <String, MilkSale>{for (final x in all) x.buyer: x};
     return Result.success(
       MilkSalesSummary(
         soldThisWeek: all.where((x) => !x.at!.isBefore(weekStart)).fold(0, (t, x) => t + x.litres),
         owed: unpaid.fold(0, (t, x) => t + x.amount),
         buyersOwing: unpaid.map((x) => x.buyer).toSet().length,
-        sales: latest.values.toList(),
+        sales: [
+          for (final x in all.reversed)
+            if (!x.at!.isBefore(listFrom) || !x.paid) x,
+        ],
       ),
     );
+  }
+
+  @override
+  Future<Result<MilkSale>> addSale({
+    required String buyer,
+    required BuyerKind kind,
+    required double litres,
+    required int pricePerLitre,
+    required bool paid,
+  }) async {
+    final id = await journal.add(_sales, {
+      'buyer': buyer.trim(),
+      'kind': kind.name,
+      'litres': litres,
+      'pricePerLitre': pricePerLitre,
+      'paid': paid,
+    });
+    final now = clock.now();
+    return Result.success(
+      MilkSale(
+        id: id,
+        buyer: buyer.trim(),
+        litres: litres,
+        pricePerLitre: pricePerLitre,
+        paid: paid,
+        kind: kind,
+        at: now,
+        paidAt: paid ? now : null,
+      ),
+    );
+  }
+
+  @override
+  Future<Result<void>> setSalePaid(String saleId, {required bool paid}) async {
+    // One mark per sale, updated in place (last write wins across phones).
+    await journal.put(_payments, 'pay-$saleId', {'saleId': saleId, 'paid': paid});
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<List<MilkSale>>> recentBuyers() async {
+    final latest = <String, MilkSale>{};
+    for (final x in (await _allSales()).reversed) {
+      latest.putIfAbsent(x.buyer.toLowerCase(), () => x);
+    }
+    return Result.success(latest.values.toList());
+  }
+
+  @override
+  Future<Result<double>> litresOn([DateTime? day]) async {
+    final d = day ?? clock.today();
+    return Result.success((await _all()).where((r) => _sameDay(r.at, d)).fold<double>(0, (t, r) => t + r.litres));
   }
 
   @override

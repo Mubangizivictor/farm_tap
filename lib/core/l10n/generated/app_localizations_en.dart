@@ -3706,4 +3706,96 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get multiFarmAnswer =>
       'One account runs one farm. Ask us about the multi-farm plan.';
+
+  @override
+  String get exportPdf => 'PDF';
+
+  @override
+  String get exportPdfSub => 'To print, or send on WhatsApp or email';
+
+  @override
+  String get exportSheet => 'Spreadsheet (Excel)';
+
+  @override
+  String get exportSheetSub => 'Opens in Excel or Google Sheets';
+
+  @override
+  String get nothingToExport => 'Nothing to export yet';
+
+  @override
+  String get exportFailed => 'Could not make the file. Try again.';
+
+  @override
+  String viewingDay(String day) {
+    return 'Viewing $day';
+  }
+
+  @override
+  String get backToToday => 'Back to today';
+
+  @override
+  String get noMilkRecordedToday =>
+      'No milk recorded today yet. Record milk first, then split it here.';
+
+  @override
+  String useMoreThanMilked(String litres) {
+    return '$litres more than was milked today';
+  }
+
+  @override
+  String get buyerCentre => 'Centre';
+
+  @override
+  String get buyerShop => 'Shop';
+
+  @override
+  String get buyerNeighbours => 'Neighbours';
+
+  @override
+  String get saleSaved => 'Sale saved';
+
+  @override
+  String get salePaidSaved => 'Marked as paid';
+
+  @override
+  String get saleUnpaidSaved => 'Marked as not paid';
+
+  @override
+  String paidOn(String date) {
+    return 'Paid $date';
+  }
+
+  @override
+  String get markPaid => 'Mark as paid';
+
+  @override
+  String get markUnpaid => 'Mark as not paid';
+
+  @override
+  String get colDate => 'Date';
+
+  @override
+  String get noSalesYet => 'No sales yet';
+
+  @override
+  String get noSalesYetBody =>
+      'Add each sale of milk, to the centre, a shop or neighbours. Unpaid sales show what buyers owe you.';
+
+  @override
+  String get enterBuyer => 'Enter who bought the milk';
+
+  @override
+  String get enterLitres => 'Enter the litres';
+
+  @override
+  String get enterPrice => 'Enter the price';
+
+  @override
+  String get notPaidYet => 'Not paid yet';
+
+  @override
+  String get paidNow => 'Paid now';
+
+  @override
+  String get saveSale => 'Save sale';
 }

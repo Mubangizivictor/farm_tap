@@ -133,6 +133,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
   );
   sectionRoots[AppRoutes.milk] = (context, state) => MilkTodayPage(
     repo: deps.milk,
+    onCow: (id) => context.push(AppRoutes.herdAnimal(id)),
     onRecord: () => context.push(AppRoutes.milkRecord),
     onTool: (i) => context.push([AppRoutes.milkTotal, AppRoutes.milkUse, AppRoutes.milkSales, AppRoutes.milkTrends][i]),
   );
@@ -256,12 +257,16 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         'sales',
         parent: AppRoutes.milk,
-        builder: (context, state) => MilkSalesPage(repo: deps.milk),
+        builder: (context, state) => MilkSalesPage(repo: deps.milk, farmName: session.farm?.name ?? ''),
       ),
       page(
         'trends',
         parent: AppRoutes.milk,
-        builder: (context, state) => MilkTrendsPage(repo: deps.milk),
+        builder: (context, state) => MilkTrendsPage(
+          repo: deps.milk,
+          farmName: session.farm?.name ?? '',
+          onCow: (id) => context.push(AppRoutes.herdAnimal(id)),
+        ),
       ),
     ],
     AppRoutes.herd: [

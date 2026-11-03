@@ -2890,5 +2890,54 @@
   "talkToUsWhatsApp": "Talk to us on WhatsApp",
   "multiFarmWhatsAppMessage": "Hello FarmTap, I want to run more than one farm. Please tell me about the multi-farm plan.",
   "multiFarmQuestion": "Running more than one farm?",
-  "multiFarmAnswer": "One account runs one farm. Ask us about the multi-farm plan."
+  "multiFarmAnswer": "One account runs one farm. Ask us about the multi-farm plan.",
+  "exportPdf": "PDF",
+  "exportPdfSub": "To print, or send on WhatsApp or email",
+  "exportSheet": "Spreadsheet (Excel)",
+  "exportSheetSub": "Opens in Excel or Google Sheets",
+  "nothingToExport": "Nothing to export yet",
+  "exportFailed": "Could not make the file. Try again.",
+  "viewingDay": "Viewing {day}",
+  "@viewingDay": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "backToToday": "Back to today",
+  "noMilkRecordedToday": "No milk recorded today yet. Record milk first, then split it here.",
+  "useMoreThanMilked": "{litres} more than was milked today",
+  "@useMoreThanMilked": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "buyerCentre": "Centre",
+  "buyerShop": "Shop",
+  "buyerNeighbours": "Neighbours",
+  "saleSaved": "Sale saved",
+  "salePaidSaved": "Marked as paid",
+  "saleUnpaidSaved": "Marked as not paid",
+  "paidOn": "Paid {date}",
+  "@paidOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "markPaid": "Mark as paid",
+  "markUnpaid": "Mark as not paid",
+  "colDate": "Date",
+  "noSalesYet": "No sales yet",
+  "noSalesYetBody": "Add each sale of milk, to the centre, a shop or neighbours. Unpaid sales show what buyers owe you.",
+  "enterBuyer": "Enter who bought the milk",
+  "enterLitres": "Enter the litres",
+  "enterPrice": "Enter the price",
+  "notPaidYet": "Not paid yet",
+  "paidNow": "Paid now",
+  "saveSale": "Save sale"
 }

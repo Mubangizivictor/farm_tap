@@ -6357,6 +6357,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'One account runs one farm. Ask us about the multi-farm plan.'**
   String get multiFarmAnswer;
+
+  /// No description provided for @exportPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF'**
+  String get exportPdf;
+
+  /// No description provided for @exportPdfSub.
+  ///
+  /// In en, this message translates to:
+  /// **'To print, or send on WhatsApp or email'**
+  String get exportPdfSub;
+
+  /// No description provided for @exportSheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Spreadsheet (Excel)'**
+  String get exportSheet;
+
+  /// No description provided for @exportSheetSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens in Excel or Google Sheets'**
+  String get exportSheetSub;
+
+  /// No description provided for @nothingToExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to export yet'**
+  String get nothingToExport;
+
+  /// No description provided for @exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not make the file. Try again.'**
+  String get exportFailed;
+
+  /// No description provided for @viewingDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewing {day}'**
+  String viewingDay(String day);
+
+  /// No description provided for @backToToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to today'**
+  String get backToToday;
+
+  /// No description provided for @noMilkRecordedToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No milk recorded today yet. Record milk first, then split it here.'**
+  String get noMilkRecordedToday;
+
+  /// No description provided for @useMoreThanMilked.
+  ///
+  /// In en, this message translates to:
+  /// **'{litres} more than was milked today'**
+  String useMoreThanMilked(String litres);
+
+  /// No description provided for @buyerCentre.
+  ///
+  /// In en, this message translates to:
+  /// **'Centre'**
+  String get buyerCentre;
+
+  /// No description provided for @buyerShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get buyerShop;
+
+  /// No description provided for @buyerNeighbours.
+  ///
+  /// In en, this message translates to:
+  /// **'Neighbours'**
+  String get buyerNeighbours;
+
+  /// No description provided for @saleSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Sale saved'**
+  String get saleSaved;
+
+  /// No description provided for @salePaidSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as paid'**
+  String get salePaidSaved;
+
+  /// No description provided for @saleUnpaidSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as not paid'**
+  String get saleUnpaidSaved;
+
+  /// No description provided for @paidOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid {date}'**
+  String paidOn(String date);
+
+  /// No description provided for @markPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as paid'**
+  String get markPaid;
+
+  /// No description provided for @markUnpaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as not paid'**
+  String get markUnpaid;
+
+  /// No description provided for @colDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get colDate;
+
+  /// No description provided for @noSalesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No sales yet'**
+  String get noSalesYet;
+
+  /// No description provided for @noSalesYetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add each sale of milk, to the centre, a shop or neighbours. Unpaid sales show what buyers owe you.'**
+  String get noSalesYetBody;
+
+  /// No description provided for @enterBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter who bought the milk'**
+  String get enterBuyer;
+
+  /// No description provided for @enterLitres.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the litres'**
+  String get enterLitres;
+
+  /// No description provided for @enterPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the price'**
+  String get enterPrice;
+
+  /// No description provided for @notPaidYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not paid yet'**
+  String get notPaidYet;
+
+  /// No description provided for @paidNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid now'**
+  String get paidNow;
+
+  /// No description provided for @saveSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Save sale'**
+  String get saveSale;
 }
 
 class _AppLocalizationsDelegate

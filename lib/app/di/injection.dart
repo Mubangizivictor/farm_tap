@@ -402,6 +402,7 @@ const List<String> syncedCollections = [
   'reminders',
   'settings',
   'milkUse',
+  'milkSalePayments',
   'reconciliations',
 ];
 
