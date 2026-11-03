@@ -1,0 +1,123 @@
+rules_version = '2';
+
+// FarmTap security rules (ROADMAP 7.4, decision 0014).
+// - A farm's data is readable and writable only by its members.
+// - Records keep their base fields; the id, farm and collection in the
+//   document must match its path.
+// - Append-only records (milk, deliveries, money...) can be created and
+//   re-sent unchanged, never edited. Corrections are new records.
+// - Nothing is ever hard-deleted from the app (soft delete with isDeleted).
+// - Money, staff and settings need an owner or manager.
+// - Subscription and payment confirmation are server-only (Cloud Functions).
+// Tests: firestore/rules.test.mjs (npm test in firestore/).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function member(t) {
+      return signedIn() && exists(/databases/$(database)/documents/tenants/$(t)/members/$(request.auth.uid));
+    }
+
+    function role(t) {
+      return get(/databases/$(database)/documents/tenants/$(t)/members/$(request.auth.uid)).data.role;
+    }
+
+    function manages(t) {
+      return member(t) && role(t) in ['owner', 'manager'];
+    }
+
+    function tenantDoc(t) {
+      return get(/databases/$(database)/documents/tenants/$(t)).data;
+    }
+
+    // Read-only after the trial (binding rule 3), calculated from stored
+    // dates like the app does: trial end, or paid-until plus 7 days' grace.
+    // Two extra days let a phone that was offline send what it recorded
+    // while the farm could still write.
+    function canWrite(t) {
+      let sub = tenantDoc(t).get('subscription', {});
+      let slack = duration.value(2, 'd');
+      return (sub.get('trialEndsAt', null) != null && request.time < sub.trialEndsAt + slack)
+        || (sub.get('paidUntil', null) != null && request.time < sub.paidUntil + duration.value(9, 'd'));
+    }
+
+    function appendOnly(c) {
+      return c in ['milkRecords', 'milkSales', 'deliveries', 'qualityTests', 'treatments',
+        'vaccinations', 'attendance', 'payments', 'payouts', 'expenses', 'income', 'wages',
+        'feedUsage', 'stockMovements', 'animalEvents', 'breedingEvents', 'auditLog'];
+    }
+
+    // Only an owner or manager may write these.
+    function managerOnly(c) {
+      return c in ['staff', 'nfcCards', 'settings', 'paymentPeriods', 'farmerStatements',
+        'deductions', 'payouts', 'expenses', 'income', 'wages', 'payments'];
+    }
+
+    // A subscription payment is only ever submitted from the app; Victorbee
+    // confirms it on the server.
+    function paymentOk(c) {
+      return c != 'payments' || request.resource.data.body.get('status', '') == 'submitted';
+    }
+
+    // Written only by Cloud Functions (admin SDK skips these rules).
+    function serverOnly(c) {
+      return c in ['members', 'messages', 'aiQuestions', 'iotDevices', 'iotReadings'];
+    }
+
+    function validRecord(t, c, id) {
+      let d = request.resource.data;
+      return d.id == id && d.tenantId == t && d.collection == c
+        && d.version is int && d.version >= 1
+        && d.deviceId is string && d.createdBy is string && d.updatedBy is string
+        && d.isDeleted is bool && d.body is map
+        && d.serverUpdatedAt == request.time;
+    }
+
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    match /waitlist/{id} {
+      allow create: if true;
+    }
+
+    match /tenants/{t} {
+      allow read: if member(t);
+      // Onboarding: the signer creates the farm as its owner, on trial.
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.subscription.keys().hasOnly(['trialStartedAt', 'trialEndsAt'])
+        && request.resource.data.subscription.trialEndsAt is timestamp
+        && request.resource.data.subscription.trialEndsAt <= request.time + duration.value(15, 'd');
+      // Profile edits only; subscription stays server-side.
+      allow update: if manages(t)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'ownerUid']);
+
+      match /members/{uid} {
+        allow read: if member(t);
+        // The owner's own first membership, right after creating the farm.
+        allow create: if signedIn() && uid == request.auth.uid
+          && get(/databases/$(database)/documents/tenants/$(t)).data.ownerUid == request.auth.uid
+          && request.resource.data.role == 'owner';
+        allow update, delete: if member(t) && role(t) == 'owner' && uid != request.auth.uid;
+      }
+
+      match /{c}/{id} {
+        allow read: if member(t) && c != 'members';
+        allow create: if member(t) && !serverOnly(c) && canWrite(t)
+          && (!managerOnly(c) || manages(t))
+          && paymentOk(c)
+          && validRecord(t, c, id);
+        allow update: if member(t) && !serverOnly(c) && canWrite(t)
+          && (!managerOnly(c) || manages(t))
+          && validRecord(t, c, id)
+          && request.resource.data.createdBy == resource.data.createdBy
+          // Append-only: only the same version again (a retried send).
+          && (!appendOnly(c) || request.resource.data.version == resource.data.version);
+        allow delete: if false;
+      }
+    }
+  }
+}
