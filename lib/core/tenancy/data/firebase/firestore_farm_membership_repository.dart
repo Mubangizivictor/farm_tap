@@ -50,7 +50,7 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
       final tenant = await db.collection('tenants').doc(id).get(server);
       final member = await db.collection('tenants').doc(id).collection('members').doc(me).get(server);
       if (!tenant.exists || !member.exists) continue;
-      places.add(_fromTenant(id, tenant.data()!, member.data()!['role'] as String));
+      places.add(_fromTenant(id, tenant.data()!, member.data()!['role'] as String, member.data()!['staffId'] as String?));
     }
     return places;
   }
@@ -62,7 +62,7 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
     return const Result.success(null);
   }
 
-  static FarmMembership _fromTenant(String id, Map<String, dynamic> t, String role) {
+  static FarmMembership _fromTenant(String id, Map<String, dynamic> t, String role, [String? staffId]) {
     final sub = (t['subscription'] as Map?) ?? const {};
     DateTime? date(Object? v) => v is Timestamp ? v.toDate() : null;
     return FarmMembership(
@@ -77,6 +77,7 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
         paidUntil: date(sub['paidUntil']),
       ),
       avatarIndex: t['avatarIndex'] as int? ?? 1,
+      staffId: staffId,
     );
   }
 
@@ -90,6 +91,7 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
     'trialEndsAt': p.subscription.trialEndsAt?.toIso8601String(),
     'paidUntil': p.subscription.paidUntil?.toIso8601String(),
     'avatarIndex': p.avatarIndex,
+    'staffId': p.staffId,
   };
 
   static FarmMembership _fromJson(Map<String, dynamic> m) {
@@ -106,6 +108,7 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
         paidUntil: date(m['paidUntil']),
       ),
       avatarIndex: m['avatarIndex'] as int? ?? 1,
+      staffId: m['staffId'] as String?,
     );
   }
 }

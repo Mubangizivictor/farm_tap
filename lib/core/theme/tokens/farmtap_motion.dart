@@ -13,6 +13,7 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
     this.celebration = const Duration(milliseconds: 1800),
     this.autoAdvance = const Duration(seconds: 2),
     this.undoWindow = const Duration(seconds: 5),
+    this.scanResult = const Duration(seconds: 4),
     this.standard = Curves.easeOutCubic,
     this.emphasized = Curves.easeOutBack,
     this.exit = Curves.easeInCubic,
@@ -40,6 +41,10 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
   /// How long Undo stays available on a saved delivery.
   final Duration undoWindow;
 
+  /// Scan station: how long a person's ID stays up before the next card
+  /// (decision 0015 §4).
+  final Duration scanResult;
+
   final Curve standard;
   final Curve emphasized;
   final Curve exit;
@@ -55,6 +60,7 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
     Duration? celebration,
     Duration? autoAdvance,
     Duration? undoWindow,
+    Duration? scanResult,
     Curve? standard,
     Curve? emphasized,
     Curve? exit,
@@ -68,6 +74,7 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
     celebration: celebration ?? this.celebration,
     autoAdvance: autoAdvance ?? this.autoAdvance,
     undoWindow: undoWindow ?? this.undoWindow,
+    scanResult: scanResult ?? this.scanResult,
     standard: standard ?? this.standard,
     emphasized: emphasized ?? this.emphasized,
     exit: exit ?? this.exit,

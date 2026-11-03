@@ -10,6 +10,9 @@ class AccountUser extends Equatable {
   final String email;
   final bool emailVerified;
 
+  /// A worker who signed in with phone + PIN (decision 0015 §5).
+  bool get isStaffLogin => email.endsWith('@staff.farmtap.app');
+
   @override
   List<Object?> get props => [id, name, email, emailVerified];
 }

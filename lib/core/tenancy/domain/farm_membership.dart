@@ -81,7 +81,12 @@ class FarmMembership extends Equatable {
     required this.role,
     required this.subscription,
     this.avatarIndex = 1,
+    this.staffId,
   });
+
+  /// Set when a worker signed in with phone + PIN (decision 0015 §5): the
+  /// staff record they are. Null for owners and managers with an account.
+  final String? staffId;
 
   final String tenantId;
   final String name;
@@ -94,5 +99,5 @@ class FarmMembership extends Equatable {
   final int avatarIndex;
 
   @override
-  List<Object?> get props => [tenantId, name, place, kind, role, subscription, avatarIndex];
+  List<Object?> get props => [tenantId, name, place, kind, role, subscription, avatarIndex, staffId];
 }

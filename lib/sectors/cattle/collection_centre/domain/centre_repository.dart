@@ -1,4 +1,6 @@
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/people/domain/card_registry.dart';
+import 'package:farm_tap/core/people/domain/photo_store.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_models.dart';
 
 abstract interface class CentreRepository {
@@ -13,6 +15,21 @@ abstract interface class CentreRepository {
     required String village,
     String? card,
   });
+
+  /// Gives the farmer a card ([scanned]: number, chip id or QR; null = a
+  /// new number). One holder per card (decision 0015); with [replace] the
+  /// farmer's old card is marked lost.
+  Future<Result<CentreFarmer>> assignCard(String farmerId, String? scanned, {bool replace = false});
+
+  /// Ends the farmer's card: lost or returned.
+  Future<Result<CentreFarmer>> revokeCard(String farmerId, CardStatus why);
+
+  Future<Result<List<IdCardRecord>>> cardHistory(String farmerId);
+
+  Future<Result<CentreFarmer>> setPhoto(String farmerId, PersonPhoto photo);
+
+  /// The farmer's latest deliveries, newest first (scan station, G07).
+  Future<Result<List<Delivery>>> deliveriesOf(String farmerId, {int limit = 10});
 
   /// Saves a delivery (after the read-back). Undo removes it again.
   Future<Result<Delivery>> recordDelivery(String farmerId, double litres, {QualityTest test});
