@@ -11,7 +11,6 @@ abstract final class AppRoutes {
 
   // B — onboarding
   static const setup = '/setup';
-  static const setupLanguage = '/setup/language';
   static const setupSector = '/setup/sector';
   static const setupWaitlistDone = '/setup/waitlist-done';
   static const setupDairyType = '/setup/dairy-type';

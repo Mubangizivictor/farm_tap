@@ -26,7 +26,6 @@ class FirstWorker extends Equatable {
 /// by OTP: they show "Not yet confirmed" until the first message arrives.
 class FarmSetup extends Equatable {
   const new({
-    this.languageCode = 'en',
     this.sector = Sector.dairy,
     this.dairyType = DairyType.farm,
     this.farmName = '',
@@ -42,7 +41,6 @@ class FarmSetup extends Equatable {
     this.firstWorker,
   });
 
-  final String languageCode;
   final Sector sector;
   final DairyType dairyType;
   final String farmName;
@@ -58,7 +56,6 @@ class FarmSetup extends Equatable {
   final FirstWorker? firstWorker;
 
   FarmSetup copyWith({
-    String? languageCode,
     Sector? sector,
     DairyType? dairyType,
     String? farmName,
@@ -73,7 +70,6 @@ class FarmSetup extends Equatable {
     SetupRole? role,
     FirstWorker? firstWorker,
   }) => FarmSetup(
-    languageCode: languageCode ?? this.languageCode,
     sector: sector ?? this.sector,
     dairyType: dairyType ?? this.dairyType,
     farmName: farmName ?? this.farmName,
@@ -91,7 +87,6 @@ class FarmSetup extends Equatable {
 
   @override
   List<Object?> get props => [
-    languageCode,
     sector,
     dairyType,
     farmName,

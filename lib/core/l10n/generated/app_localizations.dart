@@ -6,7 +6,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
-import 'app_localizations_nyn.dart';
 
 // ignore_for_file: type=lint
 
@@ -93,10 +92,7 @@ abstract class AppLocalizations {
       ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[
-    Locale('en'),
-    Locale('nyn'),
-  ];
+  static const List<Locale> supportedLocales = <Locale>[Locale('en')];
 
   /// No description provided for @appName.
   ///
@@ -548,18 +544,6 @@ abstract class AppLocalizations {
   /// **'Continue with email'**
   String get continueEmail;
 
-  /// No description provided for @languageEnglish.
-  ///
-  /// In en, this message translates to:
-  /// **'English'**
-  String get languageEnglish;
-
-  /// No description provided for @languageRunyankore.
-  ///
-  /// In en, this message translates to:
-  /// **'Runyankore'**
-  String get languageRunyankore;
-
   /// No description provided for @terms.
   ///
   /// In en, this message translates to:
@@ -847,30 +831,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep editing'**
   String get keepEditing;
-
-  /// No description provided for @chooseLanguageTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose your language'**
-  String get chooseLanguageTitle;
-
-  /// No description provided for @chooseLanguageSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Hitamu orurimi. You can change it later.'**
-  String get chooseLanguageSubtitle;
-
-  /// No description provided for @runyankoreSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Orurimi rw\'Ankole'**
-  String get runyankoreSubtitle;
-
-  /// No description provided for @englishSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Use the app in English'**
-  String get englishSubtitle;
 
   /// No description provided for @sectorTitle.
   ///
@@ -5684,7 +5644,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'nyn'].contains(locale.languageCode);
+      <String>['en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -5695,8 +5655,6 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
-    case 'nyn':
-      return AppLocalizationsNyn();
   }
 
   throw FlutterError(

@@ -32,8 +32,6 @@ OnboardingCubit _cubit([FarmSetup setup = _sample]) => OnboardingCubit()..update
 void main() {
   final repo = FakeOnboardingRepository(FixedClock());
 
-  screenGoldens('B01_onboard_language', (_) => OnboardLanguagePage(cubit: _cubit(), onContinue: () {}));
-
   screenGoldens(
     'B02_onboard_sector',
     (_) => OnboardSectorPage(cubit: _cubit(), onContinue: () {}, onComingSoon: (_) {}),

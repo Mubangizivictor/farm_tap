@@ -39,7 +39,7 @@ void main() {
     addTearDown(tester.view.reset);
     final deps = await fakeDependencies(signedIn: true);
     final session = deps.session;
-    final router = buildRouter(deps, initialLocation: AppRoutes.setupLanguage);
+    final router = buildRouter(deps, initialLocation: AppRoutes.setupSector);
     addTearDown(router.dispose);
     await tester.pumpWidget(
       MaterialApp.router(
@@ -61,8 +61,6 @@ void main() {
       await _settle(tester);
     }
 
-    expect(_location(router), AppRoutes.setupLanguage);
-    await next();
     expect(_location(router), AppRoutes.setupSector);
     await next();
     expect(_location(router), AppRoutes.setupDairyType);

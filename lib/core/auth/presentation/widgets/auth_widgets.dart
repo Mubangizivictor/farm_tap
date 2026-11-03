@@ -1,9 +1,7 @@
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
-import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/navigation_scope.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// "G" / "A" letter in a small neutral circle: placeholder for the official
@@ -29,7 +27,7 @@ class ProviderBadge extends StatelessWidget {
   }
 }
 
-/// "English · Runyankore   Terms · Privacy" under the sign-in buttons.
+/// "Terms · Privacy" under the sign-in buttons.
 /// Tapping a language switches the app language at once.
 class AuthFooter extends StatelessWidget {
   const new({super.key, this.onTerms, this.onPrivacy});
@@ -55,13 +53,10 @@ class AuthFooter extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        link(l10n.languageEnglish, () => context.read<AppSettingsCubit>().setLanguage('en')),
-        dot,
-        link(l10n.languageRunyankore, () => context.read<AppSettingsCubit>().setLanguage('nyn')),
-        context.space.gapLg,
-        link(l10n.terms, onTerms),
-        dot,
-        link(l10n.privacy, onPrivacy),
+        // Shown once the Terms and Privacy pages exist.
+        if (onTerms != null) link(l10n.terms, onTerms),
+        if (onTerms != null && onPrivacy != null) dot,
+        if (onPrivacy != null) link(l10n.privacy, onPrivacy),
       ],
     );
   }

@@ -260,12 +260,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get continueEmail => 'Continue with email';
 
   @override
-  String get languageEnglish => 'English';
-
-  @override
-  String get languageRunyankore => 'Runyankore';
-
-  @override
   String get terms => 'Terms';
 
   @override
@@ -423,19 +417,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keepEditing => 'Keep editing';
-
-  @override
-  String get chooseLanguageTitle => 'Choose your language';
-
-  @override
-  String get chooseLanguageSubtitle =>
-      'Hitamu orurimi. You can change it later.';
-
-  @override
-  String get runyankoreSubtitle => 'Orurimi rw\'Ankole';
-
-  @override
-  String get englishSubtitle => 'Use the app in English';
 
   @override
   String get sectorTitle => 'What do you do?';

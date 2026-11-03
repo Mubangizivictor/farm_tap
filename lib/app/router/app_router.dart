@@ -24,7 +24,6 @@ import 'package:farm_tap/core/onboarding/presentation/pages/form_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/waitlist_and_done.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
-import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/settings/presentation/pages/more_page.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
@@ -44,7 +43,6 @@ import 'package:farm_tap/sectors/cattle/milk/presentation/pages/milk_pages.dart'
 import 'package:farm_tap/sectors/cattle/money/presentation/pages/money_pages.dart';
 import 'package:farm_tap/sectors/cattle/workers/presentation/pages/workers_pages.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -539,7 +537,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) => CheckEmailPage(
           auth: auth,
           email: state.uri.queryParameters['email'] ?? auth.currentUser?.email ?? '',
-          onContinue: () => context.go(AppRoutes.setupLanguage),
+          onContinue: () => context.go(AppRoutes.setupSector),
         ),
       ),
       page(
@@ -553,7 +551,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           },
           onAddFarm: () {
             setup.reset();
-            unawaited(context.push(AppRoutes.setupLanguage));
+            unawaited(context.push(AppRoutes.setupSector));
           },
           onSignOut: () => unawaited(session.signOut()),
         ),
@@ -561,17 +559,8 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
 
       // ---- B: onboarding (each step pushes the next; back = previous step) ----
       page(
-        AppRoutes.setupLanguage,
-        parent: null,
-        builder: (context, state) => OnboardLanguagePage(
-          cubit: setup,
-          onLanguage: (code) => context.read<AppSettingsCubit>().setLanguage(code),
-          onContinue: () => context.push(AppRoutes.setupSector),
-        ),
-      ),
-      page(
         AppRoutes.setupSector,
-        parent: AppRoutes.setupLanguage,
+        parent: null,
         builder: (context, state) => OnboardSectorPage(
           cubit: setup,
           onContinue: () => context.push(AppRoutes.setupDairyType),

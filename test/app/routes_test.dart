@@ -22,7 +22,6 @@ const _routes = <(String, String, bool, bool)>[
   (AppRoutes.emailSignIn, AppRoutes.signIn, false, false),
   (AppRoutes.signUp, AppRoutes.emailSignIn, false, false),
   (AppRoutes.forgotPassword, AppRoutes.emailSignIn, false, false),
-  (AppRoutes.setupSector, AppRoutes.setupLanguage, true, false),
   (AppRoutes.setupWaitlistDone, AppRoutes.setupSector, true, false),
   (AppRoutes.setupDairyType, AppRoutes.setupSector, true, false),
   (AppRoutes.setupFarm, AppRoutes.setupDairyType, true, false),

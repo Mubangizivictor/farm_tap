@@ -67,7 +67,7 @@ class _OnboardFarmDetailsPageState extends State<OnboardFarmDetailsPage> {
     return DiscardGuard(
       dirty: _dirty,
       child: OnboardingStep(
-        step: 4,
+        step: 3,
         title: l10n.farmDetailsTitle,
         animation: FarmTapAnimations.cowGrazing,
         onContinue: _continue,
@@ -186,7 +186,7 @@ class _OnboardContactsPageState extends State<OnboardContactsPage> {
     return DiscardGuard(
       dirty: _dirty,
       child: OnboardingStep(
-        step: 5,
+        step: 4,
         title: l10n.contactsTitle,
         subtitle: l10n.contactsSubtitle,
         animation: FarmTapAnimations.smsSent,
@@ -287,7 +287,7 @@ class _OnboardFirstStaffPageState extends State<OnboardFirstStaffPage> {
     return DiscardGuard(
       dirty: _dirty,
       child: OnboardingStep(
-        step: 7,
+        step: 6,
         title: l10n.firstStaffTitle,
         subtitle: l10n.firstStaffSubtitle,
         animation: FarmTapAnimations.attendance,

@@ -60,7 +60,6 @@ class FirestoreOnboardingRepository implements OnboardingRepository {
           'dailyReport': setup.dailyReport,
           'smsAlerts': setup.smsAlerts,
         },
-        'settings': {'language': setup.languageCode},
         'subscription': {'trialStartedAt': Timestamp.fromDate(start), 'trialEndsAt': Timestamp.fromDate(end)},
         'createdAt': FieldValue.serverTimestamp(),
         'owner': {'uid': me, 'name': account?.call()?.name ?? '', 'email': account?.call()?.email ?? ''},
@@ -73,7 +72,6 @@ class FirestoreOnboardingRepository implements OnboardingRepository {
         'memberships': FieldValue.arrayUnion([
           {'tenantId': id, 'role': role.name},
         ]),
-        'language': setup.languageCode,
       }, SetOptions(merge: true));
     } on FirebaseException catch (e) {
       return Result.failure(e.code == 'unavailable' ? NetworkFailure(e.code) : UnexpectedFailure(e.code));

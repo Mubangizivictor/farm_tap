@@ -3,7 +3,6 @@ import 'package:farm_tap/app/flavor.dart';
 import 'package:farm_tap/app/router/app_dependencies.dart';
 import 'package:farm_tap/app/router/app_router.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
-import 'package:farm_tap/core/l10n/nyn_delegates.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/theme/farmtap_theme.dart';
 import 'package:farm_tap/core/utils/clock.dart';
@@ -34,20 +33,14 @@ class _FarmTapAppState extends State<FarmTapApp> {
   Widget build(BuildContext context) {
     return ClockScope(
       clock: getIt<Clock>(),
-      child: BlocProvider(
-        create: (_) => AppSettingsCubit(),
-        child: BlocBuilder<AppSettingsCubit, AppSettings>(
-          buildWhen: (a, b) => a.languageCode != b.languageCode,
-          builder: (context, settings) => _app(Locale(settings.languageCode)),
-        ),
-      ),
+      child: BlocProvider(create: (_) => AppSettingsCubit(), child: _app()),
     );
   }
 
-  Widget _app(Locale locale) {
+  Widget _app() {
     return MaterialApp.router(
       title: widget.config.appName,
-      locale: locale,
+      locale: const Locale('en'),
       theme: FarmTapTheme.light,
       darkTheme: FarmTapTheme.dark,
       routerConfig: _router,
@@ -56,10 +49,8 @@ class _FarmTapAppState extends State<FarmTapApp> {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
-        RunyankoreMaterialLocalizationsDelegate(),
-        RunyankoreCupertinoLocalizationsDelegate(),
       ],
-      supportedLocales: const [Locale('en'), Locale('nyn')],
+      supportedLocales: const [Locale('en')],
       debugShowCheckedModeBanner: false,
     );
   }
