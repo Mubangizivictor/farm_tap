@@ -557,6 +557,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         parent: null,
         builder: (context, state) => FarmPickerPage(
           places: places,
+          prepare: deps.prepareFarm,
           onOpened: (farm) {
             session.openFarm(farm);
             context.go(AppRoutes.home);

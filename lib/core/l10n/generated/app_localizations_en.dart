@@ -3456,4 +3456,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get typeCardNumberLink => 'Type the card number';
+
+  @override
+  String gettingFarmReady(String farm) {
+    return 'Getting $farm ready…';
+  }
+
+  @override
+  String get gettingFarmReadySub => 'Bringing back your animals, workers and records.';
 }

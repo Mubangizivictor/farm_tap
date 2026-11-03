@@ -6126,6 +6126,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Type the card number'**
   String get typeCardNumberLink;
+
+  /// No description provided for @gettingFarmReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting {farm} ready…'**
+  String gettingFarmReady(String farm);
+
+  /// No description provided for @gettingFarmReadySub.
+  ///
+  /// In en, this message translates to:
+  /// **'Bringing back your animals, workers and records.'**
+  String get gettingFarmReadySub;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -10,9 +10,13 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// A07 — choose which farm or collection centre to open.
 class FarmPickerPage extends StatefulWidget {
-  const new({required this.places, required this.onOpened, super.key, this.onAddFarm, this.onSignOut});
+  const new({required this.places, required this.onOpened, super.key, this.onAddFarm, this.onSignOut, this.prepare});
 
   final FarmMembershipRepository places;
+
+  /// Loads the farm's records (downloads them on a new or reinstalled
+  /// phone) before it opens.
+  final Future<void> Function(String tenantId)? prepare;
   final ValueChanged<FarmMembership> onOpened;
   final VoidCallback? onAddFarm;
 
@@ -26,9 +30,16 @@ class FarmPickerPage extends StatefulWidget {
 class _FarmPickerPageState extends State<FarmPickerPage> {
   late final Future<List<FarmMembership>> _load = widget.places.myPlaces().then((r) => r.data ?? const []);
 
+  FarmMembership? _opening;
+
   Future<void> _open(FarmMembership m) async {
+    if (_opening != null) return;
+    setState(() => _opening = m);
     final result = await widget.places.open(m.tenantId);
-    if (mounted && result.isSuccess) widget.onOpened(m);
+    if (result.isSuccess) await widget.prepare?.call(m.tenantId);
+    if (!mounted) return;
+    setState(() => _opening = null);
+    if (result.isSuccess) widget.onOpened(m);
   }
 
   @override
@@ -38,6 +49,34 @@ class _FarmPickerPageState extends State<FarmPickerPage> {
       future: _load,
       builder: (context, snapshot) {
         final places = snapshot.data ?? const <FarmMembership>[];
+        final opening = _opening;
+        if (opening != null) {
+          return Scaffold(
+            body: Center(
+              child: Padding(
+                padding: EdgeInsets.all(context.space.xl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FarmTapLoader(size: context.sizes.loaderSize),
+                    context.space.gapXl,
+                    Text(
+                      l10n.gettingFarmReady(opening.name),
+                      textAlign: TextAlign.center,
+                      style: context.text.titleLarge,
+                    ),
+                    context.space.gapXs,
+                    Text(
+                      l10n.gettingFarmReadySub,
+                      textAlign: TextAlign.center,
+                      style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
         return SplitAuthLayout(
           animation: FarmTapAnimations.welcome,
           tagline: l10n.brandTagline,

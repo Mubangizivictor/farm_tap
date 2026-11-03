@@ -265,6 +265,37 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
     ..registerFactory(() => HerdBloc(watchAnimals: getIt<WatchAnimals>(), addAnimal: getIt<AddAnimal>()));
 }
 
+/// Longest a first download holds the farm list before opening anyway.
+const _farmDownloadLimit = Duration(seconds: 45); // theme-guard: ignore
+
+/// Opening a farm (A07). Its saved records come back; a phone that has
+/// never downloaded this farm (a new phone, or the app reinstalled) first
+/// pulls everything, so the first screens show the farm, not an empty one.
+/// Offline it opens with what the phone has and the download follows.
+Future<void> prepareFarmRecords(String tenantId) async {
+  final tenants = getIt<TenantProvider>();
+  if (tenants is InMemoryTenantProvider) tenants.currentTenantId = tenantId;
+  final store = getIt<LocalRecordStore>();
+  Future<bool> fresh() async {
+    for (final c in syncedCollections) {
+      if (await store.cursor(tenantId, c) != null) return false;
+    }
+    return true;
+  }
+
+  if (!useFakeData && await fresh() && getIt<ConnectivityMonitor>().online) {
+    final sync = getIt<SyncService>();
+    try {
+      await sync.sync().timeout(_farmDownloadLimit);
+      // A sync already running when the farm opened may not have pulled it.
+      if (await fresh()) await sync.sync().timeout(_farmDownloadLimit);
+    } on Object {
+      // Slow or lost network: open with what is here; sync carries on.
+    }
+  }
+  await restoreSavedRecords();
+}
+
 /// Real data: when a farm opens, its records are the ones saved and synced;
 /// the sections reload them, and again after each sync brings in records
 /// from the farm's other phones.
@@ -370,6 +401,8 @@ const List<String> syncedCollections = [
   'tasks',
   'reminders',
   'settings',
+  'milkUse',
+  'reconciliations',
 ];
 
 /// Reloads what was saved on this phone before the first screen shows

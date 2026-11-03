@@ -2745,5 +2745,14 @@
       }
     }
   },
-  "typeCardNumberLink": "Type the card number"
+  "typeCardNumberLink": "Type the card number",
+  "gettingFarmReady": "Getting {farm} ready…",
+  "@gettingFarmReady": {
+    "placeholders": {
+      "farm": {
+        "type": "String"
+      }
+    }
+  },
+  "gettingFarmReadySub": "Bringing back your animals, workers and records."
 }

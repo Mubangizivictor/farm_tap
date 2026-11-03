@@ -38,6 +38,7 @@ class AppDependencies {
     required this.staffDirectory,
     required this.farmMoney,
     required this.dailyReport,
+    this.prepareFarm,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -58,7 +59,11 @@ class AppDependencies {
     staffDirectory: getIt<StaffDirectory>(),
     farmMoney: getIt<FarmMoneyRepository>(),
     dailyReport: getIt<DailyReportRepository>(),
+    prepareFarm: prepareFarmRecords,
   );
+
+  /// Loads (or first downloads) a farm's records before it opens.
+  final Future<void> Function(String tenantId)? prepareFarm;
 
   final SessionController session;
   final FarmMembershipRepository places;
