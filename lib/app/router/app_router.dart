@@ -26,6 +26,7 @@ import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
 import 'package:farm_tap/core/settings/presentation/pages/more_page.dart';
+import 'package:farm_tap/core/settings/presentation/pages/settings_page.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
@@ -154,16 +155,20 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     final user = session.auth.currentUser;
     return MorePage(
       name: session.staff?.name ?? user?.name ?? '',
-      role: switch (session.farm?.role) {
-        PlaceRole.owner => l10n.roleOwner,
-        PlaceRole.manager => l10n.roleManager,
-        PlaceRole.clerk => l10n.roleClerk,
-        PlaceRole.worker => l10n.roleWorker,
-        null => '',
-      },
+      role: _roleLabel(l10n, session.farm?.role),
       email: user?.email ?? '',
       trialDaysLeft: session.trialDaysLeft,
       onOpen: (t) => _openMore(context, session, t),
+    );
+  };
+  sectionRoots[AppRoutes.settings] = (context, state) {
+    final user = session.auth.currentUser;
+    return SettingsPage(
+      name: session.staff?.name ?? user?.name ?? '',
+      email: user?.email ?? '',
+      role: _roleLabel(AppLocalizations.of(context), session.farm?.role),
+      farmName: session.farm?.name ?? '',
+      onSignOut: () => unawaited(_confirmSignOut(context, session)),
     );
   };
   sectionRoots[AppRoutes.workers] = (context, state) => WorkersPage(
@@ -736,7 +741,6 @@ String? _guard(SessionController session, String location) {
 
 /// N01: More-sections push from /more (back arrow returns to More).
 Future<void> _openMore(BuildContext context, SessionController session, MoreTarget t) async {
-  final l10n = AppLocalizations.of(context);
   switch (t) {
     case MoreTarget.feeding:
       await context.push(AppRoutes.feeding);
@@ -758,18 +762,31 @@ Future<void> _openMore(BuildContext context, SessionController session, MoreTarg
     case MoreTarget.lock:
       session.lock();
     case MoreTarget.signOut:
-      final ok = await showFarmTapDialog(
-        context,
-        icon: Symbols.logout_rounded,
-        title: l10n.signOutTitle,
-        message: l10n.signOutBody,
-        primaryLabel: l10n.signOutLabel,
-        primaryKind: ButtonKind.danger,
-        secondaryLabel: l10n.cancel,
-        tone: FarmTapTone.danger,
-      );
-      if (ok) await session.signOut();
+      await _confirmSignOut(context, session);
   }
+}
+
+String _roleLabel(AppLocalizations l10n, PlaceRole? role) => switch (role) {
+  PlaceRole.owner => l10n.roleOwner,
+  PlaceRole.manager => l10n.roleManager,
+  PlaceRole.clerk => l10n.roleClerk,
+  PlaceRole.worker => l10n.roleWorker,
+  null => '',
+};
+
+Future<void> _confirmSignOut(BuildContext context, SessionController session) async {
+  final l10n = AppLocalizations.of(context);
+  final ok = await showFarmTapDialog(
+    context,
+    icon: Symbols.logout_rounded,
+    title: l10n.signOutTitle,
+    message: l10n.signOutBody,
+    primaryLabel: l10n.signOutLabel,
+    primaryKind: ButtonKind.danger,
+    secondaryLabel: l10n.cancel,
+    tone: FarmTapTone.danger,
+  );
+  if (ok) await session.signOut();
 }
 
 /// Saves the first worker from onboarding (B09) into the farm just opened.

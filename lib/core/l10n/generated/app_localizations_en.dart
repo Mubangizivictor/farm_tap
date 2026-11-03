@@ -3365,4 +3365,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get creatingFarm => 'Creating your farm…';
+
+  @override
+  String get appearanceTitle => 'Appearance';
+
+  @override
+  String get themeSystem => 'Phone';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get themeHelp => 'Phone follows your phone\'s light or dark setting.';
+
+  @override
+  String get soundsLabel => 'Sounds';
+
+  @override
+  String get soundsSub => 'Clicks and chimes when you save';
+
+  @override
+  String get accountTitle => 'Account';
+
+  @override
+  String get farmTitle => 'Farm';
 }

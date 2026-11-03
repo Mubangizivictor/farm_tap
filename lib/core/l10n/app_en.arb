@@ -2663,5 +2663,14 @@
     }
   },
   "farmCreateFailed": "Could not create the farm. Check the internet and try again.",
-  "creatingFarm": "Creating your farm…"
+  "creatingFarm": "Creating your farm…",
+  "appearanceTitle": "Appearance",
+  "themeSystem": "Phone",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeHelp": "Phone follows your phone's light or dark setting.",
+  "soundsLabel": "Sounds",
+  "soundsSub": "Clicks and chimes when you save",
+  "accountTitle": "Account",
+  "farmTitle": "Farm"
 }

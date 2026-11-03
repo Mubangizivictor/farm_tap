@@ -5853,6 +5853,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Creating your farm…'**
   String get creatingFarm;
+
+  /// No description provided for @appearanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearanceTitle;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @themeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone follows your phone\'s light or dark setting.'**
+  String get themeHelp;
+
+  /// No description provided for @soundsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sounds'**
+  String get soundsLabel;
+
+  /// No description provided for @soundsSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Clicks and chimes when you save'**
+  String get soundsSub;
+
+  /// No description provided for @accountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountTitle;
+
+  /// No description provided for @farmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm'**
+  String get farmTitle;
 }
 
 class _AppLocalizationsDelegate

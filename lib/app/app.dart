@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/app/flavor.dart';
 import 'package:farm_tap/app/router/app_dependencies.dart';
@@ -33,16 +35,27 @@ class _FarmTapAppState extends State<FarmTapApp> {
   Widget build(BuildContext context) {
     return ClockScope(
       clock: getIt<Clock>(),
-      child: BlocProvider(create: (_) => AppSettingsCubit(), child: _app()),
+      child: BlocProvider(
+        create: (_) {
+          final settings = AppSettingsCubit();
+          unawaited(settings.load());
+          return settings;
+        },
+        child: BlocBuilder<AppSettingsCubit, AppSettings>(
+          buildWhen: (a, b) => a.themeMode != b.themeMode,
+          builder: (context, settings) => _app(settings.themeMode),
+        ),
+      ),
     );
   }
 
-  Widget _app() {
+  Widget _app(ThemeMode themeMode) {
     return MaterialApp.router(
       title: widget.config.appName,
       locale: const Locale('en'),
       theme: FarmTapTheme.light,
       darkTheme: FarmTapTheme.dark,
+      themeMode: themeMode,
       routerConfig: _router,
       localizationsDelegates: const [
         AppLocalizations.delegate,
