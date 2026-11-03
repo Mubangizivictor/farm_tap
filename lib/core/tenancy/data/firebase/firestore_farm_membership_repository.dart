@@ -55,7 +55,9 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
       final tenant = await db.collection('tenants').doc(id).get(server);
       final member = await db.collection('tenants').doc(id).collection('members').doc(me).get(server);
       if (!tenant.exists || !member.exists) continue;
-      places.add(_fromTenant(id, tenant.data()!, member.data()!['role'] as String));
+      places.add(
+        _fromTenant(id, tenant.data()!, member.data()!['role'] as String, member.data()!['staffId'] as String?),
+      );
     }
     return places;
   }
@@ -82,7 +84,7 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
 
   static String? _text(Object? v) => v is String && v.trim().isNotEmpty ? v.trim() : null;
 
-  static FarmMembership _fromTenant(String id, Map<String, dynamic> t, String role) {
+  static FarmMembership _fromTenant(String id, Map<String, dynamic> t, String role, [String? staffId]) {
     final sub = (t['subscription'] as Map?) ?? const {};
     DateTime? date(Object? v) => v is Timestamp ? v.toDate() : null;
     return FarmMembership(
@@ -101,6 +103,7 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
       village: _text(t['village']),
       herdSize: t['cows'] as int?,
       withCentre: t['type'] == 'both',
+      staffId: staffId,
     );
   }
 
@@ -118,6 +121,7 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
     'village': p.village,
     'herdSize': p.herdSize,
     'withCentre': p.withCentre,
+    'staffId': p.staffId,
   };
 
   static FarmMembership _fromJson(Map<String, dynamic> m) {
@@ -138,6 +142,7 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
       village: m['village'] as String?,
       herdSize: m['herdSize'] as int?,
       withCentre: m['withCentre'] as bool? ?? false,
+      staffId: m['staffId'] as String?,
     );
   }
 }

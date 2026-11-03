@@ -16,7 +16,7 @@ import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 /// this month: Amos 120,000, Peter 80,000, Rita 40,000 (wage expenses).
 /// With [withSamples] false (real data) it starts empty.
 class FakeWorkersRepository implements WorkersRepository, Restorable {
-  new(this.clock, this.directory, this.money, this.milk, {this.journal, this.withSamples = true}) {
+  new(this.clock, this.directory, this.money, this.milk, {this.journal, this.withSamples = true, this.findByCard}) {
     if (!withSamples) return;
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -104,6 +104,10 @@ class FakeWorkersRepository implements WorkersRepository, Restorable {
   /// Saves records on the phone for sync (decision 0014); null in tests.
   final RecordJournal? journal;
   final StaffDirectory directory;
+
+  /// Resolves an NFC chip id, QR code or typed number to its worker through
+  /// the card register (decision 0016); null matches printed numbers only.
+  final Future<StaffMember?> Function(String scanned)? findByCard;
   final MoneyRepository money;
 
   /// Milk records carry recordedBy (K02 count).
@@ -129,17 +133,55 @@ class FakeWorkersRepository implements WorkersRepository, Restorable {
 
   @override
   Future<Result<StaffToday?>> clockByCard(String cardNumber) async {
-    final card = cardNumber.padLeft(4, '0');
-    final s = (await _staff()).where((m) => m.cardNumber == card).firstOrNull;
+    final s =
+        await findByCard?.call(cardNumber) ??
+        (await _staff()).where((m) => m.cardNumber != null && m.cardNumber == cardNumber.padLeft(4, '0')).firstOrNull;
+    if (s == null) return const Result.success(null);
+    return await clockStaff(s.id);
+  }
+
+  @override
+  Future<Result<StaffToday?>> clockStaff(String staffId, {String method = 'card'}) async {
+    final s = (await _staff()).where((m) => m.id == staffId).firstOrNull;
     if (s == null) return const Result.success(null);
     final now = clock.now();
     final open = _todayRecord(s.id);
     if (open != null && open.outAt == null) {
       _attendance[_attendance.indexOf(open)] = open.clockOut(now);
+      // Attendance is append-only (decision 0014): clocking out is a new
+      // record pointing at the clock-in.
+      await journal?.add('attendance', {
+        'staffId': s.id,
+        'event': 'out',
+        'inId': open.id,
+        'at': now.toIso8601String(),
+        'method': method,
+      });
     } else {
-      _attendance.add(AttendanceRecord(id: 'att-${_next++}', staffId: s.id, inAt: now));
+      final id = journal?.newId() ?? 'att-${_next++}';
+      _attendance.add(AttendanceRecord(id: id, staffId: s.id, inAt: now));
+      await journal?.add('attendance', {
+        'staffId': s.id,
+        'event': 'in',
+        'at': now.toIso8601String(),
+        'method': method,
+      }, id: id);
     }
     return Result.success(StaffToday(staff: s, record: _todayRecord(s.id)));
+  }
+
+  @override
+  Future<Result<List<AttendanceRecord>>> attendanceThisMonth(String staffId) async {
+    final monthStart = DateTime(_today.year, _today.month);
+    final mine = _attendance.where((a) => a.staffId == staffId && !a.inAt.isBefore(monthStart)).toList()
+      ..sort((a, b) => b.inAt.compareTo(a.inAt));
+    return Result.success(mine);
+  }
+
+  @override
+  Future<Result<List<StaffPayment>>> paymentsOf(String staffId) async {
+    final mine = _payments.where((p) => p.staffId == staffId).toList()..sort((a, b) => b.at.compareTo(a.at));
+    return Result.success(mine);
   }
 
   @override
@@ -182,6 +224,23 @@ class FakeWorkersRepository implements WorkersRepository, Restorable {
         _tasks.add(t);
       }
     }
+    // Clock-ins first, then each clock-out closes its clock-in.
+    final events = await j.load('attendance');
+    for (final r in events) {
+      if (r.body['event'] != 'in' || _attendance.any((a) => a.id == r.id)) continue;
+      final at = DateTime.tryParse(r.body['at'] as String? ?? '');
+      final staffId = r.body['staffId'] as String?;
+      if (at == null || staffId == null) continue;
+      _attendance.add(AttendanceRecord(id: r.id, staffId: staffId, inAt: at));
+    }
+    for (final r in events) {
+      if (r.body['event'] != 'out') continue;
+      final at = DateTime.tryParse(r.body['at'] as String? ?? '');
+      final i = _attendance.indexWhere((a) => a.id == r.body['inId']);
+      if (at == null || i < 0 || _attendance[i].outAt != null) continue;
+      _attendance[i] = _attendance[i].clockOut(at);
+    }
+    _attendance.sort((a, b) => a.inAt.compareTo(b.inAt));
     for (final r in await j.load('wages')) {
       if (_payments.any((p) => p.id == r.id)) continue;
       final b = r.body;

@@ -5,8 +5,11 @@ import 'package:farm_tap/app/flavor.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/audit/audit_logger.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
+import 'package:farm_tap/core/auth/data/fake/fake_staff_login_repository.dart';
 import 'package:farm_tap/core/auth/data/firebase/firebase_auth_repository.dart';
+import 'package:farm_tap/core/auth/data/firebase/firebase_staff_login_repository.dart';
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
+import 'package:farm_tap/core/auth/domain/staff_login_repository.dart';
 import 'package:farm_tap/core/database/isar_service.dart';
 import 'package:farm_tap/core/media/photo_store.dart';
 import 'package:farm_tap/core/money/data/fake/fake_money_repository.dart';
@@ -15,6 +18,11 @@ import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.da
 import 'package:farm_tap/core/onboarding/data/firebase/firestore_onboarding_repository.dart';
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
+import 'package:farm_tap/core/people/data/firebase/firebase_photo_store.dart';
+import 'package:farm_tap/core/people/data/local_card_registry.dart';
+import 'package:farm_tap/core/people/data/memory_photo_store.dart';
+import 'package:farm_tap/core/people/domain/card_registry.dart';
+import 'package:farm_tap/core/people/domain/photo_store.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
@@ -97,7 +105,19 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
   if (useFakeData) {
     getIt
       ..registerLazySingleton<AuthRepository>(FakeAuthRepository.new)
-      ..registerLazySingleton<FarmMembershipRepository>(() => FakeFarmMembershipRepository(tenants))
+      ..registerLazySingleton<StaffLoginRepository>(
+        () => FakeStaffLoginRepository(
+          auth: getIt<AuthRepository>() as FakeAuthRepository,
+          farm: (t) => FakeFarmMembershipRepository.places.where((p) => p.tenantId == t).firstOrNull,
+        ),
+      )
+      ..registerLazySingleton<PersonPhotoStore>(MemoryPhotoStore.new)
+      ..registerLazySingleton<FarmMembershipRepository>(
+        () => FakeFarmMembershipRepository(
+          tenants,
+          staffPlace: () => (getIt<StaffLoginRepository>() as FakeStaffLoginRepository).currentPlace,
+        ),
+      )
       ..registerLazySingleton<OnboardingRepository>(() => FakeOnboardingRepository(getIt<Clock>()))
       ..registerLazySingleton<TreatmentRepository>(
         () => FakeTreatmentRepository(getIt<Clock>(), journal: getIt<RecordJournal>()),
@@ -129,6 +149,10 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
       ..registerSingleton<LocalRecordStore>(IsarRecordStore(isarService.isar))
       ..registerSingleton<RemoteStore>(FirestoreRemoteStore(db))
       ..registerSingleton<AuthRepository>(auth)
+      ..registerLazySingleton<StaffLoginRepository>(() => FirebaseStaffLoginRepository(db: db))
+      ..registerLazySingleton<PersonPhotoStore>(
+        () => FirebasePhotoStore(tenantId: () => tenants.currentTenantId, prefs: prefs),
+      )
       ..registerLazySingleton<FarmMembershipRepository>(
         () => FirestoreFarmMembershipRepository(db: db, uid: uid, prefs: prefs, tenants: tenants),
       )
@@ -175,12 +199,24 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
   // Firebase build starts them empty and fills them from the farm's records.
   final samples = useFakeData;
   getIt
+    // One card register for staff and farmers (decision 0016 §1).
+    ..registerLazySingleton<LocalCardRegistry>(
+      () => LocalCardRegistry(
+        now: getIt<Clock>().now,
+        journal: getIt<RecordJournal>(),
+        tenantId: () => tenants.currentTenantId,
+        seed: samples ? FakeStaffAccessRepository.sampleCards : const [],
+        blankStock: samples ? [for (var n = 207; n <= 215; n++) n.toString().padLeft(4, '0')] : const [],
+      ),
+    )
+    ..registerLazySingleton<CardRegistry>(getIt.call<LocalCardRegistry>)
     ..registerLazySingleton<FakeStaffAccessRepository>(
       () => FakeStaffAccessRepository(
         today: getIt<Clock>().today,
         now: getIt<Clock>().now,
         journal: getIt<RecordJournal>(),
         withSamples: samples,
+        cards: getIt<LocalCardRegistry>(),
       ),
     )
     ..registerLazySingleton<StaffAccessRepository>(getIt.call<FakeStaffAccessRepository>)
@@ -203,6 +239,7 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
         sms: samples ? null : SmsOutbox(getIt<RecordJournal>()),
         withSamples: samples,
         verifyPin: samples ? null : _managerPinOk,
+        cards: getIt<LocalCardRegistry>(),
       ),
     )
     ..registerLazySingleton<MoneyRepository>(
@@ -216,6 +253,7 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
         getIt<MilkRepository>(),
         journal: getIt<RecordJournal>(),
         withSamples: samples,
+        findByCard: (c) async => (await getIt<StaffAccessRepository>().findByCard(c)).data,
       ),
     )
     ..registerLazySingleton<FarmMoneyRepository>(
@@ -413,6 +451,7 @@ const List<String> syncedCollections = [
   'animals',
   'animalGroups',
   'staff',
+  'staffPins',
   'farmers',
   'nfcCards',
   'paymentPeriods',
@@ -431,6 +470,8 @@ const List<String> syncedCollections = [
 /// (decision 0014). Runs offline; a broken record never blocks start-up.
 Future<void> restoreSavedRecords() async {
   final repos = <Object>[
+    // Cards first: staff and farmers read their card from it.
+    getIt<LocalCardRegistry>(),
     getIt<MoneyRepository>(),
     getIt<StaffAccessRepository>(),
     getIt<BreedingRepository>(),
@@ -448,5 +489,27 @@ Future<void> restoreSavedRecords() async {
     } on Object catch (e, s) {
       getIt<AppLogger>().e('restore failed: ${r.runtimeType}', e, s);
     }
+  }
+  unawaited(_uploadWaitingPhotos());
+}
+
+/// Photos saved while cloud storage was off or the phone offline go up now
+/// and their link is put on the person's record (decision 0016 §2).
+Future<void> _uploadWaitingPhotos() async {
+  try {
+    final done = await getIt<PersonPhotoStore>().retryPending();
+    for (final e in done.entries) {
+      final staff = getIt<StaffDirectory>();
+      final s = (await staff.staffById(e.key)).data;
+      if (s != null) {
+        await staff.setPhoto(s.id, PersonPhoto(thumb: s.photo ?? '', url: e.value));
+        continue;
+      }
+      final centre = getIt<CentreRepository>();
+      final f = (await centre.farmer(e.key)).data;
+      if (f != null) await centre.setPhoto(f.id, PersonPhoto(thumb: f.photo ?? '', url: e.value));
+    }
+  } on Object catch (e, s) {
+    getIt<AppLogger>().e('photo upload failed', e, s);
   }
 }

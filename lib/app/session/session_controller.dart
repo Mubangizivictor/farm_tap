@@ -39,6 +39,17 @@ class SessionController extends ChangeNotifier {
   /// Worker who unlocked the phone (null = the account owner / manager).
   StaffMember? get staff => _staff;
 
+  /// A worker signed in on their own phone with phone + PIN (decision
+  /// 0016 §5): never locked, avatar opens My page.
+  bool get staffLogin => auth.currentUser?.isStaffLogin ?? false;
+
+  /// Keeps the open worker's details (photo, card) current after an edit.
+  void refreshStaff(StaffMember staff) {
+    if (_staff?.id != staff.id) return;
+    _staff = staff;
+    notifyListeners();
+  }
+
   /// Trial ended (or grace ran out) and not paid: read-only state (M05).
   bool get readOnly => _farm?.subscription.readOnly(trialClock.today()) ?? false;
 

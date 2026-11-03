@@ -8,6 +8,7 @@ import 'package:farm_tap/core/nfc/card_reader.dart';
 import 'package:farm_tap/core/nfc/card_tap_listener.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
+import 'package:farm_tap/core/people/presentation/widgets/choose_pin_sheet.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/material.dart';
@@ -195,7 +196,18 @@ class _CardNumberPageState extends State<CardNumberPage> {
 /// C03 — enter your PIN; C04 is the wrong-PIN state (dots shake, red ring,
 /// tries left). After 5 wrong tries the card locks for 5 minutes.
 class StaffPinPage extends StatefulWidget {
-  const new({required this.staff, required this.access, required this.onUnlocked, super.key, this.onNotMe});
+  const new({
+    required this.staff,
+    required this.access,
+    required this.onUnlocked,
+    super.key,
+    this.onNotMe,
+    this.onNewPin,
+  });
+
+  /// A manager set this PIN: the worker chooses their own before going on
+  /// (decision 0016 §5). Saves it; null skips the step.
+  final Future<void> Function(StaffMember staff, String pin)? onNewPin;
 
   final StaffMember staff;
   final StaffAccessRepository access;
@@ -226,6 +238,18 @@ class _StaffPinPageState extends State<StaffPinPage> {
     if (!mounted) return;
     _busy = false;
     if (check is PinAccepted) {
+      final save = widget.onNewPin;
+      if (check.mustChange && save != null) {
+        final pin = await showChooseNewPin(context, name: widget.staff.greetingName);
+        if (!mounted) return;
+        if (pin == null) {
+          setState(() => _pin = '');
+          return;
+        }
+        await save(widget.staff, pin);
+        if (!mounted) return;
+        FarmTapToast.show(context, message: AppLocalizations.of(context).pinChangedToast);
+      }
       widget.onUnlocked(widget.staff);
       return;
     }
@@ -263,6 +287,7 @@ class _StaffPinPageState extends State<StaffPinPage> {
         children: [
           PersonAvatar(
             name: widget.staff.name,
+            photo: widget.staff.photo,
             size: context.sizes.avatarReadBack,
             ring: true,
             ringColor: _wrong ? context.status.danger : null,

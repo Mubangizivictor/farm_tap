@@ -191,6 +191,23 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
   // ---- Previews ----
   double get cardPreviewWidth => 320 * scale;
   double get qrLabel => 72 * scale;
+
+  // ---- ID cards (decision 0016): CR80, 85.6 x 54 mm ----
+  double get idCardMaxWidth => 380 * scale;
+
+  /// Width / height of a bank-card sized ID card.
+  double get idCardAspect => 85.6 / 53.98;
+
+  /// Parts of the card as fractions of its width, so the preview matches
+  /// the printed card at any size.
+  double get idCardPadding => 0.04;
+  double get idCardPhoto => 0.25;
+  double get idCardQr => 0.2;
+  double get idCardBand => 0.13;
+  double get idCardRadius => 0.04;
+
+  /// Photo on the scan station result and My page.
+  double get scanPhoto => 120 * scale;
   double get scanFrameStroke => 5 * scale;
   double get scanFrameArm => 46 * scale;
   double get viewfinderAspect => 0.69;

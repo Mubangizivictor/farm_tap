@@ -1,5 +1,8 @@
 import 'package:farm_tap/core/error/failure.dart';
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/people/data/local_card_registry.dart';
+import 'package:farm_tap/core/people/domain/card_registry.dart';
+import 'package:farm_tap/core/people/domain/photo_store.dart';
 import 'package:farm_tap/core/sms/sms_outbox.dart';
 import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
@@ -11,7 +14,8 @@ import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_reposito
 /// With [withSamples] false (real data) the centre starts with no farmers and
 /// every total comes from its own records.
 class FakeCentreRepository implements CentreRepository, Restorable {
-  new(this.clock, {this.journal, this.sms, this.withSamples = true, this.verifyPin}) {
+  new(this.clock, {this.journal, this.sms, this.withSamples = true, this.verifyPin, LocalCardRegistry? cards})
+    : cards = cards ?? LocalCardRegistry(now: clock.now, journal: journal) {
     final now = clock.now();
     _day = DateTime(now.year, now.month, now.day);
     if (!withSamples) {
@@ -132,7 +136,22 @@ class FakeCentreRepository implements CentreRepository, Restorable {
       _delivery('d-3', _farmers[2], 26.5, 6, 49),
       _delivery('d-4', _farmers[0], 42.5, 6, 52),
     ];
+    // The sample farmers' cards join the farm's card register.
+    this.cards.seed([
+      for (final f in _farmers)
+        if (f.card != null)
+          IdCardRecord(
+            number: f.card!,
+            holderId: f.id,
+            holderKind: CardHolderKind.farmer,
+            holderName: f.name,
+            status: CardStatus.active,
+          ),
+    ]);
   }
+
+  /// Every card on the farm or centre (staff and farmers share it).
+  final LocalCardRegistry cards;
 
   final Clock clock;
 
@@ -228,8 +247,90 @@ class FakeCentreRepository implements CentreRepository, Restorable {
       Result.success(_farmers.where((f) => f.id == id).firstOrNull);
 
   @override
-  Future<Result<CentreFarmer?>> farmerByCard(String card) async =>
-      Result.success(_farmers.where((f) => f.card == card.padLeft(4, '0')).firstOrNull);
+  Future<Result<CentreFarmer?>> farmerByCard(String card) async {
+    final record = (await cards.lookup(card)).data;
+    if (record != null && record.holderKind == CardHolderKind.farmer) {
+      if (!record.active) return const Result.success(null);
+      return Result.success(_farmers.where((f) => f.id == record.holderId).firstOrNull);
+    }
+    // Demo only: a sample farmer whose number a sample worker also has.
+    if (!withSamples) return const Result.success(null);
+    final n = card.replaceAll(RegExp(r'\D'), '');
+    if (n.isEmpty || n.length > 4) return const Result.success(null);
+    return Result.success(_farmers.where((f) => f.card == n.padLeft(4, '0')).firstOrNull);
+  }
+
+  Map<String, Object?> _farmerBody(CentreFarmer f) => {
+    'name': f.name,
+    'phone': f.phone,
+    'village': f.village,
+    'card': f.card,
+    'photo': f.photo,
+    'photoUrl': f.photoUrl,
+    'since': f.since?.toIso8601String(),
+  };
+
+  Future<void> _replace(CentreFarmer f) async {
+    _farmers = [
+      for (final x in _farmers)
+        if (x.id == f.id) f else x,
+    ];
+    await journal?.put('farmers', f.id, _farmerBody(f));
+  }
+
+  @override
+  Future<Result<CentreFarmer>> assignCard(String farmerId, String? scanned, {bool replace = false}) async {
+    final f = _farmers.where((x) => x.id == farmerId).firstOrNull;
+    if (f == null) return const Result.failure(ValidationFailure('farmer-unknown'));
+    // A sample farmer's card that is not in the register yet.
+    if (f.card != null && (await cards.activeCardOf(f.id)).data == null && !replace) {
+      return const Result.failure(ValidationFailure(CardIssueError.hasCard));
+    }
+    final issued = await cards.issue(
+      holderId: f.id,
+      kind: CardHolderKind.farmer,
+      holderName: f.name,
+      scanned: scanned,
+      replace: replace,
+    );
+    switch (issued) {
+      case FailureResult(:final failure):
+        return Result.failure(failure);
+      case Success(:final data):
+        final updated = f.withCard(data.number);
+        await _replace(updated);
+        return Result.success(updated);
+    }
+  }
+
+  @override
+  Future<Result<CentreFarmer>> revokeCard(String farmerId, CardStatus why) async {
+    final f = _farmers.where((x) => x.id == farmerId).firstOrNull;
+    if (f == null) return const Result.failure(ValidationFailure('farmer-unknown'));
+    final card = (await cards.activeCardOf(f.id)).data;
+    if (card != null) await cards.revoke(card.number, why);
+    final updated = f.withCard(null);
+    await _replace(updated);
+    return Result.success(updated);
+  }
+
+  @override
+  Future<Result<List<IdCardRecord>>> cardHistory(String farmerId) => cards.historyOf(farmerId);
+
+  @override
+  Future<Result<CentreFarmer>> setPhoto(String farmerId, PersonPhoto photo) async {
+    final f = _farmers.where((x) => x.id == farmerId).firstOrNull;
+    if (f == null) return const Result.failure(ValidationFailure('farmer-unknown'));
+    final updated = f.withCard(null, keepCard: true, photo: photo.thumb, photoUrl: photo.url);
+    await _replace(updated);
+    return Result.success(updated);
+  }
+
+  @override
+  Future<Result<List<Delivery>>> deliveriesOf(String farmerId, {int limit = 10}) async {
+    final mine = _deliveries.where((d) => d.farmerId == farmerId).toList()..sort((a, b) => b.at.compareTo(a.at));
+    return Result.success(mine.take(limit).toList());
+  }
 
   @override
   Future<Result<CentreFarmer>> addFarmer({
@@ -238,24 +339,28 @@ class FakeCentreRepository implements CentreRepository, Restorable {
     required String village,
     String? card,
   }) async {
+    final id = journal?.newId() ?? 'farmer-${_next++}';
+    String? number;
+    if (card != null && card.isNotEmpty) {
+      // One holder per card (decision 0016): refuse a card someone has.
+      final issued = await cards.issue(holderId: id, kind: CardHolderKind.farmer, holderName: name, scanned: card);
+      if (issued case FailureResult(:final failure)) return Result.failure(failure);
+      number = issued.data!.number;
+    }
     final farmer = CentreFarmer(
-      id: journal?.newId() ?? 'farmer-${_next++}',
+      id: id,
       name: name,
-      card: card == null || card.isEmpty ? null : card.padLeft(4, '0'),
+      card: number,
       village: village,
       phone: phone,
       network: CentreFarmer.networkOf(phone),
       periodLitres: 0,
       usualLow: 0,
       usualHigh: 0,
+      since: clock.today(),
     );
     _farmers = [..._farmers, farmer];
-    await journal?.add('farmers', {
-      'name': name,
-      'phone': phone,
-      'village': village,
-      'card': farmer.card,
-    }, id: farmer.id);
+    await journal?.add('farmers', _farmerBody(farmer), id: farmer.id);
     return Result.success(farmer);
   }
 
@@ -317,10 +422,21 @@ class FakeCentreRepository implements CentreRepository, Restorable {
   Future<void> restore() async {
     final j = journal;
     if (j == null) return;
+    await cards.restore();
     final farmerIds = {for (final f in _farmers) f.id};
     for (final r in await j.load('farmers')) {
-      if (farmerIds.contains(r.id)) continue;
       final b = r.body;
+      if (farmerIds.contains(r.id)) {
+        // Card and photo can change after the farmer was added.
+        _farmers = [
+          for (final x in _farmers)
+            if (x.id == r.id)
+              x.withCard(b['card'] as String?, photo: b['photo'] as String?, photoUrl: b['photoUrl'] as String?)
+            else
+              x,
+        ];
+        continue;
+      }
       final phone = b['phone'] as String? ?? '';
       _farmers = [
         ..._farmers,
@@ -331,6 +447,9 @@ class FakeCentreRepository implements CentreRepository, Restorable {
           village: b['village'] as String? ?? '',
           phone: phone,
           network: CentreFarmer.networkOf(phone),
+          photo: b['photo'] as String?,
+          photoUrl: b['photoUrl'] as String?,
+          since: DateTime.tryParse(b['since'] as String? ?? ''),
           periodLitres: 0,
           usualLow: 0,
           usualHigh: 0,

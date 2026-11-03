@@ -17,6 +17,8 @@ import 'package:farm_tap/core/auth/presentation/pages/farm_picker_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/forgot_password_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/sign_in_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/splash_page.dart';
+import 'package:farm_tap/core/auth/presentation/pages/staff_sign_in_page.dart';
+import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/export/table_export.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
@@ -24,9 +26,17 @@ import 'package:farm_tap/core/onboarding/presentation/cubit/onboarding_cubit.dar
 import 'package:farm_tap/core/onboarding/presentation/pages/choice_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/form_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/waitlist_and_done.dart';
+import 'package:farm_tap/core/people/domain/card_registry.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
+import 'package:farm_tap/core/people/domain/staff_permissions.dart';
+import 'package:farm_tap/core/people/presentation/pages/card_register_page.dart';
+import 'package:farm_tap/core/people/presentation/pages/id_card_page.dart';
 import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
+import 'package:farm_tap/core/people/presentation/widgets/choose_pin_sheet.dart';
+import 'package:farm_tap/core/people/presentation/widgets/give_card_sheet.dart';
+import 'package:farm_tap/core/people/presentation/widgets/id_card.dart';
+import 'package:farm_tap/core/people/presentation/widgets/photo_picker.dart';
 import 'package:farm_tap/core/settings/presentation/pages/help_page.dart';
 import 'package:farm_tap/core/settings/presentation/pages/more_page.dart';
 import 'package:farm_tap/core/settings/presentation/pages/settings_page.dart';
@@ -35,6 +45,8 @@ import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/breeding/presentation/pages/breeding_pages.dart';
+import 'package:farm_tap/sectors/cattle/cards/presentation/card_scan_page.dart';
+import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_models.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_collect_pages.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_farmers_pay_pages.dart';
 import 'package:farm_tap/sectors/cattle/feeding/presentation/pages/feeding_pages.dart';
@@ -48,6 +60,7 @@ import 'package:farm_tap/sectors/cattle/home/presentation/pages/alerts_page.dart
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/home_page.dart';
 import 'package:farm_tap/sectors/cattle/milk/presentation/pages/milk_pages.dart';
 import 'package:farm_tap/sectors/cattle/money/presentation/pages/money_pages.dart';
+import 'package:farm_tap/sectors/cattle/workers/presentation/pages/my_page.dart';
 import 'package:farm_tap/sectors/cattle/workers/presentation/pages/workers_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -100,6 +113,9 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
 
   final setup = OnboardingCubit();
 
+  /// The PIN a worker chose at phone sign-in, saved once their farm opens.
+  String? pendingStaffPin;
+
   // Roots of the shell branches; filled in section by section.
   final sectionRoots = <String, PageBuilder>{
     AppRoutes.home: (context, state) => session.isCentre
@@ -128,6 +144,127 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
             onOpen: (target) => _openFromHome(context, target),
           ),
   };
+  // ---- ID cards (decision 0016) ----
+  Future<IdCardData?> staffCardData(BuildContext context, String staffId) async {
+    final l10n = AppLocalizations.of(context);
+    final s = (await deps.staffDirectory.staffById(staffId)).data;
+    if (s == null) return null;
+    final farm = session.farm;
+    return staffIdCard(
+      l10n,
+      s,
+      tenantId: farm?.tenantId ?? '',
+      farmName: farm?.name ?? '',
+      farmPlace: farm?.place,
+      card: (await deps.cards.activeCardOf(s.id)).data,
+    );
+  }
+
+  Future<IdCardData?> farmerCardData(String farmerId) async {
+    final x = (await deps.centre.farmer(farmerId)).data;
+    if (x == null) return null;
+    final farm = session.farm;
+    return IdCardData(
+      kind: CardHolderKind.farmer,
+      tenantId: farm?.tenantId ?? '',
+      farmName: farm?.name ?? '',
+      farmPlace: farm?.place,
+      name: x.name,
+      personCode: x.supplierCode,
+      cardNumber: x.card,
+      phone: x.localPhone,
+      village: x.village,
+      since: x.since,
+      issued: (await deps.cards.activeCardOf(x.id)).data?.issuedAt,
+      photo: x.photo,
+    );
+  }
+
+  Future<void> staffPhoto(BuildContext context, String staffId) async {
+    final photo = await takePersonPhoto(context, deps.photos, staffId);
+    if (photo == null) return;
+    final saved = (await deps.staffDirectory.setPhoto(staffId, photo)).data;
+    if (saved != null) session.refreshStaff(saved);
+  }
+
+  Future<void> farmerPhoto(BuildContext context, CentreFarmer f) async {
+    final photo = await takePersonPhoto(context, deps.photos, f.id);
+    if (photo != null) await deps.centre.setPhoto(f.id, photo);
+  }
+
+  /// Phone + PIN sign-in for a worker (decision 0016 §5).
+  Future<void> makeStaffLogin(BuildContext context, StaffMember s, String pin) async {
+    final repo = deps.staffLogin;
+    final farm = session.farm;
+    final phone = s.phone;
+    if (repo == null || farm == null || phone == null || phone.isEmpty) return;
+    final r = await repo.createLogin(
+      tenantId: farm.tenantId,
+      staffId: s.id,
+      name: s.name,
+      phone: phone,
+      pin: pin,
+      role: s.role,
+    );
+    await deps.staffDirectory.setLoginStatus(
+      s.id,
+      r.isSuccess ? StaffLoginStatus.mustChangePin : StaffLoginStatus.failed,
+    );
+    if (!context.mounted) return;
+    final l10n = AppLocalizations.of(context);
+    FarmTapToast.show(
+      context,
+      message: r.isSuccess
+          ? l10n.staffLoginMade(s.greetingName, '0${phone.replaceAll(' ', '')}')
+          : r.failure?.message == 'staff-login-other-farm'
+          ? l10n.staffLoginOtherFarm
+          : l10n.staffLoginNotMade,
+    );
+  }
+
+  Future<void> giveFarmerCard(BuildContext context, CentreFarmer f) async {
+    final l10n = AppLocalizations.of(context);
+    final choice = await showGiveCardSheet(context, name: f.name.split(' ').first);
+    if (choice == null || !context.mounted) return;
+    final r = await deps.centre.assignCard(f.id, choice.scanned, replace: f.card != null);
+    if (!context.mounted) return;
+    switch (r) {
+      case Success(:final data):
+        FarmTapToast.show(context, message: l10n.cardAssigned(data.card ?? '', f.name.split(' ').first));
+      case FailureResult(:final failure):
+        await showFarmTapDialog(
+          context,
+          icon: Symbols.gpp_bad_rounded,
+          tone: FarmTapTone.danger,
+          title: l10n.cardNotGivenTitle,
+          message: cardIssueMessage(l10n, choice.scanned ?? '', failure),
+          primaryLabel: l10n.close,
+        );
+    }
+  }
+
+  Future<void> revokeFarmerCard(BuildContext context, CentreFarmer f) async {
+    final why = await askRevokeCard(context, f.card!, f.name.split(' ').first);
+    if (why == null || !context.mounted) return;
+    await deps.centre.revokeCard(f.id, why);
+    if (context.mounted) FarmTapToast.show(context, message: AppLocalizations.of(context).cardRevokedToast(f.card!));
+  }
+
+  void openPerson(BuildContext context, CardHolderKind kind, String id) =>
+      unawaited(context.push(kind == CardHolderKind.staff ? AppRoutes.worker(id) : AppRoutes.centreFarmer(id)));
+
+  Widget scanStation(BuildContext context, ScanMode mode) => CardScanPage(
+    cards: deps.cards,
+    directory: deps.staffDirectory,
+    workers: deps.workers,
+    centre: deps.centre,
+    mode: canManageStaff() ? mode : ScanMode.lookUp,
+    preferFarmers: session.isCentre,
+    canManage: canManageStaff(),
+    onGiveCard: () => context.go(AppRoutes.workers),
+    onOpenPerson: canManageStaff() ? (k, id) => openPerson(context, k, id) : null,
+  );
+
   sectionRoots[AppRoutes.herd] = (context, state) => HerdListPage(
     repo: deps.herd,
     onAnimal: (a) => context.push(AppRoutes.herdAnimal(a.id)),
@@ -164,7 +301,23 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
   sectionRoots[AppRoutes.more] = (context, state) {
     final l10n = AppLocalizations.of(context);
     final user = session.auth.currentUser;
+    final role = session.staff?.role;
+    final sections = StaffPermissions.sections(role);
+    final manages = StaffPermissions.managesStaff(role);
     return MorePage(
+      photo: session.staff?.photo,
+      visible: {
+        if (session.staff != null) MoreTarget.me,
+        if (sections.contains(AppSection.feeding)) MoreTarget.feeding,
+        if (sections.contains(AppSection.breeding)) MoreTarget.breeding,
+        if (manages) ...{MoreTarget.workers, MoreTarget.money, MoreTarget.reports, MoreTarget.cards},
+        MoreTarget.scan,
+        if (manages) ...{MoreTarget.subscription, MoreTarget.settings},
+        MoreTarget.help,
+        MoreTarget.profile,
+        if (!session.staffLogin) MoreTarget.lock,
+        MoreTarget.signOut,
+      },
       name: session.staff?.name ?? user?.name ?? '',
       role: _roleLabel(l10n, session.farm?.role),
       email: user?.email ?? '',
@@ -187,12 +340,49 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     onStaff: (id) => context.push(AppRoutes.worker(id)),
     onAdd: () => context.push(AppRoutes.workersAdd),
     canManageStaff: canManageStaff(),
+    onScan: () => unawaited(context.push(AppRoutes.workersScan)),
+    onCards: () => unawaited(context.push(AppRoutes.workersCards)),
+    onPrintAll: () async {
+      final staff = (await deps.staffDirectory.staff()).data ?? const <StaffMember>[];
+      final cards = <IdCardData>[];
+      for (final s in staff.where((s) => s.hasCard)) {
+        if (!context.mounted) return;
+        final d = await staffCardData(context, s.id);
+        if (d != null) cards.add(d);
+      }
+      if (!context.mounted) return;
+      if (cards.isEmpty) {
+        FarmTapToast.show(context, message: AppLocalizations.of(context).noCardsToPrint);
+        return;
+      }
+      await shareIdCards(context, cards, sheet: true);
+    },
     onOpen: (t) => context.push(switch (t) {
       WorkersTarget.attendance => AppRoutes.workersAttendance,
       WorkersTarget.tasks => AppRoutes.workersTasks,
       WorkersTarget.wages => AppRoutes.workersWages,
     }),
   );
+  sectionRoots[AppRoutes.me] = (context, state) {
+    final s = session.staff;
+    if (s == null) return const PendingSection(path: AppRoutes.me);
+    return FutureBuilder<IdCardData?>(
+      future: staffCardData(context, s.id),
+      builder: (context, snap) {
+        final card = snap.data;
+        if (card == null) return const FarmTapPageLoader();
+        return MyPage(
+          staff: s,
+          directory: deps.staffDirectory,
+          workers: deps.workers,
+          card: card,
+          onCard: () => unawaited(context.push(AppRoutes.workerIdCard(s.id))),
+          onChangePin: session.staffLogin ? (pin) async => await deps.staffLogin?.changePin(pin) : null,
+          onSignOut: session.staffLogin ? () => unawaited(_confirmSignOut(context, session)) : null,
+        );
+      },
+    );
+  };
   sectionRoots[AppRoutes.money] = (context, state) => MoneyPage(
     repo: deps.farmMoney,
     reports: deps.reports,
@@ -375,7 +565,35 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         ':farmerId',
         parent: AppRoutes.farmers,
-        builder: (context, state) => CentreFarmerPage(repo: deps.centre, farmerId: state.pathParameters['farmerId']!),
+        builder: (context, state) => CentreFarmerPage(
+          repo: deps.centre,
+          farmerId: state.pathParameters['farmerId']!,
+          canManage: StaffPermissions.can(session.staff?.role, AppSection.farmers),
+          onIdCard: () => context.push(AppRoutes.farmerIdCard(state.pathParameters['farmerId']!)),
+          onPhoto: (f) => farmerPhoto(context, f),
+          onAssignCard: (f) => giveFarmerCard(context, f),
+          onRevokeCard: (f) => revokeFarmerCard(context, f),
+        ),
+        routes: [
+          page(
+            'id-card',
+            parent: AppRoutes.farmers,
+            builder: (context, state) {
+              final id = state.pathParameters['farmerId']!;
+              return IdCardPage(
+                load: () => farmerCardData(id),
+                onGiveCard: () async {
+                  final f = (await deps.centre.farmer(id)).data;
+                  if (f != null && context.mounted) await giveFarmerCard(context, f);
+                },
+                onPhoto: () async {
+                  final f = (await deps.centre.farmer(id)).data;
+                  if (f != null && context.mounted) await farmerPhoto(context, f);
+                },
+              );
+            },
+          ),
+        ],
       ),
     ],
     AppRoutes.pay: [
@@ -438,7 +656,21 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           directory: deps.staffDirectory,
           farmerByCard: (card) async => (await deps.centre.farmerByCard(card)).data?.name,
           onGiveCard: () => popOrGo(context, AppRoutes.workers),
+          onScanStation: () =>
+              unawaited(context.push(Uri(path: AppRoutes.workersScan, queryParameters: {'mode': 'clock'}).toString())),
         ),
+      ),
+      page(
+        'scan',
+        parent: AppRoutes.workers,
+        builder: (context, state) =>
+            scanStation(context, state.uri.queryParameters['mode'] == 'clock' ? ScanMode.attendance : ScanMode.lookUp),
+      ),
+      page(
+        'cards',
+        parent: AppRoutes.workers,
+        builder: (context, state) =>
+            CardRegisterPage(cards: deps.cards, onHolder: (c) => openPerson(context, c.holderKind, c.holderId)),
       ),
       page(
         'tasks',
@@ -453,8 +685,11 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         'add',
         parent: AppRoutes.workers,
-        builder: (context, state) =>
-            StaffFormPage(directory: deps.staffDirectory, onSaved: (_) => popOrGo(context, AppRoutes.workers)),
+        builder: (context, state) => StaffFormPage(
+          directory: deps.staffDirectory,
+          onSaved: (_) => popOrGo(context, AppRoutes.workers),
+          onCreatedWithPhone: (s, pin) => makeStaffLogin(context, s, pin),
+        ),
       ),
       page(
         ':staffId',
@@ -466,8 +701,31 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           onAssignCard: () => context.push(AppRoutes.workerCard(state.pathParameters['staffId']!)),
           onEdit: () => context.push(AppRoutes.workerEdit(state.pathParameters['staffId']!)),
           canManageStaff: canManageStaff(),
+          onIdCard: () => context.push(AppRoutes.workerIdCard(state.pathParameters['staffId']!)),
+          onPhoto: (s) => staffPhoto(context, s.id),
+          onResetLogin: (s, pin) async {
+            if (s.login != StaffLoginStatus.none) await makeStaffLogin(context, s, pin);
+          },
+          onSetUpLogin: (s) async {
+            final pin = await showChooseNewPin(context, name: s.greetingName);
+            if (pin == null || !context.mounted) return;
+            await deps.staffDirectory.resetPin(s.id, pin);
+            if (context.mounted) await makeStaffLogin(context, s, pin);
+          },
         ),
         routes: [
+          page(
+            'id-card',
+            parent: AppRoutes.workers,
+            builder: (context, state) {
+              final id = state.pathParameters['staffId']!;
+              return IdCardPage(
+                load: () => staffCardData(context, id),
+                onGiveCard: canManageStaff() ? () => context.push(AppRoutes.workerCard(id)) : null,
+                onPhoto: canManageStaff() ? () => staffPhoto(context, id) : null,
+              );
+            },
+          ),
           page(
             'edit',
             parent: AppRoutes.workers,
@@ -567,8 +825,21 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           auth: auth,
           onSignedIn: () => context.go(AppRoutes.farmPickerAuto),
           onEmail: () => context.push(AppRoutes.emailSignIn),
+          onStaff: deps.staffLogin == null ? null : () => context.push(AppRoutes.staffSignIn),
         ),
         routes: [
+          if (deps.staffLogin != null)
+            page(
+              'staff',
+              parent: AppRoutes.signIn,
+              builder: (context, state) => StaffSignInPage(
+                repo: deps.staffLogin!,
+                onSignedIn: (signIn, newPin) {
+                  pendingStaffPin = newPin;
+                  context.go(AppRoutes.farmPickerAuto);
+                },
+              ),
+            ),
           page(
             'email',
             parent: AppRoutes.signIn,
@@ -614,9 +885,20 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           account: auth.currentUser,
           autoOpen: state.uri.queryParameters['auto'] == '1',
           prepare: deps.prepareFarm,
-          onOpened: (farm) {
+          onOpened: (farm) async {
             session.openFarm(farm);
-            context.go(AppRoutes.home);
+            // A worker signed in with phone + PIN is that staff member
+            // (decision 0016 §5); the PIN they just chose works on the farm
+            // phone's card unlock too.
+            final staffId = farm.staffId;
+            if (staffId != null) {
+              final pin = pendingStaffPin;
+              pendingStaffPin = null;
+              if (pin != null) await deps.staffDirectory.setOwnPin(staffId, pin);
+              final s = (await deps.staffDirectory.staffById(staffId)).data;
+              if (s != null) session.unlock(s);
+            }
+            if (context.mounted) context.go(AppRoutes.home);
           },
           onAddFarm: () {
             setup.reset();
@@ -743,6 +1025,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
                     context.go(AppRoutes.home);
                   },
                   onNotMe: () => popOrGo(context, AppRoutes.unlock),
+                  onNewPin: (s, pin) async => await deps.staffDirectory.setOwnPin(s.id, pin),
                 );
               },
             ),
@@ -791,6 +1074,8 @@ void _openFromHome(BuildContext context, HomeTarget target) {
 String? _guard(SessionController session, String location) {
   if (location == AppRoutes.splash || location.startsWith('/dev')) return null;
   if (!session.signedIn) return location.startsWith(AppRoutes.signIn) ? null : AppRoutes.signIn;
+  // A worker stays on phone sign-in to choose their own PIN (decision 0016 §5).
+  if (location.startsWith(AppRoutes.staffSignIn) && !session.hasFarm) return null;
   if (location.startsWith(AppRoutes.signIn)) return session.hasFarm ? AppRoutes.home : AppRoutes.farmPickerAuto;
   final settingUp =
       location.startsWith(AppRoutes.farmPicker) ||
@@ -799,6 +1084,17 @@ String? _guard(SessionController session, String location) {
   if (!session.hasFarm) return settingUp ? null : AppRoutes.farmPickerAuto;
   final unlocking = location.startsWith(AppRoutes.unlock) || location.startsWith(AppRoutes.farmPicker);
   if (session.locked && !unlocking) return AppRoutes.unlock;
+  // A worker only opens their sections (decision 0016 §7).
+  final section = sectionOf(location);
+  final staff = session.staff;
+  if (section != null && staff != null && !StaffPermissions.can(staff.role, section)) {
+    // Their own ID card lives under Workers.
+    if (location == AppRoutes.workerIdCard(staff.id)) return null;
+    // Scanning cards is open to all; giving cards is not.
+    if (location.startsWith(AppRoutes.workersScan)) return null;
+    return AppRoutes.home;
+  }
+  if (section == AppSection.me && staff == null) return AppRoutes.home;
   return null;
 }
 
@@ -822,6 +1118,10 @@ Future<void> _openMore(BuildContext context, SessionController session, MoreTarg
       await context.push(AppRoutes.settingsSubscription);
     case MoreTarget.help:
       await context.push(AppRoutes.settingsHelp);
+    case MoreTarget.me:
+      context.go(AppRoutes.me);
+    case MoreTarget.scan:
+      await context.push(AppRoutes.workersScan);
     case MoreTarget.lock:
       session.lock();
     case MoreTarget.signOut:

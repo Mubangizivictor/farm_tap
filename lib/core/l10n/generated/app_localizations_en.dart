@@ -4054,4 +4054,557 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get phoneCopied => 'Phone number copied';
+
+  @override
+  String get absentWord => 'Absent';
+
+  @override
+  String get presentWord => 'Present';
+
+  @override
+  String broughtToday(String litres) {
+    return 'Brought $litres today';
+  }
+
+  @override
+  String get notDeliveredToday => 'No milk today';
+
+  @override
+  String get cardNotUsable => 'Card cannot be used';
+
+  @override
+  String get chooseFromGallery => 'Choose from gallery';
+
+  @override
+  String get photoSheetTitle => 'Photo for the ID card';
+
+  @override
+  String get photoSheetBody => 'Face the camera, in good light.';
+
+  @override
+  String get photoSaved => 'Photo saved';
+
+  @override
+  String get photoSavedLocal =>
+      'Photo saved. The full photo uploads when cloud storage is on.';
+
+  @override
+  String get photoNotSaved => 'Photo not saved. Try again.';
+
+  @override
+  String get clockInOutShort => 'Clock in/out';
+
+  @override
+  String get lookUpShort => 'Look up';
+
+  @override
+  String get departmentLabel => 'Department';
+
+  @override
+  String get emergencyLabel => 'Emergency';
+
+  @override
+  String get phoneLabel => 'Phone';
+
+  @override
+  String get ninLabel => 'NIN';
+
+  @override
+  String get memberSinceLabel => 'Since';
+
+  @override
+  String get issuedLabel => 'Issued';
+
+  @override
+  String get idNumberLabel => 'ID';
+
+  @override
+  String get downloadCardPdf => 'Download PDF';
+
+  @override
+  String get printCard => 'Print card';
+
+  @override
+  String get printOnA4 => 'Print on A4 paper';
+
+  @override
+  String get giveCardToSomeone => 'Give this card';
+
+  @override
+  String get holdQrToCamera => 'Hold the card\'s QR code to the camera';
+
+  @override
+  String get idCardBack => 'Back';
+
+  @override
+  String get idCardFront => 'Front';
+
+  @override
+  String idCardFrontLabel(String name) {
+    return 'ID card of $name, front';
+  }
+
+  @override
+  String idCardBackLabel(String name) {
+    return 'ID card of $name, back';
+  }
+
+  @override
+  String get idCardIfFound => 'If found, please return to the farm';
+
+  @override
+  String get idCardNoCardTitle => 'No card yet';
+
+  @override
+  String get idCardNoCardBody =>
+      'Give a card first. Its number and QR code go on the print.';
+
+  @override
+  String get idCardPrintHelp =>
+      'Card printer: print the 2 pages on a blank PVC card. Normal printer: print on A4, cut along the marks and laminate.';
+
+  @override
+  String get idCardScanMe => 'Scan me';
+
+  @override
+  String get idCardStaff => 'Staff';
+
+  @override
+  String get idCardSupplier => 'Milk supplier';
+
+  @override
+  String get idCardTitle => 'ID card';
+
+  @override
+  String get idCardValidNote => 'Valid until revoked. Tap or scan at the farm.';
+
+  @override
+  String lastPaidLine(String amount, String date) {
+    return 'Last paid $amount on $date';
+  }
+
+  @override
+  String payrollLine(String wage, String advances, String paid) {
+    return 'Wage $wage · advances $advances · paid $paid';
+  }
+
+  @override
+  String lostCardTitle(String number) {
+    return 'Card $number was reported lost';
+  }
+
+  @override
+  String lostCardBody(String name, String date) {
+    return 'It belonged to $name ($date). Keep the card and tell the manager.';
+  }
+
+  @override
+  String returnedCardTitle(String number) {
+    return 'Card $number was returned';
+  }
+
+  @override
+  String returnedCardBody(String name) {
+    return 'It belonged to $name. Give it to someone new from their page.';
+  }
+
+  @override
+  String get unknownCardBody => 'No one has this card yet.';
+
+  @override
+  String get otherFarmCardTitle => 'Card from another farm';
+
+  @override
+  String get otherFarmCardBody =>
+      'This card belongs to another farm and does not work here.';
+
+  @override
+  String get moneyOwedLabel => 'Money owed';
+
+  @override
+  String get thisPeriodLabel => 'This period';
+
+  @override
+  String payDayLine(String date, String price) {
+    return 'Pay day $date · $price a litre';
+  }
+
+  @override
+  String get rejectedWord => 'rejected';
+
+  @override
+  String get nextCard => 'Next card';
+
+  @override
+  String get openDetails => 'Details';
+
+  @override
+  String get scanModeAttendance => 'Each card clocks in or out';
+
+  @override
+  String get scanModeLookUp => 'Each card shows who it is';
+
+  @override
+  String get scanQrInstead => 'Scan QR with camera';
+
+  @override
+  String get useNfcInstead => 'Tap cards instead';
+
+  @override
+  String get scanStationTitle => 'Scan cards';
+
+  @override
+  String get scanStationBody =>
+      'Tap one card after another. Each person shows for a few seconds.';
+
+  @override
+  String scannedTodayTitle(int n) {
+    return 'Scanned ($n)';
+  }
+
+  @override
+  String statusClockedIn(String time) {
+    return 'Clocked in $time';
+  }
+
+  @override
+  String statusClockedOut(String time) {
+    return 'Clocked out $time';
+  }
+
+  @override
+  String statusLeftAt(String time) {
+    return 'Left at $time';
+  }
+
+  @override
+  String statusPresentSince(String time) {
+    return 'Present since $time';
+  }
+
+  @override
+  String get statusNotInToday => 'Not in today';
+
+  @override
+  String get advanceWord => 'Advance';
+
+  @override
+  String get advancesLabel => 'Advances';
+
+  @override
+  String get alreadyHasCard =>
+      'This person already has a card. Replace it instead.';
+
+  @override
+  String get cardActive => 'Working';
+
+  @override
+  String get cardHistoryTitle => 'Card history';
+
+  @override
+  String get cardLost => 'Lost';
+
+  @override
+  String get cardNotGivenTitle => 'Card not given';
+
+  @override
+  String get cardRegisterTitle => 'All cards';
+
+  @override
+  String get cardReturned => 'Given back';
+
+  @override
+  String get changeMyPin => 'Change my PIN';
+
+  @override
+  String get changeNumber => 'Change number';
+
+  @override
+  String get chooseOwnPinBody =>
+      'Pick 4 numbers only you know. Not 1234, not 0000.';
+
+  @override
+  String get chooseOwnPinTitle => 'Choose your own PIN';
+
+  @override
+  String get confirmPinBody => 'Type the same 4 numbers again.';
+
+  @override
+  String get confirmPinTitle => 'Type it again';
+
+  @override
+  String get departmentOptional => 'Department (optional)';
+
+  @override
+  String get deptAnimalHealth => 'Animal health';
+
+  @override
+  String get deptCollection => 'Milk collection';
+
+  @override
+  String get deptFeeding => 'Feeding';
+
+  @override
+  String get deptField => 'Field and pasture';
+
+  @override
+  String get deptHerd => 'Herd';
+
+  @override
+  String get deptKitchen => 'Kitchen';
+
+  @override
+  String get deptManagement => 'Management';
+
+  @override
+  String get deptMilking => 'Milking';
+
+  @override
+  String get deptOffice => 'Office';
+
+  @override
+  String get deptSecurity => 'Security';
+
+  @override
+  String get deptTransport => 'Transport';
+
+  @override
+  String get detailsTitle => 'Details';
+
+  @override
+  String get emergencyNameOptional => 'Next of kin (optional)';
+
+  @override
+  String get emergencyPhoneOptional => 'Next of kin phone (optional)';
+
+  @override
+  String get idCardRowBody => 'See, print or download the ID card';
+
+  @override
+  String get myAttendanceTitle => 'My days';
+
+  @override
+  String get myPageShort => 'Me';
+
+  @override
+  String get myPageTitle => 'My page';
+
+  @override
+  String get myTasksTitle => 'My tasks';
+
+  @override
+  String get nfcChipWord => 'NFC chip';
+
+  @override
+  String get ninOptional => 'National ID number (optional)';
+
+  @override
+  String get noCardsToPrint => 'No one has a card yet. Give cards first.';
+
+  @override
+  String get noCardsYetBody =>
+      'Cards you give to workers and milk suppliers show here.';
+
+  @override
+  String get noCardsYetTitle => 'No cards yet';
+
+  @override
+  String get noTasksForYou => 'No tasks for you today';
+
+  @override
+  String get openMyCard => 'Open my card';
+
+  @override
+  String get paidInFull => 'Paid in full';
+
+  @override
+  String get paidLabel => 'Paid';
+
+  @override
+  String get paymentsTitle => 'Payments';
+
+  @override
+  String get phoneNumberLabel => 'Phone number';
+
+  @override
+  String get phoneSignInBadge => 'Phone sign-in';
+
+  @override
+  String get pinChangedToast => 'Your new PIN is saved';
+
+  @override
+  String get pinTooEasy => 'Too easy to guess. Pick other numbers.';
+
+  @override
+  String get pinWhatFor =>
+      'Your card says who you are. Your PIN proves it is you, so nobody can clock in or record milk with your card. On your own phone it is your password.';
+
+  @override
+  String get pinsDoNotMatch => 'The two PINs are not the same. Try again.';
+
+  @override
+  String get printAllCards => 'Print all cards';
+
+  @override
+  String get printedCardNoChip => 'Printed card, no chip (QR and number only)';
+
+  @override
+  String get revokeCardRow => 'Take back or report lost';
+
+  @override
+  String get revokeCardRowBody => 'The card stops working at once';
+
+  @override
+  String get revokeLost => 'Lost or stolen: never use again';
+
+  @override
+  String get revokeReturned => 'Given back: can go to someone new';
+
+  @override
+  String get setUpPhoneSignIn => 'Set up phone sign-in';
+
+  @override
+  String get setUpPhoneSignInBody =>
+      'They sign in on their own phone with phone number and PIN';
+
+  @override
+  String get staffLoginNotMade =>
+      'Phone sign-in was not set up. Check the internet and try again.';
+
+  @override
+  String get staffLoginOtherFarm =>
+      'This phone number already signs in to another farm.';
+
+  @override
+  String get staffPhoneInvalid =>
+      'Type a Ugandan phone number, like 0701 220 318.';
+
+  @override
+  String get staffSignInBody =>
+      'Type the phone number your farm saved for you.';
+
+  @override
+  String get staffSignInEntry => 'I work on a farm: sign in with phone and PIN';
+
+  @override
+  String get staffSignInHelpBody =>
+      'Ask your farm manager. They add your phone number and give you a PIN to start. The first time, you choose your own PIN.';
+
+  @override
+  String get staffSignInHelpTitle => 'No PIN yet?';
+
+  @override
+  String get staffSignInOffline =>
+      'No internet. Sign-in needs internet the first time.';
+
+  @override
+  String get staffSignInTitle => 'Sign in as a worker';
+
+  @override
+  String get staffSignInTooMany =>
+      'Too many tries. Wait a few minutes and try again.';
+
+  @override
+  String get staffSignInWrong => 'Phone number or PIN is wrong.';
+
+  @override
+  String get temporaryPinTitle => 'Starting PIN';
+
+  @override
+  String get todayLabel => 'Today';
+
+  @override
+  String get villageOptional => 'Village (optional)';
+
+  @override
+  String get wageLabel => 'Wage';
+
+  @override
+  String get wageWord => 'Wage';
+
+  @override
+  String cardLostCannotReuse(String card) {
+    return 'Card $card was reported lost. It can never be given again.';
+  }
+
+  @override
+  String cardRevokedToast(String card) {
+    return 'Card $card no longer works';
+  }
+
+  @override
+  String cardsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count working cards',
+      one: '1 working card',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String endedOn(String date) {
+    return 'Ended $date';
+  }
+
+  @override
+  String issuedOn(String date) {
+    return 'Given $date';
+  }
+
+  @override
+  String myPayTitle(String month) {
+    return 'My pay for $month';
+  }
+
+  @override
+  String opensSections(String sections) {
+    return 'Opens: $sections';
+  }
+
+  @override
+  String replaceCardBody(String name, String card) {
+    return '$name\'s card $card will be marked lost and stop working. Then tap the new card.';
+  }
+
+  @override
+  String replaceCardTitle(String card) {
+    return 'Replace card $card?';
+  }
+
+  @override
+  String resetPinBodyTemp(String name) {
+    return 'Give $name a starting PIN. They must choose their own the next time they sign in.';
+  }
+
+  @override
+  String resetPinDoneTemp(String name) {
+    return '$name must choose a new PIN at next sign-in';
+  }
+
+  @override
+  String revokeCardBody(String name) {
+    return 'What happened to $name\'s card?';
+  }
+
+  @override
+  String revokeCardTitle(String card) {
+    return 'Card $card';
+  }
+
+  @override
+  String staffLoginMade(String name, String phone) {
+    return '$name can now sign in on their phone with $phone and the starting PIN';
+  }
+
+  @override
+  String staffSignInPinBody(String phone) {
+    return 'Enter the PIN for $phone';
+  }
+
+  @override
+  String temporaryPinBody(String name) {
+    return 'Tell $name this PIN. They choose their own the first time.';
+  }
 }

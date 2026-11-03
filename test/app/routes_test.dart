@@ -271,8 +271,13 @@ void main() {
       await _settle(tester);
       expect(find.text('Reset PIN'), allowed ? findsOneWidget : findsNothing);
       expect(find.byTooltip('Edit worker'), allowed ? findsOneWidget : findsNothing);
+      if (!allowed) {
+        // Workers is not one of their sections (decision 0016 §7): home instead.
+        expect(h.location, AppRoutes.home);
+        return;
+      }
       await _tapBack(tester);
-      expect(find.text('Add worker'), allowed ? findsOneWidget : findsNothing);
+      expect(find.text('Add worker'), findsOneWidget);
     }
 
     testWidgets('manager (Tom) sees Add / Edit / Reset PIN', (tester) => check(tester, staffIndex: 0, allowed: true));

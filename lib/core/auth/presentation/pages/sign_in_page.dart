@@ -21,11 +21,21 @@ import 'package:material_symbols_icons/symbols.dart';
 /// small feature cards, then the sign-in buttons. One centred column on every
 /// width.
 class SignInPage extends StatelessWidget {
-  const new({required this.auth, required this.onSignedIn, required this.onEmail, super.key, this.showApple});
+  const new({
+    required this.auth,
+    required this.onSignedIn,
+    required this.onEmail,
+    super.key,
+    this.showApple,
+    this.onStaff,
+  });
 
   final AuthRepository auth;
   final VoidCallback onSignedIn;
   final VoidCallback onEmail;
+
+  /// "I work on a farm": phone + PIN sign-in for workers (decision 0016 §5).
+  final VoidCallback? onStaff;
 
   /// Defaults to iOS / macOS / web.
   final bool? showApple;
@@ -34,18 +44,19 @@ class SignInPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => AuthActionCubit(),
-      child: _SignInView(auth: auth, onSignedIn: onSignedIn, onEmail: onEmail, showApple: showApple),
+      child: _SignInView(auth: auth, onSignedIn: onSignedIn, onEmail: onEmail, showApple: showApple, onStaff: onStaff),
     );
   }
 }
 
 class _SignInView extends StatefulWidget {
-  const new({required this.auth, required this.onSignedIn, required this.onEmail, this.showApple});
+  const new({required this.auth, required this.onSignedIn, required this.onEmail, this.showApple, this.onStaff});
 
   final AuthRepository auth;
   final VoidCallback onSignedIn;
   final VoidCallback onEmail;
   final bool? showApple;
+  final VoidCallback? onStaff;
 
   @override
   State<_SignInView> createState() => _SignInViewState();
@@ -100,6 +111,13 @@ class _SignInViewState extends State<_SignInView> {
         ],
         const OrDivider(),
         FarmTapButton(label: l10n.continueEmail, icon: Symbols.mail_rounded, onPressed: busy ? null : widget.onEmail),
+        if (widget.onStaff != null)
+          FarmTapButton(
+            label: l10n.staffSignInEntry,
+            icon: Symbols.badge_rounded,
+            kind: ButtonKind.text,
+            onPressed: busy ? null : widget.onStaff,
+          ),
         const AuthFooter(),
       ],
     );

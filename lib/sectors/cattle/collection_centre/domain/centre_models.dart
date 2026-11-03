@@ -30,10 +30,25 @@ class CentreFarmer {
     this.rejectedLitres = 0,
     this.smsReceipts = true,
     this.owed = 0,
+    this.photo,
+    this.photoUrl,
+    this.since,
   });
 
   final String id;
   final String name;
+
+  /// Small JPEG (base64) in the record: prints on the supplier card
+  /// (decision 0016 §2).
+  final String? photo;
+
+  /// Full photo in Firebase Storage once Storage is on.
+  final String? photoUrl;
+
+  /// First added to the centre (printed on the card).
+  final DateTime? since;
+
+  bool get hasPhoto => (photo ?? '').isNotEmpty;
 
   /// Four-digit card number ("0142"); null when no card was issued yet.
   final String? card;
@@ -71,6 +86,9 @@ class CentreFarmer {
     usualHigh: usualHigh,
     smsReceipts: smsReceipts,
     owed: value,
+    photo: photo,
+    photoUrl: photoUrl,
+    since: since,
   );
 
   /// The same farmer with edited details (G07 edit).
@@ -109,7 +127,39 @@ class CentreFarmer {
     usualHigh: usualHigh,
     smsReceipts: smsReceipts,
     owed: owed,
+    photo: photo,
+    photoUrl: photoUrl,
+    since: since,
   );
+
+  /// The same farmer with another card (null = no card) or photo.
+  CentreFarmer withCard(String? number, {bool keepCard = false, String? photo, String? photoUrl}) => CentreFarmer(
+    id: id,
+    name: name,
+    card: keepCard ? card : number,
+    village: village,
+    phone: phone,
+    network: network,
+    todayLitres: todayLitres,
+    periodLitres: periodLitres,
+    rejectedLitres: rejectedLitres,
+    usualLow: usualLow,
+    usualHigh: usualHigh,
+    smsReceipts: smsReceipts,
+    owed: owed,
+    photo: photo ?? this.photo,
+    photoUrl: photoUrl ?? this.photoUrl,
+    since: since,
+  );
+
+  /// "MS-55120": the supplier number printed on the card.
+  String get supplierCode {
+    var h = 0x811c9dc5;
+    for (final c in id.codeUnits) {
+      h = ((h ^ c) * 0x01000193) & 0xffffffff;
+    }
+    return 'MS-${(h % 100000).toString().padLeft(5, '0')}';
+  }
 }
 
 enum FarmerFilter { all, deliveredToday, notToday, noCard }

@@ -233,3 +233,44 @@ describe('one farm per account (decision 0018)', () => {
     await assertFails(setDoc(doc(db, `tenants/${T}/members/newbie`), { role: 'owner' }));
   });
 });
+
+describe('worker phone sign-in and PINs (decision 0016)', () => {
+  beforeEach(async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, `tenants/${T}/members/amos-uid`), { role: 'worker', staffId: 'staff-ta' });
+      await setDoc(doc(db, `tenants/${T}/members/tom-uid`), { role: 'manager', staffId: 'staff-tm' });
+    });
+  });
+
+  const login = { tenantId: T, staffId: 'staff-ta', uid: 'amos-uid', v: 1 };
+
+  test('the owner gives a worker a phone login; anyone can find which version it is', async () => {
+    const db = as('owner');
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/members/new-uid`), { role: 'worker', staffId: 'staff-np', name: 'Peter' }));
+    await assertSucceeds(setDoc(doc(db, 'staffLogins/701220318'), login));
+    await assertSucceeds(getDoc(doc(env.unauthenticatedContext().firestore(), 'staffLogins/701220318')));
+  });
+
+  test('only the owner makes managers; nobody makes an owner', async () => {
+    await assertFails(setDoc(doc(as('tom-uid'), `tenants/${T}/members/x`), { role: 'manager', staffId: 'staff-x' }));
+    await assertSucceeds(setDoc(doc(as('tom-uid'), `tenants/${T}/members/y`), { role: 'clerk', staffId: 'staff-y' }));
+    await assertFails(setDoc(doc(as('owner'), `tenants/${T}/members/z`), { role: 'owner', staffId: 'staff-z' }));
+    await assertFails(setDoc(doc(as('owner'), `tenants/${T}/members/w`), { role: 'worker' }));
+  });
+
+  test('a worker cannot make logins or point a phone at another farm', async () => {
+    await assertFails(setDoc(doc(as('amos-uid'), `tenants/${T}/members/x`), { role: 'worker', staffId: 'staff-x' }));
+    await assertFails(setDoc(doc(as('amos-uid'), 'staffLogins/701220318'), login));
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'staffLogins/701220318'), login));
+    await assertFails(setDoc(doc(as('stranger'), 'staffLogins/701220318'), { ...login, tenantId: 'other', v: 2 }));
+    await assertSucceeds(setDoc(doc(as('owner'), 'staffLogins/701220318'), { ...login, uid: 'amos-2', v: 2 }));
+  });
+
+  test("a worker saves their own PIN, never someone else's", async () => {
+    const db = as('amos-uid');
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/staffPins/staff-ta`), rec('staffPins', 'staff-ta')));
+    await assertFails(setDoc(doc(db, `tenants/${T}/staffPins/staff-tm`), rec('staffPins', 'staff-tm')));
+    await assertSucceeds(setDoc(doc(as('owner'), `tenants/${T}/staffPins/staff-tm`), rec('staffPins', 'staff-tm')));
+  });
+});

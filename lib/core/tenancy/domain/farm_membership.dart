@@ -88,7 +88,12 @@ class FarmMembership extends Equatable {
     this.village,
     this.herdSize,
     this.withCentre = false,
+    this.staffId,
   });
+
+  /// Set when a worker signed in with phone + PIN (decision 0016 §5): the
+  /// staff record they are. Null for owners and managers with an account.
+  final String? staffId;
 
   final String tenantId;
   final String name;
@@ -128,6 +133,7 @@ class FarmMembership extends Equatable {
     village,
     herdSize,
     withCentre,
+    staffId,
   ];
 }
 

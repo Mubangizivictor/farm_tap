@@ -6981,6 +6981,942 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Phone number copied'**
   String get phoneCopied;
+
+  /// No description provided for @absentWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Absent'**
+  String get absentWord;
+
+  /// No description provided for @presentWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Present'**
+  String get presentWord;
+
+  /// No description provided for @broughtToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Brought {litres} today'**
+  String broughtToday(String litres);
+
+  /// No description provided for @notDeliveredToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No milk today'**
+  String get notDeliveredToday;
+
+  /// No description provided for @cardNotUsable.
+  ///
+  /// In en, this message translates to:
+  /// **'Card cannot be used'**
+  String get cardNotUsable;
+
+  /// No description provided for @chooseFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get chooseFromGallery;
+
+  /// No description provided for @photoSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo for the ID card'**
+  String get photoSheetTitle;
+
+  /// No description provided for @photoSheetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Face the camera, in good light.'**
+  String get photoSheetBody;
+
+  /// No description provided for @photoSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo saved'**
+  String get photoSaved;
+
+  /// No description provided for @photoSavedLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo saved. The full photo uploads when cloud storage is on.'**
+  String get photoSavedLocal;
+
+  /// No description provided for @photoNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo not saved. Try again.'**
+  String get photoNotSaved;
+
+  /// No description provided for @clockInOutShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Clock in/out'**
+  String get clockInOutShort;
+
+  /// No description provided for @lookUpShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up'**
+  String get lookUpShort;
+
+  /// No description provided for @departmentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Department'**
+  String get departmentLabel;
+
+  /// No description provided for @emergencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency'**
+  String get emergencyLabel;
+
+  /// No description provided for @phoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phoneLabel;
+
+  /// No description provided for @ninLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'NIN'**
+  String get ninLabel;
+
+  /// No description provided for @memberSinceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Since'**
+  String get memberSinceLabel;
+
+  /// No description provided for @issuedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Issued'**
+  String get issuedLabel;
+
+  /// No description provided for @idNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ID'**
+  String get idNumberLabel;
+
+  /// No description provided for @downloadCardPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Download PDF'**
+  String get downloadCardPdf;
+
+  /// No description provided for @printCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Print card'**
+  String get printCard;
+
+  /// No description provided for @printOnA4.
+  ///
+  /// In en, this message translates to:
+  /// **'Print on A4 paper'**
+  String get printOnA4;
+
+  /// No description provided for @giveCardToSomeone.
+  ///
+  /// In en, this message translates to:
+  /// **'Give this card'**
+  String get giveCardToSomeone;
+
+  /// No description provided for @holdQrToCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the card\'s QR code to the camera'**
+  String get holdQrToCamera;
+
+  /// No description provided for @idCardBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get idCardBack;
+
+  /// No description provided for @idCardFront.
+  ///
+  /// In en, this message translates to:
+  /// **'Front'**
+  String get idCardFront;
+
+  /// No description provided for @idCardFrontLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ID card of {name}, front'**
+  String idCardFrontLabel(String name);
+
+  /// No description provided for @idCardBackLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ID card of {name}, back'**
+  String idCardBackLabel(String name);
+
+  /// No description provided for @idCardIfFound.
+  ///
+  /// In en, this message translates to:
+  /// **'If found, please return to the farm'**
+  String get idCardIfFound;
+
+  /// No description provided for @idCardNoCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No card yet'**
+  String get idCardNoCardTitle;
+
+  /// No description provided for @idCardNoCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Give a card first. Its number and QR code go on the print.'**
+  String get idCardNoCardBody;
+
+  /// No description provided for @idCardPrintHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Card printer: print the 2 pages on a blank PVC card. Normal printer: print on A4, cut along the marks and laminate.'**
+  String get idCardPrintHelp;
+
+  /// No description provided for @idCardScanMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan me'**
+  String get idCardScanMe;
+
+  /// No description provided for @idCardStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff'**
+  String get idCardStaff;
+
+  /// No description provided for @idCardSupplier.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk supplier'**
+  String get idCardSupplier;
+
+  /// No description provided for @idCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ID card'**
+  String get idCardTitle;
+
+  /// No description provided for @idCardValidNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until revoked. Tap or scan at the farm.'**
+  String get idCardValidNote;
+
+  /// No description provided for @lastPaidLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Last paid {amount} on {date}'**
+  String lastPaidLine(String amount, String date);
+
+  /// No description provided for @payrollLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Wage {wage} · advances {advances} · paid {paid}'**
+  String payrollLine(String wage, String advances, String paid);
+
+  /// No description provided for @lostCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {number} was reported lost'**
+  String lostCardTitle(String number);
+
+  /// No description provided for @lostCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It belonged to {name} ({date}). Keep the card and tell the manager.'**
+  String lostCardBody(String name, String date);
+
+  /// No description provided for @returnedCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {number} was returned'**
+  String returnedCardTitle(String number);
+
+  /// No description provided for @returnedCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It belonged to {name}. Give it to someone new from their page.'**
+  String returnedCardBody(String name);
+
+  /// No description provided for @unknownCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No one has this card yet.'**
+  String get unknownCardBody;
+
+  /// No description provided for @otherFarmCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Card from another farm'**
+  String get otherFarmCardTitle;
+
+  /// No description provided for @otherFarmCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This card belongs to another farm and does not work here.'**
+  String get otherFarmCardBody;
+
+  /// No description provided for @moneyOwedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Money owed'**
+  String get moneyOwedLabel;
+
+  /// No description provided for @thisPeriodLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'This period'**
+  String get thisPeriodLabel;
+
+  /// No description provided for @payDayLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay day {date} · {price} a litre'**
+  String payDayLine(String date, String price);
+
+  /// No description provided for @rejectedWord.
+  ///
+  /// In en, this message translates to:
+  /// **'rejected'**
+  String get rejectedWord;
+
+  /// No description provided for @nextCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Next card'**
+  String get nextCard;
+
+  /// No description provided for @openDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get openDetails;
+
+  /// No description provided for @scanModeAttendance.
+  ///
+  /// In en, this message translates to:
+  /// **'Each card clocks in or out'**
+  String get scanModeAttendance;
+
+  /// No description provided for @scanModeLookUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Each card shows who it is'**
+  String get scanModeLookUp;
+
+  /// No description provided for @scanQrInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR with camera'**
+  String get scanQrInstead;
+
+  /// No description provided for @useNfcInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap cards instead'**
+  String get useNfcInstead;
+
+  /// No description provided for @scanStationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan cards'**
+  String get scanStationTitle;
+
+  /// No description provided for @scanStationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap one card after another. Each person shows for a few seconds.'**
+  String get scanStationBody;
+
+  /// No description provided for @scannedTodayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanned ({n})'**
+  String scannedTodayTitle(int n);
+
+  /// No description provided for @statusClockedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Clocked in {time}'**
+  String statusClockedIn(String time);
+
+  /// No description provided for @statusClockedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Clocked out {time}'**
+  String statusClockedOut(String time);
+
+  /// No description provided for @statusLeftAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Left at {time}'**
+  String statusLeftAt(String time);
+
+  /// No description provided for @statusPresentSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Present since {time}'**
+  String statusPresentSince(String time);
+
+  /// No description provided for @statusNotInToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in today'**
+  String get statusNotInToday;
+
+  /// No description provided for @advanceWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Advance'**
+  String get advanceWord;
+
+  /// No description provided for @advancesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Advances'**
+  String get advancesLabel;
+
+  /// No description provided for @alreadyHasCard.
+  ///
+  /// In en, this message translates to:
+  /// **'This person already has a card. Replace it instead.'**
+  String get alreadyHasCard;
+
+  /// No description provided for @cardActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Working'**
+  String get cardActive;
+
+  /// No description provided for @cardHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Card history'**
+  String get cardHistoryTitle;
+
+  /// No description provided for @cardLost.
+  ///
+  /// In en, this message translates to:
+  /// **'Lost'**
+  String get cardLost;
+
+  /// No description provided for @cardNotGivenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Card not given'**
+  String get cardNotGivenTitle;
+
+  /// No description provided for @cardRegisterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All cards'**
+  String get cardRegisterTitle;
+
+  /// No description provided for @cardReturned.
+  ///
+  /// In en, this message translates to:
+  /// **'Given back'**
+  String get cardReturned;
+
+  /// No description provided for @changeMyPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Change my PIN'**
+  String get changeMyPin;
+
+  /// No description provided for @changeNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Change number'**
+  String get changeNumber;
+
+  /// No description provided for @chooseOwnPinBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick 4 numbers only you know. Not 1234, not 0000.'**
+  String get chooseOwnPinBody;
+
+  /// No description provided for @chooseOwnPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your own PIN'**
+  String get chooseOwnPinTitle;
+
+  /// No description provided for @confirmPinBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the same 4 numbers again.'**
+  String get confirmPinBody;
+
+  /// No description provided for @confirmPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Type it again'**
+  String get confirmPinTitle;
+
+  /// No description provided for @departmentOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Department (optional)'**
+  String get departmentOptional;
+
+  /// No description provided for @deptAnimalHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal health'**
+  String get deptAnimalHealth;
+
+  /// No description provided for @deptCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk collection'**
+  String get deptCollection;
+
+  /// No description provided for @deptFeeding.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeding'**
+  String get deptFeeding;
+
+  /// No description provided for @deptField.
+  ///
+  /// In en, this message translates to:
+  /// **'Field and pasture'**
+  String get deptField;
+
+  /// No description provided for @deptHerd.
+  ///
+  /// In en, this message translates to:
+  /// **'Herd'**
+  String get deptHerd;
+
+  /// No description provided for @deptKitchen.
+  ///
+  /// In en, this message translates to:
+  /// **'Kitchen'**
+  String get deptKitchen;
+
+  /// No description provided for @deptManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Management'**
+  String get deptManagement;
+
+  /// No description provided for @deptMilking.
+  ///
+  /// In en, this message translates to:
+  /// **'Milking'**
+  String get deptMilking;
+
+  /// No description provided for @deptOffice.
+  ///
+  /// In en, this message translates to:
+  /// **'Office'**
+  String get deptOffice;
+
+  /// No description provided for @deptSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get deptSecurity;
+
+  /// No description provided for @deptTransport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get deptTransport;
+
+  /// No description provided for @detailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get detailsTitle;
+
+  /// No description provided for @emergencyNameOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Next of kin (optional)'**
+  String get emergencyNameOptional;
+
+  /// No description provided for @emergencyPhoneOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Next of kin phone (optional)'**
+  String get emergencyPhoneOptional;
+
+  /// No description provided for @idCardRowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'See, print or download the ID card'**
+  String get idCardRowBody;
+
+  /// No description provided for @myAttendanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My days'**
+  String get myAttendanceTitle;
+
+  /// No description provided for @myPageShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Me'**
+  String get myPageShort;
+
+  /// No description provided for @myPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My page'**
+  String get myPageTitle;
+
+  /// No description provided for @myTasksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My tasks'**
+  String get myTasksTitle;
+
+  /// No description provided for @nfcChipWord.
+  ///
+  /// In en, this message translates to:
+  /// **'NFC chip'**
+  String get nfcChipWord;
+
+  /// No description provided for @ninOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'National ID number (optional)'**
+  String get ninOptional;
+
+  /// No description provided for @noCardsToPrint.
+  ///
+  /// In en, this message translates to:
+  /// **'No one has a card yet. Give cards first.'**
+  String get noCardsToPrint;
+
+  /// No description provided for @noCardsYetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards you give to workers and milk suppliers show here.'**
+  String get noCardsYetBody;
+
+  /// No description provided for @noCardsYetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No cards yet'**
+  String get noCardsYetTitle;
+
+  /// No description provided for @noTasksForYou.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks for you today'**
+  String get noTasksForYou;
+
+  /// No description provided for @openMyCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Open my card'**
+  String get openMyCard;
+
+  /// No description provided for @paidInFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid in full'**
+  String get paidInFull;
+
+  /// No description provided for @paidLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get paidLabel;
+
+  /// No description provided for @paymentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get paymentsTitle;
+
+  /// No description provided for @phoneNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get phoneNumberLabel;
+
+  /// No description provided for @phoneSignInBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone sign-in'**
+  String get phoneSignInBadge;
+
+  /// No description provided for @pinChangedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Your new PIN is saved'**
+  String get pinChangedToast;
+
+  /// No description provided for @pinTooEasy.
+  ///
+  /// In en, this message translates to:
+  /// **'Too easy to guess. Pick other numbers.'**
+  String get pinTooEasy;
+
+  /// No description provided for @pinWhatFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Your card says who you are. Your PIN proves it is you, so nobody can clock in or record milk with your card. On your own phone it is your password.'**
+  String get pinWhatFor;
+
+  /// No description provided for @pinsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The two PINs are not the same. Try again.'**
+  String get pinsDoNotMatch;
+
+  /// No description provided for @printAllCards.
+  ///
+  /// In en, this message translates to:
+  /// **'Print all cards'**
+  String get printAllCards;
+
+  /// No description provided for @printedCardNoChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Printed card, no chip (QR and number only)'**
+  String get printedCardNoChip;
+
+  /// No description provided for @revokeCardRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Take back or report lost'**
+  String get revokeCardRow;
+
+  /// No description provided for @revokeCardRowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The card stops working at once'**
+  String get revokeCardRowBody;
+
+  /// No description provided for @revokeLost.
+  ///
+  /// In en, this message translates to:
+  /// **'Lost or stolen: never use again'**
+  String get revokeLost;
+
+  /// No description provided for @revokeReturned.
+  ///
+  /// In en, this message translates to:
+  /// **'Given back: can go to someone new'**
+  String get revokeReturned;
+
+  /// No description provided for @setUpPhoneSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up phone sign-in'**
+  String get setUpPhoneSignIn;
+
+  /// No description provided for @setUpPhoneSignInBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They sign in on their own phone with phone number and PIN'**
+  String get setUpPhoneSignInBody;
+
+  /// No description provided for @staffLoginNotMade.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone sign-in was not set up. Check the internet and try again.'**
+  String get staffLoginNotMade;
+
+  /// No description provided for @staffLoginOtherFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone number already signs in to another farm.'**
+  String get staffLoginOtherFarm;
+
+  /// No description provided for @staffPhoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a Ugandan phone number, like 0701 220 318.'**
+  String get staffPhoneInvalid;
+
+  /// No description provided for @staffSignInBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the phone number your farm saved for you.'**
+  String get staffSignInBody;
+
+  /// No description provided for @staffSignInEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'I work on a farm: sign in with phone and PIN'**
+  String get staffSignInEntry;
+
+  /// No description provided for @staffSignInHelpBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask your farm manager. They add your phone number and give you a PIN to start. The first time, you choose your own PIN.'**
+  String get staffSignInHelpBody;
+
+  /// No description provided for @staffSignInHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No PIN yet?'**
+  String get staffSignInHelpTitle;
+
+  /// No description provided for @staffSignInOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet. Sign-in needs internet the first time.'**
+  String get staffSignInOffline;
+
+  /// No description provided for @staffSignInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in as a worker'**
+  String get staffSignInTitle;
+
+  /// No description provided for @staffSignInTooMany.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many tries. Wait a few minutes and try again.'**
+  String get staffSignInTooMany;
+
+  /// No description provided for @staffSignInWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number or PIN is wrong.'**
+  String get staffSignInWrong;
+
+  /// No description provided for @temporaryPinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting PIN'**
+  String get temporaryPinTitle;
+
+  /// No description provided for @todayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get todayLabel;
+
+  /// No description provided for @villageOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Village (optional)'**
+  String get villageOptional;
+
+  /// No description provided for @wageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wage'**
+  String get wageLabel;
+
+  /// No description provided for @wageWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Wage'**
+  String get wageWord;
+
+  /// No description provided for @cardLostCannotReuse.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {card} was reported lost. It can never be given again.'**
+  String cardLostCannotReuse(String card);
+
+  /// No description provided for @cardRevokedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {card} no longer works'**
+  String cardRevokedToast(String card);
+
+  /// No description provided for @cardsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 working card} other{{count} working cards}}'**
+  String cardsCount(int count);
+
+  /// No description provided for @endedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Ended {date}'**
+  String endedOn(String date);
+
+  /// No description provided for @issuedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Given {date}'**
+  String issuedOn(String date);
+
+  /// No description provided for @myPayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My pay for {month}'**
+  String myPayTitle(String month);
+
+  /// No description provided for @opensSections.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens: {sections}'**
+  String opensSections(String sections);
+
+  /// No description provided for @replaceCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s card {card} will be marked lost and stop working. Then tap the new card.'**
+  String replaceCardBody(String name, String card);
+
+  /// No description provided for @replaceCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace card {card}?'**
+  String replaceCardTitle(String card);
+
+  /// No description provided for @resetPinBodyTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'Give {name} a starting PIN. They must choose their own the next time they sign in.'**
+  String resetPinBodyTemp(String name);
+
+  /// No description provided for @resetPinDoneTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} must choose a new PIN at next sign-in'**
+  String resetPinDoneTemp(String name);
+
+  /// No description provided for @revokeCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened to {name}\'s card?'**
+  String revokeCardBody(String name);
+
+  /// No description provided for @revokeCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {card}'**
+  String revokeCardTitle(String card);
+
+  /// No description provided for @staffLoginMade.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} can now sign in on their phone with {phone} and the starting PIN'**
+  String staffLoginMade(String name, String phone);
+
+  /// No description provided for @staffSignInPinBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the PIN for {phone}'**
+  String staffSignInPinBody(String phone);
+
+  /// No description provided for @temporaryPinBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell {name} this PIN. They choose their own the first time.'**
+  String temporaryPinBody(String name);
 }
 
 class _AppLocalizationsDelegate

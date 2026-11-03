@@ -3,6 +3,8 @@
 import 'package:farm_tap/app/router/routes.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
+import 'package:farm_tap/core/people/domain/staff_member.dart';
+import 'package:farm_tap/core/people/domain/staff_permissions.dart';
 import 'package:farm_tap/core/sync/presentation/sync_status_sheet.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
@@ -28,7 +30,42 @@ const List<String> shellBranches = [
   AppRoutes.money,
   AppRoutes.reports,
   AppRoutes.settings,
+  AppRoutes.me,
 ];
+
+/// The section a path belongs to, for role checks (decision 0016 §7).
+AppSection? sectionOf(String location) {
+  for (final (path, section) in const [
+    (AppRoutes.home, AppSection.home),
+    (AppRoutes.herd, AppSection.herd),
+    (AppRoutes.milk, AppSection.milk),
+    (AppRoutes.health, AppSection.health),
+    (AppRoutes.feeding, AppSection.feeding),
+    (AppRoutes.breeding, AppSection.breeding),
+    (AppRoutes.collect, AppSection.collect),
+    (AppRoutes.farmers, AppSection.farmers),
+    (AppRoutes.pay, AppSection.pay),
+    (AppRoutes.workers, AppSection.workers),
+    (AppRoutes.money, AppSection.money),
+    (AppRoutes.reports, AppSection.reports),
+    (AppRoutes.settings, AppSection.settings),
+    (AppRoutes.me, AppSection.me),
+  ]) {
+    if (location == path || location.startsWith('$path/')) return section;
+  }
+  return null;
+}
+
+/// Shell paths a role may open; null = everything (owner / manager).
+Set<String>? allowedPaths(StaffRole? role) {
+  if (StaffPermissions.managesStaff(role)) return null;
+  final sections = StaffPermissions.sections(role);
+  return {
+    for (final p in shellBranches)
+      if (sectionOf(p) case final s? when sections.contains(s)) p,
+    AppRoutes.more,
+  };
+}
 
 /// Sections that are not on the phone bottom bar: on phones they open from
 /// More (push, back arrow); on wide screens they are root sections.
@@ -39,6 +76,7 @@ const List<String> moreSections = [
   AppRoutes.money,
   AppRoutes.reports,
   AppRoutes.settings,
+  AppRoutes.me,
 ];
 
 class AppShell extends StatelessWidget {
@@ -56,6 +94,7 @@ class AppShell extends StatelessWidget {
       context.formFactor,
       current: shellBranches[shell.currentIndex],
       centre: session.isCentre,
+      allowed: allowedPaths(session.staff?.role),
       onSelect: (path) {
         final index = shellBranches.indexOf(path);
         // Tapping the current tab again returns it to its root.
@@ -86,8 +125,13 @@ class AppShell extends StatelessWidget {
           pending: s.waiting,
           onSyncTap: () => showSyncStatusSheet(context, sync),
           profileName: session.staff?.name ?? session.auth.currentUser?.name,
-          // The staff avatar locks the farm phone (back to C01 tap card).
+          // The staff avatar locks the farm phone (back to C01 tap card); a
+          // worker signed in on their own phone goes to My page instead.
           onProfileTap: () {
+            if (session.staffLogin) {
+              GoRouter.of(context).go(AppRoutes.me);
+              return;
+            }
             session.lock();
             GoRouter.of(context).go(AppRoutes.unlock);
           },
@@ -110,8 +154,33 @@ AdaptiveNavigation shellNavigation(
   required String current,
   required ValueChanged<String> onSelect,
   bool centre = false,
+  Set<String>? allowed,
 }) {
   NavItem item(String path) => _item(l10n, path);
+  // A worker sees only their sections (decision 0016 §7); My page joins
+  // the bar when there is room.
+  List<String> only(List<String> paths, {int? max}) {
+    if (allowed == null) return paths;
+    final kept = [
+      for (final p in paths)
+        if (allowed.contains(p) && p != AppRoutes.more) p,
+    ];
+    for (final p in [
+      AppRoutes.herd,
+      AppRoutes.milk,
+      AppRoutes.collect,
+      AppRoutes.health,
+      AppRoutes.farmers,
+      AppRoutes.feeding,
+      AppRoutes.breeding,
+      AppRoutes.me,
+    ]) {
+      if (max != null && kept.length >= max) break;
+      if (allowed.contains(p) && !kept.contains(p)) kept.add(p);
+    }
+    return [...kept, AppRoutes.more];
+  }
+
   final bottom = centre
       ? [AppRoutes.home, AppRoutes.collect, AppRoutes.farmers, AppRoutes.pay, AppRoutes.more]
       : [AppRoutes.home, AppRoutes.herd, AppRoutes.milk, AppRoutes.health, AppRoutes.more];
@@ -150,15 +219,18 @@ AdaptiveNavigation shellNavigation(
           AppRoutes.reports,
           AppRoutes.settings,
         ];
+  final bottomShown = only(bottom, max: 4);
+  final railShown = only(rail, max: 6);
+  final sidebarShown = only(sidebar);
   final visible = switch (form) {
-    FormFactor.compact => bottom,
-    FormFactor.medium => rail,
-    FormFactor.expanded => sidebar,
+    FormFactor.compact => bottomShown,
+    FormFactor.medium => railShown,
+    FormFactor.expanded => sidebarShown,
   };
   return AdaptiveNavigation(
-    items: [for (final p in bottom) item(p)],
-    railItems: [for (final p in rail) item(p)],
-    sidebarItems: [for (final p in sidebar) item(p)],
+    items: [for (final p in bottomShown) item(p)],
+    railItems: [for (final p in railShown) item(p)],
+    sidebarItems: [for (final p in sidebarShown) item(p)],
     selectedId: visible.contains(current) ? current : AppRoutes.more,
     onSelect: onSelect,
   );
@@ -178,6 +250,7 @@ NavItem _item(AppLocalizations l10n, String path) => switch (path) {
   AppRoutes.workers => NavItem(id: path, icon: Symbols.badge_rounded, label: l10n.workers),
   AppRoutes.money => NavItem(id: path, icon: Symbols.account_balance_wallet_rounded, label: l10n.money),
   AppRoutes.reports => NavItem(id: path, icon: Symbols.bar_chart_rounded, label: l10n.reports),
+  AppRoutes.me => NavItem(id: path, icon: Symbols.badge_rounded, label: l10n.myPageShort),
   _ => NavItem(id: path, icon: Symbols.settings_rounded, label: l10n.settings),
 };
 

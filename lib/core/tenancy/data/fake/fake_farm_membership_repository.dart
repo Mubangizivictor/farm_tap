@@ -5,9 +5,13 @@ import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 
 /// Sample places from the mockups (A07).
 class FakeFarmMembershipRepository implements FarmMembershipRepository {
-  new(this._tenants);
+  new(this._tenants, {this.staffPlace});
 
   final InMemoryTenantProvider _tenants;
+
+  /// A worker signed in with phone + PIN sees only their farm (decision
+  /// 0016); null or returning null shows the owner's places.
+  final FarmMembership? Function()? staffPlace;
 
   /// Both trials: started Mon 2 Nov 2026, end Mon 16 Nov (9 days left and
   /// 5 of 14 used on the demo date, Sat 7 Nov).
@@ -38,7 +42,10 @@ class FakeFarmMembershipRepository implements FarmMembershipRepository {
   int limit = defaultFarmLimit;
 
   @override
-  Future<Result<List<FarmMembership>>> myPlaces() async => Result.success(places);
+  Future<Result<List<FarmMembership>>> myPlaces() async {
+    final staff = staffPlace?.call();
+    return Result.success(staff == null ? places : [staff]);
+  }
 
   @override
   Future<Result<void>> open(String tenantId) async {

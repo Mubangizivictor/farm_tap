@@ -46,6 +46,21 @@ List<(String, StaffRole)> staffJobs(AppLocalizations l10n) => [
   (l10n.roleFamily, StaffRole.worker),
 ];
 
+/// Departments offered in the list (a farm can type its own).
+List<String> staffDepartments(AppLocalizations l10n) => [
+  l10n.deptMilking,
+  l10n.deptHerd,
+  l10n.deptField,
+  l10n.deptFeeding,
+  l10n.deptAnimalHealth,
+  l10n.deptOffice,
+  l10n.deptCollection,
+  l10n.deptTransport,
+  l10n.deptSecurity,
+  l10n.deptKitchen,
+  l10n.deptManagement,
+];
+
 class StaffFormFields extends StatelessWidget {
   const new({
     required this.name,
@@ -62,7 +77,21 @@ class StaffFormFields extends StatelessWidget {
     this.nameError,
     this.pinError,
     this.showCardNote = true,
+    this.department,
+    this.onDepartment,
+    this.nationalId,
+    this.village,
+    this.emergencyName,
+    this.emergencyPhone,
   });
+
+  /// Optional ID-card details (decision 0016); null hides the field.
+  final String? department;
+  final ValueChanged<String>? onDepartment;
+  final TextEditingController? nationalId;
+  final TextEditingController? village;
+  final TextEditingController? emergencyName;
+  final TextEditingController? emergencyPhone;
 
   final TextEditingController name;
 
@@ -162,6 +191,23 @@ class StaffFormFields extends StatelessWidget {
             onChanged: (_) => onChanged(),
           ),
         ],
+        if (onDepartment != null) ...[
+          context.space.gapLg,
+          FarmTapSelectField<String>(
+            label: l10n.departmentOptional,
+            icon: Symbols.apartment_rounded,
+            options: staffDepartments(l10n),
+            labelOf: (d) => d,
+            value: (department ?? '').isEmpty ? null : department,
+            picker: (context) => showSearchPicker(
+              context,
+              title: l10n.departmentLabel,
+              options: staffDepartments(l10n),
+              selected: department ?? '',
+            ),
+            onChanged: onDepartment!,
+          ),
+        ],
         if (wage != null) ...[
           context.space.gapLg,
           FarmTapTextField(
@@ -171,6 +217,34 @@ class StaffFormFields extends StatelessWidget {
             controller: wage,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            onChanged: (_) => onChanged(),
+          ),
+        ],
+        for (final (c, label, icon, type) in [
+          (village, l10n.villageOptional, Symbols.home_pin_rounded, TextInputType.text),
+          (nationalId, l10n.ninOptional, Symbols.id_card_rounded, TextInputType.text),
+          (emergencyName, l10n.emergencyNameOptional, Symbols.contact_emergency_rounded, TextInputType.name),
+        ])
+          if (c != null) ...[
+            context.space.gapLg,
+            FarmTapTextField(
+              label: label,
+              icon: icon,
+              controller: c,
+              keyboardType: type,
+              textInputAction: TextInputAction.next,
+              onChanged: (_) => onChanged(),
+            ),
+          ],
+        if (emergencyPhone != null) ...[
+          context.space.gapLg,
+          FarmTapTextField(
+            label: l10n.emergencyPhoneOptional,
+            icon: Symbols.call_rounded,
+            prefixText: l10n.phonePrefix,
+            controller: emergencyPhone,
+            keyboardType: TextInputType.phone,
+            inputFormatters: [UgPhoneFormatter()],
             onChanged: (_) => onChanged(),
           ),
         ],

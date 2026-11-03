@@ -1,7 +1,12 @@
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
+import 'package:farm_tap/core/auth/domain/staff_login_repository.dart';
 import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
+import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
+import 'package:farm_tap/core/people/data/memory_photo_store.dart';
+import 'package:farm_tap/core/people/domain/card_registry.dart';
+import 'package:farm_tap/core/people/domain/photo_store.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
@@ -40,6 +45,9 @@ class AppDependencies {
     required this.farmMoney,
     required this.dailyReport,
     this.prepareFarm,
+    this._cards,
+    this._photos,
+    this.staffLogin,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -61,7 +69,23 @@ class AppDependencies {
     farmMoney: getIt<FarmMoneyRepository>(),
     dailyReport: getIt<DailyReportRepository>(),
     prepareFarm: prepareFarmRecords,
+    cards: getIt<CardRegistry>(),
+    photos: getIt<PersonPhotoStore>(),
+    staffLogin: getIt<StaffLoginRepository>(),
   );
+
+  final CardRegistry? _cards;
+  final PersonPhotoStore? _photos;
+
+  /// Every card on the farm (decision 0016); tests may leave it out and get
+  /// the staff repository's own register.
+  CardRegistry get cards => _cards ?? (staffDirectory as FakeStaffAccessRepository).cards;
+
+  PersonPhotoStore get photos => _photos ?? _memoryPhotos;
+  static final _memoryPhotos = MemoryPhotoStore();
+
+  /// Staff phone + PIN sign-in; null where it is not offered (tests).
+  final StaffLoginRepository? staffLogin;
 
   /// Loads (or first downloads) a farm's records before it opens.
   final Future<void> Function(String tenantId)? prepareFarm;

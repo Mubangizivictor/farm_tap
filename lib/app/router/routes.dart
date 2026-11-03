@@ -9,6 +9,9 @@ abstract final class AppRoutes {
   static const checkEmail = '/verify';
   static const farmPicker = '/farms';
 
+  /// A08 — staff sign-in with phone + PIN (decision 0016).
+  static const staffSignIn = '/sign-in/staff';
+
   /// A07 opening the remembered (or only) farm by itself: after the splash
   /// and after signing in (decision 0018).
   static const farmPickerAuto = '/farms?auto=1';
@@ -71,6 +74,15 @@ abstract final class AppRoutes {
   static String worker(String staffId) => '/workers/$staffId';
   static String workerEdit(String staffId) => '/workers/$staffId/edit';
   static String workerCard(String staffId) => '/workers/$staffId/card';
+
+  // Cards (decision 0016)
+  static const workersScan = '/workers/scan';
+  static const workersCards = '/workers/cards';
+  static String workerIdCard(String staffId) => '/workers/$staffId/id-card';
+  static String farmerIdCard(String farmerId) => '/farmers/$farmerId/id-card';
+
+  /// K08 — a worker's own page.
+  static const me = '/me';
   static const money = '/money';
   static const moneyExpense = '/money/expense';
   static const reports = '/reports';

@@ -3071,5 +3071,399 @@
     }
   },
   "pricePerLitreHint": "What the centre pays farmers for each litre. Amounts owed update straight away.",
-  "phoneCopied": "Phone number copied"
+  "phoneCopied": "Phone number copied",
+  "absentWord": "Absent",
+  "presentWord": "Present",
+  "broughtToday": "Brought {litres} today",
+  "@broughtToday": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "notDeliveredToday": "No milk today",
+  "cardNotUsable": "Card cannot be used",
+  "chooseFromGallery": "Choose from gallery",
+  "photoSheetTitle": "Photo for the ID card",
+  "photoSheetBody": "Face the camera, in good light.",
+  "photoSaved": "Photo saved",
+  "photoSavedLocal": "Photo saved. The full photo uploads when cloud storage is on.",
+  "photoNotSaved": "Photo not saved. Try again.",
+  "clockInOutShort": "Clock in/out",
+  "lookUpShort": "Look up",
+  "departmentLabel": "Department",
+  "emergencyLabel": "Emergency",
+  "phoneLabel": "Phone",
+  "ninLabel": "NIN",
+  "memberSinceLabel": "Since",
+  "issuedLabel": "Issued",
+  "idNumberLabel": "ID",
+  "downloadCardPdf": "Download PDF",
+  "printCard": "Print card",
+  "printOnA4": "Print on A4 paper",
+  "giveCardToSomeone": "Give this card",
+  "holdQrToCamera": "Hold the card's QR code to the camera",
+  "idCardBack": "Back",
+  "idCardFront": "Front",
+  "idCardFrontLabel": "ID card of {name}, front",
+  "@idCardFrontLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "idCardBackLabel": "ID card of {name}, back",
+  "@idCardBackLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "idCardIfFound": "If found, please return to the farm",
+  "idCardNoCardTitle": "No card yet",
+  "idCardNoCardBody": "Give a card first. Its number and QR code go on the print.",
+  "idCardPrintHelp": "Card printer: print the 2 pages on a blank PVC card. Normal printer: print on A4, cut along the marks and laminate.",
+  "idCardScanMe": "Scan me",
+  "idCardStaff": "Staff",
+  "idCardSupplier": "Milk supplier",
+  "idCardTitle": "ID card",
+  "idCardValidNote": "Valid until revoked. Tap or scan at the farm.",
+  "lastPaidLine": "Last paid {amount} on {date}",
+  "@lastPaidLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "payrollLine": "Wage {wage} · advances {advances} · paid {paid}",
+  "@payrollLine": {
+    "placeholders": {
+      "wage": {
+        "type": "String"
+      },
+      "advances": {
+        "type": "String"
+      },
+      "paid": {
+        "type": "String"
+      }
+    }
+  },
+  "lostCardTitle": "Card {number} was reported lost",
+  "@lostCardTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "lostCardBody": "It belonged to {name} ({date}). Keep the card and tell the manager.",
+  "@lostCardBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "returnedCardTitle": "Card {number} was returned",
+  "@returnedCardTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "returnedCardBody": "It belonged to {name}. Give it to someone new from their page.",
+  "@returnedCardBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "unknownCardBody": "No one has this card yet.",
+  "otherFarmCardTitle": "Card from another farm",
+  "otherFarmCardBody": "This card belongs to another farm and does not work here.",
+  "moneyOwedLabel": "Money owed",
+  "thisPeriodLabel": "This period",
+  "payDayLine": "Pay day {date} · {price} a litre",
+  "@payDayLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "rejectedWord": "rejected",
+  "nextCard": "Next card",
+  "openDetails": "Details",
+  "scanModeAttendance": "Each card clocks in or out",
+  "scanModeLookUp": "Each card shows who it is",
+  "scanQrInstead": "Scan QR with camera",
+  "useNfcInstead": "Tap cards instead",
+  "scanStationTitle": "Scan cards",
+  "scanStationBody": "Tap one card after another. Each person shows for a few seconds.",
+  "scannedTodayTitle": "Scanned ({n})",
+  "@scannedTodayTitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "statusClockedIn": "Clocked in {time}",
+  "@statusClockedIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statusClockedOut": "Clocked out {time}",
+  "@statusClockedOut": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statusLeftAt": "Left at {time}",
+  "@statusLeftAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statusPresentSince": "Present since {time}",
+  "@statusPresentSince": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statusNotInToday": "Not in today",
+  "advanceWord": "Advance",
+  "advancesLabel": "Advances",
+  "alreadyHasCard": "This person already has a card. Replace it instead.",
+  "cardActive": "Working",
+  "cardHistoryTitle": "Card history",
+  "cardLost": "Lost",
+  "cardNotGivenTitle": "Card not given",
+  "cardRegisterTitle": "All cards",
+  "cardReturned": "Given back",
+  "changeMyPin": "Change my PIN",
+  "changeNumber": "Change number",
+  "chooseOwnPinBody": "Pick 4 numbers only you know. Not 1234, not 0000.",
+  "chooseOwnPinTitle": "Choose your own PIN",
+  "confirmPinBody": "Type the same 4 numbers again.",
+  "confirmPinTitle": "Type it again",
+  "departmentOptional": "Department (optional)",
+  "deptAnimalHealth": "Animal health",
+  "deptCollection": "Milk collection",
+  "deptFeeding": "Feeding",
+  "deptField": "Field and pasture",
+  "deptHerd": "Herd",
+  "deptKitchen": "Kitchen",
+  "deptManagement": "Management",
+  "deptMilking": "Milking",
+  "deptOffice": "Office",
+  "deptSecurity": "Security",
+  "deptTransport": "Transport",
+  "detailsTitle": "Details",
+  "emergencyNameOptional": "Next of kin (optional)",
+  "emergencyPhoneOptional": "Next of kin phone (optional)",
+  "idCardRowBody": "See, print or download the ID card",
+  "myAttendanceTitle": "My days",
+  "myPageShort": "Me",
+  "myPageTitle": "My page",
+  "myTasksTitle": "My tasks",
+  "nfcChipWord": "NFC chip",
+  "ninOptional": "National ID number (optional)",
+  "noCardsToPrint": "No one has a card yet. Give cards first.",
+  "noCardsYetBody": "Cards you give to workers and milk suppliers show here.",
+  "noCardsYetTitle": "No cards yet",
+  "noTasksForYou": "No tasks for you today",
+  "openMyCard": "Open my card",
+  "paidInFull": "Paid in full",
+  "paidLabel": "Paid",
+  "paymentsTitle": "Payments",
+  "phoneNumberLabel": "Phone number",
+  "phoneSignInBadge": "Phone sign-in",
+  "pinChangedToast": "Your new PIN is saved",
+  "pinTooEasy": "Too easy to guess. Pick other numbers.",
+  "pinWhatFor": "Your card says who you are. Your PIN proves it is you, so nobody can clock in or record milk with your card. On your own phone it is your password.",
+  "pinsDoNotMatch": "The two PINs are not the same. Try again.",
+  "printAllCards": "Print all cards",
+  "printedCardNoChip": "Printed card, no chip (QR and number only)",
+  "revokeCardRow": "Take back or report lost",
+  "revokeCardRowBody": "The card stops working at once",
+  "revokeLost": "Lost or stolen: never use again",
+  "revokeReturned": "Given back: can go to someone new",
+  "setUpPhoneSignIn": "Set up phone sign-in",
+  "setUpPhoneSignInBody": "They sign in on their own phone with phone number and PIN",
+  "staffLoginNotMade": "Phone sign-in was not set up. Check the internet and try again.",
+  "staffLoginOtherFarm": "This phone number already signs in to another farm.",
+  "staffPhoneInvalid": "Type a Ugandan phone number, like 0701 220 318.",
+  "staffSignInBody": "Type the phone number your farm saved for you.",
+  "staffSignInEntry": "I work on a farm: sign in with phone and PIN",
+  "staffSignInHelpBody": "Ask your farm manager. They add your phone number and give you a PIN to start. The first time, you choose your own PIN.",
+  "staffSignInHelpTitle": "No PIN yet?",
+  "staffSignInOffline": "No internet. Sign-in needs internet the first time.",
+  "staffSignInTitle": "Sign in as a worker",
+  "staffSignInTooMany": "Too many tries. Wait a few minutes and try again.",
+  "staffSignInWrong": "Phone number or PIN is wrong.",
+  "temporaryPinTitle": "Starting PIN",
+  "todayLabel": "Today",
+  "villageOptional": "Village (optional)",
+  "wageLabel": "Wage",
+  "wageWord": "Wage",
+  "cardLostCannotReuse": "Card {card} was reported lost. It can never be given again.",
+  "@cardLostCannotReuse": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "cardRevokedToast": "Card {card} no longer works",
+  "@cardRevokedToast": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "cardsCount": "{count, plural, =1{1 working card} other{{count} working cards}}",
+  "@cardsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "endedOn": "Ended {date}",
+  "@endedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "issuedOn": "Given {date}",
+  "@issuedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "myPayTitle": "My pay for {month}",
+  "@myPayTitle": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "opensSections": "Opens: {sections}",
+  "@opensSections": {
+    "placeholders": {
+      "sections": {
+        "type": "String"
+      }
+    }
+  },
+  "replaceCardBody": "{name}'s card {card} will be marked lost and stop working. Then tap the new card.",
+  "@replaceCardBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "replaceCardTitle": "Replace card {card}?",
+  "@replaceCardTitle": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "resetPinBodyTemp": "Give {name} a starting PIN. They must choose their own the next time they sign in.",
+  "@resetPinBodyTemp": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "resetPinDoneTemp": "{name} must choose a new PIN at next sign-in",
+  "@resetPinDoneTemp": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "revokeCardBody": "What happened to {name}'s card?",
+  "@revokeCardBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "revokeCardTitle": "Card {card}",
+  "@revokeCardTitle": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "staffLoginMade": "{name} can now sign in on their phone with {phone} and the starting PIN",
+  "@staffLoginMade": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "staffSignInPinBody": "Enter the PIN for {phone}",
+  "@staffSignInPinBody": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "temporaryPinBody": "Tell {name} this PIN. They choose their own the first time.",
+  "@temporaryPinBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

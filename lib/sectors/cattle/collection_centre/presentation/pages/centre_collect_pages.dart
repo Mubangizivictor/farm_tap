@@ -39,6 +39,7 @@ class FarmerAvatar extends StatelessWidget {
     final i = int.tryParse(farmer.card ?? '') ?? farmer.name.length;
     return PersonAvatar(
       name: farmer.name,
+      photo: farmer.photo,
       size: size ?? context.sizes.avatarMd,
       ring: ring,
       tone: plain ? FarmTapTone.primary : tones[i % tones.length],

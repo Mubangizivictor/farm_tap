@@ -29,6 +29,21 @@ service cloud.firestore {
       return member(t) && role(t) in ['owner', 'manager'];
     }
 
+    // The staff record a worker signed in with phone + PIN is (decision 0016 §5).
+    function myStaffId(t) {
+      return get(/databases/$(database)/documents/tenants/$(t)/members/$(request.auth.uid)).data.get('staffId', null);
+    }
+
+    // A worker's PIN: the managers set a starting one, the worker their own.
+    function pinOk(t, c, id) {
+      return c != 'staffPins' || manages(t) || myStaffId(t) == id;
+    }
+
+    // Roles a manager may give a staff login: only the owner makes managers.
+    function staffRoles(t) {
+      return role(t) == 'owner' ? ['manager', 'clerk', 'worker'] : ['clerk', 'worker'];
+    }
+
     function tenantDoc(t) {
       return get(/databases/$(database)/documents/tenants/$(t)).data;
     }
@@ -105,6 +120,21 @@ service cloud.firestore {
         && ownedFarms(request.resource.data) <= ownedFarms(resource.data) + 1;
     }
 
+    // Phone sign-in for workers (decision 0016 §5): which login version a
+    // phone number has, read before sign-in. Holds no PIN and no name.
+    match /staffLogins/{phone} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if manages(request.resource.data.tenantId)
+        && request.resource.data.keys().hasOnly(['tenantId', 'staffId', 'uid', 'v'])
+        && request.resource.data.v is int;
+      allow update: if manages(resource.data.tenantId)
+        && request.resource.data.tenantId == resource.data.tenantId
+        && request.resource.data.keys().hasOnly(['tenantId', 'staffId', 'uid', 'v'])
+        && request.resource.data.v > resource.data.v;
+      allow delete: if manages(resource.data.tenantId);
+    }
+
     match /waitlist/{id} {
       allow create: if true;
     }
@@ -140,6 +170,15 @@ service cloud.firestore {
           && getAfter(/databases/$(database)/documents/tenants/$(t)).data.ownerUid == request.auth.uid
           && request.resource.data.role in ['owner', 'manager'];
         allow update, delete: if member(t) && role(t) == 'owner' && uid != request.auth.uid;
+        // A worker's phone sign-in, made by the owner or a manager. It is
+        // tied to a staff record and never makes an owner.
+        allow create, update: if manages(t) && uid != request.auth.uid
+          && request.resource.data.staffId is string
+          && request.resource.data.role in staffRoles(t)
+          && (resource == null || resource.data.get('staffId', null) is string);
+        allow delete: if manages(t) && uid != request.auth.uid
+          && resource.data.get('staffId', null) is string
+          && resource.data.role in staffRoles(t);
       }
 
       match /{c}/{id} {
@@ -148,9 +187,11 @@ service cloud.firestore {
           && (!managerOnly(c) || manages(t))
           && paymentOk(c)
           && smsOk(c)
+          && pinOk(t, c, id)
           && validRecord(t, c, id);
         allow update: if member(t) && !serverOnly(c) && canWrite(t)
           && (!managerOnly(c) || manages(t))
+          && pinOk(t, c, id)
           && validRecord(t, c, id)
           && request.resource.data.createdBy == resource.data.createdBy
           // Append-only: only the same version again (a retried send), or
