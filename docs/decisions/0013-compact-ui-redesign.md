@@ -37,9 +37,9 @@ offline-first, Runyankore + English, and all features and routes as they are.
 - **Touch targets stay ≥ 48 dp** (Material pads smaller visuals). Dense look, not small hit areas.
 
 ### 3. Screen pattern (shared shell in `lib/core/ui/`)
-1. **Brand bar (phone tab roots):** logo mark, farm name over "place · role", sync, alerts bell with dot, profile avatar (`_BrandBar` in `adaptive_scaffold.dart`).
+1. **Brand bar (phone and tablet tab roots):** logo mark, farm name over "place · role", sync, alerts bell with dot, profile avatar (`_BrandBar` in `adaptive_scaffold.dart`).
 2. **Page header:** title 18 + subtitle 12, the page's actions on the right (`PageHeader`). Sub-pages keep the back-arrow app bar.
-3. **Content:** 2-column metric tiles (more on wide screens), compact list rows with the status badge on the title line (`RecordTile`), compact row action tiles (`ActionTile`), sentence-case section labels.
+3. **Content:** metric cards in one row (`MetricStrip`: up to 3 fit a phone, more swipe sideways; they fill the width on tablet/desktop), small quick-action tiles 4 across (`QuickActionTile`), grids that never leave an empty column (`ResponsiveGrid` balances rows and stretches a short last row), compact list rows with the status badge on the title line (`RecordTile`), compact row action tiles (`ActionTile`), sentence-case section labels.
 4. **Bottom bar (phone, 5 items)**, rail (tablet), sidebar (desktop) as decision 0012.
 5. **Primary action:** FAB bottom-right (48 high, icon + label).
 6. **Details and forms:** bottom sheet (phone) / dialog (wider) via `showAdaptiveSheet`, 16 padding.
