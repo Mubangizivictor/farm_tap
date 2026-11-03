@@ -72,6 +72,7 @@ class _TapCardPageState extends State<TapCardPage> {
         bottom: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (ScanCardButton.needed) ...[ScanCardButton(label: l10n.scanCard), context.space.gapMd],
             FarmTapButton(
               label: l10n.enterCardInstead,
               icon: Symbols.dialpad_rounded,

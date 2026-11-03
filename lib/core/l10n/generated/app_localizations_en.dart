@@ -3416,4 +3416,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orLabel => 'or';
+
+  @override
+  String get scanCard => 'Scan card';
+
+  @override
+  String workerCardTitle(String name) {
+    return '$name\'s worker card';
+  }
+
+  @override
+  String get workerCardOnCollect =>
+      'This card is for clocking in and out. Farmers bringing milk need their own farmer card.';
+
+  @override
+  String get openAttendance => 'Clock in or out';
+
+  @override
+  String newCardTitle(String number) {
+    return 'New card $number';
+  }
+
+  @override
+  String get newCardOnCollect => 'No farmer has this card yet. Add the farmer now and the card is theirs.';
+
+  @override
+  String get addFarmerWithCard => 'Add farmer with this card';
+
+  @override
+  String get newCardOnAttendance => 'No worker has this card yet. Give it to a worker, then tap again to clock in.';
+
+  @override
+  String get giveCardToWorker => 'Give it to a worker';
+
+  @override
+  String farmerCardOnAttendance(String name) {
+    return 'This is $name\'s farmer card. Worker cards clock in here.';
+  }
+
+  @override
+  String get typeCardNumberLink => 'Type the card number';
 }

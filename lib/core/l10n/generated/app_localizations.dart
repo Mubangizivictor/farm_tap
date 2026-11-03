@@ -6060,6 +6060,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'or'**
   String get orLabel;
+
+  /// No description provided for @scanCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan card'**
+  String get scanCard;
+
+  /// No description provided for @workerCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s worker card'**
+  String workerCardTitle(String name);
+
+  /// No description provided for @workerCardOnCollect.
+  ///
+  /// In en, this message translates to:
+  /// **'This card is for clocking in and out. Farmers bringing milk need their own farmer card.'**
+  String get workerCardOnCollect;
+
+  /// No description provided for @openAttendance.
+  ///
+  /// In en, this message translates to:
+  /// **'Clock in or out'**
+  String get openAttendance;
+
+  /// No description provided for @newCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New card {number}'**
+  String newCardTitle(String number);
+
+  /// No description provided for @newCardOnCollect.
+  ///
+  /// In en, this message translates to:
+  /// **'No farmer has this card yet. Add the farmer now and the card is theirs.'**
+  String get newCardOnCollect;
+
+  /// No description provided for @addFarmerWithCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add farmer with this card'**
+  String get addFarmerWithCard;
+
+  /// No description provided for @newCardOnAttendance.
+  ///
+  /// In en, this message translates to:
+  /// **'No worker has this card yet. Give it to a worker, then tap again to clock in.'**
+  String get newCardOnAttendance;
+
+  /// No description provided for @giveCardToWorker.
+  ///
+  /// In en, this message translates to:
+  /// **'Give it to a worker'**
+  String get giveCardToWorker;
+
+  /// No description provided for @farmerCardOnAttendance.
+  ///
+  /// In en, this message translates to:
+  /// **'This is {name}\'s farmer card. Worker cards clock in here.'**
+  String farmerCardOnAttendance(String name);
+
+  /// No description provided for @typeCardNumberLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the card number'**
+  String get typeCardNumberLink;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

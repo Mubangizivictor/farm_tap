@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:farm_tap/core/error/failure.dart';
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
+import 'package:farm_tap/core/nfc/card_reader.dart';
 import 'package:farm_tap/core/nfc/card_tap_listener.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
@@ -486,6 +487,7 @@ class _AssignCardPageState extends State<AssignCardPage> {
                     style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                   ),
                   context.space.gapLg,
+                  if (ScanCardButton.needed) ...[ScanCardButton(label: l10n.scanCard), context.space.gapMd],
                   Center(
                     child: TextAction(
                       label: l10n.typeCardNumber,
@@ -510,12 +512,26 @@ class _AssignCardPageState extends State<AssignCardPage> {
 // ---------------------------------------------------------------- K04
 
 class AttendancePage extends StatefulWidget {
-  const new({required this.repo, required this.directory, super.key, this.now, this.showSimulate = false});
+  const new({
+    required this.repo,
+    required this.directory,
+    super.key,
+    this.now,
+    this.showSimulate = false,
+    this.farmerByCard,
+    this.onGiveCard,
+  });
 
   final WorkersRepository repo;
 
   /// Checks the manager PIN for typed card numbers (DAIRY-WRK-01).
   final StaffDirectory directory;
+
+  /// The farmer whose card this is, if any (a farmer card tapped here).
+  final Future<String?> Function(String card)? farmerByCard;
+
+  /// A new card: go and give it to a worker (Workers list).
+  final VoidCallback? onGiveCard;
   final DateTime? now;
   final bool showSimulate;
 
@@ -534,7 +550,21 @@ class _AttendancePageState extends State<AttendancePage> {
     final t = (await widget.repo.clockByCard(card)).data;
     if (!mounted) return;
     if (t == null) {
-      FarmTapToast.show(context, message: l10n.noOneHasCard(card));
+      // A dialog, not a toast: it is still there after the phone's scan
+      // sheet closes.
+      final farmer = await widget.farmerByCard?.call(card);
+      if (!mounted) return;
+      final give = widget.onGiveCard;
+      final ok = await showFarmTapDialog(
+        context,
+        icon: Symbols.contactless_rounded,
+        tone: FarmTapTone.gold,
+        title: farmer == null ? l10n.newCardTitle(card) : l10n.noOneHasCard(card),
+        message: farmer == null ? l10n.newCardOnAttendance : l10n.farmerCardOnAttendance(farmer),
+        primaryLabel: farmer == null && give != null ? l10n.giveCardToWorker : l10n.close,
+        secondaryLabel: farmer == null && give != null ? l10n.cancel : null,
+      );
+      if (ok && farmer == null) give?.call();
       return;
     }
     unawaited(HapticFeedback.mediumImpact());
@@ -591,12 +621,24 @@ class _AttendancePageState extends State<AttendancePage> {
                 animationLeading: true,
               ),
               context.space.gapLg,
+              // iPhone: open the scan sheet; phones without NFC: type the
+              // number (with a manager PIN).
               FarmTapButton(
                 label: l10n.clockInOut,
                 icon: Symbols.contactless_rounded,
                 large: true,
-                onPressed: _tapCard,
+                onPressed: () async {
+                  if (ScanCardButton.needed && await CardReader.instance.available()) {
+                    CardTapListener.scanAgain();
+                  } else {
+                    await _tapCard();
+                  }
+                },
               ),
+              if (ScanCardButton.needed)
+                Center(
+                  child: TextAction(label: l10n.typeCardNumberLink, icon: Symbols.dialpad_rounded, onPressed: _tapCard),
+                ),
               if (widget.showSimulate)
                 Center(
                   child: TextAction(label: l10n.simulateTap, small: true, onPressed: () => _clock('0168')),

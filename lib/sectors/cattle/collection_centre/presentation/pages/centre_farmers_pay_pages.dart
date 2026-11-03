@@ -156,13 +156,18 @@ class _CentreFarmersPageState extends State<CentreFarmersPage> {
 }
 
 /// Add a supplier from the G06 FAB: name, Mobile Money phone, village, card.
-Future<CentreFarmer?> showAddFarmerSheet(BuildContext context, CentreRepository repo) =>
-    showAdaptiveSheet<CentreFarmer>(context, builder: (_) => _AddFarmerSheet(repo: repo));
+/// Adds a farmer; [card] fills in a card that was just tapped.
+Future<CentreFarmer?> showAddFarmerSheet(BuildContext context, CentreRepository repo, {String? card}) =>
+    showAdaptiveSheet<CentreFarmer>(
+      context,
+      builder: (_) => _AddFarmerSheet(repo: repo, card: card),
+    );
 
 class _AddFarmerSheet extends StatefulWidget {
-  const new({required this.repo});
+  const new({required this.repo, this.card});
 
   final CentreRepository repo;
+  final String? card;
 
   @override
   State<_AddFarmerSheet> createState() => _AddFarmerSheetState();
@@ -172,7 +177,7 @@ class _AddFarmerSheetState extends State<_AddFarmerSheet> {
   final _name = TextEditingController();
   final _phone = TextEditingController();
   final _village = TextEditingController();
-  final _card = TextEditingController();
+  late final _card = TextEditingController(text: widget.card ?? '');
 
   @override
   void dispose() {

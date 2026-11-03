@@ -140,6 +140,9 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     repo: deps.centre,
     savedDeliveryId: state.uri.queryParameters['saved'],
     onFarmer: (farmer) => context.push(AppRoutes.collectFarmer(farmer.id)),
+    workerByCard: (card) async => (await staffAccess.findByCard(card)).data?.name,
+    onAddFarmer: (card) => showAddFarmerSheet(context, deps.centre, card: card),
+    onWorkerCard: () => unawaited(context.push(AppRoutes.workersAttendance)),
   );
   sectionRoots[AppRoutes.farmers] = (context, state) => CentreFarmersPage(
     repo: deps.centre,
@@ -381,7 +384,12 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         'attendance',
         parent: AppRoutes.workers,
-        builder: (context, state) => AttendancePage(repo: deps.workers, directory: deps.staffDirectory),
+        builder: (context, state) => AttendancePage(
+          repo: deps.workers,
+          directory: deps.staffDirectory,
+          farmerByCard: (card) async => (await deps.centre.farmerByCard(card)).data?.name,
+          onGiveCard: () => popOrGo(context, AppRoutes.workers),
+        ),
       ),
       page(
         'tasks',

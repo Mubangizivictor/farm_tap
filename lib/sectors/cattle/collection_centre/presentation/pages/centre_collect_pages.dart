@@ -342,9 +342,21 @@ class ReceiveMilkPage extends StatefulWidget {
     this.showSimulate = false,
     this.now,
     this.showToast = true,
+    this.workerByCard,
+    this.onAddFarmer,
+    this.onWorkerCard,
   });
 
   final CentreRepository repo;
+
+  /// The worker whose card this is, if any (a worker card tapped here).
+  final Future<String?> Function(String card)? workerByCard;
+
+  /// A new card: add a farmer with it; returns the farmer once saved.
+  final Future<CentreFarmer?> Function(String card)? onAddFarmer;
+
+  /// A worker card was tapped and they want to clock in or out.
+  final VoidCallback? onWorkerCard;
 
   /// A card was read (or the farmer was found by number / name).
   final ValueChanged<CentreFarmer> onFarmer;
@@ -414,16 +426,46 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
   Future<void> _byCard(String card) async {
     final farmer = (await widget.repo.farmerByCard(card)).data;
     if (!mounted) return;
-    if (farmer == null) {
-      FarmTapToast.show(
-        context,
-        message: AppLocalizations.of(context).farmerCardNotFound,
-        icon: Symbols.error_rounded,
-        tone: FarmTapTone.danger,
-      );
+    if (farmer != null) {
+      widget.onFarmer(farmer);
       return;
     }
-    widget.onFarmer(farmer);
+    await _unknownCard(card);
+  }
+
+  /// A card no farmer has: say whose it is, or offer to give it to a new
+  /// farmer. A dialog (not a toast) so it is still there after the phone's
+  /// scan sheet closes.
+  Future<void> _unknownCard(String card) async {
+    final l10n = AppLocalizations.of(context);
+    final worker = await widget.workerByCard?.call(card);
+    if (!mounted) return;
+    if (worker != null) {
+      final go = await showFarmTapDialog(
+        context,
+        icon: Symbols.badge_rounded,
+        tone: FarmTapTone.info,
+        title: l10n.workerCardTitle(worker),
+        message: l10n.workerCardOnCollect,
+        primaryLabel: l10n.openAttendance,
+        secondaryLabel: l10n.cancel,
+      );
+      if (go) widget.onWorkerCard?.call();
+      return;
+    }
+    final add = widget.onAddFarmer;
+    final ok = await showFarmTapDialog(
+      context,
+      icon: Symbols.contactless_rounded,
+      tone: FarmTapTone.gold,
+      title: l10n.newCardTitle(card),
+      message: add == null ? l10n.farmerCardNotFound : l10n.newCardOnCollect,
+      primaryLabel: add == null ? l10n.close : l10n.addFarmerWithCard,
+      secondaryLabel: add == null ? null : l10n.cancel,
+    );
+    if (!ok || add == null || !mounted) return;
+    final farmer = await add(card);
+    if (farmer != null && mounted) widget.onFarmer(farmer);
   }
 
   Future<void> _enterNumber() async {
@@ -497,8 +539,13 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
                       ],
                     ],
                   ),
-                )
-              else ...[
+                ),
+              if (saved != null && ScanCardButton.needed) ...[
+                context.space.gapLg,
+                ScanCardButton(label: l10n.scanCard),
+              ],
+              if (saved == null) ...[
+                if (ScanCardButton.needed) ...[ScanCardButton(label: l10n.scanCard), context.space.gapMd],
                 FarmTapButton(
                   label: l10n.enterCardNumber,
                   icon: Symbols.dialpad_rounded,

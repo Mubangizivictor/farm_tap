@@ -71,6 +71,10 @@ class NfcCardReader implements CardReader {
           if (_ios) {
             _running = false;
             unawaited(number == null ? _closeIos(error: unsupportedCardIos) : _closeIos(message: cardReadIos));
+            // Let Apple's sheet slide away first so the person sees what
+            // the card did (a page opening, a message).
+            if (number != null) unawaited(Future<void>.delayed(_iosSheetClose, () => onCard(number)));
+            return;
           }
           if (number != null) onCard(number);
         },
@@ -80,6 +84,10 @@ class NfcCardReader implements CardReader {
       _running = false;
     }
   }
+
+  /// How long Apple's scan sheet takes to show its tick and close.
+  // Apple's timing, not a design token. theme-guard: ignore
+  static const _iosSheetClose = Duration(milliseconds: 900); // theme-guard: ignore
 
   /// Shown on the iOS sheet after a card is read.
   static const cardReadIos = 'Card read';

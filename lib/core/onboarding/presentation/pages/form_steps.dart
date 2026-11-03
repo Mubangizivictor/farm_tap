@@ -355,6 +355,7 @@ class _OnboardFirstStaffPageState extends State<OnboardFirstStaffPage> {
       child: CardTapListener(
         onCard: (card) => setState(() => _card = card),
         prompt: l10n.tapNewCardNow,
+        autoOpenOnIos: false,
         child: OnboardingStep(
           step: 6,
           title: l10n.firstStaffTitle,
@@ -403,6 +404,7 @@ class _OnboardFirstStaffPageState extends State<OnboardFirstStaffPage> {
                       Text(l10n.cardForWorkerHelp, style: context.text.bodySmall),
                       Text(l10n.noCardYet, style: context.text.bodySmall),
                     ],
+                    if (ScanCardButton.needed) ...[context.space.gapSm, ScanCardButton(label: l10n.scanCard)],
                     Align(
                       alignment: AlignmentDirectional.centerStart,
                       child: TextAction(

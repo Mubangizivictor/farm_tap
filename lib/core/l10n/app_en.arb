@@ -2713,5 +2713,37 @@
   "signInPointOffline": "Works with no network",
   "signInPointCards": "Tap cards for staff and farmers",
   "signInPointAll": "Milk, health and money in one place",
-  "orLabel": "or"
+  "orLabel": "or",
+  "scanCard": "Scan card",
+  "workerCardTitle": "{name}'s worker card",
+  "@workerCardTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "workerCardOnCollect": "This card is for clocking in and out. Farmers bringing milk need their own farmer card.",
+  "openAttendance": "Clock in or out",
+  "newCardTitle": "New card {number}",
+  "@newCardTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "newCardOnCollect": "No farmer has this card yet. Add the farmer now and the card is theirs.",
+  "addFarmerWithCard": "Add farmer with this card",
+  "newCardOnAttendance": "No worker has this card yet. Give it to a worker, then tap again to clock in.",
+  "giveCardToWorker": "Give it to a worker",
+  "farmerCardOnAttendance": "This is {name}'s farmer card. Worker cards clock in here.",
+  "@farmerCardOnAttendance": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "typeCardNumberLink": "Type the card number"
 }
