@@ -43,9 +43,10 @@ import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_reposito
 import 'package:farm_tap/sectors/cattle/feeding/data/fake/fake_feed_repository.dart';
 import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
+import 'package:farm_tap/sectors/cattle/health/data/local/local_treatment_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/fake/fake_herd_repository.dart';
-import 'package:farm_tap/sectors/cattle/herd/data/herd_repository_impl.dart';
+import 'package:farm_tap/sectors/cattle/herd/data/local/local_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/usecases/add_animal.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/usecases/watch_animals.dart';
@@ -53,6 +54,7 @@ import 'package:farm_tap/sectors/cattle/herd/presentation/bloc/herd_bloc.dart';
 import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
+import 'package:farm_tap/sectors/cattle/milk/data/local/local_milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/money/data/fake/fake_farm_money_repository.dart';
 import 'package:farm_tap/sectors/cattle/money/domain/farm_money_repository.dart';
@@ -86,69 +88,11 @@ Future<void> configureDependencies(Flavor flavor) async {
       ..registerLazySingleton<AuthRepository>(FakeAuthRepository.new)
       ..registerLazySingleton<FarmMembershipRepository>(() => FakeFarmMembershipRepository(tenants))
       ..registerLazySingleton<OnboardingRepository>(() => FakeOnboardingRepository(getIt<Clock>()))
-      ..registerLazySingleton<FakeStaffAccessRepository>(
-        () => FakeStaffAccessRepository(
-          today: getIt<Clock>().today,
-          now: getIt<Clock>().now,
-          journal: getIt<RecordJournal>(),
-        ),
-      )
-      ..registerLazySingleton<StaffAccessRepository>(getIt.call<FakeStaffAccessRepository>)
-      ..registerLazySingleton<StaffDirectory>(getIt.call<FakeStaffAccessRepository>)
       ..registerLazySingleton<TreatmentRepository>(
         () => FakeTreatmentRepository(getIt<Clock>(), journal: getIt<RecordJournal>()),
       )
-      ..registerLazySingleton<HomeRepository>(
-        () => FakeHomeRepository(
-          getIt<Clock>(),
-          getIt<TreatmentRepository>(),
-          breeding: getIt<BreedingRepository>(),
-          feed: getIt<FeedRepository>(),
-          workers: getIt<WorkersRepository>(),
-        ),
-      )
       ..registerLazySingleton<MilkRepository>(
         () => FakeMilkRepository(getIt<Clock>(), getIt<TreatmentRepository>(), journal: getIt<RecordJournal>()),
-      )
-      ..registerLazySingleton<CentreRepository>(
-        () => FakeCentreRepository(getIt<Clock>(), journal: getIt<RecordJournal>()),
-      )
-      ..registerLazySingleton<MoneyRepository>(
-        () => FakeMoneyRepository(getIt<Clock>(), journal: getIt<RecordJournal>()),
-      )
-      ..registerLazySingleton<WorkersRepository>(
-        () => FakeWorkersRepository(
-          getIt<Clock>(),
-          getIt<StaffDirectory>(),
-          getIt<MoneyRepository>(),
-          getIt<MilkRepository>(),
-          journal: getIt<RecordJournal>(),
-        ),
-      )
-      ..registerLazySingleton<FarmMoneyRepository>(
-        () => FakeFarmMoneyRepository(getIt<Clock>(), getIt<MoneyRepository>(), getIt<MilkRepository>()),
-      )
-      ..registerLazySingleton<DailyReportRepository>(
-        () => FakeDailyReportRepository(
-          clock: getIt<Clock>(),
-          farmName: () => getIt<SessionController>().farm?.name ?? '',
-          home: getIt<HomeRepository>(),
-          milk: getIt<MilkRepository>(),
-          treatments: getIt<TreatmentRepository>(),
-          feed: getIt<FeedRepository>(),
-          money: getIt<FarmMoneyRepository>(),
-        ),
-      )
-      ..registerLazySingleton<BreedingRepository>(
-        () => FakeBreedingRepository(getIt<Clock>(), getIt<MoneyRepository>(), journal: getIt<RecordJournal>()),
-      )
-      ..registerLazySingleton<FeedRepository>(
-        () => FakeFeedRepository(
-          getIt<Clock>(),
-          getIt<MilkRepository>(),
-          getIt<MoneyRepository>(),
-          journal: getIt<RecordJournal>(),
-        ),
       )
       ..registerLazySingleton<HerdRepository>(
         () => FakeHerdRepository(
@@ -180,15 +124,96 @@ Future<void> configureDependencies(Flavor flavor) async {
       ..registerLazySingleton<OnboardingRepository>(
         () => FirestoreOnboardingRepository(db: db, clock: getIt<Clock>(), ids: getIt<IdGenerator>(), uid: uid),
       )
-      ..registerLazySingleton<HerdRepository>(
-        () => HerdRepositoryImpl(
-          isar: isarService.isar,
-          idGenerator: getIt<IdGenerator>(),
+      // Real data: calculated from the farm's records, no samples.
+      ..registerLazySingleton<TreatmentRepository>(
+        () => LocalTreatmentRepository(
+          journal: getIt<RecordJournal>(),
           clock: getIt<Clock>(),
-          tenantProvider: tenants,
+          herd: getIt.call<HerdRepository>,
+          me: () {
+            final session = getIt<SessionController>();
+            return session.staff?.name ?? session.auth.currentUser?.name ?? '';
+          },
+        ),
+      )
+      ..registerLazySingleton<MilkRepository>(
+        () => LocalMilkRepository(
+          journal: getIt<RecordJournal>(),
+          clock: getIt<Clock>(),
+          treatments: getIt<TreatmentRepository>(),
+          herd: getIt.call<HerdRepository>,
+        ),
+      )
+      ..registerLazySingleton<HerdRepository>(
+        () => LocalHerdRepository(
+          journal: getIt<RecordJournal>(),
+          clock: getIt<Clock>(),
+          treatments: getIt<TreatmentRepository>(),
+          breeding: getIt<BreedingRepository>(),
+          milk: getIt.call<MilkRepository>,
         ),
       );
   }
+
+  // Not yet on real data (part 2 of real-data mode): these still start from
+  // the sample data in both builds, but every save is journaled and synced.
+  getIt
+    ..registerLazySingleton<FakeStaffAccessRepository>(
+      () => FakeStaffAccessRepository(
+        today: getIt<Clock>().today,
+        now: getIt<Clock>().now,
+        journal: getIt<RecordJournal>(),
+      ),
+    )
+    ..registerLazySingleton<StaffAccessRepository>(getIt.call<FakeStaffAccessRepository>)
+    ..registerLazySingleton<StaffDirectory>(getIt.call<FakeStaffAccessRepository>)
+    ..registerLazySingleton<HomeRepository>(
+      () => FakeHomeRepository(
+        getIt<Clock>(),
+        getIt<TreatmentRepository>(),
+        breeding: getIt<BreedingRepository>(),
+        feed: getIt<FeedRepository>(),
+        workers: getIt<WorkersRepository>(),
+      ),
+    )
+    ..registerLazySingleton<CentreRepository>(
+      () => FakeCentreRepository(getIt<Clock>(), journal: getIt<RecordJournal>()),
+    )
+    ..registerLazySingleton<MoneyRepository>(() => FakeMoneyRepository(getIt<Clock>(), journal: getIt<RecordJournal>()))
+    ..registerLazySingleton<WorkersRepository>(
+      () => FakeWorkersRepository(
+        getIt<Clock>(),
+        getIt<StaffDirectory>(),
+        getIt<MoneyRepository>(),
+        getIt<MilkRepository>(),
+        journal: getIt<RecordJournal>(),
+      ),
+    )
+    ..registerLazySingleton<FarmMoneyRepository>(
+      () => FakeFarmMoneyRepository(getIt<Clock>(), getIt<MoneyRepository>(), getIt<MilkRepository>()),
+    )
+    ..registerLazySingleton<DailyReportRepository>(
+      () => FakeDailyReportRepository(
+        clock: getIt<Clock>(),
+        farmName: () => getIt<SessionController>().farm?.name ?? '',
+        home: getIt<HomeRepository>(),
+        milk: getIt<MilkRepository>(),
+        treatments: getIt<TreatmentRepository>(),
+        feed: getIt<FeedRepository>(),
+        money: getIt<FarmMoneyRepository>(),
+      ),
+    )
+    ..registerLazySingleton<BreedingRepository>(
+      () => FakeBreedingRepository(getIt<Clock>(), getIt<MoneyRepository>(), journal: getIt<RecordJournal>()),
+    )
+    ..registerLazySingleton<FeedRepository>(
+      () => FakeFeedRepository(
+        getIt<Clock>(),
+        getIt<MilkRepository>(),
+        getIt<MoneyRepository>(),
+        journal: getIt<RecordJournal>(),
+      ),
+    );
 
   await _configureOffline(tenants);
 
