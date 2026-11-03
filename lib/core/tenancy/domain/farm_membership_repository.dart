@@ -13,6 +13,6 @@ abstract interface class FarmMembershipRepository {
   Future<String?> lastOpened();
 
   /// How many farms this account may own: [defaultFarmLimit], more only on
-  /// a multi-farm plan (decision 0015).
+  /// a multi-farm plan (decision 0018).
   Future<int> farmLimit();
 }

@@ -10,7 +10,7 @@ abstract final class AppRoutes {
   static const farmPicker = '/farms';
 
   /// A07 opening the remembered (or only) farm by itself: after the splash
-  /// and after signing in (decision 0015).
+  /// and after signing in (decision 0018).
   static const farmPickerAuto = '/farms?auto=1';
 
   // B — onboarding

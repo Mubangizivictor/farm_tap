@@ -41,7 +41,7 @@ class FirestoreOnboardingRepository implements OnboardingRepository {
     try {
       final tenant = db.collection('tenants').doc(id);
       // One batch: the rules count the farms an account owns (one unless on
-      // a multi-farm plan, decision 0015) by checking that `ownedFarms` goes
+      // a multi-farm plan, decision 0018) by checking that `ownedFarms` goes
       // up by one with each new farm.
       final batch = db.batch()
         ..set(tenant, {

@@ -155,7 +155,7 @@ describe('roles and money', () => {
 });
 
 // The app creates a farm in one batch: farm, owner membership, and the
-// account's ownedFarms going up by one (decision 0015).
+// account's ownedFarms going up by one (decision 0018).
 function createFarm(db, uid, id, farm = {}) {
   const b = writeBatch(db);
   b.set(doc(db, `tenants/${id}`), {
@@ -194,7 +194,7 @@ describe('onboarding', () => {
   });
 });
 
-describe('one farm per account (decision 0015)', () => {
+describe('one farm per account (decision 0018)', () => {
   test('a second farm is refused', async () => {
     const db = as('newbie');
     await assertSucceeds(createFarm(db, 'newbie', 'first'));

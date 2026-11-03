@@ -87,7 +87,7 @@ class HelpPage extends StatelessWidget {
             ],
           ),
           context.space.gapLg,
-          // Kept out of the way on purpose (decision 0015): one account runs
+          // Kept out of the way on purpose (decision 0018): one account runs
           // one farm; more farms is a plan Victorbee sells.
           ListCard(
             children: [

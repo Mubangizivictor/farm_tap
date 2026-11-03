@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// A07 — the farm this account works on (decision 0015).
+/// A07 — the farm this account works on (decision 0018).
 ///
 /// One account runs one farm, so for most people this is a short "Welcome
 /// back, Victor · Opening Rwemera Dairy Farm" on the way in: with
@@ -165,7 +165,7 @@ class _FarmPickerPageState extends State<FarmPickerPage> {
       ),
       context.space.gapLg,
       for (final p in places) ...[FarmPlaceCard(place: p, onOpen: () => _open(p)), context.space.gapMd],
-      // Multi-farm plan only (decision 0015): never offered on the free path.
+      // Multi-farm plan only (decision 0018): never offered on the free path.
       if (owned < limit && widget.onAddFarm != null) ...[
         FarmTapButton(
           label: l10n.addAnotherFarm,

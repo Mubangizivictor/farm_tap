@@ -88,7 +88,7 @@ service cloud.firestore {
         && d.serverUpdatedAt == request.time;
     }
 
-    // One account owns one farm (decision 0015). `farmLimit` is set by
+    // One account owns one farm (decision 0018). `farmLimit` is set by
     // Victorbee for a multi-farm plan and never from the app; `ownedFarms`
     // only goes up, by one, with each farm the account creates.
     function ownedFarms(d) { return d.get('ownedFarms', 0); }

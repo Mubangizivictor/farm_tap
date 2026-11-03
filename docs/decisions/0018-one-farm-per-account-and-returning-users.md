@@ -1,4 +1,4 @@
-# 0015 — One farm per account, returning users and FarmTap-named Google sign-in
+# 0018 — One farm per account, returning users and FarmTap-named Google sign-in
 
 - Status: accepted (2026-11-03), asked for by the owner in the project chat
 - Date: 2026-11-03

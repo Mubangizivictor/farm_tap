@@ -24,7 +24,7 @@ Source of truth for navigation (go_router). Overlays (sheets, dialogs, toasts, c
 | A04 | /sign-in/email/sign-up | /sign-in/email | push | pop |
 | A05 | /sign-in/email/forgot | /sign-in/email | push | pop |
 | A06 | /verify?email= | — | go (after sign-up) | root; Continue → go /setup/language |
-| A07 | /farms | `auto=1` opens the last-used or only farm (0015) | go (after splash / sign-in when signed in) | root; pick → go /home |
+| A07 | /farms | `auto=1` opens the last-used or only farm (0018) | go (after splash / sign-in when signed in) | root; pick → go /home |
 | B01 | /setup/language | — | go (signed in, no farm) | root of onboarding |
 | B02 | /setup/sector | /setup/language | push | pop (previous step) |
 | B03 | sheet on B02 | /setup/sector | overlay | back closes sheet |
