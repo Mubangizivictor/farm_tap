@@ -34,7 +34,7 @@ class FarmTapBanner extends StatelessWidget {
     final action = actionLabel == null
         ? null
         : Padding(
-            padding: EdgeInsets.only(top: context.space.sm),
+            padding: EdgeInsets.zero,
             child: Text(
               actionLabel!,
               style: context.text.labelLarge?.copyWith(color: on, fontWeight: FarmTapWeights.semiBold),
@@ -46,7 +46,6 @@ class FarmTapBanner extends StatelessWidget {
       button: onAction != null,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final actionRight = constraints.maxWidth > context.sizes.centeredMaxWidth;
           return Material(
             color: colors.container,
             borderRadius: context.radii.banner,
@@ -56,7 +55,6 @@ class FarmTapBanner extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.all(context.space.banner),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(icon, fill: 1, color: on, size: context.sizes.iconBanner),
                     context.space.gapMd,
@@ -67,11 +65,13 @@ class FarmTapBanner extends StatelessWidget {
                         children: [
                           Text(title, style: context.text.titleSmall?.copyWith(color: on)),
                           if (message != null) Text(message!, style: context.text.bodySmall?.copyWith(color: on)),
-                          if (action != null && !actionRight) action,
                         ],
                       ),
                     ),
-                    if (action != null && actionRight) ...[context.space.gapMd, action],
+                    if (action != null) ...[
+                      // decision 0013: action on the right keeps the banner short
+                      context.space.gapMd, action,
+                    ],
                   ],
                 ),
               ),

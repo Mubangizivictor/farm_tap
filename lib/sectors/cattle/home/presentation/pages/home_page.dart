@@ -120,9 +120,7 @@ class _HomePageState extends State<HomePage> {
             if (summary == null)
               const _SkeletonGrid()
             else
-              ResponsiveGrid(
-                minItemWidth: context.sizes.gridMetric,
-                spacing: context.space.lg,
+              MetricStrip(
                 children: [
                   MetricCard(
                     icon: Symbols.water_drop_rounded,
@@ -163,26 +161,26 @@ class _HomePageState extends State<HomePage> {
             SectionLabel(l10n.quickActions),
             context.space.gapSm,
             ResponsiveGrid(
-              minItemWidth: context.sizes.gridAction,
-              spacing: context.space.lg,
+              minItemWidth: context.sizes.gridQuickAction,
+              spacing: context.space.md,
               children: [
-                ActionTile(
+                QuickActionTile(
                   icon: Symbols.water_drop_rounded,
                   label: l10n.recordMilk,
                   onTap: () => widget.onOpen(HomeTarget.recordMilk),
                 ),
-                ActionTile(
+                QuickActionTile(
                   icon: Symbols.contactless_rounded,
                   label: l10n.tapCard,
                   onTap: () => widget.onOpen(HomeTarget.tapCard),
                 ),
-                ActionTile(
+                QuickActionTile(
                   icon: Symbols.medication_rounded,
                   label: l10n.treatment,
                   tone: FarmTapTone.danger,
                   onTap: () => widget.onOpen(HomeTarget.treatment),
                 ),
-                ActionTile(
+                QuickActionTile(
                   icon: Symbols.grass_rounded,
                   label: l10n.feeding,
                   tone: FarmTapTone.gold,
@@ -193,7 +191,7 @@ class _HomePageState extends State<HomePage> {
             context.space.gapLg,
             ResponsiveGrid(
               minItemWidth: context.sizes.gridPaired,
-              spacing: context.space.lg,
+              spacing: context.space.md,
               maxColumns: 2,
               children: [
                 ListCard(

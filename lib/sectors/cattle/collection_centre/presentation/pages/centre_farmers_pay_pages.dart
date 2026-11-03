@@ -310,10 +310,7 @@ class _CentreFarmerPageState extends State<CentreFarmerPage> {
                       ),
                     ),
                     context.space.gapLg,
-                    ResponsiveGrid(
-                      minItemWidth: context.sizes.gridMetric,
-                      maxColumns: 3,
-                      spacing: context.space.lg,
+                    MetricStrip(
                       children: [
                         MetricCard(
                           icon: Symbols.water_drop_rounded,

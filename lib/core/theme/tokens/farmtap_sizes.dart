@@ -90,6 +90,16 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
   double get gridAction => 140 * scale;
   double get gridPaired => 380 * scale;
 
+  /// Width of one metric card in a phone's horizontal metric strip (decision 0013).
+  double get metricStripItem => 148 * scale;
+
+  /// Narrowest a metric card may get before the strip scrolls instead of fitting.
+  double get metricStripMin => 108 * scale;
+
+  /// Min height of a small quick-action tile (bubble over label), 4 across on phones.
+  double get quickAction => 76 * scale;
+  double get gridQuickAction => 72 * scale;
+
   // ---- Animations ----
   double get animationSm => 96 * scale;
   double get animationSheet => 112 * scale;

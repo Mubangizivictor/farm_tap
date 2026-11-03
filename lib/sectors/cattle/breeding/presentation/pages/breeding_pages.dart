@@ -211,10 +211,7 @@ class _BreedingPageState extends State<BreedingPage> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ResponsiveGrid(
-                minItemWidth: context.sizes.gridMetric,
-                maxColumns: 3,
-                spacing: context.space.lg,
+              MetricStrip(
                 children: [
                   MetricCard(
                     icon: Symbols.favorite_rounded,

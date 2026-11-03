@@ -934,10 +934,7 @@ class _ReconcilePageState extends State<ReconcilePage> {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      ResponsiveGrid(
-                        minItemWidth: context.sizes.gridMetric,
-                        maxColumns: 3,
-                        spacing: context.space.lg,
+                      MetricStrip(
                         children: [
                           MetricCard(
                             icon: Symbols.download_rounded,

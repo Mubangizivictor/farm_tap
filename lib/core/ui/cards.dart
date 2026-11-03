@@ -3,6 +3,7 @@ import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/animation_view.dart';
 import 'package:farm_tap/core/ui/buttons.dart';
 import 'package:farm_tap/core/ui/icon_bubble.dart';
+import 'package:farm_tap/core/ui/responsive_grid.dart';
 import 'package:farm_tap/core/ui/status_badge.dart';
 import 'package:farm_tap/core/ui/tone.dart';
 import 'package:flutter/material.dart';
@@ -701,6 +702,102 @@ class SummaryRow extends StatelessWidget {
             context.space.gapMd,
             Text(value, textAlign: TextAlign.end, style: valueStyle),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Metric cards in one horizontal, swipeable row on phones; a grid on wider
+/// screens (decision 0013: the whole dashboard fits the first screen).
+class MetricStrip extends StatelessWidget {
+  const new({required this.children, super.key});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final gap = context.space.md;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= FarmTapBreakpoints.medium) {
+          return ResponsiveGrid(minItemWidth: context.sizes.gridMetric, spacing: gap, children: children);
+        }
+        final n = children.length;
+        if (n * context.sizes.metricStripMin + (n - 1) * gap <= constraints.maxWidth) {
+          // Everything fits: one row of equal cards.
+          return IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < n; i++) ...[if (i > 0) SizedBox(width: gap), Expanded(child: children[i])],
+              ],
+            ),
+          );
+        }
+        // Cards scroll out under the side padding (no clip), like CONC.
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.none,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < children.length; i++) ...[
+                  if (i > 0) SizedBox(width: gap),
+                  SizedBox(width: context.sizes.metricStripItem, child: children[i]),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Small quick action: bubble over a one-line label, 4 across on phones
+/// (decision 0013, like the CONC "More" tiles).
+class QuickActionTile extends StatelessWidget {
+  const new({required this.icon, required this.label, super.key, this.tone = FarmTapTone.primary, this.onTap});
+
+  final IconData icon;
+  final String label;
+  final FarmTapTone tone;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      enabled: onTap != null,
+      child: Material(
+        color: context.status.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: context.radii.tile,
+          side: BorderSide(color: context.colors.outlineVariant, width: context.sizes.borderThin),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            constraints: BoxConstraints(minHeight: context.sizes.quickAction),
+            padding: EdgeInsets.symmetric(horizontal: context.space.xs, vertical: context.space.md),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconBubble(icon: icon, tone: tone, size: context.sizes.bubbleMd),
+                context.space.gapSm,
+                Text(
+                  label,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.text.labelMedium,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

@@ -372,10 +372,7 @@ class _StaffDetailPageState extends State<StaffDetailPage> {
                 ),
               ),
               context.space.gapLg,
-              ResponsiveGrid(
-                minItemWidth: context.sizes.gridMetric,
-                maxColumns: 3,
-                spacing: context.space.lg,
+              MetricStrip(
                 children: [
                   MetricCard(icon: Symbols.schedule_rounded, label: l10n.daysThisMonth, value: f.count(days)),
                   MetricCard(
@@ -930,10 +927,7 @@ class _WagesPageState extends State<WagesPage> {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ResponsiveGrid(
-                      minItemWidth: context.sizes.gridMetric,
-                      maxColumns: 3,
-                      spacing: context.space.lg,
+                    MetricStrip(
                       children: [
                         MetricCard(
                           icon: Symbols.payments_rounded,

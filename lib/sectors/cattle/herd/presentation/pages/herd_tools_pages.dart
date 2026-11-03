@@ -443,9 +443,7 @@ class HeadCountPage extends StatelessWidget {
                   children: [
                     HeroCard(label: l10n.totalAnimals, value: '${c.total}', animation: FarmTapAnimations.cowGrazing),
                     context.space.gapLg,
-                    ResponsiveGrid(
-                      minItemWidth: context.sizes.gridMetric,
-                      spacing: context.space.lg,
+                    MetricStrip(
                       children: [
                         MetricCard(icon: Symbols.water_drop_rounded, label: l10n.milkingCows, value: '${c.milking}'),
                         MetricCard(

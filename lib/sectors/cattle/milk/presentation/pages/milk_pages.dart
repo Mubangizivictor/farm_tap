@@ -788,9 +788,7 @@ class MilkSalesPage extends StatelessWidget {
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ResponsiveGrid(
-                minItemWidth: context.sizes.gridMetric,
-                spacing: context.space.lg,
+              MetricStrip(
                 children: [
                   MetricCard(
                     icon: Symbols.local_shipping_rounded,

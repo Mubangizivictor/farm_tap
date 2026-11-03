@@ -132,10 +132,7 @@ class _AnimalDetailPageState extends State<AnimalDetailPage> {
                       ),
                     ],
                     context.space.gapLg,
-                    ResponsiveGrid(
-                      minItemWidth: context.sizes.gridMetric,
-                      spacing: context.space.lg,
-                      maxColumns: 3,
+                    MetricStrip(
                       children: [
                         MetricCard(
                           icon: Symbols.water_drop_rounded,
