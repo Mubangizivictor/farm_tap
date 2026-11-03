@@ -1,13 +1,15 @@
 import 'dart:async';
 
+import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/material.dart';
 
-/// A01 — the native splash, brought to life: the same logo in the same
-/// place, now animated, with the wordmark at the bottom. It stays while
-/// start-up work ([ready]) finishes (at least [FarmTapMotion.splash]),
-/// then calls [onDone].
+/// A01 — the native splash brought to life. The logo starts exactly where
+/// the native one was and keeps animating; it lifts a little while the
+/// FarmTap name and tagline rise in right under it. Stays while start-up
+/// work ([ready]) finishes (at least [FarmTapMotion.splash]), then calls
+/// [onDone].
 class SplashPage extends StatefulWidget {
   const new({super.key, this.onDone, this.ready});
 
@@ -18,7 +20,8 @@ class SplashPage extends StatefulWidget {
   State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> {
+class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
+  late final AnimationController _intro = AnimationController(vsync: this);
   var _started = false;
 
   @override
@@ -26,7 +29,20 @@ class _SplashPageState extends State<SplashPage> {
     super.didChangeDependencies();
     if (_started) return;
     _started = true;
+    final still = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    _intro.duration = context.motion.slow;
+    if (still) {
+      _intro.value = 1;
+    } else {
+      _intro.forward();
+    }
     unawaited(_run(context.motion.splash));
+  }
+
+  @override
+  void dispose() {
+    _intro.dispose();
+    super.dispose();
   }
 
   Future<void> _run(Duration min) async {
@@ -40,22 +56,61 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final mark = context.sizes.splashMark;
+    final word = context.sizes.splashWordmarkHeight;
+    final gap = context.space.lg;
+    final tagline = Text(
+      l10n.splashTagline,
+      textAlign: TextAlign.center,
+      style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+    );
+    final line = context.space.xxl;
+    // Mark, name and tagline end up centred together; at the start the
+    // whole group sits lower so the mark is exactly where the native one was.
+    final group = mark + gap + word + context.space.sm + line;
+    final lift = group / 2 - mark / 2;
+    final curve = CurvedAnimation(parent: _intro, curve: Curves.easeOutCubic);
     return Scaffold(
-      body: Stack(
-        children: [
-          Center(
-            child: FarmTapLoader(size: context.sizes.splashMark, semanticLabel: 'FarmTap'),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            // Pinned to the screen's bottom edge, like the native splash.
-            child: Image.asset(
-              FarmTapAssets.byBrightness(context, FarmTapAssets.splashBrandingLight, FarmTapAssets.splashBrandingDark),
-              width: context.sizes.splashBranding,
-              excludeFromSemantics: true,
-            ),
-          ),
-        ],
+      body: Center(
+        child: AnimatedBuilder(
+          animation: curve,
+          builder: (context, _) {
+            final t = curve.value;
+            return Transform.translate(
+              offset: Offset(0, lift * (1 - t)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FarmTapLoader(size: mark, semanticLabel: l10n.appName),
+                  SizedBox(height: gap),
+                  Opacity(
+                    opacity: t,
+                    child: Transform.translate(
+                      offset: Offset(0, gap * (1 - t)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            FarmTapAssets.byBrightness(
+                              context,
+                              FarmTapAssets.wordmarkLight,
+                              FarmTapAssets.wordmarkDark,
+                            ),
+                            height: word,
+                            excludeFromSemantics: true,
+                          ),
+                          SizedBox(height: context.space.sm),
+                          SizedBox(height: line, child: tagline),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

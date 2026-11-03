@@ -3,12 +3,12 @@
 <plist version="1.0">
 	<dict>
 		<key>NSLocationWhenInUseUsageDescription</key>
-	<string>FarmTap uses your location once to fill in your farm's district.</string>
-	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
-	<array>
-		<string>D2760000850101</string>
-	</array>
-	<key>NFCReaderUsageDescription</key>
+		<string>FarmTap uses your location once to fill in your farm's district.</string>
+		<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+		<array>
+			<string>D2760000850101</string>
+		</array>
+		<key>NFCReaderUsageDescription</key>
 		<string>FarmTap reads staff and farmer cards.</string>
 		<key>NSCameraUsageDescription</key>
 		<string>FarmTap scans ear tags and takes photos of animals and receipts.</string>
