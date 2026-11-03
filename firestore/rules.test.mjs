@@ -274,3 +274,128 @@ describe('worker phone sign-in and PINs (decision 0016)', () => {
     await assertSucceeds(setDoc(doc(as('owner'), `tenants/${T}/staffPins/staff-tm`), rec('staffPins', 'staff-tm')));
   });
 });
+
+describe('platform control panel (decision 0020)', () => {
+  beforeEach(async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, 'platformAdmins/victor'), { role: 'owner', active: true });
+      await setDoc(doc(db, 'platformAdmins/fin'), { role: 'finance', perms: ['finance'], active: true });
+      await setDoc(doc(db, 'platformAdmins/gone'), { role: 'support', perms: ['support', 'farms'], active: false });
+      await setDoc(doc(db, 'platform/config'), { trialDays: 7, maintenance: { on: false } });
+      await setDoc(doc(db, 'platformSecrets/sms_api_key'), { value: 'secret-123' });
+    });
+  });
+
+  // An admin write plus its audit entry, in one batch.
+  function audited(db, ref, data, auditId = `a-${Math.random()}`, merge = true) {
+    const b = writeBatch(db);
+    b.set(doc(db, `adminAudit/${auditId}`), { by: db._uid, at: serverTimestamp(), action: 'test' });
+    b.set(ref, { ...data, lastAudit: auditId }, { merge });
+    return b.commit();
+  }
+  const adminDb = (uid) => {
+    const db = as(uid);
+    db._uid = uid;
+    return db;
+  };
+
+  test('the apps read the public config even signed out; nobody reads secrets', async () => {
+    await assertSucceeds(getDoc(doc(env.unauthenticatedContext().firestore(), 'platform/config')));
+    await assertFails(getDoc(doc(adminDb('victor'), 'platformSecrets/sms_api_key')));
+  });
+
+  test('the owner changes settings with an audit entry, never without', async () => {
+    const db = adminDb('victor');
+    await assertSucceeds(audited(db, doc(db, 'platform/config'), { trialDays: 10 }));
+    await assertFails(setDoc(doc(db, 'platform/config'), { trialDays: 30 }, { merge: true }));
+  });
+
+  test('an old audit entry cannot be reused', async () => {
+    const db = adminDb('victor');
+    await assertSucceeds(audited(db, doc(db, 'platform/config'), { trialDays: 10 }, 'once'));
+    await assertFails(setDoc(doc(db, 'platform/config'), { trialDays: 40, lastAudit: 'once' }, { merge: true }));
+  });
+
+  test('a farm owner or stranger cannot change settings or plans', async () => {
+    const db = adminDb('owner');
+    await assertFails(audited(db, doc(db, 'platform/config'), { trialDays: 99 }));
+    await assertFails(audited(db, doc(db, 'plans/basic'), { name: 'Free', priceUgx: 0 }));
+  });
+
+  test('finance staff record payments and extend paid-until, but not settings', async () => {
+    const db = adminDb('fin');
+    await assertSucceeds(audited(db, doc(db, 'platformPayments/p1'), { tenantId: T, amountUgx: 70000, status: 'received' }, undefined, false));
+    await assertSucceeds(audited(db, doc(db, `tenants/${T}`), { subscription: { trialEndsAt: days(9), paidUntil: days(30) } }));
+    await assertFails(audited(db, doc(db, 'platform/config'), { trialDays: 10 }));
+    await assertFails(audited(db, doc(db, `tenants/${T}`), { status: 'suspended' }));
+  });
+
+  test('turned-off staff can do nothing', async () => {
+    const db = adminDb('gone');
+    await assertFails(getDoc(doc(db, `tenants/${T}`)));
+  });
+
+  test('secrets are write-only for the owner', async () => {
+    const db = adminDb('victor');
+    await assertSucceeds(audited(db, doc(db, 'platformSecrets/mtn_api_key'), { value: 'k-999' }, undefined, false));
+    await assertFails(getDoc(doc(db, 'platformSecrets/mtn_api_key')));
+  });
+
+  test('suspending a farm stops its writes', async () => {
+    const db = adminDb('victor');
+    await assertSucceeds(audited(db, doc(db, `tenants/${T}`), { status: 'suspended' }));
+    await assertFails(setDoc(doc(as('worker'), `tenants/${T}/milkRecords/m9`), rec('milkRecords', 'm9')));
+  });
+
+  test('a farm cannot set panel fields on itself', async () => {
+    await assertFails(updateDoc(doc(as('owner'), `tenants/${T}`), { status: 'active', features: { exports: true } }));
+    await assertFails(updateDoc(doc(as('owner'), `tenants/${T}`), { smsCredits: 1000 }));
+  });
+
+  test('admins open any farm read-only', async () => {
+    const db = adminDb('victor');
+    await assertSucceeds(getDoc(doc(db, `tenants/${T}/milkRecords/x`)));
+    await assertFails(setDoc(doc(db, `tenants/${T}/milkRecords/m1`), rec('milkRecords', 'm1')));
+  });
+
+  test('the audit log cannot be edited or deleted', async () => {
+    const db = adminDb('victor');
+    await assertSucceeds(audited(db, doc(db, 'platform/config'), { trialDays: 8 }, 'keep'));
+    await assertFails(updateDoc(doc(db, 'adminAudit/keep'), { action: 'nothing happened' }));
+    await assertFails(deleteDoc(doc(db, 'adminAudit/keep')));
+  });
+
+  test('the panel never makes an owner; staff need the staff permission', async () => {
+    const v = adminDb('victor');
+    await assertSucceeds(audited(v, doc(v, 'platformAdmins/amy'), { role: 'support', perms: ['support'], active: true }, undefined, false));
+    await assertFails(audited(v, doc(v, 'platformAdmins/bob'), { role: 'owner', perms: [], active: true }, undefined, false));
+    const f = adminDb('fin');
+    await assertFails(audited(f, doc(f, 'platformAdmins/fin2'), { role: 'finance', perms: ['finance', 'staff'], active: true }, undefined, false));
+  });
+
+  test('an invited person joins with exactly the invited permissions', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'adminInvites/sam@example.com'), { role: 'support', perms: ['support'], active: true });
+    });
+    const sam = env.authenticatedContext('sam', { email: 'Sam@example.com', email_verified: true }).firestore();
+    await assertFails(setDoc(doc(sam, 'platformAdmins/sam'), { role: 'support', perms: ['support', 'secrets'], active: true, email: 'sam@example.com' }));
+    await assertSucceeds(setDoc(doc(sam, 'platformAdmins/sam'), { role: 'support', perms: ['support'], active: true, email: 'sam@example.com' }));
+  });
+
+  test('an account cannot undo its own disabling', async () => {
+    const v = adminDb('victor');
+    await assertSucceeds(setDoc(doc(as('owner'), 'users/owner'), { memberships: [], ownedFarms: 1 }));
+    await assertSucceeds(audited(v, doc(v, 'users/owner'), { disabled: true }));
+    await assertFails(setDoc(doc(as('owner'), 'users/owner'), { disabled: false }, { merge: true }));
+  });
+
+  test('support resets a card PIN with a new version', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), `tenants/${T}/staffPins/s1`), rec('staffPins', 's1', { body: { pinHash: 'x', mustChange: false } }));
+      await setDoc(doc(ctx.firestore(), 'platformAdmins/sup'), { role: 'support', perms: ['users', 'support'], active: true });
+    });
+    const db = adminDb('sup');
+    await assertSucceeds(audited(db, doc(db, `tenants/${T}/staffPins/s1`), rec('staffPins', 's1', { version: 2, body: { pinHash: 'y', mustChange: true } }), undefined, false));
+  });
+});

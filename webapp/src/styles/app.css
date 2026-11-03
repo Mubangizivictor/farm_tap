@@ -253,3 +253,34 @@ table.table { width: 100%; border-collapse: collapse; }
   .card, .table-wrap { border-color: var(--p-stone300); break-inside: avoid; }
   body { background: var(--p-white); color: var(--p-ink); }
 }
+
+/* ---- Control panel (decision 0020) ---- */
+.admin-badge { display: inline-flex; align-items: center; gap: var(--s-xs); padding: var(--s-xxs) var(--s-md); border-radius: var(--r-pill); background: var(--c-secondary-container); color: var(--c-on-secondary-container); font-size: var(--fs-label-sm); font-weight: var(--fw-bold); letter-spacing: 0.04em; text-transform: uppercase; }
+.nav-group { font-size: var(--fs-label-sm); font-weight: var(--fw-semibold); color: var(--c-on-surface-variant); text-transform: uppercase; letter-spacing: 0.04em; padding: var(--s-md) var(--s-lg) var(--s-xxs); }
+.sidebar .nav-group { display: none; }
+@media (min-width: 1024px) { .sidebar .nav-group { display: block; } }
+.tabs { display: flex; gap: var(--s-xs); overflow-x: auto; border-bottom: var(--z-border) solid var(--c-outline-variant); }
+.tabs button { border: 0; background: none; padding: var(--s-md) var(--s-lg); cursor: pointer; color: var(--c-on-surface-variant); font-weight: var(--fw-medium); border-bottom: var(--z-focus) solid transparent; white-space: nowrap; }
+.tabs button[aria-selected='true'] { color: var(--c-primary); border-bottom-color: var(--c-primary); font-weight: var(--fw-semibold); }
+.toggle { display: flex; align-items: center; gap: var(--s-lg); padding: var(--s-md) 0; border-bottom: var(--z-border) solid var(--c-outline-variant); cursor: pointer; }
+.toggle:last-child { border-bottom: 0; }
+.toggle input { appearance: none; flex: none; width: var(--z-touch); height: var(--z-icon); border-radius: var(--r-pill); background: var(--c-outline-variant); position: relative; cursor: pointer; transition: background var(--d-fast) var(--ease); margin: 0; }
+.toggle input::after { content: ''; position: absolute; top: var(--s-xxs); left: var(--s-xxs); width: var(--z-icon-sm); height: var(--z-icon-sm); border-radius: var(--r-pill); background: var(--c-card); transition: transform var(--d-fast) var(--ease); }
+.toggle input:checked { background: var(--c-primary); }
+.toggle input:checked::after { transform: translateX(calc(var(--z-touch) - var(--z-icon-sm) - var(--s-xs))); }
+.toggle input:disabled { opacity: 0.5; cursor: not-allowed; }
+.toggle .t-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.tri { display: inline-flex; padding: var(--s-xxs); gap: var(--s-xxs); border-radius: var(--r-btn); background: var(--c-container); }
+.tri button { border: 0; background: transparent; padding: var(--s-xxs) var(--s-md); border-radius: var(--r-sm); cursor: pointer; font-size: var(--fs-label); color: var(--c-on-surface-variant); }
+.tri button[aria-pressed='true'] { background: var(--c-card); color: var(--c-on-surface); font-weight: var(--fw-semibold); box-shadow: 0 var(--z-shadow-y) var(--z-shadow-blur) var(--c-shadow); }
+.tri button.on[aria-pressed='true'] { background: var(--c-success-container); color: var(--c-on-success-container); }
+.tri button.off[aria-pressed='true'] { background: var(--c-danger-container); color: var(--c-on-danger-container); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: var(--s-xs) var(--s-lg); }
+.kv dt { color: var(--c-on-surface-variant); font-size: var(--fs-body-sm); }
+.kv dd { margin: 0; font-weight: var(--fw-medium); overflow-wrap: anywhere; }
+.mono { font-family: var(--font-mono); font-size: var(--fs-body-sm); }
+.clickable { cursor: pointer; }
+.sticky-actions { position: sticky; bottom: 0; background: var(--c-surface); padding: var(--s-md) 0; border-top: var(--z-border) solid var(--c-outline-variant); display: flex; gap: var(--s-md); justify-content: flex-end; z-index: 5; }
+.full-screen { min-height: 100vh; display: grid; place-items: center; padding: var(--s-xl); text-align: center; }
+.full-screen .box { max-width: var(--z-auth); display: flex; flex-direction: column; gap: var(--s-lg); align-items: center; }
+.bars.money .bar { background: var(--c-secondary); }

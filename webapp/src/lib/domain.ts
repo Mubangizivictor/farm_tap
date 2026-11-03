@@ -43,6 +43,12 @@ export interface Farm {
   whatsapp: string;
   sms: string;
   reviewStatus: string;
+  /** Admin-set: 'active' (default) | 'suspended' */
+  farmStatus: string;
+  /** Plan id from admin (empty = default plan). */
+  planId: string;
+  /** Feature overrides: undefined means use plan/config default. */
+  features: Record<string, boolean | undefined>;
 }
 
 export function farmFromDoc(id: string, t: Record<string, unknown>, member: Record<string, unknown>): Farm {
@@ -68,6 +74,9 @@ export function farmFromDoc(id: string, t: Record<string, unknown>, member: Reco
     whatsapp: (contacts.whatsapp as string) ?? '',
     sms: (contacts.sms as string) ?? '',
     reviewStatus: (review.status as string) ?? '',
+    farmStatus: (t.status as string) ?? 'active',
+    planId: (t.planId as string) ?? '',
+    features: (t.features as Record<string, boolean | undefined>) ?? {},
   };
 }
 

@@ -8,13 +8,47 @@ rules_version = '2';
 //   re-sent unchanged, never edited. Corrections are new records.
 // - Nothing is ever hard-deleted from the app (soft delete with isDeleted).
 // - Money, staff and settings need an owner or manager.
-// - Subscription and payment confirmation are server-only (Cloud Functions).
+// - Subscription, review and other panel fields are set only from the
+//   platform control panel (decision 0020), and every such change is logged.
 // Tests: firestore/rules.test.mjs (npm test in firestore/).
 service cloud.firestore {
   match /databases/{database}/documents {
 
     function signedIn() {
       return request.auth != null;
+    }
+
+    // ---- Platform admins (decision 0020) ----
+    function adminPath() {
+      return /databases/$(database)/documents/platformAdmins/$(request.auth.uid);
+    }
+    function isAdmin() {
+      return signedIn() && exists(adminPath()) && get(adminPath()).data.get('active', false) == true;
+    }
+    // The owner has every permission; staff only the ones they were given.
+    function can(p) {
+      return isAdmin() && (get(adminPath()).data.role == 'owner' || p in get(adminPath()).data.get('perms', []));
+    }
+    // Every admin change writes adminAudit/{lastAudit} in the same batch,
+    // by the same person, at the same moment, so nothing goes unlogged.
+    function audited() {
+      let id = request.resource.data.get('lastAudit', '');
+      let path = /databases/$(database)/documents/adminAudit/$(id);
+      return id is string && id != '' && existsAfter(path)
+        && getAfter(path).data.by == request.auth.uid
+        && getAfter(path).data.at == request.time;
+    }
+    // Fields on a farm only the panel may set.
+    function adminFarmKeys() {
+      return ['subscription', 'review', 'status', 'planId', 'features', 'smsCredits',
+        'messaging', 'billing', 'lastAudit', 'suspendedReason'];
+    }
+    function platformConfig() {
+      return /databases/$(database)/documents/platform/config;
+    }
+    // Trial length set in the panel (default 7 days), plus one day of slack.
+    function trialDays() {
+      return exists(platformConfig()) ? get(platformConfig()).data.get('trialDays', 7) : 7;
     }
 
     function member(t) {
@@ -55,8 +89,8 @@ service cloud.firestore {
     function canWrite(t) {
       let sub = tenantDoc(t).get('subscription', {});
       let slack = duration.value(2, 'd');
-      return (sub.get('trialEndsAt', null) != null && request.time < sub.trialEndsAt + slack)
-        || (sub.get('paidUntil', null) != null && request.time < sub.paidUntil + duration.value(9, 'd'));
+      return tenantDoc(t).get('status', 'active') != 'suspended' && ((sub.get('trialEndsAt', null) != null && request.time < sub.trialEndsAt + slack)
+        || (sub.get('paidUntil', null) != null && request.time < sub.paidUntil + duration.value(9, 'd')));
     }
 
     function appendOnly(c) {
@@ -111,11 +145,18 @@ service cloud.firestore {
 
     match /users/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
+      allow read: if can('users') || can('support');
+      // The panel disables an account or raises its farm limit (decision 0020).
+      allow update: if (can('users') || can('farms')) && audited()
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['disabled', 'disabledReason', 'farmLimit', 'lastAudit']);
       allow create: if signedIn() && request.auth.uid == uid
         && !('farmLimit' in request.resource.data)
+        && !('disabled' in request.resource.data)
         && ownedFarms(request.resource.data) <= 1;
       allow update: if signedIn() && request.auth.uid == uid
         && farmLimit(request.resource.data) == farmLimit(resource.data)
+        && request.resource.data.get('disabled', false) == resource.data.get('disabled', false)
         && ownedFarms(request.resource.data) >= ownedFarms(resource.data)
         && ownedFarms(request.resource.data) <= ownedFarms(resource.data) + 1;
     }
@@ -137,6 +178,7 @@ service cloud.firestore {
 
     match /waitlist/{id} {
       allow create: if true;
+      allow read: if can('farms');
     }
 
     // The farm is created in one batch with the owner's `ownedFarms` going up
@@ -151,20 +193,29 @@ service cloud.firestore {
 
     match /tenants/{t} {
       allow read: if member(t);
+      allow read: if can('farms') || can('finance') || can('support') || can('users');
+      // The panel: review, suspend, plan, flags (farms); subscription and
+      // billing (finance). Never the owner or the farm's own profile.
+      allow update: if audited()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(adminFarmKeys())
+        && (can('farms') || (can('finance')
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['subscription', 'planId', 'billing', 'smsCredits', 'lastAudit'])));
       // Onboarding: the signer creates the farm as its owner, on trial.
       allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.subscription.keys().hasOnly(['trialStartedAt', 'trialEndsAt'])
         && request.resource.data.subscription.trialEndsAt is timestamp
-        && request.resource.data.subscription.trialEndsAt <= request.time + duration.value(8, 'd')
+        && request.resource.data.subscription.trialEndsAt <= request.time + duration.value(trialDays() + 1, 'd')
+        && !request.resource.data.keys().hasAny(['status', 'planId', 'features', 'smsCredits', 'messaging', 'billing', 'lastAudit'])
         // Every new farm waits for Victorbee's review (admin panel).
         && request.resource.data.review == {'status': 'pending'}
         && withinFarmLimit();
       // Profile edits only; subscription and review stay server-side.
       allow update: if manages(t)
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'ownerUid', 'review', 'owner']);
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(adminFarmKeys().concat(['ownerUid', 'owner']));
 
       match /members/{uid} {
         allow read: if member(t);
+        allow read: if can('farms') || can('support') || can('users');
         // The owner's own first membership, right after creating the farm.
         allow create: if signedIn() && uid == request.auth.uid
           && getAfter(/databases/$(database)/documents/tenants/$(t)).data.ownerUid == request.auth.uid
@@ -183,6 +234,13 @@ service cloud.firestore {
 
       match /{c}/{id} {
         allow read: if member(t) && c != 'members';
+        // Open a farm read-only from the panel (decision 0020).
+        allow read: if c != 'members' && (can('farms') || can('support') || can('users') || can('finance'));
+        // Support: reset a card PIN to a temporary one, or revoke a card.
+        allow update: if c in ['staffPins', 'nfcCards'] && can('users') && audited()
+          && validRecord(t, c, id)
+          && request.resource.data.createdBy == resource.data.createdBy
+          && request.resource.data.version == resource.data.version + 1;
         allow create: if member(t) && !serverOnly(c) && canWrite(t)
           && (!managerOnly(c) || manages(t))
           && paymentOk(c)
@@ -199,6 +257,96 @@ service cloud.firestore {
           && (!appendOnly(c) || request.resource.data.version == resource.data.version || softDelete());
         allow delete: if false;
       }
+    }
+      // ================= Platform control panel (decision 0020) =================
+
+    // Settings the apps read: versions, maintenance, support, flags, gateways
+    // (no secrets). Readable before sign-in so a phone can show maintenance.
+    match /platform/config {
+      allow get: if true;
+      allow write: if can('settings') && audited();
+    }
+    // Provider settings and masked key info, for admins only.
+    match /platform/integrations {
+      allow read: if isAdmin();
+      allow write: if (can('settings') || can('secrets')) && audited();
+    }
+    // API keys: written by the panel, read only by server code (Admin SDK).
+    match /platformSecrets/{name} {
+      allow read: if false;
+      allow create, update: if can('secrets') && audited()
+        && request.resource.data.keys().hasOnly(['value', 'lastAudit', 'updatedAt'])
+        && request.resource.data.value is string && request.resource.data.value.size() <= 4096;
+      allow delete: if false;
+    }
+    // Plans and SMS packages: the apps show them; prices edited in the panel.
+    match /plans/{id} {
+      allow read: if true;
+      allow write: if can('finance') && audited();
+    }
+    match /smsPackages/{id} {
+      allow read: if true;
+      allow write: if can('finance') && audited();
+    }
+    match /announcements/{id} {
+      allow read: if signedIn();
+      allow write: if can('messages') && audited();
+    }
+    // Payments Victorbee received. Never deleted; a mistake is voided.
+    match /platformPayments/{id} {
+      allow read: if can('finance');
+      allow create: if can('finance') && audited()
+        && request.resource.data.amountUgx is int && request.resource.data.amountUgx > 0
+        && request.resource.data.status == 'received';
+      allow update: if can('finance') && audited()
+        && resource.data.status == 'received' && request.resource.data.status == 'void'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'voidReason', 'voidedBy', 'lastAudit']);
+      allow delete: if false;
+    }
+    match /adminNotes/{id} {
+      allow read: if can('support') || can('farms');
+      allow create: if (can('support') || can('farms')) && audited()
+        && request.resource.data.by == request.auth.uid;
+      allow update, delete: if false;
+    }
+    // Payment claims farms send from the app, across all farms (finance).
+    match /{path=**}/payments/{id} {
+      allow read: if can('finance');
+    }
+    // Append-only log of every panel change.
+    match /adminAudit/{id} {
+      allow read: if can('audit');
+      allow create: if isAdmin() && request.resource.data.by == request.auth.uid
+        && request.resource.data.at == request.time
+        && request.resource.data.action is string
+        && request.resource.data.keys().hasOnly(['by', 'byName', 'at', 'action', 'target', 'tenantId', 'details']);
+      allow update, delete: if false;
+    }
+    // Staff of Victorbee. The first owner is made in the Firebase console;
+    // the panel can never make or change an owner, nor change itself.
+    match /platformAdmins/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || can('staff'));
+      allow create, update: if can('staff') && audited() && uid != request.auth.uid
+        && request.resource.data.role != 'owner'
+        && (resource == null || resource.data.role != 'owner')
+        && request.resource.data.keys().hasOnly(['role', 'perms', 'active', 'name', 'email', 'lastAudit', 'invitedBy']);
+      // Accepting an invite: exactly the invited role and permissions.
+      allow create: if signedIn() && uid == request.auth.uid
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/adminInvites/$(request.auth.token.email.lower()))
+        && inviteMatches(get(/databases/$(database)/documents/adminInvites/$(request.auth.token.email.lower())).data)
+        && request.resource.data.keys().hasOnly(['role', 'perms', 'active', 'name', 'email', 'invitedBy']);
+      allow delete: if false;
+    }
+    function inviteMatches(inv) {
+      let d = request.resource.data;
+      return inv.get('active', false) == true && inv.role != 'owner'
+        && d.role == inv.role && d.perms == inv.perms && d.active == true
+        && d.email == request.auth.token.email.lower();
+    }
+    match /adminInvites/{email} {
+      allow read: if can('staff') || (signedIn() && request.auth.token.email.lower() == email);
+      allow write: if can('staff') && audited() && request.resource.data.role != 'owner';
     }
   }
 }

@@ -29,6 +29,7 @@
 
   /* ---- Type (Outfit, farmtap_typography.dart) ---- */
   --font: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --fs-display: 30px; --fs-headline: 22px; --fs-title-lg: 18px; --fs-title: 16px; --fs-title-sm: 14px;
   --fs-body: 14px; --fs-body-sm: 12px; --fs-label: 13px; --fs-label-sm: 11px; --fs-metric: 26px;
   --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700; --fw-extrabold: 800;
