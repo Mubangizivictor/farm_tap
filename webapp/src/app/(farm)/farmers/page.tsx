@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
 import { Icon } from '@/components/Icon';
 import { Dialog, Empty, ExportButtons, LoadError, PageHead, SaveHint, SearchBox, Stat } from '@/components/ui';
 import { downloadCsv } from '@/lib/csv';
@@ -74,6 +75,81 @@ function AddSupplier({ onClose, taken }: { onClose: () => void; taken: Set<strin
   );
 }
 
+function InviteDialog({ f, farmName, onClose }: { f: FarmRecord<FarmerBody>; farmName: string; onClose: () => void }) {
+  const farm = useFarm();
+  const { user } = useSession();
+  const [link, setLink] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  async function generate() {
+    if (!user) return;
+    setBusy(true);
+    try {
+      const { db } = firebase();
+      const code = crypto.randomUUID().replace(/-/g, '').slice(0, 16);
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      await setDoc(doc(db, 'farmerInvites', code), {
+        tenantId: farm.id,
+        farmerId: f.id,
+        farmerName: f.body.name,
+        farmName,
+        createdAt: new Date().toISOString(),
+        expiresAt,
+        createdBy: user.uid,
+        used: false,
+      });
+      const url = `${window.location.origin}/supplier-invite/?code=${code}`;
+      setLink(url);
+    } catch (e) {
+      setError((e as { message?: string }).message ?? 'Could not generate link.');
+    }
+    setBusy(false);
+  }
+
+  async function copy() {
+    try { await navigator.clipboard.writeText(link); } catch { /* ignore */ }
+  }
+
+  return (
+    <Dialog title={`Invite ${f.body.name}`} onClose={onClose}>
+      <div className="stack">
+        <p className="muted">Send this link to <strong>{f.body.name}</strong> so they can view their delivery records and payments online. The link is valid for 7 days.</p>
+        {!link ? (
+          <>
+            {error && <div className="banner bad">{error}</div>}
+            <div className="actions">
+              <button type="button" className="btn outline" onClick={onClose}>Cancel</button>
+              <button className="btn" onClick={() => void generate()} disabled={busy}>
+                {busy ? 'Generating…' : 'Generate invite link'}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <label className="field">
+              <span>Invite link (valid 7 days)</span>
+              <div className="row" style={{ gap: 'var(--s-xs)' }}>
+                <input className="input grow" readOnly value={link} onFocus={(e) => e.target.select()} />
+                <button className="btn sm outline" onClick={() => void copy()} title="Copy">
+                  <Icon name="copy" />
+                </button>
+              </div>
+            </label>
+            <p className="small muted">Share via WhatsApp, SMS, or any messaging app. Each link can only be used once.</p>
+            <div className="actions">
+              <button type="button" className="btn outline" onClick={onClose}>Close</button>
+              <a className="btn" href={`https://wa.me/${f.body.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi ${f.body.name}, here is your FarmTap link to see your milk deliveries: ${link}`)}`} target="_blank" rel="noreferrer">
+                <Icon name="whatsapp" /> Send on WhatsApp
+              </a>
+            </div>
+          </>
+        )}
+      </div>
+    </Dialog>
+  );
+}
+
 function SupplierDetail({ f, deliveries, onClose }: { f: FarmRecord<FarmerBody>; deliveries: FarmRecord<DeliveryBody>[]; onClose: () => void }) {
   const mine = deliveries.filter((d) => d.body.farmerId === f.id).sort((a, b) => recordDate(b, 'at').getTime() - recordDate(a, 'at').getTime());
   const ok = mine.filter((d) => d.body.test !== 'failed');
@@ -131,6 +207,7 @@ export default function Farmers() {
   const [q, setQ] = useState('');
   const [adding, setAdding] = useState(false);
   const [open, setOpen] = useState<FarmRecord<FarmerBody> | null>(null);
+  const [inviting, setInviting] = useState<FarmRecord<FarmerBody> | null>(null);
 
   const taken = new Set<string>([
     ...farmers.data.map((f) => f.body.card ?? '').filter(Boolean),
@@ -181,20 +258,26 @@ export default function Farmers() {
               <th className="r">Today</th>
               <th className="r">This month</th>
               <th className="r">Rejected</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {shown.map((f) => (
-              <tr key={f.id} onClick={() => setOpen(f)} style={{ cursor: 'pointer' }}>
-                <td>
+              <tr key={f.id}>
+                <td onClick={() => setOpen(f)} style={{ cursor: 'pointer' }}>
                   <strong>{f.body.name}</strong>
                 </td>
-                <td>{f.body.phone}</td>
-                <td>{f.body.village || '–'}</td>
-                <td>{f.body.card || '–'}</td>
-                <td className="r">{todayL(f.id) ? litres(todayL(f.id)) : '–'}</td>
-                <td className="r">{litres(monthL(f.id))}</td>
-                <td className="r">{rejected(f.id) || '–'}</td>
+                <td onClick={() => setOpen(f)} style={{ cursor: 'pointer' }}>{f.body.phone}</td>
+                <td onClick={() => setOpen(f)} style={{ cursor: 'pointer' }}>{f.body.village || '–'}</td>
+                <td onClick={() => setOpen(f)} style={{ cursor: 'pointer' }}>{f.body.card || '–'}</td>
+                <td className="r" onClick={() => setOpen(f)} style={{ cursor: 'pointer' }}>{todayL(f.id) ? litres(todayL(f.id)) : '–'}</td>
+                <td className="r" onClick={() => setOpen(f)} style={{ cursor: 'pointer' }}>{litres(monthL(f.id))}</td>
+                <td className="r" onClick={() => setOpen(f)} style={{ cursor: 'pointer' }}>{rejected(f.id) || '–'}</td>
+                <td>
+                  <button className="btn sm outline" onClick={() => setInviting(f)} title="Invite to portal">
+                    <Icon name="globe" />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -204,6 +287,7 @@ export default function Farmers() {
 
       {adding && <AddSupplier onClose={() => setAdding(false)} taken={taken} />}
       {open && <SupplierDetail f={open} deliveries={deliveries.data} onClose={() => setOpen(null)} />}
+      {inviting && <InviteDialog f={inviting} farmName={farm.name} onClose={() => setInviting(null)} />}
     </>
   );
 }

@@ -8,6 +8,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
   where,
   type Firestore,
 } from 'firebase/firestore';
@@ -110,6 +111,27 @@ export async function addRecord(
     serverUpdatedAt: serverTimestamp(),
   });
   return id;
+}
+
+/** Update an existing record (partial body merge). */
+export async function updateRecord(
+  db: Firestore,
+  tenantId: string,
+  name: string,
+  id: string,
+  uid: string,
+  bodyPatch: Record<string, unknown>,
+  currentVersion: number,
+): Promise<void> {
+  const now = localIso(new Date());
+  const ref = doc(db, 'tenants', tenantId, name, id);
+  await updateDoc(ref, {
+    body: bodyPatch,
+    updatedAt: now,
+    updatedBy: uid,
+    version: currentVersion + 1,
+    serverUpdatedAt: serverTimestamp(),
+  });
 }
 
 /** Friendly text for a Firestore error code. */

@@ -9,20 +9,33 @@ import { addDays, startOfDay } from '@/lib/dates';
 import { saveError } from '@/lib/data';
 import { ugandaDistricts } from '@/lib/districts';
 import { firebase } from '@/lib/firebase';
+import { sectorName } from '@/lib/labels';
+import { defaultConfig, type PlatformConfig } from '@/lib/platform';
 import { useSession } from '@/lib/session';
+import { getDoc } from 'firebase/firestore';
 
-const TRIAL_DAYS = 7; // product decision 3 Nov 2026 (freeTrialDays in the phone app)
+async function loadSetupConfig(): Promise<PlatformConfig> {
+  try {
+    const snap = await getDoc(doc(firebase().db, 'platform', 'config'));
+    if (!snap.exists()) return defaultConfig;
+    const { configFromDoc } = await import('@/lib/platform');
+    return configFromDoc(snap.data() as Record<string, unknown>);
+  } catch {
+    return defaultConfig;
+  }
+}
 
 /**
- * Farm setup on the web, the same farm the phone's onboarding (B01–B10)
- * makes: tenants/{t} on a 7-day trial, waiting for Victorbee's review.
- * Dairy only for now (binding rule 1); one farm per account here.
+ * Farm setup on the web. Respects signup.open and sectors from platform/config.
  */
 export default function Setup() {
   const { user, farms, online, reloadFarms, openFarm } = useSession();
   const router = useRouter();
+  const [cfg, setCfg] = useState<PlatformConfig>(defaultConfig);
+  const [cfgLoaded, setCfgLoaded] = useState(false);
   const [name, setName] = useState('');
   const [type, setType] = useState<'farm' | 'centre' | 'both'>('farm');
+  const [sector, setSector] = useState('dairy');
   const [district, setDistrict] = useState('');
   const [village, setVillage] = useState('');
   const [cows, setCows] = useState('');
@@ -34,12 +47,53 @@ export default function Setup() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    void loadSetupConfig().then((c) => {
+      setCfg(c);
+      // Set the first open sector as the default
+      if (c.signup.sectors.length > 0) setSector(c.signup.sectors[0]);
+      setCfgLoaded(true);
+    });
+  }, []);
+
+  useEffect(() => {
     if (user === null) router.replace('/sign-in/');
-    // One farm per account: a second farm is a paid extra, not offered here.
     else if (farms && farms.length > 0) router.replace('/');
   }, [user, farms, router]);
 
-  if (!user || farms === undefined) return <Loading />;
+  if (!user || farms === undefined || !cfgLoaded) return <Loading />;
+
+  // Signup closed: show waiting list message
+  if (!cfg.signup.open) {
+    return (
+      <div className="auth-main">
+        <div className="auth-box stack" style={{ gap: 'var(--s-md)', textAlign: 'center' }}>
+          <div className="auth-brand">
+            <div className="logo-mark lg" aria-hidden />
+            <h1>Joining the waitlist</h1>
+          </div>
+          <p>{cfg.signup.closedMessage || 'FarmTap is not taking new farms right now. We will reach out when space opens.'}</p>
+          <p className="small muted">We have your contact. If you would like to follow up, reach out to our team.</p>
+          <a
+            className="btn"
+            href="https://wa.me/256793128137?text=Hello+FarmTap,+I+would+like+to+join+the+waiting+list."
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Icon name="whatsapp" /> Message us on WhatsApp
+          </a>
+          <button className="btn ghost sm" onClick={() => router.replace('/sign-in/')}>
+            <Icon name="logout" /> Sign out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const openSectors = cfg.signup.sectors;
+  // If the selected sector is not in the open list, reset it
+  const activeSector = openSectors.includes(sector) ? sector : (openSectors[0] ?? 'dairy');
+
+  const trialDays = cfg.trialDays ?? 7;
 
   async function submit(ev: FormEvent) {
     ev.preventDefault();
@@ -49,15 +103,14 @@ export default function Setup() {
     const { db } = firebase();
     const id = crypto.randomUUID();
     const start = startOfDay(new Date());
-    const end = addDays(start, TRIAL_DAYS);
+    const end = addDays(start, trialDays);
     try {
       const tenant = doc(db, 'tenants', id);
-      // In order: the rules check the farm exists before the membership.
       await setDoc(tenant, {
         ownerUid: user.uid,
         name: name.trim(),
         type,
-        sector: 'dairy',
+        sector: activeSector,
         district: district.trim() || null,
         place: district.trim(),
         village: village.trim() || null,
@@ -85,7 +138,7 @@ export default function Setup() {
         <div className="auth-brand">
           <div className="logo-mark lg" aria-hidden />
           <h1>Set up your farm</h1>
-          <p className="muted">Takes one minute. Your 7-day free trial starts today.</p>
+          <p className="muted">Takes one minute. Your {trialDays}-day free trial starts today.</p>
         </div>
 
         <label className="field">
@@ -98,7 +151,7 @@ export default function Setup() {
           <div className="seg" role="group">
             {(
               [
-                ['farm', 'Dairy farm'],
+                ['farm', 'Farm'],
                 ['centre', 'Collection centre'],
                 ['both', 'Both'],
               ] as const
@@ -108,8 +161,20 @@ export default function Setup() {
               </button>
             ))}
           </div>
-          <span className="small muted">Poultry, pigs and other farms are coming soon.</span>
         </div>
+
+        {openSectors.length > 1 && (
+          <div className="field">
+            <span>What type of farm?</span>
+            <select className="input" value={activeSector} onChange={(e) => setSector(e.target.value)}>
+              {openSectors.map((k) => (
+                <option key={k} value={k}>
+                  {sectorName[k as keyof typeof sectorName] ?? k}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <label className="field">
           <span>District</span>
@@ -126,7 +191,7 @@ export default function Setup() {
         </label>
         {type !== 'centre' && (
           <label className="field">
-            <span>How many cows do you have?</span>
+            <span>How many animals do you have?</span>
             <input className="input" type="number" min={0} inputMode="numeric" value={cows} onChange={(e) => setCows(e.target.value)} required />
           </label>
         )}

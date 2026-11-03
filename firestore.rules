@@ -99,10 +99,10 @@ service cloud.firestore {
         'feedUsage', 'stockMovements', 'animalEvents', 'breedingEvents', 'auditLog', 'smsOutbox'];
     }
 
-    // Only an owner or manager may write these.
+    // Only an owner or manager may create these.
     function managerOnly(c) {
       return c in ['staff', 'nfcCards', 'settings', 'paymentPeriods', 'farmerStatements',
-        'deductions', 'payouts', 'expenses', 'income', 'wages', 'payments'];
+        'deductions', 'payouts', 'expenses', 'income', 'wages', 'payments', 'tasks'];
     }
 
     // A subscription payment is only ever submitted from the app; Victorbee
@@ -255,6 +255,14 @@ service cloud.firestore {
           // Append-only: only the same version again (a retried send), or
           // the one soft delete (Undo on a delivery), with nothing else changed.
           && (!appendOnly(c) || request.resource.data.version == resource.data.version || softDelete());
+        // Workers may mark tasks done/open (status update only).
+        allow update: if c == 'tasks' && member(t) && canWrite(t)
+          && validRecord(t, c, id)
+          && request.resource.data.createdBy == resource.data.createdBy
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['body', 'updatedAt', 'updatedBy', 'version', 'serverUpdatedAt'])
+          && request.resource.data.body.diff(resource.data.body).affectedKeys()
+              .hasOnly(['status', 'completedAt', 'completedBy', 'completedByName']);
         allow delete: if false;
       }
     }
@@ -347,6 +355,44 @@ service cloud.firestore {
     match /adminInvites/{email} {
       allow read: if can('staff') || (signedIn() && request.auth.token.email.lower() == email);
       allow write: if can('staff') && audited() && request.resource.data.role != 'owner';
+    }
+
+    // ======================= Supplier / farmer invites =======================
+    // A collection centre manager generates a code; the farmer accepts it via
+    // the web with their Google account, linking their uid to their farmer record.
+
+    match /farmerInvites/{code} {
+      // Public read so the invite page can look up the code without sign-in.
+      allow get: if true;
+      // Managers of the linked tenant write invites.
+      allow create, update: if signedIn()
+        && exists(/databases/$(database)/documents/tenants/$(request.resource.data.tenantId)/members/$(request.auth.uid))
+        && manages(/databases/$(database)/documents/tenants/$(request.resource.data.tenantId));
+      allow delete: if false;
+    }
+
+    // A farmer who has accepted an invite can link their uid.
+    // users/{uid}.farmerLinks is an array; the farm's delivery reads check it.
+    match /users/{uid} {
+      allow read: if signedIn() && uid == request.auth.uid;
+      // Allow adding a farmerLinks entry when a valid, unused invite exists.
+      allow update: if signedIn() && uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['farmerLinks'])
+        && request.resource.data.farmerLinks.size() == resource.data.get('farmerLinks', []).size() + 1;
+    }
+
+    // Suppliers may read their own deliveries across the tenant they're linked to.
+    match /tenants/{t}/deliveries/{id} {
+      allow read: if signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data
+            .get('farmerLinks', [])
+            .hasAny([{'tenantId': t, 'farmerId': resource.data.body.farmerId}]);
+    }
+    match /tenants/{t}/farmers/{id} {
+      allow read: if signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data
+            .get('farmerLinks', [])
+            .hasAny([{'tenantId': t, 'farmerId': id}]);
     }
   }
 }

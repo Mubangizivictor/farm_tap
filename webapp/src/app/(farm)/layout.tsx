@@ -31,6 +31,7 @@ function navFor(f: Farm, cfg: PlatformConfig): NavItem[] {
     ...(hasHerd(f) && feat('health') ? [{ href: '/health/', label: 'Health', icon: 'health' as const }] : []),
     ...(isCentre(f) ? [{ href: '/farmers/', label: 'Suppliers', icon: 'truck' as const }] : []),
     { href: '/workers/', label: 'Workers', icon: 'workers' as const },
+    { href: '/tasks/', label: 'Tasks', icon: 'check' as const },
     ...(manages(f) && feat('money') ? [{ href: '/money/', label: 'Money', icon: 'money' as const }] : []),
     { href: '/settings/', label: 'Settings', icon: 'settings' as const },
   ];

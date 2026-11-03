@@ -32,6 +32,7 @@ import {
   type MilkBody,
   type MilkSaleBody,
   type StaffBody,
+  type TaskBody,
   type TreatmentBody,
 } from '@/lib/domain';
 import { count, firstName, greeting, litres, longDate, shortDate, time, ugx, words } from '@/lib/format';
@@ -49,6 +50,7 @@ export default function Home() {
   const centre = isCentre(farm);
   const boss = manages(farm);
 
+  const tasks = useRecords<TaskBody>(farm.id, 'tasks');
   const milk = useRecords<MilkBody>(herdFarm ? farm.id : null, 'milkRecords', since);
   const animals = useRecords<AnimalBody>(herdFarm ? farm.id : null, 'animals');
   const treatments = useRecords<TreatmentBody>(herdFarm ? farm.id : null, 'treatments', localIso(addDays(today, -90)));
@@ -93,6 +95,16 @@ export default function Home() {
   })();
 
   const plan = planState(farm.subscription, now);
+  const myName = staff.data.find((s) => s.body.phone === (user?.email ?? ''))?.body.name ?? user?.displayName ?? '';
+  const myTasks = tasks.data
+    .filter((t) => !t.isDeleted && t.body.status === 'open')
+    .filter((t) => !t.body.assignedTo || t.body.assignedToName === myName)
+    .sort((a, b) => {
+      const pa = a.body.priority === 'high' ? 0 : a.body.priority === 'normal' ? 1 : 2;
+      const pb = b.body.priority === 'high' ? 0 : b.body.priority === 'normal' ? 1 : 2;
+      return pa !== pb ? pa - pb : (a.body.dueDate ?? '9999') < (b.body.dueDate ?? '9999') ? -1 : 1;
+    })
+    .slice(0, 5);
   const animalName = (id: string) => {
     const a = animals.data.find((x) => x.id === id);
     return a ? animalLabel(a) : 'A cow';
@@ -130,6 +142,36 @@ export default function Home() {
       </PageHead>
 
       <LoadError code={milk.error ?? animals.error ?? deliveries.error ?? staff.error} />
+
+      {!boss && myTasks.length > 0 && (
+        <section className="card" style={{ marginBottom: 'var(--s-md)' }}>
+          <div className="card-head">
+            <h2>My tasks</h2>
+            <Link href="/tasks/" className="small no-print">All tasks</Link>
+          </div>
+          <div className="list">
+            {myTasks.map((t) => {
+              const overdue = t.body.dueDate && t.body.dueDate < localIso(now);
+              return (
+                <div key={t.id} className="list-row">
+                  <span className={`chip ${overdue ? 'bad' : t.body.priority === 'high' ? 'bad' : t.body.priority === 'normal' ? 'brand' : ''}`}>
+                    <Icon name="check" className="icon" />
+                  </span>
+                  <div className="stack grow" style={{ gap: 'var(--s-xxs)' }}>
+                    <span>{t.body.title}</span>
+                    {t.body.dueDate && (
+                      <span className="small muted">
+                        {overdue ? `Overdue (${shortDate(new Date(t.body.dueDate))})` : `Due ${shortDate(new Date(t.body.dueDate))}`}
+                      </span>
+                    )}
+                  </div>
+                  {t.body.priority === 'high' && <span className="chip bad">Urgent</span>}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <div className="grid">
         {herdFarm && (

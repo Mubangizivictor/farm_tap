@@ -202,6 +202,20 @@ export interface WageBody {
   at: string;
 }
 
+export interface TaskBody {
+  title: string;
+  description?: string;
+  assignedTo?: string;   // staffId
+  assignedToName?: string;
+  dueDate?: string;      // localIso date
+  status: 'open' | 'done' | 'cancelled';
+  priority: 'low' | 'normal' | 'high';
+  completedAt?: string | null;
+  completedBy?: string | null;
+  completedByName?: string | null;
+  category?: string;     // 'milk' | 'health' | 'feeding' | 'general' | 'cleaning' | 'other'
+}
+
 export interface MilkSaleBody {
   buyer: string;
   litres: number;
