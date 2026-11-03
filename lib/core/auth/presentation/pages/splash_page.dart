@@ -41,13 +41,20 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
   @override
   void dispose() {
+    _minTimer?.cancel();
     _intro.dispose();
     super.dispose();
   }
 
+  Timer? _minTimer;
+
+  /// Moves on once both the shortest show time has passed and start-up is
+  /// done. A Timer (not Future.delayed) so leaving early cancels it.
   Future<void> _run(Duration min) async {
+    final shown = Completer<void>();
+    _minTimer = Timer(min, shown.complete);
     try {
-      await Future.wait([Future<void>.delayed(min), widget.ready ?? Future<void>.value()]);
+      await Future.wait([shown.future, widget.ready ?? Future<void>.value()]);
     } on Object {
       // Start-up trouble is shown later by the page that needs the data.
     }
