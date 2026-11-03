@@ -3531,5 +3531,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get gettingFarmReadySub => 'Bringing back your animals, workers and records.';
+  String get gettingFarmReadySub =>
+      'Bringing back your animals, workers and records.';
 }
