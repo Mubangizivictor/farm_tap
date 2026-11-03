@@ -208,7 +208,7 @@ void main() {
       ('Workers', '/workers', '6 people'),
       ('Money', '/money', 'Cost per litre'),
       ('Reports', '/reports', 'Monthly farm report'),
-      ('Settings', '/settings', 'Appearance'),
+      ('Settings', '/settings', 'Account'),
       ('Help & support', '/settings/help', 'Coming soon'),
     ]) {
       testWidgets(label, (tester) async {
