@@ -24,6 +24,7 @@ import 'package:farm_tap/core/sync/data/memory_record_store.dart';
 import 'package:farm_tap/core/sync/domain/local_record_store.dart';
 import 'package:farm_tap/core/sync/domain/merge_policy.dart';
 import 'package:farm_tap/core/sync/domain/remote_store.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/sync/sync_engine.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
@@ -86,11 +87,17 @@ Future<void> configureDependencies(Flavor flavor) async {
       ..registerLazySingleton<FarmMembershipRepository>(() => FakeFarmMembershipRepository(tenants))
       ..registerLazySingleton<OnboardingRepository>(() => FakeOnboardingRepository(getIt<Clock>()))
       ..registerLazySingleton<FakeStaffAccessRepository>(
-        () => FakeStaffAccessRepository(today: getIt<Clock>().today, now: getIt<Clock>().now),
+        () => FakeStaffAccessRepository(
+          today: getIt<Clock>().today,
+          now: getIt<Clock>().now,
+          journal: getIt<RecordJournal>(),
+        ),
       )
       ..registerLazySingleton<StaffAccessRepository>(getIt.call<FakeStaffAccessRepository>)
       ..registerLazySingleton<StaffDirectory>(getIt.call<FakeStaffAccessRepository>)
-      ..registerLazySingleton<TreatmentRepository>(() => FakeTreatmentRepository(getIt<Clock>()))
+      ..registerLazySingleton<TreatmentRepository>(
+        () => FakeTreatmentRepository(getIt<Clock>(), journal: getIt<RecordJournal>()),
+      )
       ..registerLazySingleton<HomeRepository>(
         () => FakeHomeRepository(
           getIt<Clock>(),
@@ -100,15 +107,22 @@ Future<void> configureDependencies(Flavor flavor) async {
           workers: getIt<WorkersRepository>(),
         ),
       )
-      ..registerLazySingleton<MilkRepository>(() => FakeMilkRepository(getIt<Clock>(), getIt<TreatmentRepository>()))
-      ..registerLazySingleton<CentreRepository>(() => FakeCentreRepository(getIt<Clock>()))
-      ..registerLazySingleton<MoneyRepository>(() => FakeMoneyRepository(getIt<Clock>()))
+      ..registerLazySingleton<MilkRepository>(
+        () => FakeMilkRepository(getIt<Clock>(), getIt<TreatmentRepository>(), journal: getIt<RecordJournal>()),
+      )
+      ..registerLazySingleton<CentreRepository>(
+        () => FakeCentreRepository(getIt<Clock>(), journal: getIt<RecordJournal>()),
+      )
+      ..registerLazySingleton<MoneyRepository>(
+        () => FakeMoneyRepository(getIt<Clock>(), journal: getIt<RecordJournal>()),
+      )
       ..registerLazySingleton<WorkersRepository>(
         () => FakeWorkersRepository(
           getIt<Clock>(),
           getIt<StaffDirectory>(),
           getIt<MoneyRepository>(),
           getIt<MilkRepository>(),
+          journal: getIt<RecordJournal>(),
         ),
       )
       ..registerLazySingleton<FarmMoneyRepository>(
@@ -126,10 +140,15 @@ Future<void> configureDependencies(Flavor flavor) async {
         ),
       )
       ..registerLazySingleton<BreedingRepository>(
-        () => FakeBreedingRepository(getIt<Clock>(), getIt<MoneyRepository>()),
+        () => FakeBreedingRepository(getIt<Clock>(), getIt<MoneyRepository>(), journal: getIt<RecordJournal>()),
       )
       ..registerLazySingleton<FeedRepository>(
-        () => FakeFeedRepository(getIt<Clock>(), getIt<MilkRepository>(), getIt<MoneyRepository>()),
+        () => FakeFeedRepository(
+          getIt<Clock>(),
+          getIt<MilkRepository>(),
+          getIt<MoneyRepository>(),
+          journal: getIt<RecordJournal>(),
+        ),
       )
       ..registerLazySingleton<HerdRepository>(
         () => FakeHerdRepository(
@@ -137,6 +156,7 @@ Future<void> configureDependencies(Flavor flavor) async {
           tenantProvider: tenants,
           treatments: getIt<TreatmentRepository>(),
           breeding: getIt<BreedingRepository>(),
+          journal: getIt<RecordJournal>(),
         ),
       );
   } else {
@@ -184,6 +204,7 @@ Future<void> configureDependencies(Flavor flavor) async {
 }
 
 const _lastSeenKey = 'trustedClock.lastSeen';
+const _deviceIdKey = 'device.id';
 
 /// Decision 0014: the phone's record store, the sync engine and the
 /// rollback-proof trial clock. The demo build keeps records in memory; the
@@ -192,6 +213,10 @@ Future<void> _configureOffline(TenantProvider tenants) async {
   SharedPreferences? prefs;
   if (!useFakeData) prefs = await SharedPreferences.getInstance();
   final lastSeen = DateTime.tryParse(prefs?.getString(_lastSeenKey) ?? '');
+  // One id per installed app, on every record it makes (ROADMAP 5.1).
+  final storedDeviceId = prefs?.getString(_deviceIdKey);
+  final deviceId = storedDeviceId ?? (useFakeData ? 'demo-phone' : getIt<IdGenerator>().generate());
+  if (storedDeviceId == null) await prefs?.setString(_deviceIdKey, deviceId);
   getIt.registerSingleton<TrustedClock>(
     TrustedClock(
       getIt<Clock>(),
@@ -201,6 +226,19 @@ Future<void> _configureOffline(TenantProvider tenants) async {
   );
 
   if (!getIt.isRegistered<LocalRecordStore>()) getIt.registerSingleton<LocalRecordStore>(MemoryRecordStore());
+  getIt.registerLazySingleton<RecordJournal>(
+    () => RecordJournal(
+      store: getIt<LocalRecordStore>(),
+      clock: getIt<Clock>(),
+      ids: getIt<IdGenerator>(),
+      deviceId: deviceId,
+      tenantId: () => tenants.currentTenantId,
+      actor: () {
+        final session = getIt<SessionController>();
+        return session.staff?.id ?? session.auth.currentUser?.id ?? 'unknown';
+      },
+    ),
+  );
   // Demo build: a pretend cloud, so "Sync now" works without Firebase.
   if (!getIt.isRegistered<RemoteStore>()) getIt.registerSingleton<RemoteStore>(FakeRemoteStore());
 

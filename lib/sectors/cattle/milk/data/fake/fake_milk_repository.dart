@@ -1,4 +1,5 @@
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_models.dart';
@@ -7,7 +8,7 @@ import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 /// UI phase: the F01-F10 sample numbers. Recording a cow marks her done.
 /// Withdrawal ("not for sale") comes from the shared treatment records.
 class FakeMilkRepository implements MilkRepository {
-  new(this.clock, this.treatments) {
+  new(this.clock, this.treatments, {this.journal}) {
     final today = DateTime(clock.now().year, clock.now().month, clock.now().day);
     _cows = [
       MilkCow(
@@ -84,6 +85,10 @@ class FakeMilkRepository implements MilkRepository {
 
   final Clock clock;
   final TreatmentRepository treatments;
+
+  /// Saves records on the phone for sync (decision 0014); null in tests.
+  final RecordJournal? journal;
+
   late List<MilkCow> _cows;
   final List<MilkRecord> _records = [];
   var _nextRecord = 1;
@@ -193,9 +198,10 @@ class FakeMilkRepository implements MilkRepository {
     required bool notForSale,
     required String recordedBy,
   }) async {
+    final id = journal?.newId() ?? 'milk-${_nextRecord++}';
     _records.add(
       MilkRecord(
-        id: 'milk-${_nextRecord++}',
+        id: id,
         cowId: cowId,
         session: session,
         litres: litres,
@@ -204,6 +210,13 @@ class FakeMilkRepository implements MilkRepository {
         notForSale: notForSale,
       ),
     );
+    await journal?.add('milkRecords', {
+      'animalId': cowId,
+      'session': session.name,
+      'litres': litres,
+      'notForSale': notForSale,
+      'recordedBy': recordedBy,
+    }, id: id);
     _cows = [
       for (final c in _cows)
         if (c.id == cowId) c.copyWith(recordedLitres: litres, recordedAt: clock.now()) else c,
@@ -213,15 +226,14 @@ class FakeMilkRepository implements MilkRepository {
 
   @override
   Future<Result<void>> recordTotal(MilkSession session, double litres, {required String recordedBy}) async {
-    _records.add(
-      MilkRecord(
-        id: 'milk-${_nextRecord++}',
-        session: session,
-        litres: litres,
-        at: clock.now(),
-        recordedBy: recordedBy,
-      ),
-    );
+    final id = journal?.newId() ?? 'milk-${_nextRecord++}';
+    _records.add(MilkRecord(id: id, session: session, litres: litres, at: clock.now(), recordedBy: recordedBy));
+    await journal?.add('milkRecords', {
+      'animalId': null,
+      'session': session.name,
+      'litres': litres,
+      'recordedBy': recordedBy,
+    }, id: id);
     return const Result.success(null);
   }
 
@@ -249,7 +261,15 @@ class FakeMilkRepository implements MilkRepository {
   }
 
   @override
-  Future<Result<void>> saveUse(List<MilkUseLine> lines) async => const Result.success(null);
+  Future<Result<void>> saveUse(List<MilkUseLine> lines) async {
+    await journal?.add('milkUse', {
+      'day': clock.today().toIso8601String(),
+      'lines': [
+        for (final l in lines) {'kind': l.kind.name, 'litres': l.litres, 'detail': l.detail},
+      ],
+    });
+    return const Result.success(null);
+  }
 
   @override
   Future<Result<MilkSalesSummary>> sales() async {

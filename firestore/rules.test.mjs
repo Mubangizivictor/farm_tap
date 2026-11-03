@@ -76,6 +76,14 @@ describe('append-only and soft delete', () => {
     await assertFails(setDoc(ref, rec('milkRecords', 'm1', { version: 2, body: { litres: 19.5 } })));
   });
 
+  test('a delivery can be undone (soft delete) but not changed', async () => {
+    const db = as('worker');
+    const ref = doc(db, `tenants/${T}/deliveries/d1`);
+    await assertSucceeds(setDoc(ref, rec('deliveries', 'd1')));
+    await assertFails(setDoc(ref, rec('deliveries', 'd1', { version: 2, isDeleted: true, body: { litres: 99 } })));
+    await assertSucceeds(setDoc(ref, rec('deliveries', 'd1', { version: 2, isDeleted: true })));
+  });
+
   test('normal records can be edited (new version)', async () => {
     const db = as('worker');
     const ref = doc(db, `tenants/${T}/animals/a1`);

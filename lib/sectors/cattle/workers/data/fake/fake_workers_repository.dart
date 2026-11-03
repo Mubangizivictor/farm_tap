@@ -5,6 +5,7 @@ import 'package:farm_tap/core/money/domain/money_models.dart';
 import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_models.dart';
@@ -14,7 +15,7 @@ import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 /// Tom 6:02, Amos 5:45, Joy 6:10 and Rita 6:30 are in (4 of 6). Advances
 /// this month: Amos 120,000, Peter 80,000, Rita 40,000 (wage expenses).
 class FakeWorkersRepository implements WorkersRepository {
-  new(this.clock, this.directory, this.money, this.milk) {
+  new(this.clock, this.directory, this.money, this.milk, {this.journal}) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
     DateTime at(int h, int m, [int daysAgo = 0]) =>
@@ -94,6 +95,9 @@ class FakeWorkersRepository implements WorkersRepository {
   };
 
   final Clock clock;
+
+  /// Saves records on the phone for sync (decision 0014); null in tests.
+  final RecordJournal? journal;
   final StaffDirectory directory;
   final MoneyRepository money;
 
@@ -157,17 +161,29 @@ class FakeWorkersRepository implements WorkersRepository {
     required DateTime due,
     required String when,
   }) async {
-    final t = FarmTask(id: 'task-${_next++}', title: title, staffId: staffId, due: due, when: when);
+    final t = FarmTask(id: journal?.newId() ?? 'task-${_next++}', title: title, staffId: staffId, due: due, when: when);
     _tasks.add(t);
+    await journal?.add('tasks', _taskBody(t), id: t.id);
     return Result.success(t);
   }
 
   @override
   Future<Result<void>> setTaskDone(String taskId, {required bool done}) async {
     final i = _tasks.indexWhere((t) => t.id == taskId);
-    if (i >= 0) _tasks[i] = _tasks[i].withDone(done ? clock.now() : null);
+    if (i >= 0) {
+      _tasks[i] = _tasks[i].withDone(done ? clock.now() : null);
+      await journal?.put('tasks', taskId, _taskBody(_tasks[i]));
+    }
     return const Result.success(null);
   }
+
+  static Map<String, Object?> _taskBody(FarmTask t) => {
+    'title': t.title,
+    'staffId': t.staffId,
+    'due': t.due.toIso8601String(),
+    'when': t.when,
+    'doneAt': t.doneAt?.toIso8601String(),
+  };
 
   @override
   Future<Result<WagesSummary>> wages() async {
@@ -188,7 +204,19 @@ class FakeWorkersRepository implements WorkersRepository {
 
   @override
   Future<Result<StaffPayment>> pay(String staffId, {required PayKind kind, required int amount}) async {
-    final p = StaffPayment(id: 'pay-${_next++}', staffId: staffId, kind: kind, amount: amount, at: clock.now());
+    final p = StaffPayment(
+      id: journal?.newId() ?? 'pay-${_next++}',
+      staffId: staffId,
+      kind: kind,
+      amount: amount,
+      at: clock.now(),
+    );
+    await journal?.add('wages', {
+      'staffId': staffId,
+      'kind': kind.name,
+      'amount': amount,
+      'at': p.at.toIso8601String(),
+    }, id: p.id);
     await _record(p);
     return Result.success(p);
   }

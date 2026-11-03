@@ -4,18 +4,28 @@ import 'package:farm_tap/core/people/data/pin_security.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 
 /// Sample staff from the mockups. Every PIN is 1234 in the UI phase.
 /// Peter has no card yet (K01 "No card"); blank cards 0207-0215 are in stock.
 class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory {
-  new({this.nfc = true, this.today, DateTime Function()? now, this._hasher = const PinHasher(iterations: 2000)})
-    : _lockout = PinLockout(now: now ?? _never);
+  new({
+    this.nfc = true,
+    this.today,
+    DateTime Function()? now,
+    this._hasher = const PinHasher(iterations: 2000),
+    this.journal,
+  }) : _lockout = PinLockout(now: now ?? _never);
 
   /// The simulator and web have no NFC; set false to show C05.
   final bool nfc;
 
+  /// Saves records on the phone for sync (decision 0014); null in tests.
+  final RecordJournal? journal;
+
   /// Start date for new staff ("since").
   final DateTime Function()? today;
+
   /// PIN hashes by staff id (decision 0014 §6); never the typed PIN.
   final _pinHashes = <String, String>{};
   final PinHasher _hasher;
@@ -28,6 +38,14 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
   String _hashFor(String staffId) => _pinHashes[staffId] ?? (_sampleHash ??= _hasher.hash(pin));
   final List<StaffMember> _staff = [...sample];
   final List<String> _blankCards = [for (var n = 207; n <= 215; n++) n.toString().padLeft(4, '0')];
+
+  static Map<String, Object?> _staffBody(StaffMember s) => {
+    'name': s.name,
+    'role': s.role.name,
+    'cardNumber': s.cardNumber,
+    'since': s.since?.toIso8601String(),
+    'active': true,
+  };
 
   static final sample = [
     StaffMember(
@@ -102,9 +120,16 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
 
   @override
   Future<Result<StaffMember>> addStaff({required String name, required StaffRole role, required String pin}) async {
-    final s = StaffMember(id: 'staff-new-${_nextId++}', name: name, role: role, since: today?.call());
+    final s = StaffMember(
+      id: journal?.newId() ?? 'staff-new-${_nextId++}',
+      name: name,
+      role: role,
+      since: today?.call(),
+    );
     _staff.add(s);
     _pinHashes[s.id] = _hasher.hash(pin);
+    // Only the PIN hash leaves the phone, so unlock works on every farm phone.
+    await journal?.add('staff', {..._staffBody(s), 'pinHash': _pinHashes[s.id]}, id: s.id);
     return Result.success(s);
   }
 
@@ -112,6 +137,7 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
   Future<Result<StaffMember>> updateStaff(String staffId, {required String name, required StaffRole role}) async {
     final i = _staff.indexWhere((s) => s.id == staffId);
     _staff[i] = _staff[i].copyWith(name: name, role: role);
+    await journal?.put('staff', staffId, {..._staffBody(_staff[i]), 'pinHash': _pinHashes[staffId]});
     return Result.success(_staff[i]);
   }
 
@@ -126,14 +152,13 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
     final i = _staff.indexWhere((s) => s.id == staffId);
     _staff[i] = _staff[i].withCard(card);
     _blankCards.remove(card);
+    await journal?.put('nfcCards', card, {'personId': staffId, 'personType': 'staff', 'status': 'active'});
     return Result.success(_staff[i]);
   }
 
   @override
   Future<Result<bool>> verifyManagerPin(String entered) async =>
-      Result.success(
-        _staff.any((s) => s.role == StaffRole.manager && _hasher.verify(entered, _hashFor(s.id))),
-      );
+      Result.success(_staff.any((s) => s.role == StaffRole.manager && _hasher.verify(entered, _hashFor(s.id))));
 
   @override
   Future<Result<void>> resetPin(String staffId) async {

@@ -1,4 +1,5 @@
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_models.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
@@ -6,7 +7,7 @@ import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 /// UI phase: the H01-H06 sample treatments. Milk, herd and home fakes read
 /// withdrawal from this one store.
 class FakeTreatmentRepository implements TreatmentRepository {
-  new(this.clock) {
+  new(this.clock, {this.journal}) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
     _records = [
@@ -80,6 +81,9 @@ class FakeTreatmentRepository implements TreatmentRepository {
   }
 
   final Clock clock;
+
+  /// Saves records on the phone for sync (decision 0014); null in tests.
+  final RecordJournal? journal;
   late List<TreatmentRecord> _records;
   late List<HealthTask> _schedule;
   late List<Drug> _drugList = List.of(_drugs);
@@ -160,7 +164,7 @@ class FakeTreatmentRepository implements TreatmentRepository {
   Future<Result<TreatmentRecord>> addTreatment(NewTreatment input) async {
     final a = _animals.firstWhere((a) => a.id == input.animalId);
     final record = TreatmentRecord(
-      id: 'treat-${_next++}',
+      id: journal?.newId() ?? 'treat-${_next++}',
       animalId: a.id,
       animalName: a.name,
       tag: a.tag,
@@ -176,6 +180,16 @@ class FakeTreatmentRepository implements TreatmentRepository {
     );
     // One open course per animal: the new record replaces the old one.
     _records = [record, ..._records.where((r) => r.animalId != a.id)];
+    await journal?.add('treatments', {
+      'animalId': a.id,
+      'condition': input.condition.name,
+      'drugId': input.drugId,
+      'withdrawalDays': record.drug.withdrawalDays,
+      'given': input.given.toIso8601String(),
+      'dose': input.dose,
+      'route': input.route.name,
+      'givenBy': input.givenBy,
+    }, id: record.id);
     return Result.success(record);
   }
 
@@ -185,19 +199,26 @@ class FakeTreatmentRepository implements TreatmentRepository {
   @override
   Future<Result<void>> addTask(HealthTask task) async {
     _schedule = [..._schedule, task]..sort((a, b) => a.due.compareTo(b.due));
+    await journal?.add('reminders', {'kind': 'health', 'title': task.title, 'due': task.due.toIso8601String()});
     return const Result.success(null);
   }
 
   @override
   Future<Result<Drug>> addDrug({required String name, required double stock, required int withdrawalDays}) async {
     final drug = Drug(
-      id: 'drug-${_next++}',
+      id: journal?.newId() ?? 'drug-${_next++}',
       name: name,
       shortName: name.split(' ').first,
       withdrawalDays: withdrawalDays,
       stock: stock,
     );
     _drugList = [..._drugList, drug];
+    await journal?.add('stockItems', {
+      'kind': 'drug',
+      'name': name,
+      'stock': stock,
+      'withdrawalDays': withdrawalDays,
+    }, id: drug.id);
     return Result.success(drug);
   }
 

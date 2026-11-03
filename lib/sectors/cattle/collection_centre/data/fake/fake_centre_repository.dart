@@ -1,4 +1,5 @@
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_models.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_repository.dart';
@@ -6,7 +7,7 @@ import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_reposito
 /// UI phase: Kashari Milk Centre with the G01-G13 sample numbers. A few
 /// farmers are listed in full; the rest only count towards the totals.
 class FakeCentreRepository implements CentreRepository {
-  new(this.clock) {
+  new(this.clock, {this.journal}) {
     final now = clock.now();
     _day = DateTime(now.year, now.month, now.day);
     _farmers = [
@@ -124,6 +125,9 @@ class FakeCentreRepository implements CentreRepository {
   }
 
   final Clock clock;
+
+  /// Saves records on the phone for sync (decision 0014); null in tests.
+  final RecordJournal? journal;
   late final DateTime _day;
   late final Map<String, List<Deduction>> _deductions;
   static const double _price = 1100;
@@ -205,7 +209,7 @@ class FakeCentreRepository implements CentreRepository {
     String? card,
   }) async {
     final farmer = CentreFarmer(
-      id: 'farmer-${_next++}',
+      id: journal?.newId() ?? 'farmer-${_next++}',
       name: name,
       card: card == null || card.isEmpty ? null : card.padLeft(4, '0'),
       village: village,
@@ -216,6 +220,12 @@ class FakeCentreRepository implements CentreRepository {
       usualHigh: 0,
     );
     _farmers = [..._farmers, farmer];
+    await journal?.add('farmers', {
+      'name': name,
+      'phone': phone,
+      'village': village,
+      'card': farmer.card,
+    }, id: farmer.id);
     return Result.success(farmer);
   }
 
@@ -228,7 +238,7 @@ class FakeCentreRepository implements CentreRepository {
     final f = _farmers.firstWhere((f) => f.id == farmerId);
     final now = clock.now();
     final d = Delivery(
-      id: 'd-${_next++}',
+      id: journal?.newId() ?? 'd-${_next++}',
       farmerId: f.id,
       farmerName: f.name,
       card: f.card ?? '',
@@ -242,6 +252,7 @@ class FakeCentreRepository implements CentreRepository {
       for (final x in _farmers)
         if (x.id == farmerId) x.withToday((x.todayLitres ?? 0) + litres) else x,
     ];
+    await journal?.add('deliveries', _deliveryBody(d), id: d.id);
     return Result.success(d);
   }
 
@@ -250,12 +261,23 @@ class FakeCentreRepository implements CentreRepository {
     final d = _deliveries.where((d) => d.id == deliveryId).firstOrNull;
     if (d == null) return const Result.success(null);
     _deliveries = [..._deliveries]..remove(d);
+    // Undo is a soft delete: the record stays, marked deleted.
+    await journal?.remove('deliveries', d.id);
     _farmers = [
       for (final x in _farmers)
         if (x.id == d.farmerId) _less(x, d.litres) else x,
     ];
     return const Result.success(null);
   }
+
+  static Map<String, Object?> _deliveryBody(Delivery d) => {
+    'farmerId': d.farmerId,
+    'litres': d.litres,
+    'session': d.session.name,
+    'test': d.test.name,
+    'rejectReason': d.rejectReason?.name,
+    'at': d.at.toIso8601String(),
+  };
 
   CentreFarmer _less(CentreFarmer x, double litres) {
     final left = (x.todayLitres ?? 0) - litres;
@@ -266,20 +288,19 @@ class FakeCentreRepository implements CentreRepository {
   Future<Result<void>> rejectDelivery(String farmerId, double litres, RejectReason reason, {String? note}) async {
     final f = _farmers.firstWhere((f) => f.id == farmerId);
     final now = clock.now();
-    _deliveries = [
-      ..._deliveries,
-      Delivery(
-        id: 'd-${_next++}',
-        farmerId: f.id,
-        farmerName: f.name,
-        card: f.card ?? '',
-        litres: litres,
-        at: now,
-        session: now.hour < 12 ? CentreSession.morning : CentreSession.evening,
-        test: QualityTest.failed,
-        rejectReason: reason,
-      ),
-    ];
+    final rejected = Delivery(
+      id: journal?.newId() ?? 'd-${_next++}',
+      farmerId: f.id,
+      farmerName: f.name,
+      card: f.card ?? '',
+      litres: litres,
+      at: now,
+      session: now.hour < 12 ? CentreSession.morning : CentreSession.evening,
+      test: QualityTest.failed,
+      rejectReason: reason,
+    );
+    _deliveries = [..._deliveries, rejected];
+    await journal?.add('deliveries', {..._deliveryBody(rejected), 'note': note}, id: rejected.id);
     return const Result.success(null);
   }
 
@@ -380,5 +401,8 @@ class FakeCentreRepository implements CentreRepository {
   );
 
   @override
-  Future<Result<void>> saveReconciliation(String explanation) async => const Result.success(null);
+  Future<Result<void>> saveReconciliation(String explanation) async {
+    await journal?.add('reconciliations', {'day': _day.toIso8601String(), 'explanation': explanation});
+    return const Result.success(null);
+  }
 }

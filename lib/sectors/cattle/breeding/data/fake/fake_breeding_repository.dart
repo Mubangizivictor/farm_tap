@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/money/domain/money_models.dart';
 import 'package:farm_tap/core/money/domain/money_repository.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_models.dart';
 import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
@@ -11,7 +12,7 @@ import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart
 /// 30 days of Sat 7 Nov), 2 services due a pregnancy check and a heifer that
 /// showed heat yesterday. Every date is calculated with [BreedingRules].
 class FakeBreedingRepository implements BreedingRepository {
-  new(this.clock, this.money) {
+  new(this.clock, this.money, {this.journal}) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
     // Served so that she calves on [due].
@@ -66,6 +67,9 @@ class FakeBreedingRepository implements BreedingRepository {
   ];
 
   final Clock clock;
+
+  /// Saves records on the phone for sync (decision 0014); null in tests.
+  final RecordJournal? journal;
   final MoneyRepository money;
   final List<ServiceRecord> _services = [];
   final List<PregnancyCheck> _checks = [];
@@ -151,7 +155,7 @@ class FakeBreedingRepository implements BreedingRepository {
     int? cost,
   }) async {
     final s = ServiceRecord(
-      id: 'service-${_next++}',
+      id: journal?.newId() ?? 'service-${_next++}',
       animal: _animals.firstWhere((a) => a.id == animalId),
       kind: kind,
       at: at,
@@ -161,6 +165,16 @@ class FakeBreedingRepository implements BreedingRepository {
       cost: cost,
     );
     _services.add(s);
+    await journal?.add('breedingEvents', {
+      'type': kind == ServiceKind.ai ? 'ai' : 'service',
+      'kind': kind.name,
+      'animalId': animalId,
+      'at': at.toIso8601String(),
+      'straw': straw,
+      'bull': bull,
+      'technician': technician,
+      'cost': cost,
+    }, id: s.id);
     await _recordExpense(s);
     return Result.success(s);
   }
@@ -168,13 +182,20 @@ class FakeBreedingRepository implements BreedingRepository {
   @override
   Future<Result<Pregnancy?>> recordCheck({required String serviceId, required bool pregnant, String? by}) async {
     final check = PregnancyCheck(
-      id: 'check-${_next++}',
+      id: journal?.newId() ?? 'check-${_next++}',
       serviceId: serviceId,
       pregnant: pregnant,
       at: clock.now(),
       by: by,
     );
     _checks.add(check);
+    await journal?.add('breedingEvents', {
+      'type': 'pregnancyCheck',
+      'serviceId': serviceId,
+      'pregnant': pregnant,
+      'by': by,
+      'at': check.at.toIso8601String(),
+    }, id: check.id);
     final service = _services.firstWhere((s) => s.id == serviceId);
     return Result.success(pregnant ? Pregnancy(service: service, check: check) : null);
   }
@@ -182,6 +203,7 @@ class FakeBreedingRepository implements BreedingRepository {
   @override
   Future<Result<void>> recordCalving(String animalId, {required DateTime at}) async {
     _calvings.add(CalvingRecord(animalId: animalId, at: at));
+    await journal?.add('breedingEvents', {'type': 'calving', 'animalId': animalId, 'at': at.toIso8601String()});
     return const Result.success(null);
   }
 

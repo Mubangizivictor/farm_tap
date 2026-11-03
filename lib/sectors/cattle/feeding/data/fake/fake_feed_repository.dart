@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/money/domain/money_models.dart';
 import 'package:farm_tap/core/money/domain/money_repository.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_models.dart';
 import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_repository.dart';
@@ -16,7 +17,7 @@ import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 /// Each purchase records its expense in [money]; the month's feed cost is
 /// read back from there (the same expenses L01/L02 show).
 class FakeFeedRepository implements FeedRepository {
-  new(this.clock, this.milk, this.money) {
+  new(this.clock, this.milk, this.money, {this.journal}) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
     final monthStart = DateTime(today.year, today.month);
@@ -86,6 +87,9 @@ class FakeFeedRepository implements FeedRepository {
   static const rateDays = 7;
 
   final Clock clock;
+
+  /// Saves records on the phone for sync (decision 0014); null in tests.
+  final RecordJournal? journal;
   final MilkRepository milk;
   final MoneyRepository money;
   late List<FeedCount> _counts;
@@ -135,8 +139,20 @@ class FakeFeedRepository implements FeedRepository {
     required FeedGroup group,
     required double amount,
   }) async {
-    final record = FeedingRecord(id: 'feed-${_next++}', feed: feed, group: group, amount: amount, at: clock.now());
+    final record = FeedingRecord(
+      id: journal?.newId() ?? 'feed-${_next++}',
+      feed: feed,
+      group: group,
+      amount: amount,
+      at: clock.now(),
+    );
     _feedings = [..._feedings, record];
+    await journal?.add('feedUsage', {
+      'feed': feed.name,
+      'group': group.name,
+      'amount': amount,
+      'at': record.at.toIso8601String(),
+    }, id: record.id);
     return Result.success(record);
   }
 
@@ -148,7 +164,7 @@ class FakeFeedRepository implements FeedRepository {
     String? supplier,
   }) async {
     final p = FeedPurchase(
-      id: 'buy-${_next++}',
+      id: journal?.newId() ?? 'buy-${_next++}',
       feed: feed,
       amount: amount,
       pricePerUnit: pricePerUnit,
@@ -156,6 +172,14 @@ class FakeFeedRepository implements FeedRepository {
       supplier: supplier,
     );
     _purchases = [..._purchases, p];
+    await journal?.add('stockMovements', {
+      'kind': 'purchase',
+      'feed': feed.name,
+      'amount': amount,
+      'pricePerUnit': pricePerUnit,
+      'supplier': supplier,
+      'at': p.at.toIso8601String(),
+    }, id: p.id);
     await _recordExpense(p);
     return Result.success(p);
   }

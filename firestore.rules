@@ -67,6 +67,12 @@ service cloud.firestore {
       return c in ['members', 'messages', 'aiQuestions', 'iotDevices', 'iotReadings'];
     }
 
+    function softDelete() {
+      let d = request.resource.data;
+      return resource.data.isDeleted == false && d.isDeleted == true
+        && d.version == resource.data.version + 1 && d.body == resource.data.body;
+    }
+
     function validRecord(t, c, id) {
       let d = request.resource.data;
       return d.id == id && d.tenantId == t && d.collection == c
@@ -114,8 +120,9 @@ service cloud.firestore {
           && (!managerOnly(c) || manages(t))
           && validRecord(t, c, id)
           && request.resource.data.createdBy == resource.data.createdBy
-          // Append-only: only the same version again (a retried send).
-          && (!appendOnly(c) || request.resource.data.version == resource.data.version);
+          // Append-only: only the same version again (a retried send), or
+          // the one soft delete (Undo on a delivery), with nothing else changed.
+          && (!appendOnly(c) || request.resource.data.version == resource.data.version || softDelete());
         allow delete: if false;
       }
     }
