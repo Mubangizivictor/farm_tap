@@ -6903,6 +6903,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Overdue'**
   String get overdue;
+
+  /// No description provided for @feedNapier.
+  ///
+  /// In en, this message translates to:
+  /// **'Napier grass'**
+  String get feedNapier;
+
+  /// No description provided for @feedHay.
+  ///
+  /// In en, this message translates to:
+  /// **'Hay'**
+  String get feedHay;
+
+  /// No description provided for @feedCottonCake.
+  ///
+  /// In en, this message translates to:
+  /// **'Cotton seed cake'**
+  String get feedCottonCake;
+
+  /// No description provided for @feedBrewersWaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Brewers\' waste'**
+  String get feedBrewersWaste;
+
+  /// No description provided for @countFeedStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Count stock'**
+  String get countFeedStock;
+
+  /// No description provided for @countFeedStockSub.
+  ///
+  /// In en, this message translates to:
+  /// **'What is in the store now. Do this when you start, and whenever the numbers look wrong.'**
+  String get countFeedStockSub;
 }
 
 class _AppLocalizationsDelegate

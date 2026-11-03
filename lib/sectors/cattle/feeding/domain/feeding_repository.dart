@@ -20,6 +20,13 @@ abstract interface class FeedRepository {
     String? supplier,
   });
 
+  /// I01 "Count stock": what is in the store now (the opening count when
+  /// the farm starts using FarmTap). Later purchases and feedings move it.
+  Future<Result<void>> countStock(FeedKind feed, double amount);
+
+  /// Groups already fed on [day] (worker home: groups left to feed).
+  Future<Result<Set<FeedGroup>>> groupsFedOn(DateTime day);
+
   /// Amount of [feed] given on [day] (L04 daily report).
   Future<Result<double>> usedOn(DateTime day, FeedKind feed);
 

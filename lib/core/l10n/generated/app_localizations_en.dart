@@ -4010,4 +4010,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overdue => 'Overdue';
+
+  @override
+  String get feedNapier => 'Napier grass';
+
+  @override
+  String get feedHay => 'Hay';
+
+  @override
+  String get feedCottonCake => 'Cotton seed cake';
+
+  @override
+  String get feedBrewersWaste => 'Brewers\' waste';
+
+  @override
+  String get countFeedStock => 'Count stock';
+
+  @override
+  String get countFeedStockSub =>
+      'What is in the store now. Do this when you start, and whenever the numbers look wrong.';
 }

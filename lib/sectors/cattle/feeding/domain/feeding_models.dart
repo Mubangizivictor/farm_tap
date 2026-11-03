@@ -2,7 +2,10 @@
 // single source: what is left, the daily rate, days left and the month's
 // feed cost are all calculated from them.
 
-enum FeedKind { dairyMeal, maizeBran, mineralLick, silage }
+enum FeedKind { dairyMeal, maizeBran, mineralLick, silage, napierGrass, hay, cottonSeedCake, brewersWaste }
+
+/// Shown on I01 even before anything is recorded.
+const List<FeedKind> mainFeeds = [FeedKind.dairyMeal, FeedKind.maizeBran, FeedKind.mineralLick, FeedKind.silage];
 
 enum FeedUnit { bags, blocks, kg }
 
@@ -11,7 +14,7 @@ enum FeedGroup { milkingCows, dryCows, heifers, calves }
 extension FeedKindUnit on FeedKind {
   FeedUnit get unit => switch (this) {
     FeedKind.mineralLick => FeedUnit.blocks,
-    FeedKind.silage => FeedUnit.kg,
+    FeedKind.silage || FeedKind.napierGrass || FeedKind.brewersWaste => FeedUnit.kg,
     _ => FeedUnit.bags,
   };
 }

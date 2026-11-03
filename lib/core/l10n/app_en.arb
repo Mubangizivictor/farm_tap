@@ -3051,5 +3051,11 @@
   "jobDone": "Marked as done",
   "noHealthJobs": "No health jobs planned",
   "noHealthJobsBody": "Add dipping, deworming and vaccinations so nobody forgets them.",
-  "overdue": "Overdue"
+  "overdue": "Overdue",
+  "feedNapier": "Napier grass",
+  "feedHay": "Hay",
+  "feedCottonCake": "Cotton seed cake",
+  "feedBrewersWaste": "Brewers' waste",
+  "countFeedStock": "Count stock",
+  "countFeedStockSub": "What is in the store now. Do this when you start, and whenever the numbers look wrong."
 }

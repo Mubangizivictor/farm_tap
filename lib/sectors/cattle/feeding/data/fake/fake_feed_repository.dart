@@ -106,25 +106,71 @@ class FakeFeedRepository implements FeedRepository, Restorable {
     final today = DateTime(now.year, now.month, now.day);
     final rateFrom = today.subtract(const Duration(days: rateDays));
     final monthStart = DateTime(today.year, today.month);
+    final used = {
+      ...mainFeeds,
+      for (final c in _counts) c.feed,
+      for (final p in _purchases) p.feed,
+      for (final r in _feedings) r.feed,
+    };
     final stock = [
       for (final feed in FeedKind.values)
-        FeedStock(
-          feed: feed,
-          left: _round(_in(feed) - _out(feed)),
-          perDay: _round(
-            _feedings
-                    .where((r) => r.feed == feed && !r.at.isBefore(rateFrom) && r.at.isBefore(today))
-                    .fold<double>(0, (s, r) => s + r.amount) /
-                rateDays,
+        if (used.contains(feed))
+          FeedStock(
+            feed: feed,
+            left: _round(_left(feed)),
+            perDay: _round(
+              _feedings
+                      .where((r) => r.feed == feed && !r.at.isBefore(rateFrom) && r.at.isBefore(today))
+                      .fold<double>(0, (s, r) => s + r.amount) /
+                  rateDays,
+            ),
           ),
-        ),
     ];
     final expenses = (await money.expenses(from: monthStart, category: ExpenseCategory.feed)).data ?? const [];
     final cost = expenses.fold<int>(0, (s, e) => s + e.amount);
-    final litres = (await milk.trend(TrendRange.month)).data?.total ?? 0;
+    // Real data: this calendar month's milk (the demo keeps its sample month).
+    final litres = withSamples
+        ? (await milk.trend(TrendRange.month)).data?.total ?? 0
+        : ((await milk.records(from: monthStart)).data ?? const <MilkRecord>[]).fold<double>(0, (s, r) => s + r.litres);
     return Result.success(
       FeedSummary(stock: stock, costThisMonth: cost, costPerLitre: litres > 0 ? (cost / litres).round() : null),
     );
+  }
+
+  /// The latest count, plus what was bought and minus what was fed since.
+  /// Before any count: everything bought minus everything fed. The demo's
+  /// opening counts all add up (they are one per feed).
+  double _left(FeedKind feed) {
+    final counts = _counts.where((c) => c.feed == feed).toList()..sort((a, b) => a.at.compareTo(b.at));
+    if (withSamples || counts.isEmpty) return _in(feed) - _out(feed);
+    final last = counts.last;
+    bool after(DateTime t) => !t.isBefore(last.at);
+    return last.amount +
+        _purchases.where((p) => p.feed == feed && after(p.at)).fold<double>(0, (s, p) => s + p.amount) -
+        _feedings.where((r) => r.feed == feed && after(r.at)).fold<double>(0, (s, r) => s + r.amount);
+  }
+
+  @override
+  Future<Result<void>> countStock(FeedKind feed, double amount) async {
+    final at = clock.now();
+    _counts = [..._counts, FeedCount(feed: feed, amount: amount, at: at)];
+    await journal?.add('stockMovements', {
+      'kind': 'count',
+      'feed': feed.name,
+      'amount': amount,
+      'at': at.toIso8601String(),
+    });
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<Set<FeedGroup>>> groupsFedOn(DateTime day) async {
+    final start = DateTime(day.year, day.month, day.day);
+    final end = start.add(const Duration(days: 1));
+    return Result.success({
+      for (final r in _feedings)
+        if (!r.at.isBefore(start) && r.at.isBefore(end)) r.group,
+    });
   }
 
   double _in(FeedKind feed) =>
@@ -141,6 +187,12 @@ class FakeFeedRepository implements FeedRepository, Restorable {
   Future<void> restore() async {
     final j = journal;
     if (j == null) return;
+    if (!withSamples) {
+      // The open farm's records only.
+      _counts = const [];
+      _purchases = const [];
+      _feedings = const [];
+    }
     for (final r in await j.load('feedUsage')) {
       if (_feedings.any((f) => f.id == r.id)) continue;
       final b = r.body;
@@ -148,8 +200,8 @@ class FakeFeedRepository implements FeedRepository, Restorable {
         ..._feedings,
         FeedingRecord(
           id: r.id,
-          feed: FeedKind.values.byName(b['feed']! as String),
-          group: FeedGroup.values.byName(b['group']! as String),
+          feed: FeedKind.values.asNameMap()[b['feed']] ?? FeedKind.dairyMeal,
+          group: FeedGroup.values.asNameMap()[b['group']] ?? FeedGroup.milkingCows,
           amount: (b['amount']! as num).toDouble(),
           at: DateTime.parse(b['at']! as String),
         ),
@@ -157,6 +209,16 @@ class FakeFeedRepository implements FeedRepository, Restorable {
     }
     for (final r in await j.load('stockMovements')) {
       final b = r.body;
+      if (b['kind'] == 'count' && b['feed'] != null) {
+        final feed = FeedKind.values.asNameMap()[b['feed']];
+        if (feed != null) {
+          _counts = [
+            ..._counts,
+            FeedCount(feed: feed, amount: (b['amount']! as num).toDouble(), at: DateTime.parse(b['at']! as String)),
+          ];
+        }
+        continue;
+      }
       if (b['kind'] != 'purchase' || b['feed'] == null || _purchases.any((p) => p.id == r.id)) continue;
       _purchases = [
         ..._purchases,

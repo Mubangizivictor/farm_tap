@@ -104,9 +104,7 @@ class FakeHomeRepository implements HomeRepository {
     if (_real)
       for (final c in (await milk!.trend(TrendRange.week)).data?.dropping ?? const <CowTrend>[])
         if (c.today != null)
-          MilkDropped(animal: c.cow.name, percent: -c.changePercent, today: c.today!, average: c.average)
-        else
-          const MilkDropped(animal: 'Ngabire', percent: 22, today: 8.1, average: 10.4),
+          MilkDropped(animal: c.cow.name, percent: -c.changePercent, today: c.today!, average: c.average),
     for (final p in (await breeding.summary()).data?.calvingSoon ?? const <Pregnancy>[])
       if (p.daysToCalving(clock.now()) <= 7) CalvingDue(animal: p.animal.name, due: p.due),
     for (final st in (await feed.summary()).data?.stock ?? const <FeedStock>[])
@@ -128,12 +126,44 @@ class FakeHomeRepository implements HomeRepository {
       WorkerDay(
         clockedInAt: me?.record?.inAt,
         morningSession: true,
-        feedingGroupsLeft: _real ? 0 : 2,
-        treatmentsDue: _real ? 0 : 1,
+        feedingGroupsLeft: _real ? await _groupsLeftToFeed() : 2,
+        treatmentsDue: _real ? await _treatmentsDue() : 1,
         dippingDue: _real ? await _nextDipping() : _today.add(const Duration(days: 6)),
         tasks: [for (final t in tasks) WorkerTask(id: t.id, title: t.title, when: _capitalise(t.when), done: t.done)],
       ),
     );
+  }
+
+  /// Groups the farm has (from the herd) not yet fed today.
+  Future<int> _groupsLeftToFeed() async {
+    final c = (await herd!.counts()).data;
+    if (c == null) return 0;
+    final has = {
+      if (c.milking + c.pregnant > 0) FeedGroup.milkingCows,
+      if (c.dry > 0) FeedGroup.dryCows,
+      if (c.heifers > 0) FeedGroup.heifers,
+      if (c.calves > 0) FeedGroup.calves,
+    };
+    final fed = (await feed.groupsFedOn(_today)).data ?? const <FeedGroup>{};
+    return has.difference(fed).length;
+  }
+
+  /// Courses still running with no dose given today, plus health jobs due
+  /// today or late.
+  Future<int> _treatmentsDue() async {
+    final now = clock.now();
+    final records = await _all();
+    final givenToday = {
+      for (final r in records)
+        if (!r.given.isBefore(_today)) r.animalId,
+    };
+    final running = {
+      for (final r in records)
+        if (r.active(now) && !givenToday.contains(r.animalId)) r.animalId,
+    };
+    final tomorrow = _today.add(const Duration(days: 1));
+    final jobs = ((await treatments.schedule()).data ?? const <HealthTask>[]).where((t) => t.due.isBefore(tomorrow));
+    return running.length + jobs.length;
   }
 
   Future<DateTime?> _nextDipping() async {
@@ -154,6 +184,10 @@ const Map<FeedKind, String> _feedNames = {
   FeedKind.maizeBran: 'Maize bran',
   FeedKind.mineralLick: 'Mineral lick',
   FeedKind.silage: 'Silage',
+  FeedKind.napierGrass: 'Napier grass',
+  FeedKind.hay: 'Hay',
+  FeedKind.cottonSeedCake: 'Cotton seed cake',
+  FeedKind.brewersWaste: "Brewers' waste",
 };
 
 String _capitalise(String s) => s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
