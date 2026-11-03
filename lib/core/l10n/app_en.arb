@@ -3057,5 +3057,6 @@
   "feedCottonCake": "Cotton seed cake",
   "feedBrewersWaste": "Brewers' waste",
   "countFeedStock": "Count stock",
-  "countFeedStockSub": "What is in the store now. Do this when you start, and whenever the numbers look wrong."
+  "countFeedStockSub": "What is in the store now. Do this when you start, and whenever the numbers look wrong.",
+  "addFemalesFirst": "Add your cows and heifers in Herd first, then record heats and services here."
 }

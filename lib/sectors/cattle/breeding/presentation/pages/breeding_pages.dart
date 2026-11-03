@@ -91,6 +91,10 @@ class _BreedingPageState extends State<BreedingPage> {
     final l10n = AppLocalizations.of(context);
     final animals = (await widget.repo.animals()).data ?? const <BreedingAnimal>[];
     if (!mounted) return;
+    if (animals.isEmpty) {
+      FarmTapToast.show(context, message: l10n.addFemalesFirst);
+      return;
+    }
     final picked = await showAdaptiveSheet<BreedingAnimal>(
       context,
       builder: (sheet) => Column(
@@ -142,7 +146,7 @@ class _BreedingPageState extends State<BreedingPage> {
     if (pregnant) {
       await _celebrate(service);
     } else {
-      await widget.repo.recordCheck(serviceId: service.id, pregnant: false, by: widget.repo.technicians.last);
+      await widget.repo.recordCheck(serviceId: service.id, pregnant: false, by: widget.repo.checker);
       if (!mounted) return;
       FarmTapToast.show(context, message: l10n.notPregnantSaved(service.animal.name));
       _reload();
@@ -150,11 +154,7 @@ class _BreedingPageState extends State<BreedingPage> {
   }
 
   Future<void> _celebrate(ServiceRecord service) async {
-    final p = (await widget.repo.recordCheck(
-      serviceId: service.id,
-      pregnant: true,
-      by: widget.repo.technicians.last,
-    )).data;
+    final p = (await widget.repo.recordCheck(serviceId: service.id, pregnant: true, by: widget.repo.checker)).data;
     if (p == null || !mounted) return;
     await showPregnancyConfirmed(context, p);
     if (mounted) _reload();
@@ -297,16 +297,19 @@ class _ServiceSheet extends StatefulWidget {
 
 class _ServiceSheetState extends State<_ServiceSheet> {
   late ServiceKind _kind = widget.kind;
-  final _straw = TextEditingController(text: 'Friesian 4421');
+  late String _straw = widget.repo.straws.firstOrNull ?? '';
   final _bull = TextEditingController();
-  final _cost = TextEditingController(text: '35,000');
+  late final _cost = TextEditingController(text: _withCommas(widget.repo.lastAiCost));
   late String _technician = widget.repo.technicians.first;
+
+  static String _withCommas(int? v) =>
+      v == null ? '' : v.toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (_) => ',');
   late DateTime _at = widget.now;
   bool _edited = false;
 
   @override
   void dispose() {
-    for (final c in [_straw, _bull, _cost]) {
+    for (final c in [_bull, _cost]) {
       c.dispose();
     }
     super.dispose();
@@ -340,7 +343,7 @@ class _ServiceSheetState extends State<_ServiceSheet> {
         leading: CowAvatar(avatarIndex: widget.animal.avatarIndex, animalId: widget.animal.id),
         subject: '${widget.animal.name} · ${_kind == ServiceKind.ai ? l10n.aiLabel : l10n.servedNatural}',
         valueText: f.money(_costValue),
-        detail: _kind == ServiceKind.ai ? _straw.text.trim() : _bull.text.trim(),
+        detail: _kind == ServiceKind.ai ? _straw.trim() : _bull.text.trim(),
       );
       if (!ok || !mounted) return;
     }
@@ -348,7 +351,7 @@ class _ServiceSheetState extends State<_ServiceSheet> {
       animalId: widget.animal.id,
       kind: _kind,
       at: _at,
-      straw: _kind == ServiceKind.ai ? _straw.text.trim() : null,
+      straw: _kind == ServiceKind.ai && _straw.trim().isNotEmpty ? _straw.trim() : null,
       bull: _kind == ServiceKind.natural ? _bull.text.trim() : null,
       technician: _kind == ServiceKind.ai ? _technician : null,
       cost: _costValue > 0 ? _costValue : null,
@@ -387,11 +390,17 @@ class _ServiceSheetState extends State<_ServiceSheet> {
           ),
           context.space.gapLg,
           if (_kind == ServiceKind.ai) ...[
-            FarmTapTextField(
+            FarmTapSelectField<String>(
               label: l10n.semenStraw,
               icon: Symbols.science_rounded,
-              controller: _straw,
-              onChanged: (_) => _changed(),
+              options: widget.repo.straws,
+              value: _straw.isEmpty ? null : _straw,
+              labelOf: (t) => t,
+              onChanged: (t) => setState(() {
+                _straw = t;
+                _edited = true;
+              }),
+              picker: (c) => showSearchPicker(c, title: l10n.semenStraw, options: widget.repo.straws, selected: _straw),
             ),
             context.space.gapLg,
             FarmTapSelectField<String>(
@@ -404,6 +413,8 @@ class _ServiceSheetState extends State<_ServiceSheet> {
                 _technician = t;
                 _edited = true;
               }),
+              picker: (c) =>
+                  showSearchPicker(c, title: l10n.technician, options: widget.repo.technicians, selected: _technician),
             ),
             context.space.gapLg,
           ],

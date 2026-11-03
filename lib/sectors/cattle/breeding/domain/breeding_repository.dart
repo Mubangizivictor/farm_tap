@@ -27,4 +27,14 @@ abstract interface class BreedingRepository {
   Future<Result<void>> recordCalving(String animalId, {required DateTime at});
 
   List<String> get technicians;
+
+  /// Semen straws used before, newest first (J02 pick list; custom allowed).
+  List<String> get straws;
+
+  /// The last AI cost entered, to prefill J02; null before the first one.
+  int? get lastAiCost;
+
+  /// Who a pregnancy check is saved as: the vet in samples, else the person
+  /// using the phone.
+  String get checker;
 }

@@ -4029,4 +4029,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get countFeedStockSub =>
       'What is in the store now. Do this when you start, and whenever the numbers look wrong.';
+
+  @override
+  String get addFemalesFirst =>
+      'Add your cows and heifers in Herd first, then record heats and services here.';
 }

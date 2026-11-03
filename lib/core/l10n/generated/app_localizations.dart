@@ -6939,6 +6939,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'What is in the store now. Do this when you start, and whenever the numbers look wrong.'**
   String get countFeedStockSub;
+
+  /// No description provided for @addFemalesFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your cows and heifers in Herd first, then record heats and services here.'**
+  String get addFemalesFirst;
 }
 
 class _AppLocalizationsDelegate

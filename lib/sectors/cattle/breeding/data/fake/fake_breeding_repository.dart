@@ -289,8 +289,25 @@ class FakeBreedingRepository implements BreedingRepository, Restorable {
     // Never empty: the pages pick the first and last.
     return {
       m(),
-      for (final s in _services)
+      for (final s in _newestFirst)
         if (s.technician case final String t when t.isNotEmpty) t,
     }.toList();
+  }
+
+  List<ServiceRecord> get _newestFirst => _services.toList()..sort((a, b) => b.at.compareTo(a.at));
+
+  @override
+  List<String> get straws => {
+    for (final s in _newestFirst)
+      if (s.straw case final String t when t.isNotEmpty) t,
+  }.toList();
+
+  @override
+  int? get lastAiCost => _newestFirst.where((s) => s.kind == ServiceKind.ai && s.cost != null).firstOrNull?.cost;
+
+  @override
+  String get checker {
+    final m = me;
+    return herd == null || m == null ? _vet : m();
   }
 }
