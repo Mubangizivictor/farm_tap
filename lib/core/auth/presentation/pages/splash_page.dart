@@ -1,58 +1,59 @@
 import 'dart:async';
 
-import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/material.dart';
 
-/// A01 — animated splash. Plays for up to 2 s while the local database opens,
-/// then calls [onDone]. The native splash shows the logo before this.
+/// A01 — the native splash, brought to life: the same logo in the same
+/// place, now animated, with the wordmark at the bottom. It stays while
+/// start-up work ([ready]) finishes (at least [FarmTapMotion.splash]),
+/// then calls [onDone].
 class SplashPage extends StatefulWidget {
-  const new({super.key, this.onDone});
+  const new({super.key, this.onDone, this.ready});
 
   final VoidCallback? onDone;
+  final Future<void>? ready;
 
   @override
   State<SplashPage> createState() => _SplashPageState();
 }
 
 class _SplashPageState extends State<SplashPage> {
-  Timer? _timer;
+  var _started = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _timer ??= Timer(context.motion.splash, () => widget.onDone?.call());
+    if (_started) return;
+    _started = true;
+    unawaited(_run(context.motion.splash));
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+  Future<void> _run(Duration min) async {
+    try {
+      await Future.wait([Future<void>.delayed(min), widget.ready ?? Future<void>.value()]);
+    } on Object {
+      // Start-up trouble is shown later by the page that needs the data.
+    }
+    if (mounted) widget.onDone?.call();
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return CenteredLayout(
-      bottom: Text(
-        l10n.splashLoading,
-        textAlign: TextAlign.center,
-        style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+    return Scaffold(
+      body: Stack(
         children: [
-          FarmTapAnimationView(animation: FarmTapAnimations.milking, size: context.sizes.splashAnimationWidth),
-          context.space.gapXl,
-          FarmTapLogo(height: context.sizes.authLogoHeight),
-          context.space.gapXl,
-          const FarmTapLoader(),
-          context.space.gapLg,
-          Text(
-            l10n.splashTagline,
-            textAlign: TextAlign.center,
-            style: context.text.titleLarge?.copyWith(color: context.colors.onSurfaceVariant),
+          Center(
+            child: FarmTapLoader(size: context.sizes.splashMark, semanticLabel: 'FarmTap'),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            // Pinned to the screen's bottom edge, like the native splash.
+            child: Image.asset(
+              FarmTapAssets.byBrightness(context, FarmTapAssets.splashBrandingLight, FarmTapAssets.splashBrandingDark),
+              width: context.sizes.splashBranding,
+              excludeFromSemantics: true,
+            ),
           ),
         ],
       ),

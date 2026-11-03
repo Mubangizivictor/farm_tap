@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:farm_tap/app/app.dart';
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/app/flavor.dart';
+import 'package:farm_tap/app/startup.dart';
 import 'package:farm_tap/core/nfc/card_reader.dart';
 import 'package:farm_tap/core/sound/sound_service.dart';
 import 'package:farm_tap/core/sync/sync_engine.dart';
@@ -24,7 +25,8 @@ Future<void> bootstrap(Flavor flavor) async {
   CardReader.instance = NfcCardReader();
   await configureDependencies(flavor);
 
-  await restoreSavedRecords();
+  // Records come back from the phone's database while A01 animates.
+  startupWork = restoreSavedRecords();
 
   final logger = getIt<AppLogger>();
 
@@ -40,6 +42,7 @@ Future<void> bootstrap(Flavor flavor) async {
     AppLifecycleListener(onResume: () => unawaited(sync.onResume()));
   }
 
-  FlutterNativeSplash.remove();
   runApp(FarmTapApp(config: config));
+  // A01 draws the same logo in the same place, so the hand-over is seamless.
+  FlutterNativeSplash.remove();
 }

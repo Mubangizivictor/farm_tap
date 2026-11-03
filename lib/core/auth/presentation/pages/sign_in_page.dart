@@ -100,10 +100,11 @@ class _SignInViewState extends State<_SignInView> {
     Widget point(IconData icon, FarmTapTone tone, String text) => Padding(
       padding: EdgeInsets.only(bottom: context.space.md),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           IconBubble(icon: icon, tone: tone, size: context.sizes.bubbleMd),
           context.space.gapMd,
-          Expanded(child: Text(text, style: context.text.titleSmall)),
+          Flexible(child: Text(text, style: context.text.titleSmall)),
         ],
       ),
     );
@@ -119,18 +120,23 @@ class _SignInViewState extends State<_SignInView> {
         children: [
           Center(child: FarmTapLogo(height: context.sizes.appBarLogoHeight)),
           context.space.gapLg,
-          DecoratedBox(
-            decoration: BoxDecoration(color: context.colors.primaryContainer, borderRadius: context.radii.card),
-            child: Center(
-              child: FarmTapAnimationView(animation: FarmTapAnimations.welcome, size: context.sizes.authIllustration),
+          Center(
+            child: FarmTapAnimationView(animation: FarmTapAnimations.welcome, size: context.sizes.authIllustration),
+          ),
+          context.space.gapLg,
+          AuthHeading(title: l10n.welcomeTitle, subtitle: l10n.welcomeBody, center: true),
+          context.space.gapLg,
+          Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                point(Symbols.cloud_off_rounded, FarmTapTone.primary, l10n.signInPointOffline),
+                point(Symbols.contactless_rounded, FarmTapTone.gold, l10n.signInPointCards),
+                point(Symbols.monitoring_rounded, FarmTapTone.info, l10n.signInPointAll),
+              ],
             ),
           ),
-          context.space.gapXl,
-          AuthHeading(title: l10n.welcomeTitle, subtitle: l10n.welcomeBody),
-          context.space.gapLg,
-          point(Symbols.cloud_off_rounded, FarmTapTone.primary, l10n.signInPointOffline),
-          point(Symbols.contactless_rounded, FarmTapTone.gold, l10n.signInPointCards),
-          point(Symbols.monitoring_rounded, FarmTapTone.info, l10n.signInPointAll),
         ],
       ),
     );

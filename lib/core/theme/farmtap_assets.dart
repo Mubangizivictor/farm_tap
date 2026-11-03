@@ -42,6 +42,10 @@ abstract final class FarmTapAssets {
   static const loadingDarkGif = '$_a/loading_dark.gif';
   static const loadingLightWebp = '$_a/loading_light.webp';
   static const loadingDarkWebp = '$_a/loading_dark.webp';
+  // Native splash wordmark, reused at the bottom of A01 so the two match.
+  static const splashBrandingLight = 'assets/splash/splash_branding_light.png';
+  static const splashBrandingDark = 'assets/splash/splash_branding_dark.png';
+
   static const splashAnimationLightGif = '$_a/splash_animation_light.gif';
   static const splashAnimationDarkGif = '$_a/splash_animation_dark.gif';
   static const splashAnimationLightWebp = '$_a/splash_animation_light.webp';

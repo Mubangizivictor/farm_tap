@@ -197,6 +197,14 @@ class FarmTapSizes extends ThemeExtension<FarmTapSizes> {
   double get loaderSize => 56 * scale;
   double get splashAnimationWidth => 220 * scale;
 
+  /// The animated mark on A01, sized to sit exactly over the native splash
+  /// logo (768 px image at 4x = 192 pt; the mark fills 65 % of it). Not
+  /// scaled: the native splash is not.
+  double get splashMark => 142;
+
+  /// Native splash branding (wordmark) image width: 800 px at 4x.
+  double get splashBranding => 186;
+
   // ---- Borders and strokes ----
   double get borderThin => 1;
   double get borderInput => 1;

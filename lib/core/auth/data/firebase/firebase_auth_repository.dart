@@ -63,7 +63,16 @@ class FirebaseAuthRepository implements AuthRepository {
   };
 
   @override
-  Future<Result<AccountUser>> signInWithGoogle() => _run(() => _auth.signInWithProvider(GoogleAuthProvider()));
+  Future<Result<AccountUser>> signInWithGoogle() => _run(
+    // Always show Google's account chooser (pick or add an account), not a
+    // silent sign-in with the last one used.
+    () => _auth.signInWithProvider(
+      GoogleAuthProvider()
+        ..addScope('email')
+        ..addScope('profile')
+        ..setCustomParameters({'prompt': 'select_account'}),
+    ),
+  );
 
   @override
   Future<Result<AccountUser>> signInWithApple() => _run(

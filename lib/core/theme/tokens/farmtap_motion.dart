@@ -7,7 +7,7 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
     this.fast = const Duration(milliseconds: 150),
     this.normal = const Duration(milliseconds: 250),
     this.slow = const Duration(milliseconds: 400),
-    this.splash = const Duration(milliseconds: 2000),
+    this.splash = const Duration(milliseconds: 900),
     this.snackBar = const Duration(seconds: 3),
     this.shake = const Duration(milliseconds: 300),
     this.celebration = const Duration(milliseconds: 1800),
@@ -22,7 +22,7 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
   final Duration normal;
   final Duration slow;
 
-  /// How long the animated splash plays before moving on.
+  /// Shortest time the animated splash shows (it also waits for start-up).
   final Duration splash;
 
   /// How long confirmation messages stay on screen.

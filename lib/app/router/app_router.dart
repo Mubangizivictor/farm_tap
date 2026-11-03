@@ -9,6 +9,7 @@ import 'package:farm_tap/app/router/routes.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/app/shell/app_shell.dart';
 import 'package:farm_tap/app/shell/pending_section.dart';
+import 'package:farm_tap/app/startup.dart';
 import 'package:farm_tap/core/auth/presentation/pages/check_email_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/email_sign_in_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/email_sign_up_page.dart';
@@ -495,7 +496,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         AppRoutes.splash,
         parent: null,
-        builder: (context, state) => SplashPage(onDone: () => context.go(AppRoutes.signIn)),
+        builder: (context, state) => SplashPage(ready: startupWork, onDone: () => context.go(AppRoutes.signIn)),
       ),
       page(
         AppRoutes.signIn,
