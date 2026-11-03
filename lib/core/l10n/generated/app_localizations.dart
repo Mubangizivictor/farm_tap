@@ -6807,6 +6807,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send today\'s report on WhatsApp'**
   String get sendNowWhatsapp;
+
+  /// No description provided for @addAnimalsFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your animals in Herd first, then record treatments here.'**
+  String get addAnimalsFirst;
+
+  /// No description provided for @diseaseName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name of the disease'**
+  String get diseaseName;
+
+  /// No description provided for @whatYouSee.
+  ///
+  /// In en, this message translates to:
+  /// **'What you see (optional)'**
+  String get whatYouSee;
+
+  /// No description provided for @boughtMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought more'**
+  String get boughtMore;
+
+  /// No description provided for @countStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Count'**
+  String get countStock;
+
+  /// No description provided for @howManyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'How many are on the shelf now'**
+  String get howManyNow;
+
+  /// No description provided for @howManyBought.
+  ///
+  /// In en, this message translates to:
+  /// **'How many did you buy'**
+  String get howManyBought;
+
+  /// No description provided for @pricePaidOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Price paid (optional)'**
+  String get pricePaidOptional;
+
+  /// No description provided for @enterAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number'**
+  String get enterAmount;
+
+  /// No description provided for @stockSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock saved'**
+  String get stockSaved;
+
+  /// No description provided for @markJobDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Is “{job}” done?'**
+  String markJobDone(String job);
+
+  /// No description provided for @markDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, it is done'**
+  String get markDone;
+
+  /// No description provided for @jobDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as done'**
+  String get jobDone;
+
+  /// No description provided for @noHealthJobs.
+  ///
+  /// In en, this message translates to:
+  /// **'No health jobs planned'**
+  String get noHealthJobs;
+
+  /// No description provided for @noHealthJobsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add dipping, deworming and vaccinations so nobody forgets them.'**
+  String get noHealthJobsBody;
+
+  /// No description provided for @overdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get overdue;
 }
 
 class _AppLocalizationsDelegate

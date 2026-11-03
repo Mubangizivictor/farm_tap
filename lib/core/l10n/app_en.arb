@@ -3028,5 +3028,28 @@
   "notSetYet": "Not set yet",
   "whatsappNumber": "WhatsApp number",
   "setWhatsappNumber": "Set the WhatsApp number that gets this report.",
-  "sendNowWhatsapp": "Send today's report on WhatsApp"
+  "sendNowWhatsapp": "Send today's report on WhatsApp",
+  "addAnimalsFirst": "Add your animals in Herd first, then record treatments here.",
+  "diseaseName": "Name of the disease",
+  "whatYouSee": "What you see (optional)",
+  "boughtMore": "Bought more",
+  "countStock": "Count",
+  "howManyNow": "How many are on the shelf now",
+  "howManyBought": "How many did you buy",
+  "pricePaidOptional": "Price paid (optional)",
+  "enterAmount": "Enter a number",
+  "stockSaved": "Stock saved",
+  "markJobDone": "Is “{job}” done?",
+  "@markJobDone": {
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+  "markDone": "Yes, it is done",
+  "jobDone": "Marked as done",
+  "noHealthJobs": "No health jobs planned",
+  "noHealthJobsBody": "Add dipping, deworming and vaccinations so nobody forgets them.",
+  "overdue": "Overdue"
 }

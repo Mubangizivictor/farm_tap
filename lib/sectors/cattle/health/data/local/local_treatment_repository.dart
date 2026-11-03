@@ -1,5 +1,7 @@
 import 'package:farm_tap/core/error/failure.dart';
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/money/domain/money_models.dart';
+import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
@@ -11,7 +13,10 @@ import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 /// Real-data treatments (decision 0014): everything comes from the records
 /// saved on this phone (and pulled from other phones). No sample data.
 class LocalTreatmentRepository implements TreatmentRepository {
-  new({required this.journal, required this.clock, required this.herd, required this.me});
+  new({required this.journal, required this.clock, required this.herd, required this.me, this.money});
+
+  /// Where bought drugs are recorded as a vet expense.
+  final MoneyRepository Function()? money;
 
   final RecordJournal journal;
   final Clock clock;
@@ -51,6 +56,8 @@ class LocalTreatmentRepository implements TreatmentRepository {
             shortName: (r.body['name'] as String? ?? '').split(' ').first,
             withdrawalDays: r.body['withdrawalDays'] as int? ?? 0,
             stock: (r.body['stock'] as num? ?? 0).toDouble(),
+            unit: DrugUnit.values.asNameMap()[r.body['unit']] ?? DrugUnit.bottles,
+            reorderAt: (r.body['reorderAt'] as num?)?.toDouble(),
           ),
     ];
     final ids = {for (final d in saved) d.id};
@@ -87,6 +94,8 @@ class LocalTreatmentRepository implements TreatmentRepository {
           dose: b['dose'] as String?,
           route: DrugRoute.values.byName(b['route'] as String? ?? DrugRoute.injection.name),
           givenBy: b['givenBy'] as String?,
+          photo: b['photo'] as String?,
+          note: b['note'] as String?,
         ),
       );
     }
@@ -154,6 +163,8 @@ class LocalTreatmentRepository implements TreatmentRepository {
       'dose': input.dose,
       'route': input.route.name,
       'givenBy': input.givenBy,
+      'photo': input.photo,
+      'note': input.note,
     });
     return Result.success((await _all()).firstWhere((r) => r.id == id));
   }
@@ -162,8 +173,9 @@ class LocalTreatmentRepository implements TreatmentRepository {
   Future<Result<List<HealthTask>>> schedule() async {
     final out = <HealthTask>[
       for (final r in await journal.load('reminders'))
-        if (r.body['kind'] == 'health')
+        if (r.body['kind'] == 'health' && r.body['done'] != true)
           HealthTask(
+            id: r.id,
             kind: HealthTaskKind.values.asNameMap()[r.body['taskKind']] ?? HealthTaskKind.vaccination,
             title: r.body['title'] as String? ?? '',
             detail: r.body['detail'] as String? ?? '',
@@ -171,6 +183,14 @@ class LocalTreatmentRepository implements TreatmentRepository {
           ),
     ];
     return Result.success(out..sort((a, b) => a.due.compareTo(b.due)));
+  }
+
+  @override
+  Future<Result<void>> setTaskDone(String taskId, {required bool done}) async {
+    final r = await journal.store.get('reminders', taskId);
+    if (r == null) return const Result.success(null);
+    await journal.put('reminders', taskId, {...r.body, 'done': done, 'doneAt': clock.now().toIso8601String()});
+    return const Result.success(null);
   }
 
   @override
@@ -196,6 +216,50 @@ class LocalTreatmentRepository implements TreatmentRepository {
     return Result.success(
       Drug(id: id, name: name, shortName: name.split(' ').first, withdrawalDays: withdrawalDays, stock: stock),
     );
+  }
+
+  Future<Map<String, Object?>> _drugBody(String drugId) async {
+    final saved = await journal.store.get('stockItems', drugId);
+    if (saved != null && !saved.isDeleted) return {...saved.body};
+    final d = (await _drugs()).firstWhere((d) => d.id == drugId);
+    return {
+      'kind': 'drug',
+      'name': d.name,
+      'stock': d.stock,
+      'withdrawalDays': d.withdrawalDays,
+      'unit': d.unit.name,
+      'reorderAt': d.reorderAt,
+    };
+  }
+
+  @override
+  Future<Result<void>> restockDrug(String drugId, {required double amount, int? price}) async {
+    final body = await _drugBody(drugId);
+    final stock = (body['stock'] as num? ?? 0).toDouble() + amount;
+    await journal.put('stockItems', drugId, {...body, 'stock': stock});
+    final movement = await journal.add('stockMovements', {
+      'kind': 'drugPurchase',
+      'drugId': drugId,
+      'amount': amount,
+      'price': price,
+      'at': clock.now().toIso8601String(),
+    });
+    if (price != null && price > 0) {
+      await money?.call().addExpense(
+        category: ExpenseCategory.vet,
+        amount: price,
+        note: body['name'] as String?,
+        sourceId: movement,
+      );
+    }
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<void>> setDrugStock(String drugId, double stock) async {
+    final body = await _drugBody(drugId);
+    await journal.put('stockItems', drugId, {...body, 'stock': stock});
+    return const Result.success(null);
   }
 
   /// The phone's user first, then everyone who treated an animal before.

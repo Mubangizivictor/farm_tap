@@ -147,6 +147,7 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
           clock: getIt<Clock>(),
           herd: getIt.call<HerdRepository>,
           me: _me,
+          money: getIt.call<MoneyRepository>,
         ),
       )
       ..registerLazySingleton<MilkRepository>(

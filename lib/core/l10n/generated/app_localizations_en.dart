@@ -3958,4 +3958,56 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sendNowWhatsapp => 'Send today\'s report on WhatsApp';
+
+  @override
+  String get addAnimalsFirst =>
+      'Add your animals in Herd first, then record treatments here.';
+
+  @override
+  String get diseaseName => 'Name of the disease';
+
+  @override
+  String get whatYouSee => 'What you see (optional)';
+
+  @override
+  String get boughtMore => 'Bought more';
+
+  @override
+  String get countStock => 'Count';
+
+  @override
+  String get howManyNow => 'How many are on the shelf now';
+
+  @override
+  String get howManyBought => 'How many did you buy';
+
+  @override
+  String get pricePaidOptional => 'Price paid (optional)';
+
+  @override
+  String get enterAmount => 'Enter a number';
+
+  @override
+  String get stockSaved => 'Stock saved';
+
+  @override
+  String markJobDone(String job) {
+    return 'Is “$job” done?';
+  }
+
+  @override
+  String get markDone => 'Yes, it is done';
+
+  @override
+  String get jobDone => 'Marked as done';
+
+  @override
+  String get noHealthJobs => 'No health jobs planned';
+
+  @override
+  String get noHealthJobsBody =>
+      'Add dipping, deworming and vaccinations so nobody forgets them.';
+
+  @override
+  String get overdue => 'Overdue';
 }

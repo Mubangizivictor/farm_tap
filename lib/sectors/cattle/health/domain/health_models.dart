@@ -56,6 +56,7 @@ class TreatmentRecord {
     this.dose,
     this.route = DrugRoute.injection,
     this.givenBy,
+    this.photo,
   });
 
   final String id;
@@ -76,6 +77,9 @@ class TreatmentRecord {
   final String? dose;
   final DrugRoute route;
   final String? givenBy;
+
+  /// Photo of the wound or sick part (PhotoStore key).
+  final String? photo;
 
   DateTime get _givenDay => DateTime(given.year, given.month, given.day);
 
@@ -112,6 +116,8 @@ class NewTreatment {
     this.dose,
     this.route = DrugRoute.injection,
     this.givenBy,
+    this.photo,
+    this.note,
   });
 
   final String animalId;
@@ -121,14 +127,30 @@ class NewTreatment {
   final String? dose;
   final DrugRoute route;
   final String? givenBy;
+  final String? photo;
+
+  /// What was seen ("swollen left hind leg"), or the disease name for Other.
+  final String? note;
 }
 
 enum HealthTaskKind { dipping, deworming, vaccination }
 
 /// H05 — a planned herd health job.
 class HealthTask {
-  const new({required this.kind, required this.title, required this.detail, required this.due});
+  const new({
+    required this.kind,
+    required this.title,
+    required this.detail,
+    required this.due,
+    this.id = '',
+    this.done = false,
+  });
 
+  /// Record id (empty until saved).
+  final String id;
+
+  /// Done jobs drop off the calendar.
+  final bool done;
   final HealthTaskKind kind;
   final String title;
   final String detail;

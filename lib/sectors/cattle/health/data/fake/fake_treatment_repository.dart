@@ -223,6 +223,8 @@ class FakeTreatmentRepository implements TreatmentRepository, Restorable {
       dose: input.dose,
       route: input.route,
       givenBy: input.givenBy,
+      photo: input.photo,
+      note: input.note,
     );
     // One open course per animal: the new record replaces the old one.
     _records = [record, ..._records.where((r) => r.animalId != a.id)];
@@ -235,12 +237,17 @@ class FakeTreatmentRepository implements TreatmentRepository, Restorable {
       'dose': input.dose,
       'route': input.route.name,
       'givenBy': input.givenBy,
+      'photo': input.photo,
+      'note': input.note,
     }, id: record.id);
     return Result.success(record);
   }
 
   @override
-  Future<Result<List<HealthTask>>> schedule() async => Result.success(_schedule);
+  Future<Result<List<HealthTask>>> schedule() async => Result.success([
+    for (final t in _schedule)
+      if (!_doneTasks.contains(t.id.isEmpty ? t.title : t.id)) t,
+  ]);
 
   @override
   Future<Result<void>> addTask(HealthTask task) async {
@@ -248,6 +255,43 @@ class FakeTreatmentRepository implements TreatmentRepository, Restorable {
     await journal?.add('reminders', {'kind': 'health', 'title': task.title, 'due': task.due.toIso8601String()});
     return const Result.success(null);
   }
+
+  @override
+  Future<Result<void>> setTaskDone(String taskId, {required bool done}) async {
+    done ? _doneTasks.add(taskId) : _doneTasks.remove(taskId);
+    return const Result.success(null);
+  }
+
+  final Set<String> _doneTasks = {};
+
+  @override
+  Future<Result<void>> restockDrug(String drugId, {required double amount, int? price}) async {
+    _drugList = [
+      for (final d in _drugList)
+        if (d.id == drugId) _withStock(d, d.stock + amount) else d,
+    ];
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<void>> setDrugStock(String drugId, double stock) async {
+    _drugList = [
+      for (final d in _drugList)
+        if (d.id == drugId) _withStock(d, stock) else d,
+    ];
+    return const Result.success(null);
+  }
+
+  static Drug _withStock(Drug d, double stock) => Drug(
+    id: d.id,
+    name: d.name,
+    shortName: d.shortName,
+    withdrawalDays: d.withdrawalDays,
+    stock: stock,
+    unit: d.unit,
+    reorderAt: d.reorderAt,
+    inStockList: d.inStockList,
+  );
 
   @override
   Future<Result<Drug>> addDrug({required String name, required double stock, required int withdrawalDays}) async {
