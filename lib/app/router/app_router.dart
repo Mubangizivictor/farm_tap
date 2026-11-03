@@ -25,6 +25,7 @@ import 'package:farm_tap/core/onboarding/presentation/pages/waitlist_and_done.da
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
+import 'package:farm_tap/core/settings/presentation/pages/help_page.dart';
 import 'package:farm_tap/core/settings/presentation/pages/more_page.dart';
 import 'package:farm_tap/core/settings/presentation/pages/settings_page.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
@@ -453,11 +454,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         parent: AppRoutes.settings,
         builder: (context, state) => const PendingSection(path: AppRoutes.settingsSubscription),
       ),
-      page(
-        'help',
-        parent: AppRoutes.settings,
-        builder: (context, state) => const PendingSection(path: AppRoutes.settingsHelp),
-      ),
+      page('help', parent: AppRoutes.settings, builder: (context, state) => const HelpPage()),
     ],
     AppRoutes.home: [
       page(

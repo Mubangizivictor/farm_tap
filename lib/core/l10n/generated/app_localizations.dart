@@ -5898,6 +5898,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Farm'**
   String get farmTitle;
+
+  /// No description provided for @helpIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Stuck or have a question? Talk to the FarmTap team. We answer in English.'**
+  String get helpIntro;
+
+  /// No description provided for @helpWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat on WhatsApp'**
+  String get helpWhatsapp;
+
+  /// No description provided for @helpWhatsappSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Fastest; send a screenshot if something looks wrong'**
+  String get helpWhatsappSub;
+
+  /// No description provided for @helpCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Call us'**
+  String get helpCall;
+
+  /// No description provided for @helpSms.
+  ///
+  /// In en, this message translates to:
+  /// **'Send an SMS'**
+  String get helpSms;
+
+  /// No description provided for @helpOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open that on this phone.'**
+  String get helpOpenFailed;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -209,7 +209,7 @@ void main() {
       ('Money', '/money', 'Cost per litre'),
       ('Reports', '/reports', 'Monthly farm report'),
       ('Settings', '/settings', 'Account'),
-      ('Help & support', '/settings/help', 'Coming soon'),
+      ('Help & support', '/settings/help', 'Chat on WhatsApp'),
     ]) {
       testWidgets(label, (tester) async {
         final h = await _Harness.pump(tester, start: AppRoutes.more, signedIn: true, farm: true);

@@ -2672,5 +2672,11 @@
   "soundsLabel": "Sounds",
   "soundsSub": "Clicks and chimes when you save",
   "accountTitle": "Account",
-  "farmTitle": "Farm"
+  "farmTitle": "Farm",
+  "helpIntro": "Stuck or have a question? Talk to the FarmTap team. We answer in English.",
+  "helpWhatsapp": "Chat on WhatsApp",
+  "helpWhatsappSub": "Fastest; send a screenshot if something looks wrong",
+  "helpCall": "Call us",
+  "helpSms": "Send an SMS",
+  "helpOpenFailed": "Could not open that on this phone."
 }

@@ -3331,4 +3331,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get farmTitle => 'Farm';
+
+  @override
+  String get helpIntro => 'Stuck or have a question? Talk to the FarmTap team. We answer in English.';
+
+  @override
+  String get helpWhatsapp => 'Chat on WhatsApp';
+
+  @override
+  String get helpWhatsappSub => 'Fastest; send a screenshot if something looks wrong';
+
+  @override
+  String get helpCall => 'Call us';
+
+  @override
+  String get helpSms => 'Send an SMS';
+
+  @override
+  String get helpOpenFailed => 'Could not open that on this phone.';
 }
