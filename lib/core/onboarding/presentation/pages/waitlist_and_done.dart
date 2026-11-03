@@ -181,6 +181,11 @@ class _FarmReadyPageState extends State<FarmReadyPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (!failed && snapshot.data == null)
+                Padding(
+                  padding: EdgeInsets.only(bottom: context.space.sm),
+                  child: const Center(child: FarmTapLoader()),
+                ),
               if (failed || snapshot.data == null)
                 Padding(
                   padding: EdgeInsets.only(bottom: context.space.md),

@@ -428,7 +428,7 @@ class _ReportsPageState extends State<ReportsPage> {
             future: _load,
             builder: (context, snapshot) {
               final m = snapshot.data;
-              if (m == null) return const SizedBox.shrink();
+              if (m == null) return const FarmTapPageLoader();
               final month = '${f.monthLong(m.month)} ${m.month.year}';
               return FarmTapCard(
                 child: Column(

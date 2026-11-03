@@ -7,6 +7,7 @@ import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/avatars.dart';
 import 'package:farm_tap/core/ui/controls.dart';
+import 'package:farm_tap/core/ui/farmtap_loader.dart';
 import 'package:farm_tap/core/ui/navigation_scope.dart';
 import 'package:farm_tap/core/ui/status_banner.dart';
 import 'package:flutter/material.dart';
@@ -324,9 +325,63 @@ class _Content extends StatelessWidget {
     if (!scrollable) return framed;
     final refresh = onRefresh;
     if (refresh == null) return SingleChildScrollView(child: framed);
-    return RefreshIndicator(
+    return _LogoRefresh(
       onRefresh: refresh,
       child: SingleChildScrollView(physics: const AlwaysScrollableScrollPhysics(), child: framed),
+    );
+  }
+}
+
+/// Pull to refresh with the FarmTap loader at the top instead of the
+/// Material spinner.
+class _LogoRefresh extends StatefulWidget {
+  const new({required this.onRefresh, required this.child});
+
+  final RefreshCallback onRefresh;
+  final Widget child;
+
+  @override
+  State<_LogoRefresh> createState() => _LogoRefreshState();
+}
+
+class _LogoRefreshState extends State<_LogoRefresh> {
+  RefreshIndicatorStatus? _status;
+
+  @override
+  Widget build(BuildContext context) {
+    final showing = switch (_status) {
+      RefreshIndicatorStatus.armed || RefreshIndicatorStatus.snap || RefreshIndicatorStatus.refresh => true,
+      _ => false,
+    };
+    return Stack(
+      children: [
+        RefreshIndicator.noSpinner(
+          onRefresh: widget.onRefresh,
+          onStatusChange: (s) {
+            if (mounted && s != _status) setState(() => _status = s);
+          },
+          child: widget.child,
+        ),
+        if (showing)
+          Positioned(
+            top: context.space.md,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: context.colors.surfaceContainerLowest,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: context.colors.outlineVariant, width: context.sizes.borderThin),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(context.space.sm),
+                  child: FarmTapLoader(size: context.sizes.iconXl),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

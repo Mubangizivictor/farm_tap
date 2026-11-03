@@ -33,7 +33,7 @@ class SignInPage extends StatelessWidget {
   }
 }
 
-class _SignInView extends StatelessWidget {
+class _SignInView extends StatefulWidget {
   const new({required this.auth, required this.onSignedIn, required this.onEmail, this.showApple});
 
   final AuthRepository auth;
@@ -41,12 +41,23 @@ class _SignInView extends StatelessWidget {
   final VoidCallback onEmail;
   final bool? showApple;
 
-  Future<void> _provider(BuildContext context, Future<Result<AccountUser>> Function() action) async {
+  @override
+  State<_SignInView> createState() => _SignInViewState();
+}
+
+class _SignInViewState extends State<_SignInView> {
+  /// The provider being signed in with (its button shows the loader).
+  SignInProvider? _working;
+
+  Future<void> _provider(SignInProvider p, Future<Result<AccountUser>> Function() action) async {
     final l10n = AppLocalizations.of(context);
+    setState(() => _working = p);
     final result = await context.read<AuthActionCubit>().run(action);
-    if (!context.mounted || result == null) return;
+    if (!mounted) return;
+    setState(() => _working = null);
+    if (result == null) return;
     if (result.isSuccess) {
-      onSignedIn();
+      widget.onSignedIn();
     } else {
       final message = authErrorText(l10n, result.failure);
       if (message == null) return;
@@ -58,7 +69,7 @@ class _SignInView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final apple =
-        showApple ??
+        widget.showApple ??
         (kIsWeb || defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS);
     final busy = context.watch<AuthActionCubit>().state.busy;
     final buttons = Column(
@@ -67,22 +78,34 @@ class _SignInView extends StatelessWidget {
         FarmTapButton(
           label: l10n.continueGoogle,
           kind: ButtonKind.neutral,
-          leading: const ProviderBadge('G'),
-          onPressed: busy ? null : () => _provider(context, auth.signInWithGoogle),
+          leading: const ProviderLogo(SignInProvider.google),
+          loading: _working == SignInProvider.google,
+          onPressed: busy ? null : () => _provider(SignInProvider.google, widget.auth.signInWithGoogle),
         ),
         if (apple) ...[
           SizedBox(height: context.space.keyGap),
           FarmTapButton(
             label: l10n.continueApple,
             kind: ButtonKind.neutral,
-            leading: const ProviderBadge('A'),
-            onPressed: busy ? null : () => _provider(context, auth.signInWithApple),
+            leading: const ProviderLogo(SignInProvider.apple),
+            loading: _working == SignInProvider.apple,
+            onPressed: busy ? null : () => _provider(SignInProvider.apple, widget.auth.signInWithApple),
           ),
         ],
-        SizedBox(height: context.space.keyGap),
-        FarmTapButton(label: l10n.continueEmail, icon: Symbols.mail_rounded, onPressed: busy ? null : onEmail),
+        const OrDivider(),
+        FarmTapButton(label: l10n.continueEmail, icon: Symbols.mail_rounded, onPressed: busy ? null : widget.onEmail),
         const AuthFooter(),
       ],
+    );
+    Widget point(IconData icon, FarmTapTone tone, String text) => Padding(
+      padding: EdgeInsets.only(bottom: context.space.md),
+      child: Row(
+        children: [
+          IconBubble(icon: icon, tone: tone, size: context.sizes.bubbleMd),
+          context.space.gapMd,
+          Expanded(child: Text(text, style: context.text.titleSmall)),
+        ],
+      ),
     );
     return SplitAuthLayout(
       animation: FarmTapAnimations.welcome,
@@ -91,16 +114,24 @@ class _SignInView extends StatelessWidget {
       bottom: buttons,
       // The footer links are 48 dp tall; keep the text where the mockup has it.
       compactBottomPadding: context.space.sm,
-      child: Padding(
-        padding: EdgeInsets.only(top: context.isCompact ? context.space.xxl : context.space.xl),
-        child: Column(
-          children: [
-            FarmTapAnimationView(animation: FarmTapAnimations.welcome, size: context.sizes.authIllustration),
-            FarmTapLogo(height: context.sizes.authLogoHeight),
-            context.space.gapLg,
-            AuthHeading(title: l10n.welcomeTitle, subtitle: l10n.welcomeBody, center: true),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(child: FarmTapLogo(height: context.sizes.appBarLogoHeight)),
+          context.space.gapLg,
+          DecoratedBox(
+            decoration: BoxDecoration(color: context.colors.primaryContainer, borderRadius: context.radii.card),
+            child: Center(
+              child: FarmTapAnimationView(animation: FarmTapAnimations.welcome, size: context.sizes.authIllustration),
+            ),
+          ),
+          context.space.gapXl,
+          AuthHeading(title: l10n.welcomeTitle, subtitle: l10n.welcomeBody),
+          context.space.gapLg,
+          point(Symbols.cloud_off_rounded, FarmTapTone.primary, l10n.signInPointOffline),
+          point(Symbols.contactless_rounded, FarmTapTone.gold, l10n.signInPointCards),
+          point(Symbols.monitoring_rounded, FarmTapTone.info, l10n.signInPointAll),
+        ],
       ),
     );
   }

@@ -47,7 +47,9 @@ class _FarmPickerPageState extends State<FarmPickerPage> {
             children: [
               AuthHeading(title: l10n.chooseFarmTitle, subtitle: l10n.chooseFarmSubtitle(places.length)),
               context.space.gapLg,
-              if (places.isNotEmpty)
+              if (!snapshot.hasData && snapshot.connectionState != ConnectionState.done)
+                const FarmTapPageLoader()
+              else if (places.isNotEmpty)
                 ListCard(
                   children: [for (final p in places) _PlaceTile(place: p, onTap: () => _open(p))],
                 ),

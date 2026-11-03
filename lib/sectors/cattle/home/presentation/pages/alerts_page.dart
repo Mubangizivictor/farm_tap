@@ -64,7 +64,9 @@ class _AlertsPageState extends State<AlertsPage> {
                 onSelected: (v) => setState(() => _filter = v),
               ),
               context.space.gapMd,
-              if (snapshot.hasData && shown.isEmpty)
+              if (!snapshot.hasData)
+                const FarmTapPageLoader()
+              else if (shown.isEmpty)
                 EmptyState(title: l10n.emptyDefaultTitle, animation: FarmTapAnimations.syncDone)
               else
                 ListCard(

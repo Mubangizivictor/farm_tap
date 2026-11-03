@@ -10,6 +10,7 @@ export 'cards.dart';
 export 'celebration_overlay.dart';
 export 'charts.dart';
 export 'controls.dart';
+export 'farmtap_loader.dart';
 export 'farmtap_platform.dart';
 export 'farmtap_toast.dart';
 export 'icon_bubble.dart';

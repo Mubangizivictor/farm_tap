@@ -91,7 +91,9 @@ class _CentreFarmersPageState extends State<CentreFarmersPage> {
                 onSelected: (v) => setState(() => _filter = v),
               ),
               context.space.gapSm,
-              if (snapshot.hasData && shown.isEmpty)
+              if (!snapshot.hasData)
+                const FarmTapPageLoader()
+              else if (shown.isEmpty)
                 Padding(
                   padding: EdgeInsets.all(context.space.xl),
                   child: Text(l10n.noMatches, textAlign: TextAlign.center, style: context.text.bodyMedium),

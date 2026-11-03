@@ -110,7 +110,7 @@ class _FeedStockPageState extends State<FeedStockPage> {
         future: _load,
         builder: (context, snapshot) {
           final s = snapshot.data;
-          if (s == null) return const SizedBox.shrink();
+          if (s == null) return const FarmTapPageLoader();
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

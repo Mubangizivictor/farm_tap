@@ -149,7 +149,7 @@ class _EmailSignUpPageState extends State<EmailSignUpPage> {
         tagline: l10n.brandTagline,
         description: l10n.brandBody,
         header: const AuthBackButton(),
-        bottom: FarmTapButton(label: l10n.createAccount, onPressed: state.busy ? null : _submit),
+        bottom: FarmTapButton(label: l10n.createAccount, onPressed: state.busy ? null : _submit, loading: state.busy),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

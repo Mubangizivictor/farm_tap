@@ -175,7 +175,7 @@ class _BreedingPageState extends State<BreedingPage> {
         future: _load,
         builder: (context, snapshot) {
           final s = snapshot.data;
-          if (s == null) return const SizedBox.shrink();
+          if (s == null) return const FarmTapPageLoader();
           final calvings = ListCard(
             title: l10n.expectedCalvings,
             children: [

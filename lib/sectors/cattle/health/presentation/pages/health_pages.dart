@@ -80,7 +80,7 @@ class HealthHomePage extends StatelessWidget {
         future: _load(),
         builder: (context, snapshot) {
           final data = snapshot.data;
-          if (data == null) return const SizedBox.shrink();
+          if (data == null) return const FarmTapPageLoader();
           final (records, tasks, drugs) = data;
           final active = records.where((r) => r.active(now)).toList();
           final blocked = records.where((r) => r.inWithdrawal(now)).length;

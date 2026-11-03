@@ -34,9 +34,13 @@ abstract final class PasswordRules {
   /// Easy to read aloud and type, e.g. "Rain-Heifer-4821!".
   static String suggest([Random? random]) {
     final r = random ?? Random.secure();
-    String word() => _words[r.nextInt(_words.length)];
+    final first = _words[r.nextInt(_words.length)];
+    var second = first;
+    while (second == first) {
+      second = _words[r.nextInt(_words.length)];
+    }
     final digits = (1000 + r.nextInt(9000)).toString();
     const marks = '!#%*?';
-    return '${word()}-${word()}-$digits${marks[r.nextInt(marks.length)]}';
+    return '$first-$second-$digits${marks[r.nextInt(marks.length)]}';
   }
 }

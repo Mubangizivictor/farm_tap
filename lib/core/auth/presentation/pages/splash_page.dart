@@ -47,6 +47,8 @@ class _SplashPageState extends State<SplashPage> {
           context.space.gapXl,
           FarmTapLogo(height: context.sizes.authLogoHeight),
           context.space.gapXl,
+          const FarmTapLoader(),
+          context.space.gapLg,
           Text(
             l10n.splashTagline,
             textAlign: TextAlign.center,

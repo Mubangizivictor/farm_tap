@@ -668,7 +668,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
               future: staffAccess.findByCard(state.uri.queryParameters['card'] ?? ''),
               builder: (context, snapshot) {
                 final staff = snapshot.data?.data;
-                if (staff == null) return const SizedBox.shrink();
+                if (staff == null) return const FarmTapPageLoader();
                 return StaffPinPage(
                   staff: staff,
                   access: staffAccess,

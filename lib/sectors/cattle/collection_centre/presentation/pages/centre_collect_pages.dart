@@ -109,7 +109,7 @@ class _CentreHomePageState extends State<CentreHomePage> {
         future: _load,
         builder: (context, snapshot) {
           final (day, farmers) = snapshot.data ?? (null, const <CentreFarmer>[]);
-          if (day == null) return const SizedBox.shrink();
+          if (day == null) return const FarmTapPageLoader();
           final session = centreSessionName(l10n, day.session);
           final byId = {for (final x in farmers) x.id: x};
           final tiles = [

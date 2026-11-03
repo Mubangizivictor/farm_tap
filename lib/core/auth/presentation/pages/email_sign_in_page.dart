@@ -80,7 +80,7 @@ class _EmailSignInPageState extends State<EmailSignInPage> {
         bottom: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FarmTapButton(label: l10n.signIn, onPressed: state.busy ? null : _submit),
+            FarmTapButton(label: l10n.signIn, onPressed: state.busy ? null : _submit, loading: state.busy),
             TextAction(label: l10n.newToFarmTap, onPressed: widget.onCreateAccount),
           ],
         ),

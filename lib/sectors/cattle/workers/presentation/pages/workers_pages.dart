@@ -280,7 +280,7 @@ class _StaffDetailPageState extends State<StaffDetailPage> {
         future: _load,
         builder: (context, snapshot) {
           final (s, days, wage, milkRecords) = snapshot.data ?? (null, 0, null, 0);
-          if (s == null) return const SizedBox.shrink();
+          if (s == null) return const FarmTapPageLoader();
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -454,7 +454,7 @@ class _AssignCardPageState extends State<AssignCardPage> {
         future: _load,
         builder: (context, snapshot) {
           final (s, blank) = snapshot.data ?? (null, null);
-          if (s == null) return const SizedBox.shrink();
+          if (s == null) return const FarmTapPageLoader();
           return Center(
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: context.sizes.keypadMaxWidth),
@@ -576,7 +576,7 @@ class _AttendancePageState extends State<AttendancePage> {
         future: _load,
         builder: (context, snapshot) {
           final all = snapshot.data;
-          if (all == null) return const SizedBox.shrink();
+          if (all == null) return const FarmTapPageLoader();
           final shift = all.where((t) => t.onShift).toList();
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
