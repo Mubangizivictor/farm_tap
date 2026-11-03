@@ -8,6 +8,8 @@ import 'package:farm_tap/core/sync/record_journal.dart';
 
 /// Sample staff from the mockups. Every PIN is 1234 in the UI phase.
 /// Peter has no card yet (K01 "No card"); blank cards 0207-0215 are in stock.
+/// With [withSamples] false (real data) the farm starts with no staff, no
+/// blank cards, and no default PIN.
 class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory, Restorable {
   new({
     this.nfc = true,
@@ -15,7 +17,13 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
     DateTime Function()? now,
     this._hasher = const PinHasher(iterations: 2000),
     this.journal,
-  }) : _lockout = PinLockout(now: now ?? _never);
+    this.withSamples = true,
+  }) : _lockout = PinLockout(now: now ?? _never),
+       _staff = withSamples ? [...sample] : [],
+       _blankCards = withSamples ? [for (var n = 207; n <= 215; n++) n.toString().padLeft(4, '0')] : [];
+
+  /// False in real-data mode.
+  final bool withSamples;
 
   /// The simulator and web have no NFC; set false to show C05.
   final bool nfc;
@@ -35,9 +43,17 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
   /// Without a clock a lock never ends (tests that only count tries).
   static DateTime _never() => DateTime(2000);
   String? _sampleHash;
-  String _hashFor(String staffId) => _pinHashes[staffId] ?? (_sampleHash ??= _hasher.hash(pin));
-  final List<StaffMember> _staff = [...sample];
-  final List<String> _blankCards = [for (var n = 207; n <= 215; n++) n.toString().padLeft(4, '0')];
+
+  /// Only the demo staff share PIN 1234; a real person without a saved
+  /// hash cannot unlock until a manager sets their PIN.
+  String? _hashFor(String staffId) => _pinHashes[staffId] ?? (withSamples ? (_sampleHash ??= _hasher.hash(pin)) : null);
+  final List<StaffMember> _staff;
+  final List<String> _blankCards;
+
+  bool _matches(String staffId, String entered) {
+    final hash = _hashFor(staffId);
+    return hash != null && _hasher.verify(entered, hash);
+  }
 
   static Map<String, Object?> _staffBody(StaffMember s) => {
     'name': s.name,
@@ -138,7 +154,7 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
   @override
   Future<Result<PinCheck>> verifyPin(String staffId, String entered) async {
     if (_lockout.isLocked(staffId)) return const Result.success(PinLocked());
-    if (_hasher.verify(entered, _hashFor(staffId))) {
+    if (_matches(staffId, entered)) {
       _lockout.reset(staffId);
       return const Result.success(PinAccepted());
     }
@@ -190,7 +206,7 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
 
   @override
   Future<Result<bool>> verifyManagerPin(String entered) async =>
-      Result.success(_staff.any((s) => s.role == StaffRole.manager && _hasher.verify(entered, _hashFor(s.id))));
+      Result.success(_staff.any((s) => s.role == StaffRole.manager && _matches(s.id, entered)));
 
   @override
   Future<Result<void>> resetPin(String staffId) async {

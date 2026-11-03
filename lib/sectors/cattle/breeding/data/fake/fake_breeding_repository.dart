@@ -7,12 +7,17 @@ import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_models.dart';
 import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
+import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
+import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 
 /// UI phase: 9 confirmed pregnancies (Kyasiimire, Kahara, Bihogo calve within
 /// 30 days of Sat 7 Nov), 2 services due a pregnancy check and a heifer that
 /// showed heat yesterday. Every date is calculated with [BreedingRules].
+/// With [herd] (real data) there are no samples: the animals are the herd's
+/// breeding females and the records are the farm's own.
 class FakeBreedingRepository implements BreedingRepository, Restorable {
-  new(this.clock, this.money, {this.journal}) {
+  new(this.clock, this.money, {this.journal, this.herd, this.me}) {
+    if (herd != null) return;
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
     // Served so that she calves on [due].
@@ -71,6 +76,31 @@ class FakeBreedingRepository implements BreedingRepository, Restorable {
   /// Saves records on the phone for sync (decision 0014); null in tests.
   final RecordJournal? journal;
   final MoneyRepository money;
+
+  /// Real-data mode: breeding animals come from here.
+  final HerdRepository Function()? herd;
+
+  /// Real-data mode: the person using the phone (offered as technician).
+  final String Function()? me;
+
+  /// Females old enough to breed: not calves, not dead or sold.
+  Future<List<BreedingAnimal>> _animalList() async {
+    final h = herd;
+    if (h == null) return _animals;
+    final all = (await h().watchAnimals().first).data ?? const <Animal>[];
+    return [
+      for (final a in all)
+        if (!a.isDeleted && a.sex == AnimalSex.female && a.dairyStatus != DairyStatus.calf)
+          BreedingAnimal(
+            id: a.id,
+            name: a.name.isEmpty ? a.tagNumber : a.name,
+            tag: a.tagNumber,
+            avatarIndex: a.avatarIndex,
+            heifer: a.dairyStatus == DairyStatus.heifer,
+          ),
+    ];
+  }
+
   final List<ServiceRecord> _services = [];
   final List<PregnancyCheck> _checks = [];
   final List<CalvingRecord> _calvings = [];
@@ -111,7 +141,7 @@ class FakeBreedingRepository implements BreedingRepository, Restorable {
     final now = clock.now();
     final pregnancies = <Pregnancy>[];
     final tasks = <BreedingTask>[];
-    for (final a in _animals) {
+    for (final a in await _animalList()) {
       final last = _latest(a.id);
       if (last == null) continue;
       final calved = _calvings.any((c) => c.animalId == a.id && c.at.isAfter(last.at));
@@ -142,7 +172,7 @@ class FakeBreedingRepository implements BreedingRepository, Restorable {
   }
 
   @override
-  Future<Result<List<BreedingAnimal>>> animals() async => const Result.success(_animals);
+  Future<Result<List<BreedingAnimal>>> animals() async => Result.success(await _animalList());
 
   @override
   Future<void> restore() async {
@@ -150,12 +180,13 @@ class FakeBreedingRepository implements BreedingRepository, Restorable {
     if (j == null) return;
     final events = await j.load('breedingEvents')
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final animals = await _animalList();
     for (final r in events) {
       final b = r.body;
       final at = DateTime.parse(b['at']! as String);
       switch (b['type']) {
         case 'ai' || 'service':
-          final animal = _animals.where((a) => a.id == b['animalId']).firstOrNull;
+          final animal = animals.where((a) => a.id == b['animalId']).firstOrNull;
           if (animal == null || _services.any((s) => s.id == r.id)) continue;
           _services.add(
             ServiceRecord(
@@ -200,7 +231,7 @@ class FakeBreedingRepository implements BreedingRepository, Restorable {
   }) async {
     final s = ServiceRecord(
       id: journal?.newId() ?? 'service-${_next++}',
-      animal: _animals.firstWhere((a) => a.id == animalId),
+      animal: (await _animalList()).firstWhere((a) => a.id == animalId),
       kind: kind,
       at: at,
       straw: straw,
@@ -252,5 +283,14 @@ class FakeBreedingRepository implements BreedingRepository, Restorable {
   }
 
   @override
-  List<String> get technicians => const [_technician, _vet];
+  List<String> get technicians {
+    final m = me;
+    if (herd == null || m == null) return const [_technician, _vet];
+    // Never empty: the pages pick the first and last.
+    return {
+      m(),
+      for (final s in _services)
+        if (s.technician case final String t when t.isNotEmpty) t,
+    }.toList();
+  }
 }

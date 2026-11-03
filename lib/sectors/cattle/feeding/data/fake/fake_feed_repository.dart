@@ -16,8 +16,10 @@ import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 /// lick 6 blocks, silage 3 t; UGX 1,844,000 bought / 8,742 L = UGX 211 a litre.
 /// Each purchase records its expense in [money]; the month's feed cost is
 /// read back from there (the same expenses L01/L02 show).
+/// With [withSamples] false (real data) it starts empty.
 class FakeFeedRepository implements FeedRepository, Restorable {
-  new(this.clock, this.milk, this.money, {this.journal}) {
+  new(this.clock, this.milk, this.money, {this.journal, this.withSamples = true}) {
+    if (!withSamples) return;
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
     final monthStart = DateTime(today.year, today.month);
@@ -92,9 +94,10 @@ class FakeFeedRepository implements FeedRepository, Restorable {
   final RecordJournal? journal;
   final MilkRepository milk;
   final MoneyRepository money;
-  late List<FeedCount> _counts;
-  late List<FeedPurchase> _purchases;
-  late List<FeedingRecord> _feedings;
+  final bool withSamples;
+  List<FeedCount> _counts = const [];
+  List<FeedPurchase> _purchases = const [];
+  List<FeedingRecord> _feedings = const [];
   var _next = 100;
 
   @override
@@ -237,5 +240,10 @@ class FakeFeedRepository implements FeedRepository, Restorable {
   }
 
   @override
-  List<String> get suppliers => const [_agroVet, _silageSupplier];
+  List<String> get suppliers => withSamples
+      ? const [_agroVet, _silageSupplier]
+      : {
+          for (final p in _purchases)
+            if (p.supplier case final String s when s.isNotEmpty) s,
+        }.toList();
 }

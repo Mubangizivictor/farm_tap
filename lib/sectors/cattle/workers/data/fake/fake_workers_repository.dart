@@ -14,8 +14,10 @@ import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 /// UI phase: every worker clocked in on each earlier day this month; today
 /// Tom 6:02, Amos 5:45, Joy 6:10 and Rita 6:30 are in (4 of 6). Advances
 /// this month: Amos 120,000, Peter 80,000, Rita 40,000 (wage expenses).
+/// With [withSamples] false (real data) it starts empty.
 class FakeWorkersRepository implements WorkersRepository, Restorable {
-  new(this.clock, this.directory, this.money, this.milk, {this.journal}) {
+  new(this.clock, this.directory, this.money, this.milk, {this.journal, this.withSamples = true}) {
+    if (!withSamples) return;
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
     DateTime at(int h, int m, [int daysAgo = 0]) =>
@@ -95,6 +97,9 @@ class FakeWorkersRepository implements WorkersRepository, Restorable {
   };
 
   final Clock clock;
+
+  /// False in real-data mode.
+  final bool withSamples;
 
   /// Saves records on the phone for sync (decision 0014); null in tests.
   final RecordJournal? journal;

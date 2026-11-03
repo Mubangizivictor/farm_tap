@@ -20,7 +20,13 @@ class FakeDailyReportRepository implements DailyReportRepository {
     required this.treatments,
     required this.feed,
     required this.money,
-  });
+    bool withSamples = true,
+  }) : _settings = DailyReportSettings(
+         phone: withSamples ? '+256 772 451 908' : '',
+         sendMinutes: 19 * 60,
+         includeMoney: false,
+         smsFallback: true,
+       );
 
   final Clock clock;
   final String Function() farmName;
@@ -29,12 +35,7 @@ class FakeDailyReportRepository implements DailyReportRepository {
   final TreatmentRepository treatments;
   final FeedRepository feed;
   final FarmMoneyRepository money;
-  DailyReportSettings _settings = const DailyReportSettings(
-    phone: '+256 772 451 908',
-    sendMinutes: 19 * 60,
-    includeMoney: false,
-    smsFallback: true,
-  );
+  DailyReportSettings _settings;
 
   @override
   Future<Result<DailyReport>> today() async {

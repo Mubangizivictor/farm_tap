@@ -1,15 +1,23 @@
 import 'package:farm_tap/core/money/data/fake/fake_money_repository.dart';
+import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
+import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/sync/data/memory_record_store.dart';
 import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/id_generator.dart';
 import 'package:farm_tap/sectors/cattle/breeding/data/fake/fake_breeding_repository.dart';
+import 'package:farm_tap/sectors/cattle/collection_centre/data/fake/fake_centre_repository.dart';
+import 'package:farm_tap/sectors/cattle/feeding/data/fake/fake_feed_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/data/local/local_treatment_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_models.dart';
 import 'package:farm_tap/sectors/cattle/herd/data/local/local_herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
+import 'package:farm_tap/sectors/cattle/home/data/fake/fake_home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/data/local/local_milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_models.dart';
+import 'package:farm_tap/sectors/cattle/money/data/fake/fake_farm_money_repository.dart';
+import 'package:farm_tap/sectors/cattle/owner_reports/data/fake/fake_daily_report_repository.dart';
+import 'package:farm_tap/sectors/cattle/workers/data/fake/fake_workers_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Real-data mode: a new farm starts empty and every number comes from the
@@ -22,6 +30,8 @@ void main() {
   late LocalHerdRepository herd;
   late LocalMilkRepository milk;
   late LocalTreatmentRepository health;
+  late FakeMoneyRepository money;
+  late FakeBreedingRepository breeding;
 
   Animal cow(String id, String tag, {DairyStatus status = DairyStatus.milking, AnimalSex sex = AnimalSex.female}) =>
       Animal(
@@ -52,7 +62,8 @@ void main() {
       tenantId: () => tenant,
       actor: () => 'owner-uid',
     );
-    final breeding = FakeBreedingRepository(clock, FakeMoneyRepository(clock));
+    money = FakeMoneyRepository(clock, journal: journal, withSamples: false);
+    breeding = FakeBreedingRepository(clock, money, journal: journal, herd: () => herd, me: () => 'Victor');
     health = LocalTreatmentRepository(journal: journal, clock: clock, herd: () => herd, me: () => 'Victor');
     milk = LocalMilkRepository(journal: journal, clock: clock, treatments: health, herd: () => herd);
     herd = LocalHerdRepository(
@@ -120,5 +131,89 @@ void main() {
     open();
     expect((await herd.counts()).data!.total, 0);
     expect(await store.get('animals', 'a1'), isNotNull);
+  });
+
+  test('every other section starts empty in real-data mode', () async {
+    final staff = FakeStaffAccessRepository(journal: journal, withSamples: false);
+    final feed = FakeFeedRepository(clock, milk, money, journal: journal, withSamples: false);
+    final workers = FakeWorkersRepository(clock, staff, money, milk, journal: journal, withSamples: false);
+    final centre = FakeCentreRepository(clock, journal: journal, withSamples: false);
+    final home = FakeHomeRepository(
+      clock,
+      health,
+      breeding: breeding,
+      feed: feed,
+      workers: workers,
+      herd: herd,
+      milk: milk,
+    );
+    final report = FakeDailyReportRepository(
+      clock: clock,
+      farmName: () => 'New farm',
+      home: home,
+      milk: milk,
+      treatments: health,
+      feed: feed,
+      money: FakeFarmMoneyRepository(clock, money, milk),
+      withSamples: false,
+    );
+
+    expect((await staff.staff()).data, isEmpty);
+    expect((await staff.nextBlankCard()).data, isNull);
+    expect((await money.expenses()).data, isEmpty);
+    expect((await feed.summary()).data!.costThisMonth, 0);
+    expect(feed.suppliers, isEmpty);
+    expect((await workers.today()).data, isEmpty);
+    expect((await workers.tasks()).data, isEmpty);
+    expect((await breeding.animals()).data, isEmpty);
+    expect((await breeding.summary()).data!.pregnancies, isEmpty);
+    expect(breeding.technicians, ['Victor']);
+    expect((await centre.farmers()).data, isEmpty);
+    expect((await centre.today()).data!.litres, 0);
+    expect((await centre.payments()).data!.lines, isEmpty);
+    final summary = (await home.summary()).data!;
+    expect(summary.milkToday, 0);
+    expect(summary.cows, 0);
+    expect((await home.attention()).data, isEmpty);
+    expect((await home.workerDay('nobody')).data!.dippingDue, isNull);
+    final r = (await report.today()).data!;
+    expect(r.milkLitres, 0);
+    expect((await report.settings()).data!.phone, isEmpty);
+  });
+
+  test('real-mode records flow into home, breeding, staff and centre', () async {
+    await herd.addAnimal(cow('a1', 'FT-001'));
+    await milk.recordCow('a1', MilkSession.morning, 8, notForSale: false, recordedBy: 'owner');
+    expect((await breeding.animals()).data!.single.id, 'a1');
+
+    final staff = FakeStaffAccessRepository(journal: journal, withSamples: false);
+    final amos = (await staff.addStaff(name: 'Amos', role: StaffRole.herdsman, pin: '4821')).data!;
+    expect((await staff.verifyPin(amos.id, '1234')).data, isA<PinRejected>(), reason: 'no shared demo PIN');
+    final restarted = FakeStaffAccessRepository(journal: journal, withSamples: false);
+    await restarted.restore();
+    expect((await restarted.verifyPin(amos.id, '4821')).data, isA<PinAccepted>());
+
+    final centre = FakeCentreRepository(clock, journal: journal, withSamples: false);
+    final f = (await centre.addFarmer(name: 'Robert', phone: '+256 772 000 111', village: 'Kashari')).data!;
+    await centre.recordDelivery(f.id, 20);
+    expect((await centre.today()).data!.litres, 20);
+    expect((await centre.payments()).data!.lines.single.litres, 20);
+    expect((await centre.smsPreview()).data!.weekLitres, 20);
+
+    final feed = FakeFeedRepository(clock, milk, money, journal: journal, withSamples: false);
+    final workers = FakeWorkersRepository(clock, staff, money, milk, journal: journal, withSamples: false);
+    final home = FakeHomeRepository(
+      clock,
+      health,
+      breeding: breeding,
+      feed: feed,
+      workers: workers,
+      herd: herd,
+      milk: milk,
+    );
+    final summary = (await home.summary()).data!;
+    expect(summary.milkToday, 8);
+    expect(summary.milking, 1);
+    expect(summary.cows, 1);
   });
 }

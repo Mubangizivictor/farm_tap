@@ -45,3 +45,8 @@ Remaining UI polish in 0013 pauses for about a week. Week 2 items CORE-07/08/09/
 
 ## Tests
 Unit tests for outbox, backoff, merge rules, PIN hashing and lockout; a "flaky 2G" fake remote that drops 30% of calls must end with every record synced exactly once.
+
+## Real-data mode (3 Nov 2026)
+- The normal build now signs in with Firebase and starts every farm empty. Herd, milk and health are calculated straight from the farm's records (`data/local/`); the other sections start empty and reload from the records when a farm opens and after each sync.
+- The demo build with the mockup samples: `flutter run --dart-define=FARMTAP_DEMO=true`. Widget and golden tests use the demo data.
+- Known limit: switching to a second farm without restarting the app can show the first farm's feeding, money and staff lists until restart (saving still goes to the right farm).

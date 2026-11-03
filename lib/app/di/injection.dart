@@ -68,11 +68,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt getIt = GetIt.instance;
 
-/// UI phase: in-memory fake repositories with the sample data from the
-/// mockups. No Isar writes, no Firebase. Set to false in the backend phase.
-const bool useFakeData = true;
+/// The demo build: in-memory repositories with the mockup sample data, no
+/// Firebase. Run it with `--dart-define=FARMTAP_DEMO=true`. The normal build
+/// signs in with Firebase and starts every farm empty (decision 0014).
+const bool demoBuild = bool.fromEnvironment('FARMTAP_DEMO');
 
-Future<void> configureDependencies(Flavor flavor) async {
+bool _demo = demoBuild;
+
+/// True in the demo build and in widget/golden tests.
+bool get useFakeData => _demo;
+
+/// [demo] defaults to the build setting; tests pass true.
+Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async {
+  _demo = demo;
   final tenants = InMemoryTenantProvider();
 
   // Core utils and services
@@ -130,10 +138,7 @@ Future<void> configureDependencies(Flavor flavor) async {
           journal: getIt<RecordJournal>(),
           clock: getIt<Clock>(),
           herd: getIt.call<HerdRepository>,
-          me: () {
-            final session = getIt<SessionController>();
-            return session.staff?.name ?? session.auth.currentUser?.name ?? '';
-          },
+          me: _me,
         ),
       )
       ..registerLazySingleton<MilkRepository>(
@@ -155,14 +160,16 @@ Future<void> configureDependencies(Flavor flavor) async {
       );
   }
 
-  // Not yet on real data (part 2 of real-data mode): these still start from
-  // the sample data in both builds, but every save is journaled and synced.
+  // Shared by both builds: the demo starts them with the mockup samples; the
+  // Firebase build starts them empty and fills them from the farm's records.
+  final samples = useFakeData;
   getIt
     ..registerLazySingleton<FakeStaffAccessRepository>(
       () => FakeStaffAccessRepository(
         today: getIt<Clock>().today,
         now: getIt<Clock>().now,
         journal: getIt<RecordJournal>(),
+        withSamples: samples,
       ),
     )
     ..registerLazySingleton<StaffAccessRepository>(getIt.call<FakeStaffAccessRepository>)
@@ -174,12 +181,16 @@ Future<void> configureDependencies(Flavor flavor) async {
         breeding: getIt<BreedingRepository>(),
         feed: getIt<FeedRepository>(),
         workers: getIt<WorkersRepository>(),
+        herd: samples ? null : getIt<HerdRepository>(),
+        milk: samples ? null : getIt<MilkRepository>(),
       ),
     )
     ..registerLazySingleton<CentreRepository>(
-      () => FakeCentreRepository(getIt<Clock>(), journal: getIt<RecordJournal>()),
+      () => FakeCentreRepository(getIt<Clock>(), journal: getIt<RecordJournal>(), withSamples: samples),
     )
-    ..registerLazySingleton<MoneyRepository>(() => FakeMoneyRepository(getIt<Clock>(), journal: getIt<RecordJournal>()))
+    ..registerLazySingleton<MoneyRepository>(
+      () => FakeMoneyRepository(getIt<Clock>(), journal: getIt<RecordJournal>(), withSamples: samples),
+    )
     ..registerLazySingleton<WorkersRepository>(
       () => FakeWorkersRepository(
         getIt<Clock>(),
@@ -187,6 +198,7 @@ Future<void> configureDependencies(Flavor flavor) async {
         getIt<MoneyRepository>(),
         getIt<MilkRepository>(),
         journal: getIt<RecordJournal>(),
+        withSamples: samples,
       ),
     )
     ..registerLazySingleton<FarmMoneyRepository>(
@@ -201,10 +213,17 @@ Future<void> configureDependencies(Flavor flavor) async {
         treatments: getIt<TreatmentRepository>(),
         feed: getIt<FeedRepository>(),
         money: getIt<FarmMoneyRepository>(),
+        withSamples: samples,
       ),
     )
     ..registerLazySingleton<BreedingRepository>(
-      () => FakeBreedingRepository(getIt<Clock>(), getIt<MoneyRepository>(), journal: getIt<RecordJournal>()),
+      () => FakeBreedingRepository(
+        getIt<Clock>(),
+        getIt<MoneyRepository>(),
+        journal: getIt<RecordJournal>(),
+        herd: samples ? null : getIt.call<HerdRepository>,
+        me: samples ? null : _me,
+      ),
     )
     ..registerLazySingleton<FeedRepository>(
       () => FakeFeedRepository(
@@ -212,6 +231,7 @@ Future<void> configureDependencies(Flavor flavor) async {
         getIt<MilkRepository>(),
         getIt<MoneyRepository>(),
         journal: getIt<RecordJournal>(),
+        withSamples: samples,
       ),
     );
 
@@ -220,12 +240,46 @@ Future<void> configureDependencies(Flavor flavor) async {
   getIt.registerLazySingleton(
     () => SessionController(auth: getIt<AuthRepository>(), clock: getIt<Clock>(), trialClock: getIt<TrustedClock>()),
   );
+  if (!useFakeData) {
+    // No farm is open until the person picks or creates one.
+    tenants.currentTenantId = '';
+    _followOpenFarm(tenants);
+  }
 
   // Herd use cases and bloc
   getIt
     ..registerLazySingleton(() => AddAnimal(getIt<HerdRepository>()))
     ..registerLazySingleton(() => WatchAnimals(getIt<HerdRepository>()))
     ..registerFactory(() => HerdBloc(watchAnimals: getIt<WatchAnimals>(), addAnimal: getIt<AddAnimal>()));
+}
+
+/// Real data: when a farm opens, its records are the ones saved and synced;
+/// the sections reload them, and again after each sync brings in records
+/// from the farm's other phones.
+void _followOpenFarm(InMemoryTenantProvider tenants) {
+  final session = getIt<SessionController>();
+  final sync = getIt<SyncService>();
+  session.addListener(() {
+    final id = session.farm?.tenantId;
+    if (id == null || id == tenants.currentTenantId) return;
+    tenants.currentTenantId = id;
+    unawaited(restoreSavedRecords().then((_) => sync.sync()));
+  });
+  var wasSyncing = false;
+  sync.watch().listen((s) {
+    if (wasSyncing && !s.syncing && tenants.currentTenantId.isNotEmpty) unawaited(restoreSavedRecords());
+    wasSyncing = s.syncing;
+  });
+}
+
+/// The person using the phone: the unlocked staff member, else the
+/// signed-in account (its name, else its email). Never empty.
+String _me() {
+  final session = getIt<SessionController>();
+  final user = session.auth.currentUser;
+  final name = session.staff?.name ?? user?.name ?? '';
+  if (name.isNotEmpty) return name;
+  return (user?.email ?? '').isNotEmpty ? user!.email : 'Owner';
 }
 
 const _lastSeenKey = 'trustedClock.lastSeen';
@@ -277,7 +331,8 @@ Future<void> _configureOffline(TenantProvider tenants) async {
         remote: getIt<RemoteStore>(),
         connectivity: connectivity,
         clock: getIt<Clock>(),
-        tenants: () => [tenants.currentTenantId],
+        // Nothing to send or pull until a farm is open.
+        tenants: () => [if (tenants.currentTenantId.isNotEmpty) tenants.currentTenantId],
         collections: syncedCollections,
       ),
     );

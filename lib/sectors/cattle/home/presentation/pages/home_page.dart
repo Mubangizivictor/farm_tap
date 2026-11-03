@@ -316,7 +316,7 @@ class _HomePageState extends State<HomePage> {
                 ActionTile(
                   icon: Symbols.vaccines_rounded,
                   label: l10n.dipping,
-                  subtitle: day == null ? null : l10n.dueOn(f.weekday(day.dippingDue)),
+                  subtitle: day?.dippingDue == null ? null : l10n.dueOn(f.weekday(day!.dippingDue!)),
                   tone: FarmTapTone.info,
                   onTap: () => widget.onOpen(HomeTarget.health),
                 ),

@@ -1,3 +1,4 @@
+import 'package:farm_tap/core/error/failure.dart';
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
@@ -6,10 +7,18 @@ import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_reposito
 
 /// UI phase: Kashari Milk Centre with the G01-G13 sample numbers. A few
 /// farmers are listed in full; the rest only count towards the totals.
+/// With [withSamples] false (real data) the centre starts with no farmers and
+/// every total comes from its own records.
 class FakeCentreRepository implements CentreRepository, Restorable {
-  new(this.clock, {this.journal}) {
+  new(this.clock, {this.journal, this.withSamples = true}) {
     final now = clock.now();
     _day = DateTime(now.year, now.month, now.day);
+    if (!withSamples) {
+      _deductions = {};
+      _farmers = [];
+      _deliveries = [];
+      return;
+    }
     _farmers = [
       const CentreFarmer(
         id: 'farmer-0142',
@@ -126,6 +135,9 @@ class FakeCentreRepository implements CentreRepository, Restorable {
 
   final Clock clock;
 
+  /// False in real-data mode.
+  final bool withSamples;
+
   /// Saves records on the phone for sync (decision 0014); null in tests.
   final RecordJournal? journal;
   late final DateTime _day;
@@ -138,13 +150,23 @@ class FakeCentreRepository implements CentreRepository, Restorable {
   int _next = 5;
   bool _closed = false;
 
-  // Farmers, litres and rejections not listed one by one.
-  static const _totalFarmers = 128;
-  static const _noCard = 4;
-  static const _otherDelivered = 59;
-  static const _otherLitres = 1162;
-  static const _otherRejected = 2;
+  // Sample farmers, litres and rejections not listed one by one.
+  int get _totalFarmers => withSamples ? 128 : _farmers.length;
+  int get _noCard => withSamples ? 4 : _farmers.where((f) => f.card == null).length;
+  int get _otherDelivered => withSamples ? 59 : 0;
+  double get _otherLitres => withSamples ? 1162 : 0;
+  int get _otherRejected => withSamples ? 2 : 0;
   static const managerPin = '1234';
+
+  /// Accepted litres today by hour, 6am to 10am (G01 chart).
+  List<double> _byHour() {
+    final out = List<double>.filled(5, 0);
+    for (final d in _deliveries) {
+      final i = d.at.hour - 6;
+      if (!d.rejected && !d.at.isBefore(_day) && i >= 0 && i < out.length) out[i] += d.litres;
+    }
+    return out;
+  }
 
   Delivery _delivery(String id, CentreFarmer f, double litres, int h, int m, {QualityTest test = QualityTest.passed}) =>
       Delivery(
@@ -170,7 +192,7 @@ class FakeCentreRepository implements CentreRepository, Restorable {
         farmers: _otherDelivered + accepted.map((d) => d.farmerId).toSet().length,
         rejected: _otherRejected + _deliveries.where((d) => d.rejected).length,
         latest: _deliveries.reversed.toList(),
-        litresByHour: const [146, 312, 486, 298, 142],
+        litresByHour: withSamples ? const [146, 312, 486, 298, 142] : _byHour(),
         hourLabels: const ['6am', '7am', '8am', '9am', '10am'],
         closed: _closed,
       ),
@@ -182,7 +204,7 @@ class FakeCentreRepository implements CentreRepository, Restorable {
 
   @override
   Future<Result<FarmerCounts>> counts() async {
-    final delivered = _otherDelivered + _farmers.where((f) => f.deliveredToday).length - 2;
+    final delivered = _otherDelivered + _farmers.where((f) => f.deliveredToday).length - (withSamples ? 2 : 0);
     return Result.success(
       FarmerCounts(
         total: _totalFarmers,
@@ -360,10 +382,18 @@ class FakeCentreRepository implements CentreRepository, Restorable {
 
   @override
   Future<Result<bool>> closeSession(String pin) async {
-    if (pin != managerPin) return const Result.success(false);
+    // Real data: the manager's own PIN check comes with centre staff.
+    if (withSamples && pin != managerPin) return const Result.success(false);
     _closed = true;
     return const Result.success(true);
   }
+
+  /// Accepted litres this pay period (samples carry their own total).
+  double _periodLitres(CentreFarmer f) => withSamples
+      ? f.periodLitres
+      : _deliveries
+            .where((d) => d.farmerId == f.id && !d.rejected && !d.at.isBefore(_start) && d.at.isBefore(_end))
+            .fold(0, (s, d) => s + d.litres);
 
   DateTime get _start => DateTime(_day.year, _day.month);
   DateTime get _end => DateTime(_day.year, _day.month, 15);
@@ -373,11 +403,27 @@ class FakeCentreRepository implements CentreRepository, Restorable {
   Future<Result<PaymentPeriod>> payments() async {
     PaymentLine line(int i, [PayoutStatus status = PayoutStatus.ready]) => PaymentLine(
       farmer: _farmers[i],
-      litres: _farmers[i].periodLitres,
-      gross: _farmers[i].periodLitres * _price,
+      litres: _periodLitres(_farmers[i]),
+      gross: _periodLitres(_farmers[i]) * _price,
       deductions: _deducted(_farmers[i].id),
       status: status,
     );
+    if (!withSamples) {
+      final lines = [for (var i = 0; i < _farmers.length; i++) line(i)];
+      return Result.success(
+        PaymentPeriod(
+          start: _start,
+          end: _end,
+          payDay: _payDay,
+          pricePerLitre: _price,
+          farmers: _farmers.length,
+          litres: lines.fold(0, (s, l) => s + l.litres),
+          amount: lines.fold(0, (s, l) => s + l.gross - l.deductions),
+          fees: 0,
+          lines: lines,
+        ),
+      );
+    }
     return Result.success(
       PaymentPeriod(
         start: _start,
@@ -408,7 +454,7 @@ class FakeCentreRepository implements CentreRepository, Restorable {
         start: _start,
         end: _end,
         payDay: _payDay,
-        litres: farmer.periodLitres,
+        litres: _periodLitres(farmer),
         pricePerLitre: _price,
         deductions: _deductions[farmerId] ?? const [],
       ),
@@ -416,21 +462,47 @@ class FakeCentreRepository implements CentreRepository, Restorable {
   }
 
   @override
-  Future<Result<SmsPreview>> smsPreview() async => Result.success(
-    SmsPreview(
-      centreSender: 'KASHARI MCC',
-      sample: _farmers.first,
-      weekStart: _start,
-      weekEnd: DateTime(_day.year, _day.month, 7),
-      weekLitres: 268,
-      weekAmount: 294800,
-      payDay: _payDay,
-      sentAt: DateTime(_day.year, _day.month, 7, 19),
-      lastDelivery: _deliveries.firstWhere((d) => d.farmerId == _farmers.first.id),
-      messages: _totalFarmers,
-      smsLeft: 172,
-      smsMonthly: 300,
-    ),
+  Future<Result<SmsPreview>> smsPreview() async {
+    if (!withSamples) {
+      final last = _deliveries.where((d) => !d.rejected).lastOrNull;
+      if (last == null) return const Result.failure(ValidationFailure('no-deliveries'));
+      final farmer = _farmers.firstWhere((f) => f.id == last.farmerId);
+      final weekStart = _day.subtract(const Duration(days: 6));
+      final week = _deliveries.where((d) => d.farmerId == farmer.id && !d.rejected && !d.at.isBefore(weekStart));
+      final litres = week.fold<double>(0, (s, d) => s + d.litres);
+      return Result.success(
+        SmsPreview(
+          centreSender: 'FARMTAP',
+          sample: farmer,
+          weekStart: weekStart,
+          weekEnd: _day,
+          weekLitres: litres,
+          weekAmount: litres * _price,
+          payDay: _payDay,
+          sentAt: _day.add(const Duration(hours: 19)),
+          lastDelivery: last,
+          messages: _farmers.length,
+          smsLeft: 0,
+          smsMonthly: 0,
+        ),
+      );
+    }
+    return Result.success(_sampleSms());
+  }
+
+  SmsPreview _sampleSms() => SmsPreview(
+    centreSender: 'KASHARI MCC',
+    sample: _farmers.first,
+    weekStart: _start,
+    weekEnd: DateTime(_day.year, _day.month, 7),
+    weekLitres: 268,
+    weekAmount: 294800,
+    payDay: _payDay,
+    sentAt: DateTime(_day.year, _day.month, 7, 19),
+    lastDelivery: _deliveries.firstWhere((d) => d.farmerId == _farmers.first.id),
+    messages: _totalFarmers,
+    smsLeft: 172,
+    smsMonthly: 300,
   );
 
   @override
@@ -440,18 +512,39 @@ class FakeCentreRepository implements CentreRepository, Restorable {
   Future<Result<void>> payOut(PayMethod method) async => const Result.success(null);
 
   @override
-  Future<Result<Reconciliation>> reconciliation() async => Result.success(
-    Reconciliation(
-      session: CentreSession.morning,
-      received: 1284,
-      dispatched: 1262,
-      limitPercent: 1,
-      truck: 'UBH 223K',
-      buyer: 'Pearl Dairy',
-      driver: 'Ssali James',
-      leftAt: _day.add(const Duration(hours: 10, minutes: 42)),
-      temperature: 4.2,
-    ),
+  Future<Result<Reconciliation>> reconciliation() async {
+    if (!withSamples) {
+      // No dispatch is recorded yet, so received and sent are the same.
+      final received = _deliveries
+          .where((d) => !d.rejected && !d.at.isBefore(_day))
+          .fold<double>(0, (s, d) => s + d.litres);
+      return Result.success(
+        Reconciliation(
+          session: clock.now().hour < 12 ? CentreSession.morning : CentreSession.evening,
+          received: received,
+          dispatched: received,
+          limitPercent: 1,
+          truck: '',
+          buyer: '',
+          driver: '',
+          leftAt: clock.now(),
+          temperature: 0,
+        ),
+      );
+    }
+    return Result.success(_sampleReconciliation());
+  }
+
+  Reconciliation _sampleReconciliation() => Reconciliation(
+    session: CentreSession.morning,
+    received: 1284,
+    dispatched: 1262,
+    limitPercent: 1,
+    truck: 'UBH 223K',
+    buyer: 'Pearl Dairy',
+    driver: 'Ssali James',
+    leftAt: _day.add(const Duration(hours: 10, minutes: 42)),
+    temperature: 4.2,
   );
 
   @override

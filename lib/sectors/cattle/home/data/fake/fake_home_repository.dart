@@ -6,15 +6,35 @@ import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_models.dart';
 import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_models.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
+import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_models.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
+import 'package:farm_tap/sectors/cattle/milk/domain/milk_models.dart';
+import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_models.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 
-/// UI phase: the numbers and alerts shown in the D01-D03 mockups, dated
-/// relative to the clock.
+/// D01-D03. With [herd] and [milk] (real-data mode) every number comes from
+/// the farm's records; without them (the demo) milk and head counts are the
+/// mockup sample numbers, dated relative to the clock.
 class FakeHomeRepository implements HomeRepository {
-  new(this.clock, this.treatments, {required this.breeding, required this.feed, required this.workers});
+  new(
+    this.clock,
+    this.treatments, {
+    required this.breeding,
+    required this.feed,
+    required this.workers,
+    this.herd,
+    this.milk,
+  });
+
+  /// Real-data mode: head counts.
+  final HerdRepository? herd;
+
+  /// Real-data mode: litres and drops.
+  final MilkRepository? milk;
+
+  bool get _real => herd != null && milk != null;
 
   final Clock clock;
 
@@ -42,14 +62,27 @@ class FakeHomeRepository implements HomeRepository {
     final now = clock.now();
     final records = await _all();
     final staffToday = (await workers.today()).data ?? const <StaffToday>[];
-    const litres = [296.0, 300.0, 293.0, 302.0, 305.0, 301.0, 312.0];
+    final List<double> litres;
+    var cows = 48;
+    var milking = 41;
+    var dry = 7;
+    if (_real) {
+      litres = (await milk!.trend(TrendRange.week)).data?.points ?? List.filled(7, 0);
+      final c = (await herd!.counts()).data;
+      milking = (c?.milking ?? 0) + (c?.pregnant ?? 0);
+      dry = c?.dry ?? 0;
+      cows = milking + dry + (c?.heifers ?? 0);
+    } else {
+      litres = const [296.0, 300.0, 293.0, 302.0, 305.0, 301.0, 312.0];
+    }
+    final yesterday = litres.length > 1 ? litres[litres.length - 2] : 0.0;
     return Result.success(
       HomeSummary(
-        milkToday: 312,
-        milkTrendPercent: 6,
-        cows: 48,
-        milking: 41,
-        dry: 7,
+        milkToday: litres.last,
+        milkTrendPercent: _real ? (yesterday == 0 ? 0 : ((litres.last - yesterday) / yesterday * 100).round()) : 6,
+        cows: cows,
+        milking: milking,
+        dry: dry,
         underTreatment: records.where((r) => r.active(now)).length,
         notForSale: records.where((r) => r.inWithdrawal(now)).length,
         workersIn: staffToday.where((s) => s.onShift && s.isIn).length,
@@ -68,13 +101,20 @@ class FakeHomeRepository implements HomeRepository {
     for (final r in await _all())
       if (r.inWithdrawal(clock.now()) && !r.animalDry)
         MilkNotForSale(animal: r.animalName, drug: r.drug.shortName, safeFrom: r.safeFrom),
-    const MilkDropped(animal: 'Ngabire', percent: 22, today: 8.1, average: 10.4),
+    if (_real)
+      for (final c in (await milk!.trend(TrendRange.week)).data?.dropping ?? const <CowTrend>[])
+        if (c.today != null)
+          MilkDropped(animal: c.cow.name, percent: -c.changePercent, today: c.today!, average: c.average)
+        else
+          const MilkDropped(animal: 'Ngabire', percent: 22, today: 8.1, average: 10.4),
     for (final p in (await breeding.summary()).data?.calvingSoon ?? const <Pregnancy>[])
       if (p.daysToCalving(clock.now()) <= 7) CalvingDue(animal: p.animal.name, due: p.due),
     for (final st in (await feed.summary()).data?.stock ?? const <FeedStock>[])
       if (st.reorder) StockLow(item: _feedNames[st.feed]!, bagsLeft: st.left.round(), daysLeft: st.daysLeft!),
-    RecordEdited(person: 'Ahimbisibwe Joy', morning: true, at: _today.add(const Duration(hours: 7, minutes: 42))),
-    const TrialEnding(daysLeft: 9),
+    if (!_real) ...[
+      RecordEdited(person: 'Ahimbisibwe Joy', morning: true, at: _today.add(const Duration(hours: 7, minutes: 42))),
+      const TrialEnding(daysLeft: 9),
+    ],
   ]);
 
   @override
@@ -88,12 +128,20 @@ class FakeHomeRepository implements HomeRepository {
       WorkerDay(
         clockedInAt: me?.record?.inAt,
         morningSession: true,
-        feedingGroupsLeft: 2,
-        treatmentsDue: 1,
-        dippingDue: _today.add(const Duration(days: 6)),
+        feedingGroupsLeft: _real ? 0 : 2,
+        treatmentsDue: _real ? 0 : 1,
+        dippingDue: _real ? await _nextDipping() : _today.add(const Duration(days: 6)),
         tasks: [for (final t in tasks) WorkerTask(id: t.id, title: t.title, when: _capitalise(t.when), done: t.done)],
       ),
     );
+  }
+
+  Future<DateTime?> _nextDipping() async {
+    final due = [
+      for (final t in (await treatments.schedule()).data ?? const <HealthTask>[])
+        if (t.kind == HealthTaskKind.dipping && !t.due.isBefore(_today)) t.due,
+    ]..sort();
+    return due.firstOrNull;
   }
 
   @override
