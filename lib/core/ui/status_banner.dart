@@ -128,7 +128,7 @@ class TrialBanner extends StatelessWidget {
 /// Sidebar trial card: 232 x 82, radius 14, secondaryContainer, savings icon,
 /// "Free trial · 9 days left", 6 dp gold progress, "Upgrade · UGX 70,000/mo".
 class TrialCard extends StatelessWidget {
-  const new({required this.daysLeft, super.key, this.totalDays = 14, this.onUpgrade});
+  const new({required this.daysLeft, super.key, this.totalDays = 7, this.onUpgrade});
 
   final int daysLeft;
   final int totalDays;

@@ -58,6 +58,9 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
   static Map<String, Object?> _staffBody(StaffMember s) => {
     'name': s.name,
     'role': s.role.name,
+    'title': s.title,
+    'phone': s.phone,
+    'monthlyWage': s.monthlyWage,
     'cardNumber': s.cardNumber,
     'since': s.since?.toIso8601String(),
     'active': true,
@@ -121,6 +124,9 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
         name: b['name']! as String,
         role: StaffRole.values.byName(b['role']! as String),
         since: since == null ? null : DateTime.parse(since),
+        title: b['title'] as String?,
+        phone: b['phone'] as String?,
+        monthlyWage: b['monthlyWage'] as int?,
       );
       final card = b['cardNumber'] as String?;
       if (card != null) s = s.withCard(card);
@@ -167,12 +173,22 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
   Future<Result<List<StaffMember>>> staff() async => Result.success(List.unmodifiable(_staff));
 
   @override
-  Future<Result<StaffMember>> addStaff({required String name, required StaffRole role, required String pin}) async {
+  Future<Result<StaffMember>> addStaff({
+    required String name,
+    required StaffRole role,
+    required String pin,
+    String? title,
+    String? phone,
+    int? monthlyWage,
+  }) async {
     final s = StaffMember(
       id: journal?.newId() ?? 'staff-new-${_nextId++}',
       name: name,
       role: role,
       since: today?.call(),
+      title: title,
+      phone: phone,
+      monthlyWage: monthlyWage,
     );
     _staff.add(s);
     _pinHashes[s.id] = _hasher.hash(pin);
@@ -182,9 +198,25 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
   }
 
   @override
-  Future<Result<StaffMember>> updateStaff(String staffId, {required String name, required StaffRole role}) async {
+  Future<Result<StaffMember>> updateStaff(
+    String staffId, {
+    required String name,
+    required StaffRole role,
+    String? title,
+    String? phone,
+    int? monthlyWage,
+  }) async {
     final i = _staff.indexWhere((s) => s.id == staffId);
-    _staff[i] = _staff[i].copyWith(name: name, role: role);
+    _staff[i] = StaffMember(
+      id: staffId,
+      name: name,
+      role: role,
+      cardNumber: _staff[i].cardNumber,
+      since: _staff[i].since,
+      title: title,
+      phone: phone,
+      monthlyWage: monthlyWage,
+    );
     await journal?.put('staff', staffId, {..._staffBody(_staff[i]), 'pinHash': _pinHashes[staffId]});
     return Result.success(_staff[i]);
   }

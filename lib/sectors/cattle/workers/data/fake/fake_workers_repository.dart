@@ -238,7 +238,7 @@ class FakeWorkersRepository implements WorkersRepository, Restorable {
         month: month,
         lines: [
           for (final s in await _staff())
-            if (monthlyWage[s.id] case final wage?)
+            if (s.monthlyWage ?? monthlyWage[s.id] case final wage?)
               WageLine(staff: s, wage: wage, advances: sum(s.id, PayKind.advance), paid: sum(s.id, PayKind.wage)),
         ],
       ),

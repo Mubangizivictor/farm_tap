@@ -2,7 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
-		<key>NFCReaderUsageDescription</key>
+		<key>NSLocationWhenInUseUsageDescription</key>
+	<string>FarmTap uses your location once to fill in your farm's district.</string>
+	<key>NFCReaderUsageDescription</key>
 		<string>FarmTap reads staff and farmer cards.</string>
 		<key>NSCameraUsageDescription</key>
 		<string>FarmTap scans ear tags and takes photos of animals and receipts.</string>

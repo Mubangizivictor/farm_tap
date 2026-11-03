@@ -6,11 +6,26 @@ import 'package:farm_tap/core/people/domain/staff_member.dart';
 abstract interface class StaffDirectory {
   Future<Result<List<StaffMember>>> staff();
 
-  /// K01 Add worker: no card yet (assign one in K03); [pin] unlocks.
-  Future<Result<StaffMember>> addStaff({required String name, required StaffRole role, required String pin});
+  /// K01 Add worker (B09 too): [pin] unlocks; a card can be given at once
+  /// with [assignCard].
+  Future<Result<StaffMember>> addStaff({
+    required String name,
+    required StaffRole role,
+    required String pin,
+    String? title,
+    String? phone,
+    int? monthlyWage,
+  });
 
   /// K02 Edit worker.
-  Future<Result<StaffMember>> updateStaff(String staffId, {required String name, required StaffRole role});
+  Future<Result<StaffMember>> updateStaff(
+    String staffId, {
+    required String name,
+    required StaffRole role,
+    String? title,
+    String? phone,
+    int? monthlyWage,
+  });
 
   /// The next blank printed card in stock ("0207").
   Future<Result<String?>> nextBlankCard();

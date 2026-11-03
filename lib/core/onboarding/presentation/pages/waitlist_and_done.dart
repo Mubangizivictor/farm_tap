@@ -149,7 +149,10 @@ class FarmReadyPage extends StatefulWidget {
 }
 
 class _FarmReadyPageState extends State<FarmReadyPage> {
-  late final Future<FarmMembership?> _farm = widget.repo.createFarm(widget.setup).then((r) => r.data);
+  /// Creating the farm needs the internet once; it can be tried again.
+  late Future<FarmMembership?> _farm = _create();
+
+  Future<FarmMembership?> _create() => widget.repo.createFarm(widget.setup).then((r) => r.data);
 
   @override
   void initState() {
@@ -171,41 +174,67 @@ class _FarmReadyPageState extends State<FarmReadyPage> {
     );
     return FutureBuilder<FarmMembership?>(
       future: _farm,
-      builder: (context, snapshot) => CenteredLayout(
-        bottom: FarmTapButton(
-          label: l10n.startUsingFarmTap,
-          large: true,
-          onPressed: snapshot.data == null ? null : () => widget.onStart(snapshot.data!),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: FarmTapAnimationView(
-                animation: FarmTapAnimations.celebration,
-                size: context.sizes.animationCelebration,
+      builder: (context, snapshot) {
+        final failed = snapshot.connectionState == ConnectionState.done && snapshot.data == null;
+        return CenteredLayout(
+          bottom: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (failed || snapshot.data == null)
+                Padding(
+                  padding: EdgeInsets.only(bottom: context.space.md),
+                  child: Text(
+                    failed ? l10n.farmCreateFailed : l10n.creatingFarm,
+                    textAlign: TextAlign.center,
+                    style: context.text.bodySmall?.copyWith(color: failed ? context.colors.error : null),
+                  ),
+                ),
+              if (failed)
+                FarmTapButton(
+                  label: l10n.tryAgain,
+                  icon: Symbols.refresh_rounded,
+                  large: true,
+                  onPressed: () => setState(() => _farm = _create()),
+                )
+              else
+                FarmTapButton(
+                  label: l10n.startUsingFarmTap,
+                  large: true,
+                  onPressed: snapshot.data == null ? null : () => widget.onStart(snapshot.data!),
+                ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: FarmTapAnimationView(
+                  animation: FarmTapAnimations.celebration,
+                  size: context.sizes.animationCelebration,
+                ),
               ),
-            ),
-            context.space.gapLg,
-            Text(l10n.farmReadyTitle, textAlign: TextAlign.center, style: context.text.headlineSmall),
-            context.space.gapSm,
-            Text(
-              l10n.farmReadyBody(DateFormat('d MMMM', locale).format(ends)),
-              textAlign: TextAlign.center,
-              style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
-            ),
-            context.space.gapLg,
-            FarmTapCard(
-              children: [
-                row(l10n.summaryFarm, widget.setup.farmName),
-                row(l10n.summaryPlan, l10n.planDairy),
-                row(l10n.summaryFreeUntil, DateFormat('d MMM y', locale).format(ends)),
-              ],
-            ),
-          ],
-        ),
-      ),
+              context.space.gapLg,
+              Text(l10n.farmReadyTitle, textAlign: TextAlign.center, style: context.text.headlineSmall),
+              context.space.gapSm,
+              Text(
+                l10n.farmReadyBody(DateFormat('d MMMM', locale).format(ends)),
+                textAlign: TextAlign.center,
+                style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+              ),
+              context.space.gapLg,
+              FarmTapCard(
+                children: [
+                  row(l10n.summaryFarm, widget.setup.farmName),
+                  row(l10n.summaryPlan, l10n.planDairy),
+                  row(l10n.summaryFreeUntil, DateFormat('d MMM y', locale).format(ends)),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

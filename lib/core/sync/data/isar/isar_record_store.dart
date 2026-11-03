@@ -27,11 +27,7 @@ class IsarRecordStore implements LocalRecordStore {
     final before = await _records.getByKey(record.key);
     await _put(record.copyWith(syncStatus: SyncStatus.pending));
     if (auditAction != null && record.collection != auditCollection) {
-      final audit = auditFor(
-        record,
-        action: auditAction,
-        before: before == null ? null : _decode(before.bodyJson),
-      );
+      final audit = auditFor(record, action: auditAction, before: before == null ? null : _decode(before.bodyJson));
       await _put(audit.copyWith(syncStatus: SyncStatus.pending));
     }
   });

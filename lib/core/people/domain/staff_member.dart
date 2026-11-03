@@ -5,7 +5,17 @@ enum StaffRole { manager, herdsman, clerk, worker, vet }
 /// A farm worker who unlocks the farm phone with an NFC card + 4-digit PIN.
 /// Workers have no email account (ROADMAP binding rule 12).
 class StaffMember extends Equatable {
-  const new({required this.id, required this.name, required this.role, this.cardNumber, this.shortName, this.since});
+  const new({
+    required this.id,
+    required this.name,
+    required this.role,
+    this.cardNumber,
+    this.shortName,
+    this.since,
+    this.title,
+    this.phone,
+    this.monthlyWage,
+  });
 
   final String id;
 
@@ -14,7 +24,19 @@ class StaffMember extends Equatable {
 
   /// What the app calls them: "Amos".
   final String? shortName;
+
+  /// What they may do in the app (access level).
   final StaffRole role;
+
+  /// Their job as the farm calls it: "Secretary", "Farmer's daughter";
+  /// null shows the [role] name.
+  final String? title;
+
+  /// The 9 digits after +256.
+  final String? phone;
+
+  /// UGX a month (K05 wages); null when not on the wage sheet.
+  final int? monthlyWage;
 
   /// Printed on the card: "0142"; null until a card is assigned (K03).
   final String? cardNumber;
@@ -24,22 +46,34 @@ class StaffMember extends Equatable {
 
   bool get hasCard => cardNumber != null;
 
-  StaffMember copyWith({String? name, StaffRole? role}) => StaffMember(
+  StaffMember copyWith({String? name, StaffRole? role, String? title, String? phone, int? monthlyWage}) => StaffMember(
     id: id,
     name: name ?? this.name,
     role: role ?? this.role,
     cardNumber: cardNumber,
     shortName: name == null ? shortName : null,
     since: since,
+    title: title ?? this.title,
+    phone: phone ?? this.phone,
+    monthlyWage: monthlyWage ?? this.monthlyWage,
   );
 
-  StaffMember withCard(String? card) =>
-      StaffMember(id: id, name: name, role: role, cardNumber: card, shortName: shortName, since: since);
+  StaffMember withCard(String? card) => StaffMember(
+    id: id,
+    name: name,
+    role: role,
+    cardNumber: card,
+    shortName: shortName,
+    since: since,
+    title: title,
+    phone: phone,
+    monthlyWage: monthlyWage,
+  );
 
   String get greetingName => shortName ?? name.split(' ').last;
 
   @override
-  List<Object?> get props => [id, name, shortName, role, cardNumber, since];
+  List<Object?> get props => [id, name, shortName, role, cardNumber, since, title, phone, monthlyWage];
 }
 
 /// Result of a PIN check.

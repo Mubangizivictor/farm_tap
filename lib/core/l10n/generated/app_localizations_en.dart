@@ -303,7 +303,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signUpTitle => 'Create your account';
 
   @override
-  String get signUpSubtitle => 'You\'ll set up your farm next. 14 days free.';
+  String get signUpSubtitle => 'You\'ll set up your farm next. 7 days free.';
 
   @override
   String get fullNameLabel => 'Full name';
@@ -598,7 +598,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String farmReadyBody(String date) {
-    return 'Your 14 free days start today and end on $date. After that FarmTap is UGX 70,000 a month.';
+    return 'Your 7 free days start today and end on $date. After that FarmTap is UGX 70,000 a month.';
   }
 
   @override
@@ -3241,4 +3241,128 @@ class AppLocalizationsEn extends AppLocalizations {
   String rpMoney(String income, String expenses) {
     return 'Money this month: in $income, out $expenses';
   }
+
+  @override
+  String get searchList => 'Search';
+
+  @override
+  String useTyped(String text) {
+    return 'Use “$text”';
+  }
+
+  @override
+  String get nothingFound => 'Nothing found. Type the full name to use it.';
+
+  @override
+  String get locationOff =>
+      'Turn on location in your phone settings, or pick the district.';
+
+  @override
+  String get locationDenied =>
+      'Location is not allowed. Pick the district from the list.';
+
+  @override
+  String get locationNotFound =>
+      'Could not find your district. Pick it from the list.';
+
+  @override
+  String get findingLocation => 'Finding your location…';
+
+  @override
+  String get cowsCountLabel => 'How many cows?';
+
+  @override
+  String get cowsCountHelper => 'All cattle on the farm today';
+
+  @override
+  String get roleSupervisor => 'Supervisor';
+
+  @override
+  String get roleMilker => 'Milker';
+
+  @override
+  String get roleSecretary => 'Secretary';
+
+  @override
+  String get roleAccountant => 'Accountant';
+
+  @override
+  String get roleDriver => 'Driver';
+
+  @override
+  String get roleGuard => 'Security guard';
+
+  @override
+  String get roleCook => 'Cook';
+
+  @override
+  String get roleFamily => 'Family member';
+
+  @override
+  String get roleCoOwner => 'Co-owner';
+
+  @override
+  String get roleFarmManager => 'Farm manager';
+
+  @override
+  String get jobLabel => 'Job';
+
+  @override
+  String get jobHelper =>
+      'Pick one or type your own, e.g. “Farmer\'s daughter”';
+
+  @override
+  String get accessLabel => 'What they can do in FarmTap';
+
+  @override
+  String get phoneOptional => 'Phone number (optional)';
+
+  @override
+  String get wageOptional => 'Monthly pay (optional)';
+
+  @override
+  String get cardForWorker => 'Their card';
+
+  @override
+  String get cardForWorkerHelp =>
+      'Hold their FarmTap card to the back of the phone, or type the number printed on it.';
+
+  @override
+  String cardReadNumber(String number) {
+    return 'Card $number';
+  }
+
+  @override
+  String get changeCard => 'Change';
+
+  @override
+  String get noCardYet =>
+      'No card yet: give one later from the worker\'s page.';
+
+  @override
+  String get yourRoleLabel => 'Your role';
+
+  @override
+  String get ownerAccess => 'Full access: I own the farm and pay for FarmTap';
+
+  @override
+  String get managerAccess => 'Manager: I run the farm for the owner';
+
+  @override
+  String get accessTitle => 'What can you do?';
+
+  @override
+  String get cowsInvalid => 'Type the number of cows, e.g. 25';
+
+  @override
+  String firstWorkerSaved(String name) {
+    return '$name added';
+  }
+
+  @override
+  String get farmCreateFailed =>
+      'Could not create the farm. Check the internet and try again.';
+
+  @override
+  String get creatingFarm => 'Creating your farm…';
 }

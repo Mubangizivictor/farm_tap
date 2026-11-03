@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_tap/core/auth/domain/entities/account_user.dart';
 import 'package:farm_tap/core/error/failure.dart';
 import 'package:farm_tap/core/error/result.dart';
-import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
 import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
@@ -25,12 +24,9 @@ class FirestoreOnboardingRepository implements OnboardingRepository {
   static const _wait = Duration(seconds: 10); // theme-guard: ignore (network timing, not UI)
 
   @override
-  List<String> get districts => FakeOnboardingRepository(clock).districts;
-
-  @override
   DateTime trialEndsOn() {
     final t = clock.today();
-    return DateTime(t.year, t.month, t.day + 14);
+    return DateTime(t.year, t.month, t.day + freeTrialDays);
   }
 
   @override
@@ -53,7 +49,7 @@ class FirestoreOnboardingRepository implements OnboardingRepository {
         'district': setup.district,
         'place': setup.district ?? '',
         'village': setup.village,
-        'herdSizeRange': setup.herdSize?.name,
+        'cows': setup.cows,
         'contacts': {
           'whatsapp': setup.whatsapp,
           'sms': setup.smsSameAsWhatsapp ? setup.whatsapp : setup.sms,
@@ -67,7 +63,7 @@ class FirestoreOnboardingRepository implements OnboardingRepository {
         // works on its trial meanwhile. Only the server changes this.
         'review': {'status': 'pending'},
       });
-      await tenant.collection('members').doc(me).set({'role': role.name});
+      await tenant.collection('members').doc(me).set({'role': role.name, 'title': setup.roleTitle.trim()});
       await db.collection('users').doc(me).set({
         'memberships': FieldValue.arrayUnion([
           {'tenantId': id, 'role': role.name},

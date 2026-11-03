@@ -150,14 +150,14 @@ describe('onboarding', () => {
   test('a new user creates their farm on trial and becomes its owner', async () => {
     const db = as('newbie');
     await assertSucceeds(setDoc(doc(db, 'tenants/new-farm'),
-      { ownerUid: 'newbie', name: 'New', subscription: { trialStartedAt: days(0), trialEndsAt: days(14) },
+      { ownerUid: 'newbie', name: 'New', subscription: { trialStartedAt: days(0), trialEndsAt: days(7) },
         review: { status: 'pending' } }));
     await assertSucceeds(setDoc(doc(db, 'tenants/new-farm/members/newbie'), { role: 'owner' }));
   });
 
   test('a new farm waits for review; the owner cannot approve it', async () => {
     const db = as('newbie');
-    const farm = { ownerUid: 'newbie', name: 'New', subscription: { trialEndsAt: days(14) } };
+    const farm = { ownerUid: 'newbie', name: 'New', subscription: { trialEndsAt: days(7) } };
     await assertFails(setDoc(doc(db, 'tenants/f5'), farm));
     await assertFails(setDoc(doc(db, 'tenants/f5'), { ...farm, review: { status: 'approved' } }));
     await assertSucceeds(setDoc(doc(db, 'tenants/f5'), { ...farm, review: { status: 'pending' } }));
@@ -170,7 +170,8 @@ describe('onboarding', () => {
     const db = as('newbie');
     await assertFails(setDoc(doc(db, 'tenants/f2'),
       { ownerUid: 'newbie', subscription: { trialEndsAt: days(14), paidUntil: days(365) } }));
-    await assertFails(setDoc(doc(db, 'tenants/f3'), { ownerUid: 'newbie', subscription: { trialEndsAt: days(90) } }));
+    await assertFails(setDoc(doc(db, 'tenants/f3'), { ownerUid: 'newbie', subscription: { trialEndsAt: days(14) } }));
+    // A 7-day trial: 14 days is too long.
     await assertFails(setDoc(doc(db, 'tenants/f4'), { ownerUid: 'someone', subscription: { trialEndsAt: days(14) } }));
   });
 });

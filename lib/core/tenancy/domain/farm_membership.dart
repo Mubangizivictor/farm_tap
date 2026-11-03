@@ -4,6 +4,9 @@ enum PlaceKind { dairyFarm, collectionCentre }
 
 enum PlaceRole { owner, manager, clerk, worker }
 
+/// Length of the free trial for a new farm (owner's decision, 3 Nov 2026).
+const freeTrialDays = 7;
+
 /// What the farm may do today. Calculated from [Subscription], never stored.
 enum SubscriptionState { trial, active, grace, readOnly }
 
@@ -15,7 +18,7 @@ class Subscription extends Equatable {
   /// Day the free trial started (end of onboarding).
   final DateTime? trialStartedAt;
 
-  /// First day without the free trial (14 days after onboarding).
+  /// First day without the free trial ([freeTrialDays] after onboarding).
   final DateTime? trialEndsAt;
 
   /// First day not covered by the last payment.
@@ -52,9 +55,10 @@ class Subscription extends Equatable {
   int graceDaysLeft(DateTime today) =>
       paidUntil == null ? 0 : _daysBetween(today, _day(paidUntil!).add(const Duration(days: graceDays)));
 
-  /// Trial length in days (14) and how many are used ("5 of 14").
-  int get trialLength =>
-      trialStartedAt == null || trialEndsAt == null ? 14 : _day(trialEndsAt!).difference(_day(trialStartedAt!)).inDays;
+  /// Trial length in days and how many are used ("5 of 7").
+  int get trialLength => trialStartedAt == null || trialEndsAt == null
+      ? freeTrialDays
+      : _day(trialEndsAt!).difference(_day(trialStartedAt!)).inDays;
 
   int trialDaysUsed(DateTime today) => trialLength - trialDaysLeft(today);
 

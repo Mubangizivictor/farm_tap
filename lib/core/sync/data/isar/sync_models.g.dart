@@ -17,63 +17,23 @@ const LocalRecordModelSchema = CollectionSchema(
   name: r'LocalRecordModel',
   id: 5685491837939482083,
   properties: {
-    r'bodyJson': PropertySchema(
-      id: 0,
-      name: r'bodyJson',
-      type: IsarType.string,
-    ),
-    r'collection': PropertySchema(
-      id: 1,
-      name: r'collection',
-      type: IsarType.string,
-    ),
-    r'createdAt': PropertySchema(
-      id: 2,
-      name: r'createdAt',
-      type: IsarType.dateTime,
-    ),
-    r'createdBy': PropertySchema(
-      id: 3,
-      name: r'createdBy',
-      type: IsarType.string,
-    ),
-    r'deviceId': PropertySchema(
-      id: 4,
-      name: r'deviceId',
-      type: IsarType.string,
-    ),
-    r'isDeleted': PropertySchema(
-      id: 5,
-      name: r'isDeleted',
-      type: IsarType.bool,
-    ),
+    r'bodyJson': PropertySchema(id: 0, name: r'bodyJson', type: IsarType.string),
+    r'collection': PropertySchema(id: 1, name: r'collection', type: IsarType.string),
+    r'createdAt': PropertySchema(id: 2, name: r'createdAt', type: IsarType.dateTime),
+    r'createdBy': PropertySchema(id: 3, name: r'createdBy', type: IsarType.string),
+    r'deviceId': PropertySchema(id: 4, name: r'deviceId', type: IsarType.string),
+    r'isDeleted': PropertySchema(id: 5, name: r'isDeleted', type: IsarType.bool),
     r'key': PropertySchema(id: 6, name: r'key', type: IsarType.string),
-    r'recordId': PropertySchema(
-      id: 7,
-      name: r'recordId',
-      type: IsarType.string,
-    ),
+    r'recordId': PropertySchema(id: 7, name: r'recordId', type: IsarType.string),
     r'syncStatus': PropertySchema(
       id: 8,
       name: r'syncStatus',
       type: IsarType.byte,
       enumMap: _LocalRecordModelsyncStatusEnumValueMap,
     ),
-    r'tenantId': PropertySchema(
-      id: 9,
-      name: r'tenantId',
-      type: IsarType.string,
-    ),
-    r'updatedAt': PropertySchema(
-      id: 10,
-      name: r'updatedAt',
-      type: IsarType.dateTime,
-    ),
-    r'updatedBy': PropertySchema(
-      id: 11,
-      name: r'updatedBy',
-      type: IsarType.string,
-    ),
+    r'tenantId': PropertySchema(id: 9, name: r'tenantId', type: IsarType.string),
+    r'updatedAt': PropertySchema(id: 10, name: r'updatedAt', type: IsarType.dateTime),
+    r'updatedBy': PropertySchema(id: 11, name: r'updatedBy', type: IsarType.string),
     r'version': PropertySchema(id: 12, name: r'version', type: IsarType.long),
   },
 
@@ -88,13 +48,7 @@ const LocalRecordModelSchema = CollectionSchema(
       name: r'key',
       unique: true,
       replace: true,
-      properties: [
-        IndexPropertySchema(
-          name: r'key',
-          type: IndexType.hash,
-          caseSensitive: true,
-        ),
-      ],
+      properties: [IndexPropertySchema(name: r'key', type: IndexType.hash, caseSensitive: true)],
     ),
     r'tenantId_collection': IndexSchema(
       id: -3590708616786563143,
@@ -102,16 +56,8 @@ const LocalRecordModelSchema = CollectionSchema(
       unique: false,
       replace: false,
       properties: [
-        IndexPropertySchema(
-          name: r'tenantId',
-          type: IndexType.hash,
-          caseSensitive: true,
-        ),
-        IndexPropertySchema(
-          name: r'collection',
-          type: IndexType.hash,
-          caseSensitive: true,
-        ),
+        IndexPropertySchema(name: r'tenantId', type: IndexType.hash, caseSensitive: true),
+        IndexPropertySchema(name: r'collection', type: IndexType.hash, caseSensitive: true),
       ],
     ),
   },
@@ -124,11 +70,7 @@ const LocalRecordModelSchema = CollectionSchema(
   version: '3.4.1',
 );
 
-int _localRecordModelEstimateSize(
-  LocalRecordModel object,
-  List<int> offsets,
-  Map<Type, List<int>> allOffsets,
-) {
+int _localRecordModelEstimateSize(LocalRecordModel object, List<int> offsets, Map<Type, List<int>> allOffsets) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.bodyJson.length * 3;
   bytesCount += 3 + object.collection.length * 3;
@@ -177,11 +119,7 @@ LocalRecordModel _localRecordModelDeserialize(
   object.isDeleted = reader.readBool(offsets[5]);
   object.key = reader.readString(offsets[6]);
   object.recordId = reader.readString(offsets[7]);
-  object.syncStatus =
-      _LocalRecordModelsyncStatusValueEnumMap[reader.readByteOrNull(
-        offsets[8],
-      )] ??
-      SyncStatus.pending;
+  object.syncStatus = _LocalRecordModelsyncStatusValueEnumMap[reader.readByteOrNull(offsets[8])] ?? SyncStatus.pending;
   object.tenantId = reader.readString(offsets[9]);
   object.updatedAt = reader.readDateTime(offsets[10]);
   object.updatedBy = reader.readString(offsets[11]);
@@ -189,12 +127,7 @@ LocalRecordModel _localRecordModelDeserialize(
   return object;
 }
 
-P _localRecordModelDeserializeProp<P>(
-  IsarReader reader,
-  int propertyId,
-  int offset,
-  Map<Type, List<int>> allOffsets,
-) {
+P _localRecordModelDeserializeProp<P>(IsarReader reader, int propertyId, int offset, Map<Type, List<int>> allOffsets) {
   switch (propertyId) {
     case 0:
       return (reader.readString(offset)) as P;
@@ -213,11 +146,7 @@ P _localRecordModelDeserializeProp<P>(
     case 7:
       return (reader.readString(offset)) as P;
     case 8:
-      return (_LocalRecordModelsyncStatusValueEnumMap[reader.readByteOrNull(
-                offset,
-              )] ??
-              SyncStatus.pending)
-          as P;
+      return (_LocalRecordModelsyncStatusValueEnumMap[reader.readByteOrNull(offset)] ?? SyncStatus.pending) as P;
     case 9:
       return (reader.readString(offset)) as P;
     case 10:
@@ -231,16 +160,8 @@ P _localRecordModelDeserializeProp<P>(
   }
 }
 
-const _LocalRecordModelsyncStatusEnumValueMap = {
-  'pending': 0,
-  'synced': 1,
-  'failed': 2,
-};
-const _LocalRecordModelsyncStatusValueEnumMap = {
-  0: SyncStatus.pending,
-  1: SyncStatus.synced,
-  2: SyncStatus.failed,
-};
+const _LocalRecordModelsyncStatusEnumValueMap = {'pending': 0, 'synced': 1, 'failed': 2};
+const _LocalRecordModelsyncStatusValueEnumMap = {0: SyncStatus.pending, 1: SyncStatus.synced, 2: SyncStatus.failed};
 
 Id _localRecordModelGetId(LocalRecordModel object) {
   return object.isarId;
@@ -250,11 +171,7 @@ List<IsarLinkBase<dynamic>> _localRecordModelGetLinks(LocalRecordModel object) {
   return [];
 }
 
-void _localRecordModelAttach(
-  IsarCollection<dynamic> col,
-  Id id,
-  LocalRecordModel object,
-) {}
+void _localRecordModelAttach(IsarCollection<dynamic> col, Id id, LocalRecordModel object) {}
 
 extension LocalRecordModelByIndex on IsarCollection<LocalRecordModel> {
   Future<LocalRecordModel?> getByKey(String key) {
@@ -305,16 +222,12 @@ extension LocalRecordModelByIndex on IsarCollection<LocalRecordModel> {
     return putAllByIndex(r'key', objects);
   }
 
-  List<Id> putAllByKeySync(
-    List<LocalRecordModel> objects, {
-    bool saveLinks = true,
-  }) {
+  List<Id> putAllByKeySync(List<LocalRecordModel> objects, {bool saveLinks = true}) {
     return putAllByIndexSync(r'key', objects, saveLinks: saveLinks);
   }
 }
 
-extension LocalRecordModelQueryWhereSort
-    on QueryBuilder<LocalRecordModel, LocalRecordModel, QWhere> {
+extension LocalRecordModelQueryWhereSort on QueryBuilder<LocalRecordModel, LocalRecordModel, QWhere> {
   QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhere> anyIsarId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
@@ -322,60 +235,46 @@ extension LocalRecordModelQueryWhereSort
   }
 }
 
-extension LocalRecordModelQueryWhere
-    on QueryBuilder<LocalRecordModel, LocalRecordModel, QWhereClause> {
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause>
-  isarIdEqualTo(Id isarId) {
+extension LocalRecordModelQueryWhere on QueryBuilder<LocalRecordModel, LocalRecordModel, QWhereClause> {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause> isarIdEqualTo(Id isarId) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IdWhereClause.between(lower: isarId, upper: isarId),
-      );
+      return query.addWhereClause(IdWhereClause.between(lower: isarId, upper: isarId));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause>
-  isarIdNotEqualTo(Id isarId) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause> isarIdNotEqualTo(Id isarId) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
-            .addWhereClause(
-              IdWhereClause.lessThan(upper: isarId, includeUpper: false),
-            )
-            .addWhereClause(
-              IdWhereClause.greaterThan(lower: isarId, includeLower: false),
-            );
+            .addWhereClause(IdWhereClause.lessThan(upper: isarId, includeUpper: false))
+            .addWhereClause(IdWhereClause.greaterThan(lower: isarId, includeLower: false));
       } else {
         return query
-            .addWhereClause(
-              IdWhereClause.greaterThan(lower: isarId, includeLower: false),
-            )
-            .addWhereClause(
-              IdWhereClause.lessThan(upper: isarId, includeUpper: false),
-            );
+            .addWhereClause(IdWhereClause.greaterThan(lower: isarId, includeLower: false))
+            .addWhereClause(IdWhereClause.lessThan(upper: isarId, includeUpper: false));
       }
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause>
-  isarIdGreaterThan(Id isarId, {bool include = false}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause> isarIdGreaterThan(
+    Id isarId, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IdWhereClause.greaterThan(lower: isarId, includeLower: include),
-      );
+      return query.addWhereClause(IdWhereClause.greaterThan(lower: isarId, includeLower: include));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause>
-  isarIdLessThan(Id isarId, {bool include = false}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause> isarIdLessThan(
+    Id isarId, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IdWhereClause.lessThan(upper: isarId, includeUpper: include),
-      );
+      return query.addWhereClause(IdWhereClause.lessThan(upper: isarId, includeUpper: include));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause>
-  isarIdBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause> isarIdBetween(
     Id lowerIsarId,
     Id upperIsarId, {
     bool includeLower = true,
@@ -393,72 +292,33 @@ extension LocalRecordModelQueryWhere
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause>
-  keyEqualTo(String key) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause> keyEqualTo(String key) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IndexWhereClause.equalTo(indexName: r'key', value: [key]),
-      );
+      return query.addWhereClause(IndexWhereClause.equalTo(indexName: r'key', value: [key]));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause>
-  keyNotEqualTo(String key) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause> keyNotEqualTo(String key) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [],
-                upper: [key],
-                includeUpper: false,
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [key],
-                includeLower: false,
-                upper: [],
-              ),
-            );
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [], upper: [key], includeUpper: false))
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [key], includeLower: false, upper: []));
       } else {
         return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [key],
-                includeLower: false,
-                upper: [],
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [],
-                upper: [key],
-                includeUpper: false,
-              ),
-            );
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [key], includeLower: false, upper: []))
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [], upper: [key], includeUpper: false));
       }
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause>
-  tenantIdEqualToAnyCollection(String tenantId) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause> tenantIdEqualToAnyCollection(String tenantId) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IndexWhereClause.equalTo(
-          indexName: r'tenantId_collection',
-          value: [tenantId],
-        ),
-      );
+      return query.addWhereClause(IndexWhereClause.equalTo(indexName: r'tenantId_collection', value: [tenantId]));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause>
-  tenantIdNotEqualToAnyCollection(String tenantId) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause> tenantIdNotEqualToAnyCollection(String tenantId) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -500,20 +360,21 @@ extension LocalRecordModelQueryWhere
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause>
-  tenantIdCollectionEqualTo(String tenantId, String collection) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause> tenantIdCollectionEqualTo(
+    String tenantId,
+    String collection,
+  ) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
-        IndexWhereClause.equalTo(
-          indexName: r'tenantId_collection',
-          value: [tenantId, collection],
-        ),
+        IndexWhereClause.equalTo(indexName: r'tenantId_collection', value: [tenantId, collection]),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause>
-  tenantIdEqualToCollectionNotEqualTo(String tenantId, String collection) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterWhereClause> tenantIdEqualToCollectionNotEqualTo(
+    String tenantId,
+    String collection,
+  ) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -556,23 +417,19 @@ extension LocalRecordModelQueryWhere
   }
 }
 
-extension LocalRecordModelQueryFilter
-    on QueryBuilder<LocalRecordModel, LocalRecordModel, QFilterCondition> {
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  bodyJsonEqualTo(String value, {bool caseSensitive = true}) {
+extension LocalRecordModelQueryFilter on QueryBuilder<LocalRecordModel, LocalRecordModel, QFilterCondition> {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> bodyJsonEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'bodyJson',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.equalTo(property: r'bodyJson', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  bodyJsonGreaterThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> bodyJsonGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -589,26 +446,19 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  bodyJsonLessThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> bodyJsonLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'bodyJson',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'bodyJson', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  bodyJsonBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> bodyJsonBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -629,91 +479,74 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  bodyJsonStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> bodyJsonStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'bodyJson',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'bodyJson', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  bodyJsonEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> bodyJsonEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'bodyJson',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'bodyJson', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  bodyJsonContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> bodyJsonContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'bodyJson',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'bodyJson', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  bodyJsonMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> bodyJsonMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'bodyJson',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'bodyJson', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  bodyJsonIsEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> bodyJsonIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'bodyJson', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> bodyJsonIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'bodyJson', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> collectionEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'bodyJson', value: ''),
+        FilterCondition.equalTo(property: r'collection', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  bodyJsonIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'bodyJson', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  collectionEqualTo(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'collection',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  collectionGreaterThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> collectionGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -730,26 +563,19 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  collectionLessThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> collectionLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'collection',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'collection', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  collectionBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> collectionBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -770,113 +596,89 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  collectionStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> collectionStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'collection',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'collection', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  collectionEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> collectionEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'collection',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'collection', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  collectionContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> collectionContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'collection',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'collection', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  collectionMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> collectionMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'collection',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'collection', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  collectionIsEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> collectionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'collection', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> collectionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'collection', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdAtEqualTo(DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'createdAt', value: value));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdAtGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'collection', value: ''),
+        FilterCondition.greaterThan(include: include, property: r'createdAt', value: value),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  collectionIsNotEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdAtLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'collection', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(include: include, property: r'createdAt', value: value));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdAtEqualTo(DateTime value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'createdAt', value: value),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdAtGreaterThan(DateTime value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'createdAt',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdAtLessThan(DateTime value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'createdAt',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdAtBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdAtBetween(
     DateTime lower,
     DateTime upper, {
     bool includeLower = true,
@@ -895,21 +697,18 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdByEqualTo(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdByEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'createdBy',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.equalTo(property: r'createdBy', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdByGreaterThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdByGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -926,26 +725,19 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdByLessThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdByLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'createdBy',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'createdBy', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdByBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdByBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -966,91 +758,74 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdByStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdByStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'createdBy',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'createdBy', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdByEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdByEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'createdBy',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'createdBy', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdByContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdByContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'createdBy',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'createdBy', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdByMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdByMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'createdBy',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'createdBy', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdByIsEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdByIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'createdBy', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> createdByIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'createdBy', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> deviceIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'createdBy', value: ''),
+        FilterCondition.equalTo(property: r'deviceId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  createdByIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'createdBy', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  deviceIdEqualTo(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'deviceId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  deviceIdGreaterThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> deviceIdGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -1067,26 +842,19 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  deviceIdLessThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> deviceIdLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'deviceId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'deviceId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  deviceIdBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> deviceIdBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -1107,122 +875,93 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  deviceIdStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> deviceIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'deviceId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'deviceId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  deviceIdEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> deviceIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'deviceId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'deviceId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  deviceIdContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> deviceIdContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'deviceId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'deviceId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  deviceIdMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> deviceIdMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'deviceId',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'deviceId', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  deviceIdIsEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> deviceIdIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'deviceId', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'deviceId', value: ''));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  deviceIdIsNotEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> deviceIdIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'deviceId', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'deviceId', value: ''));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  isDeletedEqualTo(bool value) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> isDeletedEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'isDeleted', value: value),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'isDeleted', value: value));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  isarIdEqualTo(Id value) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> isarIdEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'isarId', value: value),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'isarId', value: value));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  isarIdGreaterThan(Id value, {bool include = false}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> isarIdGreaterThan(
+    Id value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'isarId',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(include: include, property: r'isarId', value: value));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  isarIdLessThan(Id value, {bool include = false}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> isarIdLessThan(
+    Id value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'isarId',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(include: include, property: r'isarId', value: value));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  isarIdBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> isarIdBetween(
     Id lower,
     Id upper, {
     bool includeLower = true,
@@ -1241,53 +980,42 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  keyEqualTo(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> keyEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.equalTo(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  keyGreaterThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> keyGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.greaterThan(include: include, property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  keyLessThan(String value, {bool include = false, bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> keyLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  keyBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> keyBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -1308,91 +1036,74 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  keyStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> keyStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  keyEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> keyEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  keyContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> keyContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  keyMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> keyMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'key',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'key', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  keyIsEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> keyIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'key', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> keyIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'key', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> recordIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'key', value: ''),
+        FilterCondition.equalTo(property: r'recordId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  keyIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'key', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  recordIdEqualTo(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'recordId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  recordIdGreaterThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> recordIdGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -1409,26 +1120,19 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  recordIdLessThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> recordIdLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'recordId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'recordId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  recordIdBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> recordIdBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -1449,113 +1153,91 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  recordIdStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> recordIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'recordId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'recordId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  recordIdEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> recordIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'recordId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'recordId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  recordIdContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> recordIdContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'recordId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'recordId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  recordIdMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> recordIdMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'recordId',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'recordId', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  recordIdIsEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> recordIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'recordId', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> recordIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'recordId', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> syncStatusEqualTo(SyncStatus value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'syncStatus', value: value));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> syncStatusGreaterThan(
+    SyncStatus value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'recordId', value: ''),
+        FilterCondition.greaterThan(include: include, property: r'syncStatus', value: value),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  recordIdIsNotEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> syncStatusLessThan(
+    SyncStatus value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'recordId', value: ''),
+        FilterCondition.lessThan(include: include, property: r'syncStatus', value: value),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  syncStatusEqualTo(SyncStatus value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'syncStatus', value: value),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  syncStatusGreaterThan(SyncStatus value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'syncStatus',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  syncStatusLessThan(SyncStatus value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'syncStatus',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  syncStatusBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> syncStatusBetween(
     SyncStatus lower,
     SyncStatus upper, {
     bool includeLower = true,
@@ -1574,21 +1256,18 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  tenantIdEqualTo(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> tenantIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'tenantId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.equalTo(property: r'tenantId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  tenantIdGreaterThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> tenantIdGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -1605,26 +1284,19 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  tenantIdLessThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> tenantIdLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'tenantId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'tenantId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  tenantIdBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> tenantIdBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -1645,113 +1317,89 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  tenantIdStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> tenantIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'tenantId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'tenantId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  tenantIdEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> tenantIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'tenantId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'tenantId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  tenantIdContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> tenantIdContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'tenantId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'tenantId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  tenantIdMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> tenantIdMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'tenantId',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'tenantId', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  tenantIdIsEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> tenantIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'tenantId', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> tenantIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'tenantId', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedAtEqualTo(DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'updatedAt', value: value));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedAtGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'tenantId', value: ''),
+        FilterCondition.greaterThan(include: include, property: r'updatedAt', value: value),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  tenantIdIsNotEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedAtLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'tenantId', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(include: include, property: r'updatedAt', value: value));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedAtEqualTo(DateTime value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'updatedAt', value: value),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedAtGreaterThan(DateTime value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'updatedAt',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedAtLessThan(DateTime value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'updatedAt',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedAtBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedAtBetween(
     DateTime lower,
     DateTime upper, {
     bool includeLower = true,
@@ -1770,21 +1418,18 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedByEqualTo(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedByEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'updatedBy',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.equalTo(property: r'updatedBy', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedByGreaterThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedByGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -1801,26 +1446,19 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedByLessThan(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedByLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'updatedBy',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'updatedBy', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedByBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedByBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -1841,113 +1479,89 @@ extension LocalRecordModelQueryFilter
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedByStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedByStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'updatedBy',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'updatedBy', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedByEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedByEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'updatedBy',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'updatedBy', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedByContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedByContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'updatedBy',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'updatedBy', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedByMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedByMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'updatedBy',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'updatedBy', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedByIsEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedByIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'updatedBy', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> updatedByIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'updatedBy', value: ''));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> versionEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'version', value: value));
+    });
+  }
+
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> versionGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'updatedBy', value: ''),
+        FilterCondition.greaterThan(include: include, property: r'version', value: value),
       );
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  updatedByIsNotEmpty() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> versionLessThan(
+    int value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'updatedBy', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(include: include, property: r'version', value: value));
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  versionEqualTo(int value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'version', value: value),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  versionGreaterThan(int value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'version',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  versionLessThan(int value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'version',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition>
-  versionBetween(
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterFilterCondition> versionBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -1967,93 +1581,78 @@ extension LocalRecordModelQueryFilter
   }
 }
 
-extension LocalRecordModelQueryObject
-    on QueryBuilder<LocalRecordModel, LocalRecordModel, QFilterCondition> {}
+extension LocalRecordModelQueryObject on QueryBuilder<LocalRecordModel, LocalRecordModel, QFilterCondition> {}
 
-extension LocalRecordModelQueryLinks
-    on QueryBuilder<LocalRecordModel, LocalRecordModel, QFilterCondition> {}
+extension LocalRecordModelQueryLinks on QueryBuilder<LocalRecordModel, LocalRecordModel, QFilterCondition> {}
 
-extension LocalRecordModelQuerySortBy
-    on QueryBuilder<LocalRecordModel, LocalRecordModel, QSortBy> {
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByBodyJson() {
+extension LocalRecordModelQuerySortBy on QueryBuilder<LocalRecordModel, LocalRecordModel, QSortBy> {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByBodyJson() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'bodyJson', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByBodyJsonDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByBodyJsonDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'bodyJson', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByCollection() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByCollection() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'collection', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByCollectionDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByCollectionDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'collection', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByCreatedAt() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByCreatedAtDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByCreatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByCreatedBy() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByCreatedBy() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdBy', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByCreatedByDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByCreatedByDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdBy', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByDeviceId() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByDeviceId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'deviceId', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByDeviceIdDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByDeviceIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'deviceId', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByIsDeleted() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByIsDeleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isDeleted', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByIsDeletedDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByIsDeletedDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isDeleted', Sort.desc);
     });
@@ -2065,193 +1664,165 @@ extension LocalRecordModelQuerySortBy
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByKeyDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByKeyDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'key', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByRecordId() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByRecordId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'recordId', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByRecordIdDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByRecordIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'recordId', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortBySyncStatus() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortBySyncStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncStatus', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortBySyncStatusDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortBySyncStatusDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncStatus', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByTenantId() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByTenantId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tenantId', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByTenantIdDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByTenantIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tenantId', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByUpdatedAt() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByUpdatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByUpdatedAtDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByUpdatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByUpdatedBy() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByUpdatedBy() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedBy', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByUpdatedByDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByUpdatedByDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedBy', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByVersion() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByVersion() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'version', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  sortByVersionDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> sortByVersionDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'version', Sort.desc);
     });
   }
 }
 
-extension LocalRecordModelQuerySortThenBy
-    on QueryBuilder<LocalRecordModel, LocalRecordModel, QSortThenBy> {
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByBodyJson() {
+extension LocalRecordModelQuerySortThenBy on QueryBuilder<LocalRecordModel, LocalRecordModel, QSortThenBy> {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByBodyJson() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'bodyJson', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByBodyJsonDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByBodyJsonDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'bodyJson', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByCollection() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByCollection() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'collection', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByCollectionDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByCollectionDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'collection', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByCreatedAt() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByCreatedAtDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByCreatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByCreatedBy() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByCreatedBy() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdBy', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByCreatedByDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByCreatedByDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdBy', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByDeviceId() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByDeviceId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'deviceId', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByDeviceIdDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByDeviceIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'deviceId', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByIsDeleted() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByIsDeleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isDeleted', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByIsDeletedDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByIsDeletedDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isDeleted', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByIsarId() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByIsarId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isarId', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByIsarIdDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByIsarIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isarId', Sort.desc);
     });
@@ -2263,195 +1834,166 @@ extension LocalRecordModelQuerySortThenBy
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByKeyDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByKeyDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'key', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByRecordId() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByRecordId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'recordId', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByRecordIdDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByRecordIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'recordId', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenBySyncStatus() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenBySyncStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncStatus', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenBySyncStatusDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenBySyncStatusDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncStatus', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByTenantId() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByTenantId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tenantId', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByTenantIdDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByTenantIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tenantId', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByUpdatedAt() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByUpdatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByUpdatedAtDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByUpdatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByUpdatedBy() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByUpdatedBy() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedBy', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByUpdatedByDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByUpdatedByDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedBy', Sort.desc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByVersion() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByVersion() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'version', Sort.asc);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy>
-  thenByVersionDesc() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QAfterSortBy> thenByVersionDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'version', Sort.desc);
     });
   }
 }
 
-extension LocalRecordModelQueryWhereDistinct
-    on QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> {
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctByBodyJson({bool caseSensitive = true}) {
+extension LocalRecordModelQueryWhereDistinct on QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByBodyJson({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'bodyJson', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctByCollection({bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByCollection({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'collection', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctByCreatedAt() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'createdAt');
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctByCreatedBy({bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByCreatedBy({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'createdBy', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctByDeviceId({bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByDeviceId({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'deviceId', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctByIsDeleted() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByIsDeleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isDeleted');
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByKey({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByKey({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'key', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctByRecordId({bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByRecordId({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'recordId', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctBySyncStatus() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctBySyncStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'syncStatus');
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctByTenantId({bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByTenantId({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'tenantId', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctByUpdatedAt() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByUpdatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'updatedAt');
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctByUpdatedBy({bool caseSensitive = true}) {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByUpdatedBy({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'updatedBy', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct>
-  distinctByVersion() {
+  QueryBuilder<LocalRecordModel, LocalRecordModel, QDistinct> distinctByVersion() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'version');
     });
   }
 }
 
-extension LocalRecordModelQueryProperty
-    on QueryBuilder<LocalRecordModel, LocalRecordModel, QQueryProperty> {
+extension LocalRecordModelQueryProperty on QueryBuilder<LocalRecordModel, LocalRecordModel, QQueryProperty> {
   QueryBuilder<LocalRecordModel, int, QQueryOperations> isarIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isarId');
@@ -2464,15 +2006,13 @@ extension LocalRecordModelQueryProperty
     });
   }
 
-  QueryBuilder<LocalRecordModel, String, QQueryOperations>
-  collectionProperty() {
+  QueryBuilder<LocalRecordModel, String, QQueryOperations> collectionProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'collection');
     });
   }
 
-  QueryBuilder<LocalRecordModel, DateTime, QQueryOperations>
-  createdAtProperty() {
+  QueryBuilder<LocalRecordModel, DateTime, QQueryOperations> createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
     });
@@ -2508,8 +2048,7 @@ extension LocalRecordModelQueryProperty
     });
   }
 
-  QueryBuilder<LocalRecordModel, SyncStatus, QQueryOperations>
-  syncStatusProperty() {
+  QueryBuilder<LocalRecordModel, SyncStatus, QQueryOperations> syncStatusProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'syncStatus');
     });
@@ -2521,8 +2060,7 @@ extension LocalRecordModelQueryProperty
     });
   }
 
-  QueryBuilder<LocalRecordModel, DateTime, QQueryOperations>
-  updatedAtProperty() {
+  QueryBuilder<LocalRecordModel, DateTime, QQueryOperations> updatedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'updatedAt');
     });
@@ -2553,28 +2091,12 @@ const OutboxModelSchema = CollectionSchema(
   id: 1700914597035560279,
   properties: {
     r'attempts': PropertySchema(id: 0, name: r'attempts', type: IsarType.long),
-    r'collection': PropertySchema(
-      id: 1,
-      name: r'collection',
-      type: IsarType.string,
-    ),
+    r'collection': PropertySchema(id: 1, name: r'collection', type: IsarType.string),
     r'failed': PropertySchema(id: 2, name: r'failed', type: IsarType.bool),
     r'key': PropertySchema(id: 3, name: r'key', type: IsarType.string),
-    r'lastError': PropertySchema(
-      id: 4,
-      name: r'lastError',
-      type: IsarType.string,
-    ),
-    r'nextAttemptAt': PropertySchema(
-      id: 5,
-      name: r'nextAttemptAt',
-      type: IsarType.dateTime,
-    ),
-    r'recordId': PropertySchema(
-      id: 6,
-      name: r'recordId',
-      type: IsarType.string,
-    ),
+    r'lastError': PropertySchema(id: 4, name: r'lastError', type: IsarType.string),
+    r'nextAttemptAt': PropertySchema(id: 5, name: r'nextAttemptAt', type: IsarType.dateTime),
+    r'recordId': PropertySchema(id: 6, name: r'recordId', type: IsarType.string),
     r'seq': PropertySchema(id: 7, name: r'seq', type: IsarType.long),
     r'version': PropertySchema(id: 8, name: r'version', type: IsarType.long),
   },
@@ -2590,26 +2112,14 @@ const OutboxModelSchema = CollectionSchema(
       name: r'key',
       unique: true,
       replace: true,
-      properties: [
-        IndexPropertySchema(
-          name: r'key',
-          type: IndexType.hash,
-          caseSensitive: true,
-        ),
-      ],
+      properties: [IndexPropertySchema(name: r'key', type: IndexType.hash, caseSensitive: true)],
     ),
     r'seq': IndexSchema(
       id: -6951239953445392806,
       name: r'seq',
       unique: false,
       replace: false,
-      properties: [
-        IndexPropertySchema(
-          name: r'seq',
-          type: IndexType.value,
-          caseSensitive: false,
-        ),
-      ],
+      properties: [IndexPropertySchema(name: r'seq', type: IndexType.value, caseSensitive: false)],
     ),
   },
   links: {},
@@ -2621,11 +2131,7 @@ const OutboxModelSchema = CollectionSchema(
   version: '3.4.1',
 );
 
-int _outboxModelEstimateSize(
-  OutboxModel object,
-  List<int> offsets,
-  Map<Type, List<int>> allOffsets,
-) {
+int _outboxModelEstimateSize(OutboxModel object, List<int> offsets, Map<Type, List<int>> allOffsets) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.collection.length * 3;
   bytesCount += 3 + object.key.length * 3;
@@ -2639,12 +2145,7 @@ int _outboxModelEstimateSize(
   return bytesCount;
 }
 
-void _outboxModelSerialize(
-  OutboxModel object,
-  IsarWriter writer,
-  List<int> offsets,
-  Map<Type, List<int>> allOffsets,
-) {
+void _outboxModelSerialize(OutboxModel object, IsarWriter writer, List<int> offsets, Map<Type, List<int>> allOffsets) {
   writer.writeLong(offsets[0], object.attempts);
   writer.writeString(offsets[1], object.collection);
   writer.writeBool(offsets[2], object.failed);
@@ -2656,12 +2157,7 @@ void _outboxModelSerialize(
   writer.writeLong(offsets[8], object.version);
 }
 
-OutboxModel _outboxModelDeserialize(
-  Id id,
-  IsarReader reader,
-  List<int> offsets,
-  Map<Type, List<int>> allOffsets,
-) {
+OutboxModel _outboxModelDeserialize(Id id, IsarReader reader, List<int> offsets, Map<Type, List<int>> allOffsets) {
   final object = OutboxModel();
   object.attempts = reader.readLong(offsets[0]);
   object.collection = reader.readString(offsets[1]);
@@ -2675,12 +2171,7 @@ OutboxModel _outboxModelDeserialize(
   return object;
 }
 
-P _outboxModelDeserializeProp<P>(
-  IsarReader reader,
-  int propertyId,
-  int offset,
-  Map<Type, List<int>> allOffsets,
-) {
+P _outboxModelDeserializeProp<P>(IsarReader reader, int propertyId, int offset, Map<Type, List<int>> allOffsets) {
   switch (propertyId) {
     case 0:
       return (reader.readLong(offset)) as P;
@@ -2713,11 +2204,7 @@ List<IsarLinkBase<dynamic>> _outboxModelGetLinks(OutboxModel object) {
   return [];
 }
 
-void _outboxModelAttach(
-  IsarCollection<dynamic> col,
-  Id id,
-  OutboxModel object,
-) {}
+void _outboxModelAttach(IsarCollection<dynamic> col, Id id, OutboxModel object) {}
 
 extension OutboxModelByIndex on IsarCollection<OutboxModel> {
   Future<OutboxModel?> getByKey(String key) {
@@ -2773,8 +2260,7 @@ extension OutboxModelByIndex on IsarCollection<OutboxModel> {
   }
 }
 
-extension OutboxModelQueryWhereSort
-    on QueryBuilder<OutboxModel, OutboxModel, QWhere> {
+extension OutboxModelQueryWhereSort on QueryBuilder<OutboxModel, OutboxModel, QWhere> {
   QueryBuilder<OutboxModel, OutboxModel, QAfterWhere> anyIsarId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
@@ -2783,68 +2269,41 @@ extension OutboxModelQueryWhereSort
 
   QueryBuilder<OutboxModel, OutboxModel, QAfterWhere> anySeq() {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        const IndexWhereClause.any(indexName: r'seq'),
-      );
+      return query.addWhereClause(const IndexWhereClause.any(indexName: r'seq'));
     });
   }
 }
 
-extension OutboxModelQueryWhere
-    on QueryBuilder<OutboxModel, OutboxModel, QWhereClause> {
-  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> isarIdEqualTo(
-    Id isarId,
-  ) {
+extension OutboxModelQueryWhere on QueryBuilder<OutboxModel, OutboxModel, QWhereClause> {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> isarIdEqualTo(Id isarId) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IdWhereClause.between(lower: isarId, upper: isarId),
-      );
+      return query.addWhereClause(IdWhereClause.between(lower: isarId, upper: isarId));
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> isarIdNotEqualTo(
-    Id isarId,
-  ) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> isarIdNotEqualTo(Id isarId) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
-            .addWhereClause(
-              IdWhereClause.lessThan(upper: isarId, includeUpper: false),
-            )
-            .addWhereClause(
-              IdWhereClause.greaterThan(lower: isarId, includeLower: false),
-            );
+            .addWhereClause(IdWhereClause.lessThan(upper: isarId, includeUpper: false))
+            .addWhereClause(IdWhereClause.greaterThan(lower: isarId, includeLower: false));
       } else {
         return query
-            .addWhereClause(
-              IdWhereClause.greaterThan(lower: isarId, includeLower: false),
-            )
-            .addWhereClause(
-              IdWhereClause.lessThan(upper: isarId, includeUpper: false),
-            );
+            .addWhereClause(IdWhereClause.greaterThan(lower: isarId, includeLower: false))
+            .addWhereClause(IdWhereClause.lessThan(upper: isarId, includeUpper: false));
       }
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> isarIdGreaterThan(
-    Id isarId, {
-    bool include = false,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> isarIdGreaterThan(Id isarId, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IdWhereClause.greaterThan(lower: isarId, includeLower: include),
-      );
+      return query.addWhereClause(IdWhereClause.greaterThan(lower: isarId, includeLower: include));
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> isarIdLessThan(
-    Id isarId, {
-    bool include = false,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> isarIdLessThan(Id isarId, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IdWhereClause.lessThan(upper: isarId, includeUpper: include),
-      );
+      return query.addWhereClause(IdWhereClause.lessThan(upper: isarId, includeUpper: include));
     });
   }
 
@@ -2866,142 +2325,58 @@ extension OutboxModelQueryWhere
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> keyEqualTo(
-    String key,
-  ) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> keyEqualTo(String key) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IndexWhereClause.equalTo(indexName: r'key', value: [key]),
-      );
+      return query.addWhereClause(IndexWhereClause.equalTo(indexName: r'key', value: [key]));
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> keyNotEqualTo(
-    String key,
-  ) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> keyNotEqualTo(String key) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [],
-                upper: [key],
-                includeUpper: false,
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [key],
-                includeLower: false,
-                upper: [],
-              ),
-            );
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [], upper: [key], includeUpper: false))
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [key], includeLower: false, upper: []));
       } else {
         return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [key],
-                includeLower: false,
-                upper: [],
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [],
-                upper: [key],
-                includeUpper: false,
-              ),
-            );
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [key], includeLower: false, upper: []))
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [], upper: [key], includeUpper: false));
       }
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> seqEqualTo(
-    int seq,
-  ) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> seqEqualTo(int seq) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IndexWhereClause.equalTo(indexName: r'seq', value: [seq]),
-      );
+      return query.addWhereClause(IndexWhereClause.equalTo(indexName: r'seq', value: [seq]));
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> seqNotEqualTo(
-    int seq,
-  ) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> seqNotEqualTo(int seq) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'seq',
-                lower: [],
-                upper: [seq],
-                includeUpper: false,
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'seq',
-                lower: [seq],
-                includeLower: false,
-                upper: [],
-              ),
-            );
+            .addWhereClause(IndexWhereClause.between(indexName: r'seq', lower: [], upper: [seq], includeUpper: false))
+            .addWhereClause(IndexWhereClause.between(indexName: r'seq', lower: [seq], includeLower: false, upper: []));
       } else {
         return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'seq',
-                lower: [seq],
-                includeLower: false,
-                upper: [],
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'seq',
-                lower: [],
-                upper: [seq],
-                includeUpper: false,
-              ),
-            );
+            .addWhereClause(IndexWhereClause.between(indexName: r'seq', lower: [seq], includeLower: false, upper: []))
+            .addWhereClause(IndexWhereClause.between(indexName: r'seq', lower: [], upper: [seq], includeUpper: false));
       }
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> seqGreaterThan(
-    int seq, {
-    bool include = false,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> seqGreaterThan(int seq, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
-        IndexWhereClause.between(
-          indexName: r'seq',
-          lower: [seq],
-          includeLower: include,
-          upper: [],
-        ),
+        IndexWhereClause.between(indexName: r'seq', lower: [seq], includeLower: include, upper: []),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> seqLessThan(
-    int seq, {
-    bool include = false,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterWhereClause> seqLessThan(int seq, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
-        IndexWhereClause.between(
-          indexName: r'seq',
-          lower: [],
-          upper: [seq],
-          includeUpper: include,
-        ),
+        IndexWhereClause.between(indexName: r'seq', lower: [], upper: [seq], includeUpper: include),
       );
     });
   }
@@ -3026,41 +2401,24 @@ extension OutboxModelQueryWhere
   }
 }
 
-extension OutboxModelQueryFilter
-    on QueryBuilder<OutboxModel, OutboxModel, QFilterCondition> {
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> attemptsEqualTo(
-    int value,
-  ) {
+extension OutboxModelQueryFilter on QueryBuilder<OutboxModel, OutboxModel, QFilterCondition> {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> attemptsEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'attempts', value: value));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> attemptsGreaterThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'attempts', value: value),
+        FilterCondition.greaterThan(include: include, property: r'attempts', value: value),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  attemptsGreaterThan(int value, {bool include = false}) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> attemptsLessThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'attempts',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  attemptsLessThan(int value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'attempts',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(include: include, property: r'attempts', value: value));
     });
   }
 
@@ -3083,21 +2441,18 @@ extension OutboxModelQueryFilter
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  collectionEqualTo(String value, {bool caseSensitive = true}) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> collectionEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'collection',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.equalTo(property: r'collection', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  collectionGreaterThan(
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> collectionGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -3114,26 +2469,19 @@ extension OutboxModelQueryFilter
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  collectionLessThan(
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> collectionLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'collection',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'collection', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  collectionBetween(
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> collectionBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -3154,121 +2502,83 @@ extension OutboxModelQueryFilter
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  collectionStartsWith(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'collection',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  collectionEndsWith(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'collection',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  collectionContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'collection',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  collectionMatches(String pattern, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'collection',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  collectionIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'collection', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  collectionIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'collection', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> failedEqualTo(
-    bool value,
-  ) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'failed', value: value),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> isarIdEqualTo(
-    Id value,
-  ) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'isarId', value: value),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  isarIdGreaterThan(Id value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'isarId',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> isarIdLessThan(
-    Id value, {
-    bool include = false,
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> collectionStartsWith(
+    String value, {
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'isarId',
-          value: value,
-        ),
+        FilterCondition.startsWith(property: r'collection', value: value, caseSensitive: caseSensitive),
       );
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> collectionEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(property: r'collection', value: value, caseSensitive: caseSensitive),
+      );
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> collectionContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(property: r'collection', value: value, caseSensitive: caseSensitive),
+      );
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> collectionMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(property: r'collection', wildcard: pattern, caseSensitive: caseSensitive),
+      );
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> collectionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'collection', value: ''));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> collectionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'collection', value: ''));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> failedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'failed', value: value));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> isarIdEqualTo(Id value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'isarId', value: value));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> isarIdGreaterThan(Id value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(include: include, property: r'isarId', value: value));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> isarIdLessThan(Id value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(include: include, property: r'isarId', value: value));
     });
   }
 
@@ -3291,17 +2601,10 @@ extension OutboxModelQueryFilter
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> keyEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> keyEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.equalTo(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
@@ -3313,12 +2616,7 @@ extension OutboxModelQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.greaterThan(include: include, property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
@@ -3330,12 +2628,7 @@ extension OutboxModelQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
@@ -3367,41 +2660,23 @@ extension OutboxModelQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> keyEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> keyEndsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> keyContains(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> keyContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
@@ -3412,65 +2687,47 @@ extension OutboxModelQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'key',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'key', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
   QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> keyIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'key', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'key', value: ''));
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  keyIsNotEmpty() {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> keyIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'key', value: ''));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(property: r'lastError'));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(property: r'lastError'));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'key', value: ''),
+        FilterCondition.equalTo(property: r'lastError', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNull(property: r'lastError'),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNotNull(property: r'lastError'),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorEqualTo(String? value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'lastError',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorGreaterThan(
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -3487,26 +2744,19 @@ extension OutboxModelQueryFilter
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorLessThan(
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'lastError',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'lastError', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorBetween(
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -3527,131 +2777,103 @@ extension OutboxModelQueryFilter
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'lastError',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'lastError', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'lastError',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'lastError', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'lastError',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'lastError', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'lastError',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'lastError', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorIsEmpty() {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'lastError', value: ''));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> lastErrorIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'lastError', value: ''));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> nextAttemptAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(property: r'nextAttemptAt'));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> nextAttemptAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(property: r'nextAttemptAt'));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> nextAttemptAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'nextAttemptAt', value: value));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> nextAttemptAtGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'lastError', value: ''),
+        FilterCondition.greaterThan(include: include, property: r'nextAttemptAt', value: value),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  lastErrorIsNotEmpty() {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> nextAttemptAtLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'lastError', value: ''),
+        FilterCondition.lessThan(include: include, property: r'nextAttemptAt', value: value),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  nextAttemptAtIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNull(property: r'nextAttemptAt'),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  nextAttemptAtIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNotNull(property: r'nextAttemptAt'),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  nextAttemptAtEqualTo(DateTime? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'nextAttemptAt', value: value),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  nextAttemptAtGreaterThan(DateTime? value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'nextAttemptAt',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  nextAttemptAtLessThan(DateTime? value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'nextAttemptAt',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  nextAttemptAtBetween(
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> nextAttemptAtBetween(
     DateTime? lower,
     DateTime? upper, {
     bool includeLower = true,
@@ -3676,17 +2898,12 @@ extension OutboxModelQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'recordId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.equalTo(property: r'recordId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  recordIdGreaterThan(
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> recordIdGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -3703,20 +2920,14 @@ extension OutboxModelQueryFilter
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  recordIdLessThan(
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> recordIdLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'recordId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'recordId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
@@ -3742,41 +2953,35 @@ extension OutboxModelQueryFilter
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  recordIdStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> recordIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'recordId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'recordId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  recordIdEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> recordIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'recordId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'recordId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  recordIdContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> recordIdContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'recordId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'recordId', value: value, caseSensitive: caseSensitive),
       );
     });
   }
@@ -3787,70 +2992,38 @@ extension OutboxModelQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'recordId',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'recordId', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  recordIdIsEmpty() {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> recordIdIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'recordId', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'recordId', value: ''));
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  recordIdIsNotEmpty() {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> recordIdIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'recordId', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'recordId', value: ''));
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> seqEqualTo(
-    int value,
-  ) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> seqEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'seq', value: value),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'seq', value: value));
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> seqGreaterThan(
-    int value, {
-    bool include = false,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> seqGreaterThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'seq',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(include: include, property: r'seq', value: value));
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> seqLessThan(
-    int value, {
-    bool include = false,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> seqLessThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'seq',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(include: include, property: r'seq', value: value));
     });
   }
 
@@ -3873,41 +3046,23 @@ extension OutboxModelQueryFilter
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> versionEqualTo(
-    int value,
-  ) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> versionEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'version', value: value));
+    });
+  }
+
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> versionGreaterThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'version', value: value),
+        FilterCondition.greaterThan(include: include, property: r'version', value: value),
       );
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition>
-  versionGreaterThan(int value, {bool include = false}) {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> versionLessThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'version',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<OutboxModel, OutboxModel, QAfterFilterCondition> versionLessThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'version',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(include: include, property: r'version', value: value));
     });
   }
 
@@ -3931,14 +3086,11 @@ extension OutboxModelQueryFilter
   }
 }
 
-extension OutboxModelQueryObject
-    on QueryBuilder<OutboxModel, OutboxModel, QFilterCondition> {}
+extension OutboxModelQueryObject on QueryBuilder<OutboxModel, OutboxModel, QFilterCondition> {}
 
-extension OutboxModelQueryLinks
-    on QueryBuilder<OutboxModel, OutboxModel, QFilterCondition> {}
+extension OutboxModelQueryLinks on QueryBuilder<OutboxModel, OutboxModel, QFilterCondition> {}
 
-extension OutboxModelQuerySortBy
-    on QueryBuilder<OutboxModel, OutboxModel, QSortBy> {
+extension OutboxModelQuerySortBy on QueryBuilder<OutboxModel, OutboxModel, QSortBy> {
   QueryBuilder<OutboxModel, OutboxModel, QAfterSortBy> sortByAttempts() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'attempts', Sort.asc);
@@ -4005,8 +3157,7 @@ extension OutboxModelQuerySortBy
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterSortBy>
-  sortByNextAttemptAtDesc() {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterSortBy> sortByNextAttemptAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nextAttemptAt', Sort.desc);
     });
@@ -4049,8 +3200,7 @@ extension OutboxModelQuerySortBy
   }
 }
 
-extension OutboxModelQuerySortThenBy
-    on QueryBuilder<OutboxModel, OutboxModel, QSortThenBy> {
+extension OutboxModelQuerySortThenBy on QueryBuilder<OutboxModel, OutboxModel, QSortThenBy> {
   QueryBuilder<OutboxModel, OutboxModel, QAfterSortBy> thenByAttempts() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'attempts', Sort.asc);
@@ -4129,8 +3279,7 @@ extension OutboxModelQuerySortThenBy
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QAfterSortBy>
-  thenByNextAttemptAtDesc() {
+  QueryBuilder<OutboxModel, OutboxModel, QAfterSortBy> thenByNextAttemptAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nextAttemptAt', Sort.desc);
     });
@@ -4173,17 +3322,14 @@ extension OutboxModelQuerySortThenBy
   }
 }
 
-extension OutboxModelQueryWhereDistinct
-    on QueryBuilder<OutboxModel, OutboxModel, QDistinct> {
+extension OutboxModelQueryWhereDistinct on QueryBuilder<OutboxModel, OutboxModel, QDistinct> {
   QueryBuilder<OutboxModel, OutboxModel, QDistinct> distinctByAttempts() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'attempts');
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QDistinct> distinctByCollection({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QDistinct> distinctByCollection({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'collection', caseSensitive: caseSensitive);
     });
@@ -4195,17 +3341,13 @@ extension OutboxModelQueryWhereDistinct
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QDistinct> distinctByKey({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QDistinct> distinctByKey({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'key', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QDistinct> distinctByLastError({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QDistinct> distinctByLastError({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'lastError', caseSensitive: caseSensitive);
     });
@@ -4217,9 +3359,7 @@ extension OutboxModelQueryWhereDistinct
     });
   }
 
-  QueryBuilder<OutboxModel, OutboxModel, QDistinct> distinctByRecordId({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<OutboxModel, OutboxModel, QDistinct> distinctByRecordId({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'recordId', caseSensitive: caseSensitive);
     });
@@ -4238,8 +3378,7 @@ extension OutboxModelQueryWhereDistinct
   }
 }
 
-extension OutboxModelQueryProperty
-    on QueryBuilder<OutboxModel, OutboxModel, QQueryProperty> {
+extension OutboxModelQueryProperty on QueryBuilder<OutboxModel, OutboxModel, QQueryProperty> {
   QueryBuilder<OutboxModel, int, QQueryOperations> isarIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isarId');
@@ -4276,8 +3415,7 @@ extension OutboxModelQueryProperty
     });
   }
 
-  QueryBuilder<OutboxModel, DateTime?, QQueryOperations>
-  nextAttemptAtProperty() {
+  QueryBuilder<OutboxModel, DateTime?, QQueryOperations> nextAttemptAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'nextAttemptAt');
     });
@@ -4328,13 +3466,7 @@ const SyncCursorModelSchema = CollectionSchema(
       name: r'key',
       unique: true,
       replace: true,
-      properties: [
-        IndexPropertySchema(
-          name: r'key',
-          type: IndexType.hash,
-          caseSensitive: true,
-        ),
-      ],
+      properties: [IndexPropertySchema(name: r'key', type: IndexType.hash, caseSensitive: true)],
     ),
   },
   links: {},
@@ -4346,11 +3478,7 @@ const SyncCursorModelSchema = CollectionSchema(
   version: '3.4.1',
 );
 
-int _syncCursorModelEstimateSize(
-  SyncCursorModel object,
-  List<int> offsets,
-  Map<Type, List<int>> allOffsets,
-) {
+int _syncCursorModelEstimateSize(SyncCursorModel object, List<int> offsets, Map<Type, List<int>> allOffsets) {
   var bytesCount = offsets.last;
   {
     final value = object.cursor;
@@ -4384,12 +3512,7 @@ SyncCursorModel _syncCursorModelDeserialize(
   return object;
 }
 
-P _syncCursorModelDeserializeProp<P>(
-  IsarReader reader,
-  int propertyId,
-  int offset,
-  Map<Type, List<int>> allOffsets,
-) {
+P _syncCursorModelDeserializeProp<P>(IsarReader reader, int propertyId, int offset, Map<Type, List<int>> allOffsets) {
   switch (propertyId) {
     case 0:
       return (reader.readStringOrNull(offset)) as P;
@@ -4408,11 +3531,7 @@ List<IsarLinkBase<dynamic>> _syncCursorModelGetLinks(SyncCursorModel object) {
   return [];
 }
 
-void _syncCursorModelAttach(
-  IsarCollection<dynamic> col,
-  Id id,
-  SyncCursorModel object,
-) {}
+void _syncCursorModelAttach(IsarCollection<dynamic> col, Id id, SyncCursorModel object) {}
 
 extension SyncCursorModelByIndex on IsarCollection<SyncCursorModel> {
   Future<SyncCursorModel?> getByKey(String key) {
@@ -4463,16 +3582,12 @@ extension SyncCursorModelByIndex on IsarCollection<SyncCursorModel> {
     return putAllByIndex(r'key', objects);
   }
 
-  List<Id> putAllByKeySync(
-    List<SyncCursorModel> objects, {
-    bool saveLinks = true,
-  }) {
+  List<Id> putAllByKeySync(List<SyncCursorModel> objects, {bool saveLinks = true}) {
     return putAllByIndexSync(r'key', objects, saveLinks: saveLinks);
   }
 }
 
-extension SyncCursorModelQueryWhereSort
-    on QueryBuilder<SyncCursorModel, SyncCursorModel, QWhere> {
+extension SyncCursorModelQueryWhereSort on QueryBuilder<SyncCursorModel, SyncCursorModel, QWhere> {
   QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhere> anyIsarId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
@@ -4480,60 +3595,43 @@ extension SyncCursorModelQueryWhereSort
   }
 }
 
-extension SyncCursorModelQueryWhere
-    on QueryBuilder<SyncCursorModel, SyncCursorModel, QWhereClause> {
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause>
-  isarIdEqualTo(Id isarId) {
+extension SyncCursorModelQueryWhere on QueryBuilder<SyncCursorModel, SyncCursorModel, QWhereClause> {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause> isarIdEqualTo(Id isarId) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IdWhereClause.between(lower: isarId, upper: isarId),
-      );
+      return query.addWhereClause(IdWhereClause.between(lower: isarId, upper: isarId));
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause>
-  isarIdNotEqualTo(Id isarId) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause> isarIdNotEqualTo(Id isarId) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
-            .addWhereClause(
-              IdWhereClause.lessThan(upper: isarId, includeUpper: false),
-            )
-            .addWhereClause(
-              IdWhereClause.greaterThan(lower: isarId, includeLower: false),
-            );
+            .addWhereClause(IdWhereClause.lessThan(upper: isarId, includeUpper: false))
+            .addWhereClause(IdWhereClause.greaterThan(lower: isarId, includeLower: false));
       } else {
         return query
-            .addWhereClause(
-              IdWhereClause.greaterThan(lower: isarId, includeLower: false),
-            )
-            .addWhereClause(
-              IdWhereClause.lessThan(upper: isarId, includeUpper: false),
-            );
+            .addWhereClause(IdWhereClause.greaterThan(lower: isarId, includeLower: false))
+            .addWhereClause(IdWhereClause.lessThan(upper: isarId, includeUpper: false));
       }
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause>
-  isarIdGreaterThan(Id isarId, {bool include = false}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause> isarIdGreaterThan(
+    Id isarId, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IdWhereClause.greaterThan(lower: isarId, includeLower: include),
-      );
+      return query.addWhereClause(IdWhereClause.greaterThan(lower: isarId, includeLower: include));
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause>
-  isarIdLessThan(Id isarId, {bool include = false}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause> isarIdLessThan(Id isarId, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IdWhereClause.lessThan(upper: isarId, includeUpper: include),
-      );
+      return query.addWhereClause(IdWhereClause.lessThan(upper: isarId, includeUpper: include));
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause>
-  isarIdBetween(
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause> isarIdBetween(
     Id lowerIsarId,
     Id upperIsarId, {
     bool includeLower = true,
@@ -4551,131 +3649,76 @@ extension SyncCursorModelQueryWhere
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause> keyEqualTo(
-    String key,
-  ) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause> keyEqualTo(String key) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IndexWhereClause.equalTo(indexName: r'key', value: [key]),
-      );
+      return query.addWhereClause(IndexWhereClause.equalTo(indexName: r'key', value: [key]));
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause>
-  keyNotEqualTo(String key) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterWhereClause> keyNotEqualTo(String key) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [],
-                upper: [key],
-                includeUpper: false,
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [key],
-                includeLower: false,
-                upper: [],
-              ),
-            );
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [], upper: [key], includeUpper: false))
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [key], includeLower: false, upper: []));
       } else {
         return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [key],
-                includeLower: false,
-                upper: [],
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'key',
-                lower: [],
-                upper: [key],
-                includeUpper: false,
-              ),
-            );
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [key], includeLower: false, upper: []))
+            .addWhereClause(IndexWhereClause.between(indexName: r'key', lower: [], upper: [key], includeUpper: false));
       }
     });
   }
 }
 
-extension SyncCursorModelQueryFilter
-    on QueryBuilder<SyncCursorModel, SyncCursorModel, QFilterCondition> {
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorIsNull() {
+extension SyncCursorModelQueryFilter on QueryBuilder<SyncCursorModel, SyncCursorModel, QFilterCondition> {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(property: r'cursor'));
+    });
+  }
+
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(property: r'cursor'));
+    });
+  }
+
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        const FilterCondition.isNull(property: r'cursor'),
+        FilterCondition.equalTo(property: r'cursor', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNotNull(property: r'cursor'),
-      );
-    });
-  }
-
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorEqualTo(String? value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'cursor',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorGreaterThan(
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'cursor',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.greaterThan(include: include, property: r'cursor', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorLessThan(
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'cursor',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'cursor', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorBetween(
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -4696,113 +3739,87 @@ extension SyncCursorModelQueryFilter
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'cursor',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'cursor', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'cursor',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'cursor', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'cursor',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'cursor', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'cursor',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'cursor', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorIsEmpty() {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'cursor', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'cursor', value: ''));
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  cursorIsNotEmpty() {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> cursorIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'cursor', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'cursor', value: ''));
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  isarIdEqualTo(Id value) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> isarIdEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'isarId', value: value),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'isarId', value: value));
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  isarIdGreaterThan(Id value, {bool include = false}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> isarIdGreaterThan(
+    Id value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'isarId',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(include: include, property: r'isarId', value: value));
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  isarIdLessThan(Id value, {bool include = false}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> isarIdLessThan(
+    Id value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'isarId',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(include: include, property: r'isarId', value: value));
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  isarIdBetween(
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> isarIdBetween(
     Id lower,
     Id upper, {
     bool includeLower = true,
@@ -4821,53 +3838,42 @@ extension SyncCursorModelQueryFilter
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  keyEqualTo(String value, {bool caseSensitive = true}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> keyEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.equalTo(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  keyGreaterThan(
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> keyGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.greaterThan(include: include, property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  keyLessThan(String value, {bool include = false, bool caseSensitive = true}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> keyLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.lessThan(include: include, property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  keyBetween(
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> keyBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -4888,93 +3894,75 @@ extension SyncCursorModelQueryFilter
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  keyStartsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> keyStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.startsWith(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  keyEndsWith(String value, {bool caseSensitive = true}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> keyEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.endsWith(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  keyContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> keyContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'key',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.contains(property: r'key', value: value, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  keyMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> keyMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'key',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
+        FilterCondition.matches(property: r'key', wildcard: pattern, caseSensitive: caseSensitive),
       );
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  keyIsEmpty() {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> keyIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'key', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(property: r'key', value: ''));
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition>
-  keyIsNotEmpty() {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterFilterCondition> keyIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'key', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(property: r'key', value: ''));
     });
   }
 }
 
-extension SyncCursorModelQueryObject
-    on QueryBuilder<SyncCursorModel, SyncCursorModel, QFilterCondition> {}
+extension SyncCursorModelQueryObject on QueryBuilder<SyncCursorModel, SyncCursorModel, QFilterCondition> {}
 
-extension SyncCursorModelQueryLinks
-    on QueryBuilder<SyncCursorModel, SyncCursorModel, QFilterCondition> {}
+extension SyncCursorModelQueryLinks on QueryBuilder<SyncCursorModel, SyncCursorModel, QFilterCondition> {}
 
-extension SyncCursorModelQuerySortBy
-    on QueryBuilder<SyncCursorModel, SyncCursorModel, QSortBy> {
+extension SyncCursorModelQuerySortBy on QueryBuilder<SyncCursorModel, SyncCursorModel, QSortBy> {
   QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterSortBy> sortByCursor() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'cursor', Sort.asc);
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterSortBy>
-  sortByCursorDesc() {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterSortBy> sortByCursorDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'cursor', Sort.desc);
     });
@@ -4993,16 +3981,14 @@ extension SyncCursorModelQuerySortBy
   }
 }
 
-extension SyncCursorModelQuerySortThenBy
-    on QueryBuilder<SyncCursorModel, SyncCursorModel, QSortThenBy> {
+extension SyncCursorModelQuerySortThenBy on QueryBuilder<SyncCursorModel, SyncCursorModel, QSortThenBy> {
   QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterSortBy> thenByCursor() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'cursor', Sort.asc);
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterSortBy>
-  thenByCursorDesc() {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterSortBy> thenByCursorDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'cursor', Sort.desc);
     });
@@ -5014,8 +4000,7 @@ extension SyncCursorModelQuerySortThenBy
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterSortBy>
-  thenByIsarIdDesc() {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QAfterSortBy> thenByIsarIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isarId', Sort.desc);
     });
@@ -5034,27 +4019,21 @@ extension SyncCursorModelQuerySortThenBy
   }
 }
 
-extension SyncCursorModelQueryWhereDistinct
-    on QueryBuilder<SyncCursorModel, SyncCursorModel, QDistinct> {
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QDistinct> distinctByCursor({
-    bool caseSensitive = true,
-  }) {
+extension SyncCursorModelQueryWhereDistinct on QueryBuilder<SyncCursorModel, SyncCursorModel, QDistinct> {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QDistinct> distinctByCursor({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'cursor', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<SyncCursorModel, SyncCursorModel, QDistinct> distinctByKey({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<SyncCursorModel, SyncCursorModel, QDistinct> distinctByKey({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'key', caseSensitive: caseSensitive);
     });
   }
 }
 
-extension SyncCursorModelQueryProperty
-    on QueryBuilder<SyncCursorModel, SyncCursorModel, QQueryProperty> {
+extension SyncCursorModelQueryProperty on QueryBuilder<SyncCursorModel, SyncCursorModel, QQueryProperty> {
   QueryBuilder<SyncCursorModel, int, QQueryOperations> isarIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isarId');

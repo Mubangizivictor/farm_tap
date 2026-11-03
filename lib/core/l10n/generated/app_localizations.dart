@@ -631,7 +631,7 @@ abstract class AppLocalizations {
   /// No description provided for @signUpSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'You\'ll set up your farm next. 14 days free.'**
+  /// **'You\'ll set up your farm next. 7 days free.'**
   String get signUpSubtitle;
 
   /// No description provided for @fullNameLabel.
@@ -1171,7 +1171,7 @@ abstract class AppLocalizations {
   /// No description provided for @farmReadyBody.
   ///
   /// In en, this message translates to:
-  /// **'Your 14 free days start today and end on {date}. After that FarmTap is UGX 70,000 a month.'**
+  /// **'Your 7 free days start today and end on {date}. After that FarmTap is UGX 70,000 a month.'**
   String farmReadyBody(String date);
 
   /// No description provided for @summaryFarm.
@@ -5631,6 +5631,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Money this month: in {income}, out {expenses}'**
   String rpMoney(String income, String expenses);
+
+  /// No description provided for @searchList.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get searchList;
+
+  /// No description provided for @useTyped.
+  ///
+  /// In en, this message translates to:
+  /// **'Use “{text}”'**
+  String useTyped(String text);
+
+  /// No description provided for @nothingFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found. Type the full name to use it.'**
+  String get nothingFound;
+
+  /// No description provided for @locationOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on location in your phone settings, or pick the district.'**
+  String get locationOff;
+
+  /// No description provided for @locationDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is not allowed. Pick the district from the list.'**
+  String get locationDenied;
+
+  /// No description provided for @locationNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not find your district. Pick it from the list.'**
+  String get locationNotFound;
+
+  /// No description provided for @findingLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding your location…'**
+  String get findingLocation;
+
+  /// No description provided for @cowsCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'How many cows?'**
+  String get cowsCountLabel;
+
+  /// No description provided for @cowsCountHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'All cattle on the farm today'**
+  String get cowsCountHelper;
+
+  /// No description provided for @roleSupervisor.
+  ///
+  /// In en, this message translates to:
+  /// **'Supervisor'**
+  String get roleSupervisor;
+
+  /// No description provided for @roleMilker.
+  ///
+  /// In en, this message translates to:
+  /// **'Milker'**
+  String get roleMilker;
+
+  /// No description provided for @roleSecretary.
+  ///
+  /// In en, this message translates to:
+  /// **'Secretary'**
+  String get roleSecretary;
+
+  /// No description provided for @roleAccountant.
+  ///
+  /// In en, this message translates to:
+  /// **'Accountant'**
+  String get roleAccountant;
+
+  /// No description provided for @roleDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver'**
+  String get roleDriver;
+
+  /// No description provided for @roleGuard.
+  ///
+  /// In en, this message translates to:
+  /// **'Security guard'**
+  String get roleGuard;
+
+  /// No description provided for @roleCook.
+  ///
+  /// In en, this message translates to:
+  /// **'Cook'**
+  String get roleCook;
+
+  /// No description provided for @roleFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family member'**
+  String get roleFamily;
+
+  /// No description provided for @roleCoOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Co-owner'**
+  String get roleCoOwner;
+
+  /// No description provided for @roleFarmManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm manager'**
+  String get roleFarmManager;
+
+  /// No description provided for @jobLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Job'**
+  String get jobLabel;
+
+  /// No description provided for @jobHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick one or type your own, e.g. “Farmer\'s daughter”'**
+  String get jobHelper;
+
+  /// No description provided for @accessLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What they can do in FarmTap'**
+  String get accessLabel;
+
+  /// No description provided for @phoneOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number (optional)'**
+  String get phoneOptional;
+
+  /// No description provided for @wageOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly pay (optional)'**
+  String get wageOptional;
+
+  /// No description provided for @cardForWorker.
+  ///
+  /// In en, this message translates to:
+  /// **'Their card'**
+  String get cardForWorker;
+
+  /// No description provided for @cardForWorkerHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold their FarmTap card to the back of the phone, or type the number printed on it.'**
+  String get cardForWorkerHelp;
+
+  /// No description provided for @cardReadNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Card {number}'**
+  String cardReadNumber(String number);
+
+  /// No description provided for @changeCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get changeCard;
+
+  /// No description provided for @noCardYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No card yet: give one later from the worker\'s page.'**
+  String get noCardYet;
+
+  /// No description provided for @yourRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your role'**
+  String get yourRoleLabel;
+
+  /// No description provided for @ownerAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Full access: I own the farm and pay for FarmTap'**
+  String get ownerAccess;
+
+  /// No description provided for @managerAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Manager: I run the farm for the owner'**
+  String get managerAccess;
+
+  /// No description provided for @accessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What can you do?'**
+  String get accessTitle;
+
+  /// No description provided for @cowsInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the number of cows, e.g. 25'**
+  String get cowsInvalid;
+
+  /// No description provided for @firstWorkerSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} added'**
+  String firstWorkerSaved(String name);
+
+  /// No description provided for @farmCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the farm. Check the internet and try again.'**
+  String get farmCreateFailed;
+
+  /// No description provided for @creatingFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating your farm…'**
+  String get creatingFarm;
 }
 
 class _AppLocalizationsDelegate

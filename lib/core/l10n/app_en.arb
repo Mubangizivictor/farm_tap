@@ -130,7 +130,7 @@
   "newToFarmTap": "New to FarmTap? Create an account",
   "signInFailed": "Email or password is wrong.",
   "signUpTitle": "Create your account",
-  "signUpSubtitle": "You'll set up your farm next. 14 days free.",
+  "signUpSubtitle": "You'll set up your farm next. 7 days free.",
   "fullNameLabel": "Full name",
   "nameRequired": "Enter your name.",
   "emailIncomplete": "Check the email — it looks incomplete.",
@@ -265,7 +265,7 @@
   "nfcLaterBody": "Tap 'Assign card' on the worker's page when cards arrive.",
   "saveWorker": "Save worker",
   "farmReadyTitle": "Your farm is ready!",
-  "farmReadyBody": "Your 14 free days start today and end on {date}. After that FarmTap is UGX 70,000 a month.",
+  "farmReadyBody": "Your 7 free days start today and end on {date}. After that FarmTap is UGX 70,000 a month.",
   "@farmReadyBody": {
     "placeholders": {
       "date": {
@@ -2605,5 +2605,63 @@
         "type": "String"
       }
     }
-  }
+  },
+  "searchList": "Search",
+  "useTyped": "Use “{text}”",
+  "@useTyped": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "nothingFound": "Nothing found. Type the full name to use it.",
+  "locationOff": "Turn on location in your phone settings, or pick the district.",
+  "locationDenied": "Location is not allowed. Pick the district from the list.",
+  "locationNotFound": "Could not find your district. Pick it from the list.",
+  "findingLocation": "Finding your location…",
+  "cowsCountLabel": "How many cows?",
+  "cowsCountHelper": "All cattle on the farm today",
+  "roleSupervisor": "Supervisor",
+  "roleMilker": "Milker",
+  "roleSecretary": "Secretary",
+  "roleAccountant": "Accountant",
+  "roleDriver": "Driver",
+  "roleGuard": "Security guard",
+  "roleCook": "Cook",
+  "roleFamily": "Family member",
+  "roleCoOwner": "Co-owner",
+  "roleFarmManager": "Farm manager",
+  "jobLabel": "Job",
+  "jobHelper": "Pick one or type your own, e.g. “Farmer's daughter”",
+  "accessLabel": "What they can do in FarmTap",
+  "phoneOptional": "Phone number (optional)",
+  "wageOptional": "Monthly pay (optional)",
+  "cardForWorker": "Their card",
+  "cardForWorkerHelp": "Hold their FarmTap card to the back of the phone, or type the number printed on it.",
+  "cardReadNumber": "Card {number}",
+  "@cardReadNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "changeCard": "Change",
+  "noCardYet": "No card yet: give one later from the worker's page.",
+  "yourRoleLabel": "Your role",
+  "ownerAccess": "Full access: I own the farm and pay for FarmTap",
+  "managerAccess": "Manager: I run the farm for the owner",
+  "accessTitle": "What can you do?",
+  "cowsInvalid": "Type the number of cows, e.g. 25",
+  "firstWorkerSaved": "{name} added",
+  "@firstWorkerSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "farmCreateFailed": "Could not create the farm. Check the internet and try again.",
+  "creatingFarm": "Creating your farm…"
 }

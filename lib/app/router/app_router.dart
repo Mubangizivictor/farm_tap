@@ -22,6 +22,7 @@ import 'package:farm_tap/core/onboarding/presentation/cubit/onboarding_cubit.dar
 import 'package:farm_tap/core/onboarding/presentation/pages/choice_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/form_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/waitlist_and_done.dart';
+import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
 import 'package:farm_tap/core/settings/presentation/pages/more_page.dart';
@@ -596,11 +597,8 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         AppRoutes.setupFarm,
         parent: AppRoutes.setupDairyType,
-        builder: (context, state) => OnboardFarmDetailsPage(
-          cubit: setup,
-          districts: onboarding.districts,
-          onContinue: () => context.push(AppRoutes.setupContacts),
-        ),
+        builder: (context, state) =>
+            OnboardFarmDetailsPage(cubit: setup, onContinue: () => context.push(AppRoutes.setupContacts)),
       ),
       page(
         AppRoutes.setupContacts,
@@ -625,10 +623,13 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) => FarmReadyPage(
           setup: setup.state,
           repo: onboarding,
-          onStart: (farm) {
+          onStart: (farm) async {
+            final worker = setup.state.firstWorker;
             session.openFarm(farm);
+            // B09's worker is saved into the new farm (and its card given).
+            if (worker != null) await saveFirstWorker(deps.staffDirectory, worker);
             setup.reset();
-            context.go(AppRoutes.home);
+            if (context.mounted) context.go(AppRoutes.home);
           },
         ),
       ),
@@ -769,4 +770,18 @@ Future<void> _openMore(BuildContext context, SessionController session, MoreTarg
       );
       if (ok) await session.signOut();
   }
+}
+
+/// Saves the first worker from onboarding (B09) into the farm just opened.
+Future<void> saveFirstWorker(StaffDirectory staff, FirstWorker w) async {
+  final added = (await staff.addStaff(
+    name: w.name,
+    role: w.role,
+    pin: w.pin,
+    title: w.title,
+    phone: w.phone,
+    monthlyWage: w.monthlyWage,
+  )).data;
+  final card = w.cardNumber;
+  if (added != null && card != null) await staff.assignCard(added.id, card);
 }

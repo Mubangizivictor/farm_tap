@@ -18,12 +18,12 @@ import '../../helpers/fake_deps.dart';
 void main() {
   final trial = Subscription(trialStartedAt: DateTime(2026, 11, 2), trialEndsAt: DateTime(2026, 11, 16));
 
-  test('a new farm (B10) gets its own trial: today + 14 days', () async {
+  test('a new farm (B10) gets its own trial: today + 7 days', () async {
     final clock = FakeClock(DateTime(2026, 11, 7, 8, 41));
     final repo = FakeOnboardingRepository(clock);
     final farm = (await repo.createFarm(const FarmSetup(farmName: 'New Farm'))).data!;
-    expect(farm.subscription.trialEndsAt, DateTime(2026, 11, 21));
-    expect(farm.subscription.trialDaysLeft(clock.today()), 14);
+    expect(farm.subscription.trialEndsAt, DateTime(2026, 11, 14));
+    expect(farm.subscription.trialDaysLeft(clock.today()), 7);
   });
 
   group('Subscription', () {

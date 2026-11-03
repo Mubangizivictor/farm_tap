@@ -9,6 +9,7 @@ import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/nfc/card_tap_listener.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
+import 'package:farm_tap/core/people/presentation/widgets/card_number_sheet.dart';
 import 'package:farm_tap/core/people/presentation/widgets/manager_pin_dialog.dart';
 import 'package:farm_tap/core/people/presentation/widgets/staff_form_fields.dart';
 import 'package:farm_tap/core/theme/theme.dart';
@@ -31,22 +32,6 @@ String _moneyShort(FarmTapFormat f, int ugx) => 'UGX ${ugx >= 1000000 ? f.compac
 FarmTapTone _avatarTone(StaffMember s, List<StaffMember> order) =>
     const [FarmTapTone.primary, FarmTapTone.gold, FarmTapTone.info][order.indexWhere((m) => m.id == s.id).abs() % 3];
 
-String staffRoleLabel(AppLocalizations l10n, StaffRole r) => switch (r) {
-  StaffRole.manager => l10n.roleManager,
-  StaffRole.herdsman => l10n.roleHerdsman,
-  StaffRole.clerk => l10n.roleMilkClerk,
-  StaffRole.worker => l10n.roleWorker,
-  StaffRole.vet => l10n.roleVet,
-};
-
-String _canDo(AppLocalizations l10n, StaffRole r) => switch (r) {
-  StaffRole.manager => l10n.canDoManager,
-  StaffRole.herdsman => l10n.canDoHerdsman,
-  StaffRole.clerk => l10n.canDoClerk,
-  StaffRole.worker => l10n.canDoWorker,
-  StaffRole.vet => l10n.canDoVet,
-};
-
 StatusBadge _cardBadge(AppLocalizations l10n, StaffMember s) => s.hasCard
     ? StatusBadge(label: l10n.cardBadge, tone: FarmTapTone.success, icon: Symbols.contactless_rounded)
     : StatusBadge(label: l10n.noCardBadge, tone: FarmTapTone.gold);
@@ -60,39 +45,6 @@ String _todayText(AppLocalizations l10n, FarmTapFormat f, StaffToday t) {
 }
 
 void _comingSoon(BuildContext context) => FarmTapToast.show(context, message: AppLocalizations.of(context).comingSoon);
-
-/// Card reading for K03 and K04: NFC where the phone has it, "Simulate tap"
-/// in debug builds, and always "Type card number" (decision 0006).
-Future<String?> showTypeCardNumber(BuildContext context, {String? initial}) {
-  final l10n = AppLocalizations.of(context);
-  var digits = initial ?? '';
-  return showAdaptiveSheet<String>(
-    context,
-    builder: (sheet) => StatefulBuilder(
-      builder: (sheet, setState) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SheetTitle(l10n.typeCardNumber, subtitle: l10n.typeTheCardNumber),
-          sheet.space.gapLg,
-          KeypadDisplay(text: digits, placeholder: '0000'),
-          sheet.space.gapLg,
-          BigNumberKeypad(
-            onDigit: (d) => setState(() => digits = digits.length < 4 ? '$digits$d' : digits),
-            onBackspace: () =>
-                setState(() => digits = digits.isEmpty ? digits : digits.substring(0, digits.length - 1)),
-          ),
-          sheet.space.gapLg,
-          FarmTapButton(
-            label: l10n.useCard,
-            icon: Symbols.check_rounded,
-            onPressed: digits.isEmpty ? null : () => Navigator.of(sheet).pop(digits.padLeft(4, '0')),
-          ),
-        ],
-      ),
-    ),
-  );
-}
 
 // ---------------------------------------------------------------- K01
 
@@ -203,7 +155,7 @@ class _WorkersPageState extends State<WorkersPage> {
                           tone: _avatarTone(t.staff, [for (final x in all) x.staff]),
                         ),
                         title: t.staff.name,
-                        subtitle: staffRoleLabel(l10n, t.staff.role),
+                        subtitle: staffTitle(l10n, t.staff),
                         badge: _cardBadge(l10n, t.staff),
                         trailingValue: t.record == null ? null : (t.isIn ? l10n.inLabel : l10n.outLabel),
                         trailingSub: t.record == null ? null : f.clock24(t.isIn ? t.record!.inAt : t.record!.outAt!),
@@ -227,11 +179,7 @@ class _WorkersPageState extends State<WorkersPage> {
                             ],
                           ),
                         ),
-                        RecordColumn(
-                          label: l10n.colRole,
-                          flex: 2,
-                          cell: (c, t) => Text(staffRoleLabel(l10n, t.staff.role)),
-                        ),
+                        RecordColumn(label: l10n.colRole, flex: 2, cell: (c, t) => Text(staffTitle(l10n, t.staff))),
                         RecordColumn(
                           label: l10n.colCard,
                           cell: (c, t) =>
@@ -349,11 +297,8 @@ class _StaffDetailPageState extends State<StaffDetailPage> {
                           context.space.gapXs,
                           Text(
                             s.since == null
-                                ? staffRoleLabel(l10n, s.role)
-                                : l10n.roleSince(
-                                    staffRoleLabel(l10n, s.role),
-                                    '${f.monthShort(s.since!)} ${s.since!.year}',
-                                  ),
+                                ? staffTitle(l10n, s)
+                                : l10n.roleSince(staffTitle(l10n, s), '${f.monthShort(s.since!)} ${s.since!.year}'),
                             style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                           ),
                           context.space.gapSm,
@@ -422,7 +367,7 @@ class _StaffDetailPageState extends State<StaffDetailPage> {
                       size: context.sizes.bubbleMd,
                     ),
                     title: l10n.whatCanDo(s.greetingName),
-                    subtitle: _canDo(l10n, s.role),
+                    subtitle: staffCanDo(l10n, s.role),
                     onTap: () => _comingSoon(context),
                   ),
                   RecordTile(
@@ -524,7 +469,7 @@ class _AssignCardPageState extends State<AssignCardPage> {
                   PrintedCardPreview(
                     name: s.name,
                     cardNumber: blank == null ? '' : l10n.cardNumberBadge(blank),
-                    subtitle: '${staffRoleLabel(l10n, s.role)} · ${widget.farmName}',
+                    subtitle: '${staffTitle(l10n, s)} · ${widget.farmName}',
                   ),
                   context.space.gapXxl,
                   FarmTapAnimationView(
@@ -666,7 +611,7 @@ class _AttendancePageState extends State<AttendancePage> {
                         tone: _avatarTone(t.staff, [for (final x in all) x.staff]),
                       ),
                       title: t.staff.name,
-                      subtitle: staffRoleLabel(l10n, t.staff.role),
+                      subtitle: staffTitle(l10n, t.staff),
                       trailingValue: _todayText(l10n, f, t),
                       showChevron: false,
                     ),
@@ -1063,16 +1008,11 @@ class StaffFormPage extends StatefulWidget {
 }
 
 class _StaffFormPageState extends State<StaffFormPage> {
-  static const List<StaffRole> _roles = [
-    StaffRole.herdsman,
-    StaffRole.clerk,
-    StaffRole.worker,
-    StaffRole.manager,
-    StaffRole.vet,
-  ];
-
   final _name = TextEditingController();
+  final _phone = TextEditingController();
+  final _wage = TextEditingController();
   StaffRole _role = StaffRole.herdsman;
+  String _job = '';
   String _pin = '';
   String? _nameError;
   String? _pinError;
@@ -1096,12 +1036,17 @@ class _StaffFormPageState extends State<StaffFormPage> {
       _editing = s;
       _name.text = s.name;
       _role = s.role;
+      _job = s.title ?? '';
+      _phone.text = s.phone ?? '';
+      _wage.text = s.monthlyWage?.toString() ?? '';
     });
   }
 
   @override
   void dispose() {
     _name.dispose();
+    _phone.dispose();
+    _wage.dispose();
     super.dispose();
   }
 
@@ -1112,9 +1057,26 @@ class _StaffFormPageState extends State<StaffFormPage> {
       _pinError = _isEdit || _pin.length == 4 ? null : l10n.pinRequired;
     });
     if (_nameError != null || _pinError != null) return;
+    final title = _job.trim().isEmpty ? null : _job.trim();
+    final phone = _phone.text.trim().isEmpty ? null : _phone.text.trim();
+    final wage = int.tryParse(_wage.text);
     final saved = _isEdit
-        ? (await widget.directory.updateStaff(widget.staffId!, name: _name.text.trim(), role: _role)).data
-        : (await widget.directory.addStaff(name: _name.text.trim(), role: _role, pin: _pin)).data;
+        ? (await widget.directory.updateStaff(
+            widget.staffId!,
+            name: _name.text.trim(),
+            role: _role,
+            title: title,
+            phone: phone,
+            monthlyWage: wage,
+          )).data
+        : (await widget.directory.addStaff(
+            name: _name.text.trim(),
+            role: _role,
+            pin: _pin,
+            title: title,
+            phone: phone,
+            monthlyWage: wage,
+          )).data;
     if (saved == null || !mounted) return;
     setState(() => _edited = false);
     FarmTapToast.show(context, message: l10n.workerSaved(saved.name));
@@ -1136,15 +1098,20 @@ class _StaffFormPageState extends State<StaffFormPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                StaffFormFields<StaffRole>(
+                StaffFormFields(
                   name: _name,
-                  roles: _roles,
-                  role: _role,
-                  roleLabel: (r) => staffRoleLabel(l10n, r),
-                  onRole: (r) => setState(() {
+                  job: _job,
+                  onJob: (j) => setState(() {
+                    _job = j;
+                    _edited = true;
+                  }),
+                  access: _role,
+                  onAccess: (r) => setState(() {
                     _role = r;
                     _edited = true;
                   }),
+                  phone: _phone,
+                  wage: _wage,
                   onChanged: () => setState(() => _edited = true),
                   pin: _isEdit ? null : _pin,
                   onPin: (p) => setState(() {

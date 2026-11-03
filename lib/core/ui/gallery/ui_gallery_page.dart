@@ -351,7 +351,7 @@ class _UiGalleryPageState extends State<UiGalleryPage> {
       context.space.gapMd,
       Align(
         alignment: Alignment.centerLeft,
-        child: SizedBox(width: context.sizes.sidebarWidth - context.space.xxl, child: const TrialCard(daysLeft: 9)),
+        child: SizedBox(width: context.sizes.sidebarWidth - context.space.xxl, child: const TrialCard(daysLeft: 5)),
       ),
       context.space.gapMd,
       const Row(
