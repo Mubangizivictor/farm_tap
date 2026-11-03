@@ -11,7 +11,7 @@ import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart
 /// UI phase: 9 confirmed pregnancies (Kyasiimire, Kahara, Bihogo calve within
 /// 30 days of Sat 7 Nov), 2 services due a pregnancy check and a heifer that
 /// showed heat yesterday. Every date is calculated with [BreedingRules].
-class FakeBreedingRepository implements BreedingRepository {
+class FakeBreedingRepository implements BreedingRepository, Restorable {
   new(this.clock, this.money, {this.journal}) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -143,6 +143,50 @@ class FakeBreedingRepository implements BreedingRepository {
 
   @override
   Future<Result<List<BreedingAnimal>>> animals() async => const Result.success(_animals);
+
+  @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    final events = await j.load('breedingEvents')
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    for (final r in events) {
+      final b = r.body;
+      final at = DateTime.parse(b['at']! as String);
+      switch (b['type']) {
+        case 'ai' || 'service':
+          final animal = _animals.where((a) => a.id == b['animalId']).firstOrNull;
+          if (animal == null || _services.any((s) => s.id == r.id)) continue;
+          _services.add(
+            ServiceRecord(
+              id: r.id,
+              animal: animal,
+              kind: ServiceKind.values.byName(b['kind']! as String),
+              at: at,
+              straw: b['straw'] as String?,
+              bull: b['bull'] as String?,
+              technician: b['technician'] as String?,
+              cost: b['cost'] as int?,
+            ),
+          );
+        case 'pregnancyCheck':
+          if (_checks.any((c) => c.id == r.id)) continue;
+          _checks.add(
+            PregnancyCheck(
+              id: r.id,
+              serviceId: b['serviceId']! as String,
+              pregnant: b['pregnant']! as bool,
+              at: at,
+              by: b['by'] as String?,
+            ),
+          );
+        case 'calving':
+          final animalId = b['animalId']! as String;
+          if (_calvings.any((c) => c.animalId == animalId && c.at == at)) continue;
+          _calvings.add(CalvingRecord(animalId: animalId, at: at));
+      }
+    }
+  }
 
   @override
   Future<Result<ServiceRecord>> recordService({

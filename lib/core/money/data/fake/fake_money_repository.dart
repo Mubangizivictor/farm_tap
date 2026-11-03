@@ -7,7 +7,7 @@ import 'package:farm_tap/core/utils/clock.dart';
 /// UI phase: in-memory expenses. Feature fakes (feed purchases, AI services,
 /// wages) add theirs through [addExpense], so every total has one source.
 /// Two expenses entered directly on L02 are seeded here.
-class FakeMoneyRepository implements MoneyRepository {
+class FakeMoneyRepository implements MoneyRepository, Restorable {
   new(this.clock, {this.journal}) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -49,6 +49,26 @@ class FakeMoneyRepository implements MoneyRepository {
             .toList()
           ..sort((a, b) => b.at.compareTo(a.at));
     return Result.success(list);
+  }
+
+  @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    for (final r in await j.load('expenses')) {
+      if (_expenses.any((e) => e.id == r.id)) continue;
+      final b = r.body;
+      _expenses.add(
+        Expense(
+          id: r.id,
+          category: ExpenseCategory.values.byName(b['category']! as String),
+          amount: b['amount']! as int,
+          at: DateTime.parse(b['at']! as String),
+          note: b['note'] as String?,
+          sourceId: b['sourceId'] as String?,
+        ),
+      );
+    }
   }
 
   @override

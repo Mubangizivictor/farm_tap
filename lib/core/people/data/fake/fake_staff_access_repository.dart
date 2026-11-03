@@ -8,7 +8,7 @@ import 'package:farm_tap/core/sync/record_journal.dart';
 
 /// Sample staff from the mockups. Every PIN is 1234 in the UI phase.
 /// Peter has no card yet (K01 "No card"); blank cards 0207-0215 are in stock.
-class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory {
+class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory, Restorable {
   new({
     this.nfc = true,
     this.today,
@@ -91,6 +91,38 @@ class FakeStaffAccessRepository implements StaffAccessRepository, StaffDirectory
 
   static const pin = '1234';
   static const maxTries = 5;
+
+  /// Staff, their PIN hashes and cards: unlock works offline after a restart.
+  @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    for (final r in await j.load('staff')) {
+      final b = r.body;
+      final since = b['since'] as String?;
+      var s = StaffMember(
+        id: r.id,
+        name: b['name']! as String,
+        role: StaffRole.values.byName(b['role']! as String),
+        since: since == null ? null : DateTime.parse(since),
+      );
+      final card = b['cardNumber'] as String?;
+      if (card != null) s = s.withCard(card);
+      final i = _staff.indexWhere((x) => x.id == r.id);
+      if (i >= 0) {
+        _staff[i] = s;
+      } else {
+        _staff.add(s);
+      }
+      if (b['pinHash'] case final String hash) _pinHashes[r.id] = hash;
+    }
+    for (final r in await j.load('nfcCards')) {
+      final personId = r.body['personId'] as String?;
+      final i = _staff.indexWhere((x) => x.id == personId);
+      if (i >= 0) _staff[i] = _staff[i].withCard(r.id);
+      _blankCards.remove(r.id);
+    }
+  }
 
   @override
   Future<bool> nfcAvailable() async => nfc;

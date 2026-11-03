@@ -16,7 +16,7 @@ import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 /// lick 6 blocks, silage 3 t; UGX 1,844,000 bought / 8,742 L = UGX 211 a litre.
 /// Each purchase records its expense in [money]; the month's feed cost is
 /// read back from there (the same expenses L01/L02 show).
-class FakeFeedRepository implements FeedRepository {
+class FakeFeedRepository implements FeedRepository, Restorable {
   new(this.clock, this.milk, this.money, {this.journal}) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -132,6 +132,42 @@ class FakeFeedRepository implements FeedRepository {
 
   // Sums of 0.7 drift (6.9 - 4.9 = 2.0000000000000004).
   static double _round(double v) => (v * 1000).roundToDouble() / 1000;
+
+  /// Expenses for purchases come back through the money repository.
+  @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    for (final r in await j.load('feedUsage')) {
+      if (_feedings.any((f) => f.id == r.id)) continue;
+      final b = r.body;
+      _feedings = [
+        ..._feedings,
+        FeedingRecord(
+          id: r.id,
+          feed: FeedKind.values.byName(b['feed']! as String),
+          group: FeedGroup.values.byName(b['group']! as String),
+          amount: (b['amount']! as num).toDouble(),
+          at: DateTime.parse(b['at']! as String),
+        ),
+      ];
+    }
+    for (final r in await j.load('stockMovements')) {
+      final b = r.body;
+      if (b['kind'] != 'purchase' || b['feed'] == null || _purchases.any((p) => p.id == r.id)) continue;
+      _purchases = [
+        ..._purchases,
+        FeedPurchase(
+          id: r.id,
+          feed: FeedKind.values.byName(b['feed']! as String),
+          amount: (b['amount']! as num).toDouble(),
+          pricePerUnit: b['pricePerUnit']! as int,
+          at: DateTime.parse(b['at']! as String),
+          supplier: b['supplier'] as String?,
+        ),
+      ];
+    }
+  }
 
   @override
   Future<Result<FeedingRecord>> recordFeeding({

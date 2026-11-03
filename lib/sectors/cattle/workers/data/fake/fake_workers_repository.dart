@@ -14,7 +14,7 @@ import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 /// UI phase: every worker clocked in on each earlier day this month; today
 /// Tom 6:02, Amos 5:45, Joy 6:10 and Rita 6:30 are in (4 of 6). Advances
 /// this month: Amos 120,000, Peter 80,000, Rita 40,000 (wage expenses).
-class FakeWorkersRepository implements WorkersRepository {
+class FakeWorkersRepository implements WorkersRepository, Restorable {
   new(this.clock, this.directory, this.money, this.milk, {this.journal}) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -153,6 +153,44 @@ class FakeWorkersRepository implements WorkersRepository {
 
   @override
   Future<Result<List<FarmTask>>> tasks() async => Result.success(List.unmodifiable(_tasks));
+
+  /// Wage expenses come back through the money repository.
+  @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    for (final r in await j.load('tasks')) {
+      final b = r.body;
+      final done = b['doneAt'] as String?;
+      final t = FarmTask(
+        id: r.id,
+        title: b['title']! as String,
+        staffId: b['staffId']! as String,
+        due: DateTime.parse(b['due']! as String),
+        when: b['when']! as String,
+        doneAt: done == null ? null : DateTime.parse(done),
+      );
+      final i = _tasks.indexWhere((x) => x.id == r.id);
+      if (i >= 0) {
+        _tasks[i] = t;
+      } else {
+        _tasks.add(t);
+      }
+    }
+    for (final r in await j.load('wages')) {
+      if (_payments.any((p) => p.id == r.id)) continue;
+      final b = r.body;
+      _payments.add(
+        StaffPayment(
+          id: r.id,
+          staffId: b['staffId']! as String,
+          kind: PayKind.values.byName(b['kind']! as String),
+          amount: b['amount']! as int,
+          at: DateTime.parse(b['at']! as String),
+        ),
+      );
+    }
+  }
 
   @override
   Future<Result<FarmTask>> addTask({

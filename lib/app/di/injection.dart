@@ -279,6 +279,11 @@ const List<String> syncedCollections = [
 /// (decision 0014). Runs offline; a broken record never blocks start-up.
 Future<void> restoreSavedRecords() async {
   final repos = <Object>[
+    getIt<MoneyRepository>(),
+    getIt<StaffAccessRepository>(),
+    getIt<BreedingRepository>(),
+    getIt<FeedRepository>(),
+    getIt<WorkersRepository>(),
     getIt<HerdRepository>(),
     getIt<TreatmentRepository>(),
     getIt<MilkRepository>(),
