@@ -6,7 +6,7 @@ import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 
 /// UI phase: the H01-H06 sample treatments. Milk, herd and home fakes read
 /// withdrawal from this one store.
-class FakeTreatmentRepository implements TreatmentRepository {
+class FakeTreatmentRepository implements TreatmentRepository, Restorable {
   new(this.clock, {this.journal}) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -159,6 +159,52 @@ class FakeTreatmentRepository implements TreatmentRepository {
 
   @override
   Future<Result<List<TreatableAnimal>>> animals() async => const Result.success(_animals);
+
+  @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    for (final r in await j.load('stockItems')) {
+      if (r.body['kind'] != 'drug' || _drugList.any((d) => d.id == r.id)) continue;
+      final name = r.body['name'] as String? ?? '';
+      _drugList = [
+        ..._drugList,
+        Drug(
+          id: r.id,
+          name: name,
+          shortName: name.split(' ').first,
+          withdrawalDays: r.body['withdrawalDays'] as int? ?? 0,
+          stock: (r.body['stock'] as num? ?? 0).toDouble(),
+        ),
+      ];
+    }
+    final saved = await j.load('treatments')
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    for (final r in saved) {
+      if (_records.any((x) => x.id == r.id)) continue;
+      final b = r.body;
+      final a = _animals.where((a) => a.id == b['animalId']).firstOrNull;
+      final drug = _drugList.where((d) => d.id == b['drugId']).firstOrNull;
+      if (a == null || drug == null) continue;
+      final record = TreatmentRecord(
+        id: r.id,
+        animalId: a.id,
+        animalName: a.name,
+        tag: a.tag,
+        avatarIndex: a.avatarIndex,
+        condition: Condition.values.byName(b['condition']! as String),
+        drug: drug,
+        given: DateTime.parse(b['given']! as String),
+        courseDays: 3,
+        animalDry: a.dry,
+        dose: b['dose'] as String?,
+        route: DrugRoute.values.byName(b['route']! as String),
+        givenBy: b['givenBy'] as String?,
+      );
+      // Same rule as addTreatment: the newest course per animal.
+      _records = [record, ..._records.where((x) => x.animalId != a.id)];
+    }
+  }
 
   @override
   Future<Result<TreatmentRecord>> addTreatment(NewTreatment input) async {

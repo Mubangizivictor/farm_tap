@@ -18,6 +18,8 @@ Future<void> bootstrap(Flavor flavor) async {
   SoundService.instance = JustAudioSoundService();
   await configureDependencies(flavor);
 
+  await restoreSavedRecords();
+
   final logger = getIt<AppLogger>();
 
   FlutterError.onError = (details) {

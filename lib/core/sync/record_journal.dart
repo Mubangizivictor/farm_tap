@@ -85,3 +85,10 @@ class RecordJournal {
   /// This farm's saved records of [collection] (not deleted).
   Future<List<SyncRecord>> load(String collection) => store.all(tenantId(), collection);
 }
+
+/// A repository that reloads its saved records when the app starts
+/// (decision 0014): what was recorded yesterday is still there today, with
+/// or without the network.
+abstract interface class Restorable {
+  Future<void> restore();
+}

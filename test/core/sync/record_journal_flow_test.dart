@@ -10,6 +10,7 @@ import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/id_generator.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/data/fake/fake_centre_repository.dart';
 import 'package:farm_tap/sectors/cattle/health/data/fake/fake_treatment_repository.dart';
+import 'package:farm_tap/sectors/cattle/health/domain/health_models.dart';
 import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_models.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -89,4 +90,41 @@ void main() {
     expect(rec.toJson().toString(), isNot(contains('4821')));
     expect(rec.syncStatus, SyncStatus.pending);
   });
+
+  test('after a restart the saved records are back, offline', () async {
+    final treatments = FakeTreatmentRepository(clock, journal: journal);
+    final milk = FakeMilkRepository(clock, treatments, journal: journal);
+    await milk.recordCow('animal-FT-022', MilkSession.morning, 9.5, notForSale: false, recordedBy: 'staff-ta');
+    final centre = FakeCentreRepository(clock, journal: journal);
+    final d = (await centre.recordDelivery('farmer-0142', 12)).data!;
+    final before = (await centre.today()).data!.latest.length;
+
+    // App closed and opened again: new repositories, same phone database.
+    final milk2 = FakeMilkRepository(clock, FakeTreatmentRepository(clock, journal: journal), journal: journal);
+    await milk2.restore();
+    final recs = (await milk2.records(from: clock.today())).data!;
+    expect(recs.where((r) => r.cowId == 'animal-FT-022' && r.litres == 9.5), hasLength(1));
+    final cow = (await milk2.cow('animal-FT-022')).data!;
+    expect(cow.recordedLitres, 9.5);
+
+    final centre2 = FakeCentreRepository(clock, journal: journal);
+    await centre2.restore();
+    expect((await centre2.today()).data!.latest.map((x) => x.id), contains(d.id));
+    expect((await centre2.today()).data!.latest.length, before);
+    await centre2.restore(); // twice: no duplicates
+    expect((await centre2.today()).data!.latest.length, before);
+  });
+
+  test('a treatment and its milk block survive a restart', () async {
+    final t1 = FakeTreatmentRepository(clock, journal: journal);
+    await t1.addTreatment(
+      NewTreatment(animalId: 'animal-FT-014', condition: Condition.fever, drugId: 'drug-oxy', given: clock.now()),
+    );
+    final t2 = FakeTreatmentRepository(clock, journal: journal);
+    expect((await t2.withdrawalFor('animal-FT-014', clock.now())).data, isNull);
+    await t2.restore();
+    final w = (await t2.withdrawalFor('animal-FT-014', clock.now())).data;
+    expect(w?.drug.id, 'drug-oxy');
+  });
 }
+

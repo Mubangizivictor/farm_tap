@@ -6,7 +6,7 @@ import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_reposito
 
 /// UI phase: Kashari Milk Centre with the G01-G13 sample numbers. A few
 /// farmers are listed in full; the rest only count towards the totals.
-class FakeCentreRepository implements CentreRepository {
+class FakeCentreRepository implements CentreRepository, Restorable {
   new(this.clock, {this.journal}) {
     final now = clock.now();
     _day = DateTime(now.year, now.month, now.day);
@@ -268,6 +268,60 @@ class FakeCentreRepository implements CentreRepository {
         if (x.id == d.farmerId) _less(x, d.litres) else x,
     ];
     return const Result.success(null);
+  }
+
+  @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    final farmerIds = {for (final f in _farmers) f.id};
+    for (final r in await j.load('farmers')) {
+      if (farmerIds.contains(r.id)) continue;
+      final b = r.body;
+      final phone = b['phone'] as String? ?? '';
+      _farmers = [
+        ..._farmers,
+        CentreFarmer(
+          id: r.id,
+          name: b['name'] as String? ?? '',
+          card: b['card'] as String?,
+          village: b['village'] as String? ?? '',
+          phone: phone,
+          network: phone.contains(' 70') || phone.contains(' 75') ? MobileNetwork.airtel : MobileNetwork.mtn,
+          periodLitres: 0,
+          usualLow: 0,
+          usualHigh: 0,
+        ),
+      ];
+    }
+    final known = {for (final d in _deliveries) d.id};
+    for (final r in await j.load('deliveries')) {
+      if (known.contains(r.id)) continue;
+      final b = r.body;
+      final f = _farmers.where((f) => f.id == b['farmerId']).firstOrNull;
+      if (f == null) continue;
+      final litres = (b['litres']! as num).toDouble();
+      final test = QualityTest.values.byName(b['test']! as String);
+      final reason = b['rejectReason'] as String?;
+      final d = Delivery(
+        id: r.id,
+        farmerId: f.id,
+        farmerName: f.name,
+        card: f.card ?? '',
+        litres: litres,
+        at: DateTime.parse(b['at']! as String),
+        session: CentreSession.values.byName(b['session']! as String),
+        test: test,
+        rejectReason: reason == null ? null : RejectReason.values.byName(reason),
+      );
+      _deliveries = [..._deliveries, d];
+      if (reason == null && !d.at.isBefore(_day)) {
+        _farmers = [
+          for (final x in _farmers)
+            if (x.id == f.id) x.withToday((x.todayLitres ?? 0) + litres) else x,
+        ];
+      }
+    }
   }
 
   static Map<String, Object?> _deliveryBody(Delivery d) => {

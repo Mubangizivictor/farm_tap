@@ -14,7 +14,7 @@ import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 /// In-memory herd for the UI phase (useFakeData = true), seeded with the
 /// sample cows from the mockups. The Isar repository (HerdRepositoryImpl)
 /// replaces it in the backend phase without touching the UI.
-class FakeHerdRepository implements HerdRepository {
+class FakeHerdRepository implements HerdRepository, Restorable {
   new({
     required this.clock,
     required this.tenantProvider,
@@ -205,6 +205,46 @@ class FakeHerdRepository implements HerdRepository {
     // Closes her pregnancy (DAIRY-BRD-05): breeding counts stay in step.
     await breeding.recordCalving(motherId, at: at);
     return Result.success(calf);
+  }
+
+  @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    for (final r in await j.load('animals')) {
+      final b = r.body;
+      final dead = b['status'] == 'dead';
+      final i = _animals.indexWhere((a) => a.id == r.id);
+      if (i >= 0) {
+        if (dead) _animals[i] = _copy(_animals[i], deleted: true);
+        continue;
+      }
+      _animals = [
+        ..._animals,
+        Animal(
+          id: r.id,
+          tenantId: r.tenantId,
+          tagNumber: b['tagNumber']! as String,
+          name: b['name'] as String? ?? '',
+          sex: AnimalSex.values.byName(b['sex']! as String),
+          breed: b['breed'] as String? ?? '',
+          dateOfBirth: DateTime.parse(b['dateOfBirth']! as String),
+          status: AnimalStatus.values.byName(dead ? AnimalStatus.active.name : b['status']! as String),
+          govIdTag: b['govIdTag'] as String?,
+          createdAt: r.createdAt,
+          updatedAt: r.updatedAt,
+          createdBy: r.createdBy,
+          updatedBy: r.updatedBy,
+          deviceId: r.deviceId,
+          syncStatus: SyncStatus.synced,
+          isDeleted: dead,
+          dairyStatus: DairyStatus.values.byName(b['dairyStatus']! as String),
+          group: b['group'] as String?,
+          motherTag: b['motherTag'] as String?,
+        ),
+      ];
+    }
+    _controller.add(Result.success(List.unmodifiable(_alive)));
   }
 
   static Map<String, Object?> _animalBody(Animal a) => {

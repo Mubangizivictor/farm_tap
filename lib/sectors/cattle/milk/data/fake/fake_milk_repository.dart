@@ -7,7 +7,7 @@ import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 
 /// UI phase: the F01-F10 sample numbers. Recording a cow marks her done.
 /// Withdrawal ("not for sale") comes from the shared treatment records.
-class FakeMilkRepository implements MilkRepository {
+class FakeMilkRepository implements MilkRepository, Restorable {
   new(this.clock, this.treatments, {this.journal}) {
     final today = DateTime(clock.now().year, clock.now().month, clock.now().day);
     _cows = [
@@ -167,6 +167,38 @@ class FakeMilkRepository implements MilkRepository {
   }
 
   Future<List<MilkCow>> _cowsNow() async => [for (final c in _cows) await _withTreatment(c)];
+
+  @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    final known = {for (final r in _records) r.id};
+    final today = clock.today();
+    for (final r in await j.load('milkRecords')) {
+      if (known.contains(r.id)) continue;
+      final b = r.body;
+      final cowId = b['animalId'] as String?;
+      final litres = (b['litres']! as num).toDouble();
+      final session = MilkSession.values.byName(b['session']! as String);
+      _records.add(
+        MilkRecord(
+          id: r.id,
+          cowId: cowId,
+          session: session,
+          litres: litres,
+          at: r.createdAt,
+          recordedBy: b['recordedBy'] as String? ?? r.createdBy,
+          notForSale: b['notForSale'] as bool? ?? false,
+        ),
+      );
+      if (cowId != null && session == MilkSession.morning && !r.createdAt.isBefore(today)) {
+        _cows = [
+          for (final c in _cows)
+            if (c.id == cowId) c.copyWith(recordedLitres: litres, recordedAt: r.createdAt) else c,
+        ];
+      }
+    }
+  }
 
   @override
   Future<Result<MilkSessionSummary>> session(MilkSession session) async {

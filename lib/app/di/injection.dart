@@ -274,3 +274,22 @@ const List<String> syncedCollections = [
   'reminders',
   'settings',
 ];
+
+/// Reloads what was saved on this phone before the first screen shows
+/// (decision 0014). Runs offline; a broken record never blocks start-up.
+Future<void> restoreSavedRecords() async {
+  final repos = <Object>[
+    getIt<HerdRepository>(),
+    getIt<TreatmentRepository>(),
+    getIt<MilkRepository>(),
+    getIt<CentreRepository>(),
+  ];
+  for (final r in repos) {
+    if (r is! Restorable) continue;
+    try {
+      await r.restore();
+    } on Object catch (e, s) {
+      getIt<AppLogger>().e('restore failed: ${r.runtimeType}', e, s);
+    }
+  }
+}
