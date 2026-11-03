@@ -10,10 +10,15 @@ import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// A02 — sign in. Google and email everywhere; Apple on iOS (and in the
 /// mockups' web view). No phone-number sign-in.
+///
+/// Brand-only design (not farm-specific): a green brand panel with the logo
+/// and a short promise, and the sign-in buttons on a sheet below it (phones)
+/// or beside it (tablet and desktop).
 class SignInPage extends StatelessWidget {
   const new({required this.auth, required this.onSignedIn, required this.onEmail, super.key, this.showApple});
 
@@ -97,44 +102,161 @@ class _SignInViewState extends State<_SignInView> {
         const AuthFooter(),
       ],
     );
-    Widget point(IconData icon, FarmTapTone tone, String text) => Padding(
-      padding: EdgeInsets.only(bottom: context.space.md),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+    return _SignInHeroLayout(buttons: buttons);
+  }
+}
+
+/// Phones: green brand panel filling the top, buttons on a rounded sheet
+/// pinned to the bottom (scrolls on very short screens). Wider: brand panel
+/// on the left, buttons centred in a column on the right.
+class _SignInHeroLayout extends StatelessWidget {
+  const new({required this.buttons});
+
+  final Widget buttons;
+
+  @override
+  Widget build(BuildContext context) {
+    final wordmark = Image.asset(
+      FarmTapAssets.byBrightness(context, FarmTapAssets.wordmarkLight, FarmTapAssets.wordmarkDark),
+      height: context.sizes.signInWordmarkHeight,
+      fit: BoxFit.contain,
+      semanticLabel: AppLocalizations.of(context).appName,
+    );
+    final panel = context.formFactor == FormFactor.compact;
+    if (panel) {
+      final sheet = DecoratedBox(
+        decoration: BoxDecoration(color: context.colors.surface, borderRadius: context.radii.sheet),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(context.space.xl, context.space.xxl, context.space.xl, context.space.sm),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(child: wordmark),
+                context.space.gapXl,
+                buttons,
+              ],
+            ),
+          ),
+        ),
+      );
+      return Scaffold(
+        backgroundColor: context.status.authHero,
+        body: LayoutBuilder(
+          builder: (context, box) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: box.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Expanded(child: _BrandHero(wide: false)),
+                    sheet,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    final fraction = context.formFactor == FormFactor.expanded
+        ? context.sizes.authPanelFractionWide
+        : context.sizes.authPanelFractionMedium;
+    return Scaffold(
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          IconBubble(icon: icon, tone: tone, size: context.sizes.bubbleMd),
-          context.space.gapMd,
-          Flexible(child: Text(text, style: context.text.titleSmall)),
+          SizedBox(width: MediaQuery.sizeOf(context).width * fraction, child: const _BrandHero(wide: true)),
+          Expanded(
+            child: SafeArea(
+              left: false,
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(vertical: context.space.xxl, horizontal: context.space.xl),
+                  child: SizedBox(
+                    width: context.sizes.authColumnWidth,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Center(child: wordmark),
+                        context.space.gapXxl,
+                        buttons,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
-    return SplitAuthLayout(
-      animation: FarmTapAnimations.welcome,
-      tagline: l10n.brandTagline,
-      description: l10n.brandBody,
-      bottom: buttons,
-      // The footer links are 48 dp tall; keep the text where the mockup has it.
-      compactBottomPadding: context.space.sm,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+  }
+}
+
+/// Logo mark, "Your records, always with you." and one line of detail on the
+/// brand green, with a faint oversized mark hanging off the top-right corner.
+class _BrandHero extends StatelessWidget {
+  const new({required this.wide});
+
+  final bool wide;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final on = context.status.onAuthHero;
+    final watermark = context.sizes.signInWatermark;
+    final offset = context.sizes.signInWatermarkOffset;
+    final inset = wide ? context.sizes.brandPanelInset : context.space.xxl;
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // The dark-mode mark (mint posts, gold sun) reads on the green in both themes.
+        SvgPicture.asset(
+          FarmTapAssets.logoMarkDarkSvg,
+          width: wide ? context.sizes.signInHeroMarkWide : context.sizes.signInHeroMark,
+          height: wide ? context.sizes.signInHeroMarkWide : context.sizes.signInHeroMark,
+          excludeFromSemantics: true,
+        ),
+        context.space.gapXxl,
+        Semantics(
+          header: true,
+          child: Text(l10n.signInHeroTitle, style: context.text.displaySmall?.copyWith(color: on)),
+        ),
+        context.space.gapLg,
+        Text(l10n.signInHeroBody, style: context.text.bodyLarge?.copyWith(color: on)),
+      ],
+    );
+    return ColoredBox(
+      color: context.status.authHero,
+      child: Stack(
         children: [
-          Center(child: FarmTapLogo(height: context.sizes.appBarLogoHeight)),
-          context.space.gapLg,
-          Center(
-            child: FarmTapAnimationView(animation: FarmTapAnimations.welcome, size: context.sizes.authIllustration),
+          Positioned(
+            top: -offset,
+            right: -offset,
+            child: ExcludeSemantics(
+              child: SvgPicture.asset(
+                FarmTapAssets.logoMarkLightSvg,
+                width: watermark,
+                height: watermark,
+                colorFilter: ColorFilter.mode(context.status.authHeroWatermark, BlendMode.srcIn),
+              ),
+            ),
           ),
-          context.space.gapLg,
-          AuthHeading(title: l10n.welcomeTitle, subtitle: l10n.welcomeBody, center: true),
-          context.space.gapLg,
-          Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                point(Symbols.cloud_off_rounded, FarmTapTone.primary, l10n.signInPointOffline),
-                point(Symbols.contactless_rounded, FarmTapTone.gold, l10n.signInPointCards),
-                point(Symbols.monitoring_rounded, FarmTapTone.info, l10n.signInPointAll),
-              ],
+          SafeArea(
+            bottom: false,
+            right: !wide,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(inset, wide ? 0 : context.space.xxxl, inset, context.space.xxxl),
+              child: Align(
+                alignment: wide ? AlignmentDirectional.centerStart : AlignmentDirectional.topStart,
+                child: text,
+              ),
             ),
           ),
         ],

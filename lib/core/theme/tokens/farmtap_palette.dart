@@ -67,6 +67,8 @@ abstract final class FarmTapPalette {
   static const transparent = Color(0x00000000);
   static const scrimLight = Color(0x6B000000); // black 42%
   static const scrimDark = Color(0x99000000); // black 60%
+  static const veilLight = Color(0x1AFFFFFF); // white 10%: watermark on green
+  static const veilDark = Color(0x0FFFFFFF); // white 6%: watermark on deep green
 
   // ---- Blue (information / tertiary) ----
   static const blue50 = Color(0xFFD3E4FF);
