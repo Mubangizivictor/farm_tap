@@ -280,7 +280,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
             ResponsiveGrid(
               minItemWidth: context.sizes.gridMetric,
               maxColumns: 3,
-              spacing: context.space.lg,
+              spacing: context.space.md,
               children: [
                 for (final g in const [
                   ExpenseGroup.feed,

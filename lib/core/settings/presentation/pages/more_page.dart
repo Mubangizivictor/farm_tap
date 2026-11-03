@@ -41,8 +41,8 @@ class MorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    ActionTile tile(MoreTarget t, IconData icon, String label, FarmTapTone tone) =>
-        ActionTile(icon: icon, label: label, tone: tone, onTap: () => onOpen(t));
+    QuickActionTile tile(MoreTarget t, IconData icon, String label, FarmTapTone tone) =>
+        QuickActionTile(icon: icon, label: label, tone: tone, onTap: () => onOpen(t));
     RecordTile row(MoreTarget t, IconData icon, String title, FarmTapTone tone, {String? subtitle}) => RecordTile(
       leading: IconBubble(icon: icon, tone: tone, size: context.sizes.bubbleMd),
       title: title,
@@ -79,9 +79,9 @@ class MorePage extends StatelessWidget {
           ),
           context.space.gapLg,
           ResponsiveGrid(
-            minItemWidth: context.sizes.gridMetric,
-            maxColumns: 3,
-            spacing: context.space.lg,
+            minItemWidth: context.sizes.gridQuickAction,
+            maxColumns: context.isCompact ? 3 : 6,
+            spacing: context.space.md,
             children: [
               tile(MoreTarget.feeding, Symbols.grass_rounded, l10n.feeding, FarmTapTone.gold),
               tile(MoreTarget.breeding, Symbols.favorite_rounded, l10n.breeding, FarmTapTone.danger),

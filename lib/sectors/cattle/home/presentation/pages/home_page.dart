@@ -291,7 +291,7 @@ class _HomePageState extends State<HomePage> {
             context.space.gapSm,
             ResponsiveGrid(
               minItemWidth: context.sizes.gridAction,
-              spacing: context.space.lg,
+              spacing: context.space.md,
               children: [
                 ActionTile(
                   icon: Symbols.water_drop_rounded,
@@ -376,7 +376,7 @@ class _SkeletonGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveGrid(
       minItemWidth: context.sizes.gridMetric,
-      spacing: context.space.lg,
+      spacing: context.space.md,
       children: [
         for (var i = 0; i < 4; i++)
           Container(

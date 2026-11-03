@@ -721,7 +721,12 @@ class MetricStrip extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth >= FarmTapBreakpoints.medium) {
-          return ResponsiveGrid(minItemWidth: context.sizes.gridMetric, spacing: gap, children: children);
+          return ResponsiveGrid(
+            minItemWidth: context.sizes.gridMetric,
+            maxColumns: children.length.clamp(1, 6),
+            spacing: gap,
+            children: children,
+          );
         }
         final n = children.length;
         if (n * context.sizes.metricStripMin + (n - 1) * gap <= constraints.maxWidth) {

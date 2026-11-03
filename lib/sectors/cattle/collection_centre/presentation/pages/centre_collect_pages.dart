@@ -182,7 +182,7 @@ class _CentreHomePageState extends State<CentreHomePage> {
                 onPressed: day.closed ? null : widget.onTapCard,
               ),
               context.space.gapLg,
-              ResponsiveGrid(minItemWidth: context.sizes.gridAction, spacing: context.space.lg, children: tiles),
+              ResponsiveGrid(minItemWidth: context.sizes.gridAction, spacing: context.space.md, children: tiles),
               context.space.gapLg,
               if (context.isCompact)
                 latest
@@ -190,7 +190,7 @@ class _CentreHomePageState extends State<CentreHomePage> {
                 ResponsiveGrid(
                   minItemWidth: context.sizes.gridPaired,
                   maxColumns: 2,
-                  spacing: context.space.lg,
+                  spacing: context.space.md,
                   children: [
                     latest,
                     FarmTapCard(

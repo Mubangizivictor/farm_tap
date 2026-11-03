@@ -191,9 +191,9 @@ class AdaptiveScaffold extends StatelessWidget {
             onSyncTap: onSyncTap,
           );
     final useDrawer = form == FormFactor.compact && showMenu && sidebar != null;
-    // Decision 0013: tab roots on phones get the brand bar (farm + role,
+    // Decision 0013: tab roots on phones and tablets get the brand bar (farm + role,
     // sync, alerts, profile) and the page title moves to a header under it.
-    final brand = form == FormFactor.compact && !hasBack && !useDrawer && farm != null && (showLogo || title != null);
+    final brand = form != FormFactor.expanded && !hasBack && !useDrawer && farm != null && (showLogo || title != null);
     final showBottomBar = form == FormFactor.compact && nav != null && !useDrawer && showNavigation;
     final topBar = form == FormFactor.expanded
         ? _WideTopBar(
@@ -372,8 +372,8 @@ class _BrandBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const FarmTapLogoMark(),
-          context.space.gapMd,
+          // The rail already shows the mark on tablets.
+          if (context.formFactor == FormFactor.compact) ...[const FarmTapLogoMark(), context.space.gapMd],
           Expanded(
             child: InkWell(
               onTap: farm.onTap,
@@ -395,7 +395,7 @@ class _BrandBar extends StatelessWidget {
               badge: hasNotifications,
               onPressed: onNotificationsTap,
             ),
-          if (profileName != null) ...[
+          if (profileName != null && context.formFactor == FormFactor.compact) ...[
             context.space.gapSm,
             PersonAvatar(name: profileName!, ring: true, size: context.sizes.avatarXs, onTap: onProfileTap),
           ],

@@ -111,7 +111,7 @@ class _MilkTodayPageState extends State<MilkTodayPage> {
               ResponsiveGrid(
                 minItemWidth: context.sizes.gridPaired,
                 maxColumns: 2,
-                spacing: context.space.lg,
+                spacing: context.space.md,
                 children: [
                   ListCard(
                     title: l10n.justRecorded,
@@ -143,7 +143,7 @@ class _MilkTodayPageState extends State<MilkTodayPage> {
               context.space.gapSm,
               ResponsiveGrid(
                 minItemWidth: context.sizes.gridAction,
-                spacing: context.space.lg,
+                spacing: context.space.md,
                 children: [
                   ActionTile(icon: Symbols.functions_rounded, label: l10n.quickTotal, onTap: () => widget.onTool(0)),
                   ActionTile(
@@ -276,6 +276,7 @@ class _PickCowPageState extends State<PickCowPage> {
               ResponsiveGrid(
                 minItemWidth: context.sizes.avatarHero + context.space.sm,
                 maxColumns: 8,
+                fillLastRow: false,
                 spacing: context.space.md,
                 children: [for (final c in shown) _CowTile(cow: c, onTap: () => _pick(c))],
               ),
@@ -910,7 +911,7 @@ class _MilkTrendsPageState extends State<MilkTrendsPage> {
                 ResponsiveGrid(
                   minItemWidth: context.sizes.gridPaired,
                   maxColumns: 2,
-                  spacing: context.space.lg,
+                  spacing: context.space.md,
                   children: [
                     ListCard(
                       title: l10n.topCows,

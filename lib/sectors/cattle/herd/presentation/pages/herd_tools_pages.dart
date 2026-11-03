@@ -571,6 +571,7 @@ class QrLabelsPage extends StatelessWidget {
                     return ResponsiveGrid(
                       minItemWidth: (c.maxWidth - context.space.md * (cols - 1)) / cols,
                       maxColumns: cols,
+                      fillLastRow: false,
                       spacing: context.space.md,
                       children: [for (final a in animals) _QrLabel(animal: a)],
                     );

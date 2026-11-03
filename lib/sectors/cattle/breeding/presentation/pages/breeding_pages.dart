@@ -234,7 +234,7 @@ class _BreedingPageState extends State<BreedingPage> {
                 ],
               ),
               context.space.gapLg,
-              if (context.isExpanded)
+              if (!context.isCompact)
                 IntrinsicHeight(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
