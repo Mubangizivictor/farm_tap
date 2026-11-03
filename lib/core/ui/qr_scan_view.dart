@@ -35,7 +35,7 @@ class _QrScanViewState extends State<QrScanView> {
   MobileScannerController? _controller;
   bool _torch = false;
   String? _last;
-  DateTime _lastAt = DateTime(0);
+  final Stopwatch _sinceLast = Stopwatch();
 
   @override
   void initState() {
@@ -53,10 +53,11 @@ class _QrScanViewState extends State<QrScanView> {
     if (widget.paused) return;
     final code = capture.barcodes.map((b) => b.rawValue).whereType<String>().firstOrNull;
     if (code == null) return;
-    final now = DateTime.now();
-    if (code == _last && now.difference(_lastAt) < context.motion.autoAdvance) return;
+    if (code == _last && _sinceLast.isRunning && _sinceLast.elapsed < context.motion.autoAdvance) return;
     _last = code;
-    _lastAt = now;
+    _sinceLast
+      ..reset()
+      ..start();
     widget.onCode(code);
   }
 

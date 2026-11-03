@@ -3860,4 +3860,102 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recordSale => 'Record sale';
+
+  @override
+  String get conditionLabel => 'Problem';
+
+  @override
+  String get givenByLabel => 'Given by';
+
+  @override
+  String get milkSafeFrom => 'Milk safe from';
+
+  @override
+  String get averagePerDayLabel => 'Average a day';
+
+  @override
+  String get cardLabel => 'Card';
+
+  @override
+  String get grossLabel => 'Gross (UGX)';
+
+  @override
+  String get deductionsLabel => 'Deductions (UGX)';
+
+  @override
+  String get netLabel => 'To pay (UGX)';
+
+  @override
+  String get incomeAnimalSale => 'Animal sold';
+
+  @override
+  String get incomeCalfSale => 'Calf sold';
+
+  @override
+  String get incomeManure => 'Manure';
+
+  @override
+  String get incomeHire => 'Bull service / hire';
+
+  @override
+  String get addIncome => 'Add income';
+
+  @override
+  String incomeSaved(String amount) {
+    return '$amount income saved';
+  }
+
+  @override
+  String get sourceLabel => 'From';
+
+  @override
+  String otherIncomeCaption(String amount) {
+    return 'Other $amount';
+  }
+
+  @override
+  String get deleteExpense => 'Remove this expense';
+
+  @override
+  String get deleteExpenseBody =>
+      'Only remove an expense entered by mistake. It stays in the audit trail.';
+
+  @override
+  String get expenseDeleted => 'Expense removed';
+
+  @override
+  String get fromFeedPurchase =>
+      'Made by a feed purchase. Change it in Feeding.';
+
+  @override
+  String get previousMonth => 'Previous month';
+
+  @override
+  String get nextMonth => 'Next month';
+
+  @override
+  String get noExpensesYet => 'No money recorded this month';
+
+  @override
+  String get noExpensesYetBody =>
+      'Add expenses as you spend, and milk sales as you sell. Profit and cost per litre are worked out for you.';
+
+  @override
+  String get makingReport => 'Making the report…';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String get notSetYet => 'Not set yet';
+
+  @override
+  String get whatsappNumber => 'WhatsApp number';
+
+  @override
+  String get setWhatsappNumber =>
+      'Set the WhatsApp number that gets this report.';
+
+  @override
+  String get sendNowWhatsapp => 'Send today\'s report on WhatsApp';
 }

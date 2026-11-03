@@ -227,6 +227,7 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
         treatments: getIt<TreatmentRepository>(),
         feed: getIt<FeedRepository>(),
         money: getIt<FarmMoneyRepository>(),
+        journal: getIt<RecordJournal>(),
         withSamples: samples,
       ),
     )

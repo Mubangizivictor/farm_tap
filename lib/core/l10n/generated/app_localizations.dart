@@ -6627,6 +6627,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Record sale'**
   String get recordSale;
+
+  /// No description provided for @conditionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem'**
+  String get conditionLabel;
+
+  /// No description provided for @givenByLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Given by'**
+  String get givenByLabel;
+
+  /// No description provided for @milkSafeFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk safe from'**
+  String get milkSafeFrom;
+
+  /// No description provided for @averagePerDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Average a day'**
+  String get averagePerDayLabel;
+
+  /// No description provided for @cardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Card'**
+  String get cardLabel;
+
+  /// No description provided for @grossLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gross (UGX)'**
+  String get grossLabel;
+
+  /// No description provided for @deductionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Deductions (UGX)'**
+  String get deductionsLabel;
+
+  /// No description provided for @netLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To pay (UGX)'**
+  String get netLabel;
+
+  /// No description provided for @incomeAnimalSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Animal sold'**
+  String get incomeAnimalSale;
+
+  /// No description provided for @incomeCalfSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Calf sold'**
+  String get incomeCalfSale;
+
+  /// No description provided for @incomeManure.
+  ///
+  /// In en, this message translates to:
+  /// **'Manure'**
+  String get incomeManure;
+
+  /// No description provided for @incomeHire.
+  ///
+  /// In en, this message translates to:
+  /// **'Bull service / hire'**
+  String get incomeHire;
+
+  /// No description provided for @addIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Add income'**
+  String get addIncome;
+
+  /// No description provided for @incomeSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} income saved'**
+  String incomeSaved(String amount);
+
+  /// No description provided for @sourceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get sourceLabel;
+
+  /// No description provided for @otherIncomeCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Other {amount}'**
+  String otherIncomeCaption(String amount);
+
+  /// No description provided for @deleteExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this expense'**
+  String get deleteExpense;
+
+  /// No description provided for @deleteExpenseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Only remove an expense entered by mistake. It stays in the audit trail.'**
+  String get deleteExpenseBody;
+
+  /// No description provided for @expenseDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense removed'**
+  String get expenseDeleted;
+
+  /// No description provided for @fromFeedPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Made by a feed purchase. Change it in Feeding.'**
+  String get fromFeedPurchase;
+
+  /// No description provided for @previousMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get previousMonth;
+
+  /// No description provided for @nextMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Next month'**
+  String get nextMonth;
+
+  /// No description provided for @noExpensesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No money recorded this month'**
+  String get noExpensesYet;
+
+  /// No description provided for @noExpensesYetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add expenses as you spend, and milk sales as you sell. Profit and cost per litre are worked out for you.'**
+  String get noExpensesYetBody;
+
+  /// No description provided for @makingReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Making the report…'**
+  String get makingReport;
+
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
+
+  /// No description provided for @notSetYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set yet'**
+  String get notSetYet;
+
+  /// No description provided for @whatsappNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp number'**
+  String get whatsappNumber;
+
+  /// No description provided for @setWhatsappNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Set the WhatsApp number that gets this report.'**
+  String get setWhatsappNumber;
+
+  /// No description provided for @sendNowWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'Send today\'s report on WhatsApp'**
+  String get sendNowWhatsapp;
 }
 
 class _AppLocalizationsDelegate

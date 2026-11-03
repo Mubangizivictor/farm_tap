@@ -2984,5 +2984,49 @@
   "sellAnimalBody": "She moves to past animals. The price is added to this month's income.",
   "salePrice": "Price",
   "boughtByOptional": "Bought by (optional)",
-  "recordSale": "Record sale"
+  "recordSale": "Record sale",
+  "conditionLabel": "Problem",
+  "givenByLabel": "Given by",
+  "milkSafeFrom": "Milk safe from",
+  "averagePerDayLabel": "Average a day",
+  "cardLabel": "Card",
+  "grossLabel": "Gross (UGX)",
+  "deductionsLabel": "Deductions (UGX)",
+  "netLabel": "To pay (UGX)",
+  "incomeAnimalSale": "Animal sold",
+  "incomeCalfSale": "Calf sold",
+  "incomeManure": "Manure",
+  "incomeHire": "Bull service / hire",
+  "addIncome": "Add income",
+  "incomeSaved": "{amount} income saved",
+  "@incomeSaved": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceLabel": "From",
+  "otherIncomeCaption": "Other {amount}",
+  "@otherIncomeCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteExpense": "Remove this expense",
+  "deleteExpenseBody": "Only remove an expense entered by mistake. It stays in the audit trail.",
+  "expenseDeleted": "Expense removed",
+  "fromFeedPurchase": "Made by a feed purchase. Change it in Feeding.",
+  "previousMonth": "Previous month",
+  "nextMonth": "Next month",
+  "noExpensesYet": "No money recorded this month",
+  "noExpensesYetBody": "Add expenses as you spend, and milk sales as you sell. Profit and cost per litre are worked out for you.",
+  "makingReport": "Making the report…",
+  "saved": "Saved",
+  "notSetYet": "Not set yet",
+  "whatsappNumber": "WhatsApp number",
+  "setWhatsappNumber": "Set the WhatsApp number that gets this report.",
+  "sendNowWhatsapp": "Send today's report on WhatsApp"
 }

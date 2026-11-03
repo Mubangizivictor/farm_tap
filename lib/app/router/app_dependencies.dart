@@ -15,6 +15,7 @@ import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/money/domain/farm_money_repository.dart';
 import 'package:farm_tap/sectors/cattle/owner_reports/domain/daily_report.dart';
+import 'package:farm_tap/sectors/cattle/owner_reports/presentation/farm_reports.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
 
 /// Everything the router hands to pages (repositories behind domain
@@ -82,4 +83,8 @@ class AppDependencies {
   final StaffDirectory staffDirectory;
   final FarmMoneyRepository farmMoney;
   final DailyReportRepository dailyReport;
+
+  /// L03 / L01 exports, built from the repositories above.
+  FarmReports get reports =>
+      FarmReports(money: farmMoney, milk: milk, treatments: treatments, centre: session.isCentre ? centre : null);
 }

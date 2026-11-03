@@ -189,10 +189,15 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       WorkersTarget.wages => AppRoutes.workersWages,
     }),
   );
-  sectionRoots[AppRoutes.money] = (context, state) =>
-      MoneyPage(repo: deps.farmMoney, onAddExpense: () => context.push(AppRoutes.moneyExpense));
+  sectionRoots[AppRoutes.money] = (context, state) => MoneyPage(
+    repo: deps.farmMoney,
+    reports: deps.reports,
+    farmName: session.farm?.name ?? '',
+    onAddExpense: () => context.push(AppRoutes.moneyExpense),
+  );
   sectionRoots[AppRoutes.reports] = (context, state) => ReportsPage(
     money: deps.farmMoney,
+    reports: deps.reports,
     farmName: session.farm?.name ?? '',
     onDaily: () => context.push(AppRoutes.reportsWhatsapp),
   );

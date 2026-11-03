@@ -1,4 +1,5 @@
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_models.dart';
 import 'package:farm_tap/sectors/cattle/feeding/domain/feeding_repository.dart';
@@ -20,6 +21,8 @@ class FakeDailyReportRepository implements DailyReportRepository {
     required this.treatments,
     required this.feed,
     required this.money,
+    this.journal,
+    this.defaultPhone,
     bool withSamples = true,
   }) : _settings = DailyReportSettings(
          phone: withSamples ? '+256 772 451 908' : '',
@@ -35,7 +38,16 @@ class FakeDailyReportRepository implements DailyReportRepository {
   final TreatmentRepository treatments;
   final FeedRepository feed;
   final FarmMoneyRepository money;
+
+  /// Keeps the settings with the farm's records (they sync to its phones).
+  final RecordJournal? journal;
+
+  /// The farm's WhatsApp number from onboarding, until one is set here.
+  final String Function()? defaultPhone;
   DailyReportSettings _settings;
+
+  static const _collection = 'settings';
+  static const _id = 'dailyReport';
 
   @override
   Future<Result<DailyReport>> today() async {
@@ -73,11 +85,19 @@ class FakeDailyReportRepository implements DailyReportRepository {
   }
 
   @override
-  Future<Result<DailyReportSettings>> settings() async => Result.success(_settings);
+  Future<Result<DailyReportSettings>> settings() async {
+    var base = _settings;
+    final fallbackPhone = defaultPhone?.call() ?? '';
+    if (base.phone.isEmpty && fallbackPhone.isNotEmpty) base = base.copyWith(phone: fallbackPhone);
+    final saved = await journal?.store.get(_collection, _id);
+    if (saved == null || saved.isDeleted) return Result.success(base);
+    return Result.success(DailyReportSettings.fromJson(saved.body, base));
+  }
 
   @override
   Future<Result<void>> saveSettings(DailyReportSettings settings) async {
     _settings = settings;
+    await journal?.put(_collection, _id, settings.toJson());
     return const Result.success(null);
   }
 }
