@@ -19,6 +19,8 @@ class FakeFarmMembershipRepository implements FarmMembershipRepository {
       kind: PlaceKind.dairyFarm,
       role: PlaceRole.owner,
       subscription: Subscription(trialStartedAt: DateTime(2026, 11, 2), trialEndsAt: DateTime(2026, 11, 16)),
+      village: 'Rwemera',
+      herdSize: 42,
     ),
     FarmMembership(
       tenantId: 'centre-kashari',
@@ -30,12 +32,24 @@ class FakeFarmMembershipRepository implements FarmMembershipRepository {
     ),
   ];
 
+  String? _lastOpened;
+
+  /// Demo account: the owner may own one farm (the centre is a membership).
+  int limit = defaultFarmLimit;
+
   @override
   Future<Result<List<FarmMembership>>> myPlaces() async => Result.success(places);
 
   @override
   Future<Result<void>> open(String tenantId) async {
     _tenants.currentTenantId = tenantId;
+    _lastOpened = tenantId;
     return const Result.success(null);
   }
+
+  @override
+  Future<String?> lastOpened() async => _lastOpened;
+
+  @override
+  Future<int> farmLimit() async => limit;
 }

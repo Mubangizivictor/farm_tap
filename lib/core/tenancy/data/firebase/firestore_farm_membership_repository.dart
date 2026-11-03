@@ -22,6 +22,8 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
   final InMemoryTenantProvider tenants;
 
   String _cacheKey(String uid) => 'places.$uid';
+  String _openKey(String uid) => 'places.open.$uid';
+  String _limitKey(String uid) => 'places.limit.$uid';
 
   @override
   Future<Result<List<FarmMembership>>> myPlaces() async {
@@ -42,6 +44,9 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
   Future<List<FarmMembership>> _fetch(String me) async {
     const server = GetOptions(source: Source.server);
     final user = await db.collection('users').doc(me).get(server);
+    // Set by Victorbee for a multi-farm plan; the rules stop the app changing it.
+    final limit = user.data()?['farmLimit'];
+    await prefs.setInt(_limitKey(me), limit is int && limit > 0 ? limit : defaultFarmLimit);
     final ids = ((user.data()?['memberships'] as List?) ?? const [])
         .map((m) => (m as Map)['tenantId'] as String)
         .toSet();
@@ -58,9 +63,24 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
   @override
   Future<Result<void>> open(String tenantId) async {
     tenants.currentTenantId = tenantId;
-    await prefs.setString('places.open', tenantId);
+    final me = uid();
+    if (me != null) await prefs.setString(_openKey(me), tenantId);
     return const Result.success(null);
   }
+
+  @override
+  Future<String?> lastOpened() async {
+    final me = uid();
+    return me == null ? null : prefs.getString(_openKey(me));
+  }
+
+  @override
+  Future<int> farmLimit() async {
+    final me = uid();
+    return (me == null ? null : prefs.getInt(_limitKey(me))) ?? defaultFarmLimit;
+  }
+
+  static String? _text(Object? v) => v is String && v.trim().isNotEmpty ? v.trim() : null;
 
   static FarmMembership _fromTenant(String id, Map<String, dynamic> t, String role) {
     final sub = (t['subscription'] as Map?) ?? const {};
@@ -77,6 +97,10 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
         paidUntil: date(sub['paidUntil']),
       ),
       avatarIndex: t['avatarIndex'] as int? ?? 1,
+      sector: Sector.values.asNameMap()[t['sector']] ?? Sector.dairy,
+      village: _text(t['village']),
+      herdSize: t['cows'] as int?,
+      withCentre: t['type'] == 'both',
     );
   }
 
@@ -90,6 +114,10 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
     'trialEndsAt': p.subscription.trialEndsAt?.toIso8601String(),
     'paidUntil': p.subscription.paidUntil?.toIso8601String(),
     'avatarIndex': p.avatarIndex,
+    'sector': p.sector.name,
+    'village': p.village,
+    'herdSize': p.herdSize,
+    'withCentre': p.withCentre,
   };
 
   static FarmMembership _fromJson(Map<String, dynamic> m) {
@@ -106,6 +134,10 @@ class FirestoreFarmMembershipRepository implements FarmMembershipRepository {
         paidUntil: date(m['paidUntil']),
       ),
       avatarIndex: m['avatarIndex'] as int? ?? 1,
+      sector: Sector.values.asNameMap()[m['sector']] ?? Sector.dairy,
+      village: m['village'] as String?,
+      herdSize: m['herdSize'] as int?,
+      withCentre: m['withCentre'] as bool? ?? false,
     );
   }
 }

@@ -2755,5 +2755,140 @@
       }
     }
   },
-  "gettingFarmReadySub": "Bringing back your animals, workers and records."
+  "gettingFarmReadySub": "Bringing back your animals, workers and records.",
+  "welcomeBackName": "Welcome back, {name}",
+  "@welcomeBackName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeName": "Welcome, {name}",
+  "@welcomeName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeBackPlain": "Welcome back",
+  "openingFarmTitle": "Opening {farm}",
+  "@openingFarmTitle": {
+    "placeholders": {
+      "farm": {
+        "type": "String"
+      }
+    }
+  },
+  "farmPickerOneSub": "Your farm is ready on this phone. Tap it to open.",
+  "farmPickerManySub": "You can open {count} farms. Pick the one to work on.",
+  "@farmPickerManySub": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "openFarmButton": "Open farm",
+  "placeDairyFarm": "Dairy farm",
+  "placeCentre": "Milk collection centre",
+  "placeDairyAndCentre": "Dairy farm and milk centre",
+  "herdCows": "{count, plural, =1{1 cow} other{{count} cows}}",
+  "@herdCows": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "herdBirds": "{count, plural, =1{1 bird} other{{count} birds}}",
+  "@herdBirds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "herdPigs": "{count, plural, =1{1 pig} other{{count} pigs}}",
+  "@herdPigs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "herdAnimals": "{count, plural, =1{1 animal} other{{count} animals}}",
+  "@herdAnimals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "youAreRole": "You: {role}",
+  "@youAreRole": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "freeTrialLabel": "Free trial",
+  "trialDaysLeftOf": "{left} of {total} days left",
+  "@trialDaysLeftOf": {
+    "placeholders": {
+      "left": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "paidUntilDate": "Paid until {date}",
+  "@paidUntilDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "graceDaysToPay": "Payment due · {days, plural, =1{1 day} other{{days} days}} to pay",
+  "@graceDaysToPay": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "readOnlyPickerHint": "Trial ended. You can look at records but not add new ones until you pay.",
+  "signedInAsEmail": "Signed in as {email}",
+  "@signedInAsEmail": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "useAnotherAccount": "Use another account",
+  "noFarmTitle": "Let's set up your farm",
+  "noFarmBody": "It takes about 2 minutes. Your first {days} days are free.",
+  "@noFarmBody": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "setUpMyFarm": "Set up my farm",
+  "joinFarmHint": "Joining someone else's farm? Ask the owner to add your email, then tap Check again.",
+  "checkAgain": "Check again",
+  "placesOfflineTitle": "Can't load your farm",
+  "placesOfflineBody": "This phone needs the internet once to download your farm. After that it works offline.",
+  "farmLimitReachedBody": "This account already has a farm. To run more than one farm, ask us about the multi-farm plan.",
+  "talkToUsWhatsApp": "Talk to us on WhatsApp",
+  "multiFarmWhatsAppMessage": "Hello FarmTap, I want to run more than one farm. Please tell me about the multi-farm plan.",
+  "multiFarmQuestion": "Running more than one farm?",
+  "multiFarmAnswer": "One account runs one farm. Ask us about the multi-farm plan."
 }

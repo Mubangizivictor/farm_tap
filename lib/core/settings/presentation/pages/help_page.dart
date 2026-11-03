@@ -13,6 +13,19 @@ const supportPhone = '+256793128137';
 String get supportPhoneDisplay =>
     '${supportPhone.substring(0, 4)} ${supportPhone.substring(4, 7)} ${supportPhone.substring(7, 10)} ${supportPhone.substring(10)}';
 
+/// Opens WhatsApp to the support line with [message] typed in; false when
+/// the phone cannot.
+Future<bool> openSupportWhatsApp(String message) async {
+  try {
+    return await launchUrl(
+      Uri.https('wa.me', '/${supportPhone.substring(1)}', {'text': message}),
+      mode: LaunchMode.externalApplication,
+    );
+  } on Object {
+    return false;
+  }
+}
+
 class HelpPage extends StatelessWidget {
   const new({super.key, this.open = _launch});
 
@@ -70,6 +83,20 @@ class HelpPage extends StatelessWidget {
                 l10n.helpSms,
                 supportPhoneDisplay,
                 Uri.parse('sms:$supportPhone'),
+              ),
+            ],
+          ),
+          context.space.gapLg,
+          // Kept out of the way on purpose (decision 0015): one account runs
+          // one farm; more farms is a plan Victorbee sells.
+          ListCard(
+            children: [
+              row(
+                Symbols.domain_add_rounded,
+                FarmTapTone.neutral,
+                l10n.multiFarmQuestion,
+                l10n.multiFarmAnswer,
+                Uri.https('wa.me', '/${supportPhone.substring(1)}', {'text': l10n.multiFarmWhatsAppMessage}),
               ),
             ],
           ),

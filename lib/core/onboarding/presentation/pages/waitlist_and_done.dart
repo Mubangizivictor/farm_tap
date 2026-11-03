@@ -6,6 +6,7 @@ import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/choice_steps.dart';
+import 'package:farm_tap/core/settings/presentation/pages/help_page.dart';
 import 'package:farm_tap/core/sound/sound_service.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/theme/theme.dart';
@@ -152,7 +153,14 @@ class _FarmReadyPageState extends State<FarmReadyPage> {
   /// Creating the farm needs the internet once; it can be tried again.
   late Future<FarmMembership?> _farm = _create();
 
-  Future<FarmMembership?> _create() => widget.repo.createFarm(widget.setup).then((r) => r.data);
+  /// The account already owns its farm (one per account unless on the
+  /// multi-farm plan): trying again will not help.
+  var _limit = false;
+
+  Future<FarmMembership?> _create() => widget.repo.createFarm(widget.setup).then((r) {
+    if (mounted) setState(() => _limit = r.failure?.message == farmLimitReached);
+    return r.data;
+  });
 
   @override
   void initState() {
@@ -190,12 +198,23 @@ class _FarmReadyPageState extends State<FarmReadyPage> {
                 Padding(
                   padding: EdgeInsets.only(bottom: context.space.md),
                   child: Text(
-                    failed ? l10n.farmCreateFailed : l10n.creatingFarm,
+                    _limit
+                        ? l10n.farmLimitReachedBody
+                        : failed
+                        ? l10n.farmCreateFailed
+                        : l10n.creatingFarm,
                     textAlign: TextAlign.center,
                     style: context.text.bodySmall?.copyWith(color: failed ? context.colors.error : null),
                   ),
                 ),
-              if (failed)
+              if (_limit)
+                FarmTapButton(
+                  label: l10n.talkToUsWhatsApp,
+                  icon: Symbols.chat_rounded,
+                  large: true,
+                  onPressed: () => unawaited(openSupportWhatsApp(l10n.multiFarmWhatsAppMessage)),
+                )
+              else if (failed)
                 FarmTapButton(
                   label: l10n.tryAgain,
                   icon: Symbols.refresh_rounded,

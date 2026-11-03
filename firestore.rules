@@ -88,12 +88,35 @@ service cloud.firestore {
         && d.serverUpdatedAt == request.time;
     }
 
+    // One account owns one farm (decision 0015). `farmLimit` is set by
+    // Victorbee for a multi-farm plan and never from the app; `ownedFarms`
+    // only goes up, by one, with each farm the account creates.
+    function ownedFarms(d) { return d.get('ownedFarms', 0); }
+    function farmLimit(d) { return d.get('farmLimit', 1); }
+
     match /users/{uid} {
-      allow read, write: if signedIn() && request.auth.uid == uid;
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create: if signedIn() && request.auth.uid == uid
+        && !('farmLimit' in request.resource.data)
+        && ownedFarms(request.resource.data) <= 1;
+      allow update: if signedIn() && request.auth.uid == uid
+        && farmLimit(request.resource.data) == farmLimit(resource.data)
+        && ownedFarms(request.resource.data) >= ownedFarms(resource.data)
+        && ownedFarms(request.resource.data) <= ownedFarms(resource.data) + 1;
     }
 
     match /waitlist/{id} {
       allow create: if true;
+    }
+
+    // The farm is created in one batch with the owner's `ownedFarms` going up
+    // by one, and only while the account is under its farm limit.
+    function withinFarmLimit() {
+      let path = /databases/$(database)/documents/users/$(request.auth.uid);
+      let before = exists(path) ? get(path).data : {};
+      let after = getAfter(path).data;
+      return ownedFarms(before) < farmLimit(before)
+        && ownedFarms(after) == ownedFarms(before) + 1;
     }
 
     match /tenants/{t} {
@@ -104,7 +127,8 @@ service cloud.firestore {
         && request.resource.data.subscription.trialEndsAt is timestamp
         && request.resource.data.subscription.trialEndsAt <= request.time + duration.value(8, 'd')
         // Every new farm waits for Victorbee's review (admin panel).
-        && request.resource.data.review == {'status': 'pending'};
+        && request.resource.data.review == {'status': 'pending'}
+        && withinFarmLimit();
       // Profile edits only; subscription and review stay server-side.
       allow update: if manages(t)
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['subscription', 'ownerUid', 'review', 'owner']);
@@ -113,7 +137,7 @@ service cloud.firestore {
         allow read: if member(t);
         // The owner's own first membership, right after creating the farm.
         allow create: if signedIn() && uid == request.auth.uid
-          && get(/databases/$(database)/documents/tenants/$(t)).data.ownerUid == request.auth.uid
+          && getAfter(/databases/$(database)/documents/tenants/$(t)).data.ownerUid == request.auth.uid
           && request.resource.data.role in ['owner', 'manager'];
         allow update, delete: if member(t) && role(t) == 'owner' && uid != request.auth.uid;
       }

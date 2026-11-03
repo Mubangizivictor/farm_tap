@@ -504,14 +504,19 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         AppRoutes.splash,
         parent: null,
-        builder: (context, state) => SplashPage(ready: startupWork, onDone: () => context.go(AppRoutes.signIn)),
+        // A returning person stays signed in on this phone until they sign
+        // out: straight to their farm, never back to the sign-in screen.
+        builder: (context, state) => SplashPage(
+          ready: startupWork,
+          onDone: () => context.go(session.signedIn ? AppRoutes.farmPickerAuto : AppRoutes.signIn),
+        ),
       ),
       page(
         AppRoutes.signIn,
         parent: null,
         builder: (context, state) => SignInPage(
           auth: auth,
-          onSignedIn: () => context.go(AppRoutes.farmPicker),
+          onSignedIn: () => context.go(AppRoutes.farmPickerAuto),
           onEmail: () => context.push(AppRoutes.emailSignIn),
         ),
         routes: [
@@ -520,7 +525,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
             parent: AppRoutes.signIn,
             builder: (context, state) => EmailSignInPage(
               auth: auth,
-              onSignedIn: () => context.go(AppRoutes.farmPicker),
+              onSignedIn: () => context.go(AppRoutes.farmPickerAuto),
               onForgotPassword: () => context.push(AppRoutes.forgotPassword),
               onCreateAccount: () => context.push(AppRoutes.signUp),
             ),
@@ -557,6 +562,8 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         parent: null,
         builder: (context, state) => FarmPickerPage(
           places: places,
+          account: auth.currentUser,
+          autoOpen: state.uri.queryParameters['auto'] == '1',
           prepare: deps.prepareFarm,
           onOpened: (farm) {
             session.openFarm(farm);
@@ -735,12 +742,12 @@ void _openFromHome(BuildContext context, HomeTarget target) {
 String? _guard(SessionController session, String location) {
   if (location == AppRoutes.splash || location.startsWith('/dev')) return null;
   if (!session.signedIn) return location.startsWith(AppRoutes.signIn) ? null : AppRoutes.signIn;
-  if (location.startsWith(AppRoutes.signIn)) return session.hasFarm ? AppRoutes.home : AppRoutes.farmPicker;
+  if (location.startsWith(AppRoutes.signIn)) return session.hasFarm ? AppRoutes.home : AppRoutes.farmPickerAuto;
   final settingUp =
       location.startsWith(AppRoutes.farmPicker) ||
       location.startsWith(AppRoutes.setup) ||
       location.startsWith(AppRoutes.checkEmail);
-  if (!session.hasFarm) return settingUp ? null : AppRoutes.farmPicker;
+  if (!session.hasFarm) return settingUp ? null : AppRoutes.farmPickerAuto;
   final unlocking = location.startsWith(AppRoutes.unlock) || location.startsWith(AppRoutes.farmPicker);
   if (session.locked && !unlocking) return AppRoutes.unlock;
   return null;

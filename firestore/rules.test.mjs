@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
-import { Timestamp, doc, getDoc, serverTimestamp, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { Timestamp, doc, getDoc, serverTimestamp, setDoc, deleteDoc, updateDoc, writeBatch, increment, arrayUnion } from 'firebase/firestore';
 
 const days = (n) => Timestamp.fromMillis(Date.now() + n * 86400000);
 
@@ -154,32 +154,82 @@ describe('roles and money', () => {
   });
 });
 
+// The app creates a farm in one batch: farm, owner membership, and the
+// account's ownedFarms going up by one (decision 0015).
+function createFarm(db, uid, id, farm = {}) {
+  const b = writeBatch(db);
+  b.set(doc(db, `tenants/${id}`), {
+    ownerUid: uid, name: 'New', subscription: { trialStartedAt: days(0), trialEndsAt: days(7) },
+    review: { status: 'pending' }, ...farm,
+  });
+  b.set(doc(db, `tenants/${id}/members/${uid}`), { role: 'owner' });
+  b.set(doc(db, `users/${uid}`), { memberships: arrayUnion({ tenantId: id, role: 'owner' }), ownedFarms: increment(1) },
+    { merge: true });
+  return b.commit();
+}
+
 describe('onboarding', () => {
   test('a new user creates their farm on trial and becomes its owner', async () => {
     const db = as('newbie');
-    await assertSucceeds(setDoc(doc(db, 'tenants/new-farm'),
-      { ownerUid: 'newbie', name: 'New', subscription: { trialStartedAt: days(0), trialEndsAt: days(7) },
-        review: { status: 'pending' } }));
-    await assertSucceeds(setDoc(doc(db, 'tenants/new-farm/members/newbie'), { role: 'owner' }));
+    await assertSucceeds(createFarm(db, 'newbie', 'new-farm'));
+    await assertSucceeds(getDoc(doc(db, 'tenants/new-farm')));
   });
 
   test('a new farm waits for review; the owner cannot approve it', async () => {
     const db = as('newbie');
-    const farm = { ownerUid: 'newbie', name: 'New', subscription: { trialEndsAt: days(7) } };
-    await assertFails(setDoc(doc(db, 'tenants/f5'), farm));
-    await assertFails(setDoc(doc(db, 'tenants/f5'), { ...farm, review: { status: 'approved' } }));
-    await assertSucceeds(setDoc(doc(db, 'tenants/f5'), { ...farm, review: { status: 'pending' } }));
-    await assertSucceeds(setDoc(doc(db, 'tenants/f5/members/newbie'), { role: 'owner' }));
+    const farm = { subscription: { trialEndsAt: days(7) } };
+    await assertFails(createFarm(db, 'newbie', 'f5', { ...farm, review: null }));
+    await assertFails(createFarm(db, 'newbie', 'f5', { ...farm, review: { status: 'approved' } }));
+    await assertSucceeds(createFarm(db, 'newbie', 'f5', farm));
     await assertFails(updateDoc(doc(db, 'tenants/f5'), { review: { status: 'approved' } }));
     await assertSucceeds(updateDoc(doc(db, 'tenants/f5'), { name: 'New name' }));
   });
 
   test('cannot create a farm already paid, or for someone else', async () => {
     const db = as('newbie');
-    await assertFails(setDoc(doc(db, 'tenants/f2'),
-      { ownerUid: 'newbie', subscription: { trialEndsAt: days(14), paidUntil: days(365) } }));
-    await assertFails(setDoc(doc(db, 'tenants/f3'), { ownerUid: 'newbie', subscription: { trialEndsAt: days(14) } }));
+    await assertFails(createFarm(db, 'newbie', 'f2', { subscription: { trialEndsAt: days(14), paidUntil: days(365) } }));
+    await assertFails(createFarm(db, 'newbie', 'f3', { subscription: { trialEndsAt: days(14) } }));
     // A 7-day trial: 14 days is too long.
-    await assertFails(setDoc(doc(db, 'tenants/f4'), { ownerUid: 'someone', subscription: { trialEndsAt: days(14) } }));
+    await assertFails(createFarm(db, 'newbie', 'f4', { ownerUid: 'someone' }));
+  });
+});
+
+describe('one farm per account (decision 0015)', () => {
+  test('a second farm is refused', async () => {
+    const db = as('newbie');
+    await assertSucceeds(createFarm(db, 'newbie', 'first'));
+    await assertFails(createFarm(db, 'newbie', 'second'));
+  });
+
+  test('a farm without counting it is refused', async () => {
+    const db = as('newbie');
+    await assertFails(setDoc(doc(db, 'tenants/sneaky'), {
+      ownerUid: 'newbie', name: 'New', subscription: { trialStartedAt: days(0), trialEndsAt: days(7) },
+      review: { status: 'pending' },
+    }));
+  });
+
+  test('the count cannot be reset, the limit cannot be raised, the account cannot be deleted', async () => {
+    const db = as('newbie');
+    await assertSucceeds(createFarm(db, 'newbie', 'first'));
+    await assertFails(updateDoc(doc(db, 'users/newbie'), { ownedFarms: 0 }));
+    await assertFails(updateDoc(doc(db, 'users/newbie'), { farmLimit: 5 }));
+    await assertFails(deleteDoc(doc(db, 'users/newbie')));
+    await assertFails(setDoc(doc(db, 'users/other-new'), { farmLimit: 3 }));
+    // Other profile fields still save.
+    await assertSucceeds(updateDoc(doc(db, 'users/newbie'), { phone: '+256700000000' }));
+  });
+
+  test('a multi-farm plan (set by Victorbee) allows more farms', async () => {
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'users/big'), { farmLimit: 2 }));
+    const db = as('big');
+    await assertSucceeds(createFarm(db, 'big', 'one'));
+    await assertSucceeds(createFarm(db, 'big', 'two'));
+    await assertFails(createFarm(db, 'big', 'three'));
+  });
+
+  test("cannot join someone else's farm as owner", async () => {
+    const db = as('newbie');
+    await assertFails(setDoc(doc(db, `tenants/${T}/members/newbie`), { role: 'owner' }));
   });
 });

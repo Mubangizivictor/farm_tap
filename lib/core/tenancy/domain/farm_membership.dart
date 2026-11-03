@@ -1,4 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
+
+export 'package:farm_tap/core/onboarding/domain/farm_setup.dart' show Sector;
 
 enum PlaceKind { dairyFarm, collectionCentre }
 
@@ -81,6 +84,10 @@ class FarmMembership extends Equatable {
     required this.role,
     required this.subscription,
     this.avatarIndex = 1,
+    this.sector = Sector.dairy,
+    this.village,
+    this.herdSize,
+    this.withCentre = false,
   });
 
   final String tenantId;
@@ -93,6 +100,37 @@ class FarmMembership extends Equatable {
   final Subscription subscription;
   final int avatarIndex;
 
+  /// What the farm does (chosen at B02). Picks the farm's picture and words.
+  final Sector sector;
+
+  /// Village or parish under the district, when given ("Kashari").
+  final String? village;
+
+  /// Animals at set-up (cows for dairy); null for a centre.
+  final int? herdSize;
+
+  /// A dairy farm that also runs a milk collection centre (B05 "both").
+  final bool withCentre;
+
+  /// The account owns this farm (counts towards the farm limit).
+  bool get owned => role == PlaceRole.owner;
+
   @override
-  List<Object?> get props => [tenantId, name, place, kind, role, subscription, avatarIndex];
+  List<Object?> get props => [
+    tenantId,
+    name,
+    place,
+    kind,
+    role,
+    subscription,
+    avatarIndex,
+    sector,
+    village,
+    herdSize,
+    withCentre,
+  ];
 }
+
+/// How many farms one account may own. One by default; a multi-farm plan
+/// (set by Victorbee on the server, never from the app) raises it.
+const defaultFarmLimit = 1;

@@ -3539,4 +3539,171 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get gettingFarmReadySub =>
       'Bringing back your animals, workers and records.';
+
+  @override
+  String welcomeBackName(String name) {
+    return 'Welcome back, $name';
+  }
+
+  @override
+  String welcomeName(String name) {
+    return 'Welcome, $name';
+  }
+
+  @override
+  String get welcomeBackPlain => 'Welcome back';
+
+  @override
+  String openingFarmTitle(String farm) {
+    return 'Opening $farm';
+  }
+
+  @override
+  String get farmPickerOneSub =>
+      'Your farm is ready on this phone. Tap it to open.';
+
+  @override
+  String farmPickerManySub(int count) {
+    return 'You can open $count farms. Pick the one to work on.';
+  }
+
+  @override
+  String get openFarmButton => 'Open farm';
+
+  @override
+  String get placeDairyFarm => 'Dairy farm';
+
+  @override
+  String get placeCentre => 'Milk collection centre';
+
+  @override
+  String get placeDairyAndCentre => 'Dairy farm and milk centre';
+
+  @override
+  String herdCows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cows',
+      one: '1 cow',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String herdBirds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count birds',
+      one: '1 bird',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String herdPigs(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pigs',
+      one: '1 pig',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String herdAnimals(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count animals',
+      one: '1 animal',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String youAreRole(String role) {
+    return 'You: $role';
+  }
+
+  @override
+  String get freeTrialLabel => 'Free trial';
+
+  @override
+  String trialDaysLeftOf(int left, int total) {
+    return '$left of $total days left';
+  }
+
+  @override
+  String paidUntilDate(String date) {
+    return 'Paid until $date';
+  }
+
+  @override
+  String graceDaysToPay(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return 'Payment due · $_temp0 to pay';
+  }
+
+  @override
+  String get readOnlyPickerHint =>
+      'Trial ended. You can look at records but not add new ones until you pay.';
+
+  @override
+  String signedInAsEmail(String email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get useAnotherAccount => 'Use another account';
+
+  @override
+  String get noFarmTitle => 'Let\'s set up your farm';
+
+  @override
+  String noFarmBody(int days) {
+    return 'It takes about 2 minutes. Your first $days days are free.';
+  }
+
+  @override
+  String get setUpMyFarm => 'Set up my farm';
+
+  @override
+  String get joinFarmHint =>
+      'Joining someone else\'s farm? Ask the owner to add your email, then tap Check again.';
+
+  @override
+  String get checkAgain => 'Check again';
+
+  @override
+  String get placesOfflineTitle => 'Can\'t load your farm';
+
+  @override
+  String get placesOfflineBody =>
+      'This phone needs the internet once to download your farm. After that it works offline.';
+
+  @override
+  String get farmLimitReachedBody =>
+      'This account already has a farm. To run more than one farm, ask us about the multi-farm plan.';
+
+  @override
+  String get talkToUsWhatsApp => 'Talk to us on WhatsApp';
+
+  @override
+  String get multiFarmWhatsAppMessage =>
+      'Hello FarmTap, I want to run more than one farm. Please tell me about the multi-farm plan.';
+
+  @override
+  String get multiFarmQuestion => 'Running more than one farm?';
+
+  @override
+  String get multiFarmAnswer =>
+      'One account runs one farm. Ask us about the multi-farm plan.';
 }

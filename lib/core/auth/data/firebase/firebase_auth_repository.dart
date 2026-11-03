@@ -7,6 +7,7 @@ import 'package:farm_tap/core/error/result.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 /// Firebase Auth: Google, Apple, email (binding rule 4; no phone sign-in).
 ///
@@ -14,9 +15,20 @@ import 'package:flutter/services.dart';
 /// phone opens signed in with no network. Only the first sign-in, sign-up and
 /// password reset need the internet.
 class FirebaseAuthRepository implements AuthRepository {
-  new([FirebaseAuth? auth]) : _auth = auth ?? FirebaseAuth.instance;
+  new([FirebaseAuth? auth, this.google = const GoogleClientIds()]) : _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseAuth _auth;
+
+  /// OAuth clients for the phone's own Google sign-in sheet.
+  final GoogleClientIds google;
+
+  Future<void>? _googleReady;
+
+  /// Phones use Google's native sign-in: the sheet names the app ("FarmTap",
+  /// from the OAuth consent screen), not the Firebase web domain
+  /// (farm-tap-1dd15.firebaseapp.com) that the browser flow shows.
+  static bool get _nativeGoogle =>
+      !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
 
   /// Failure message when the person closed the sign-in sheet.
   static const cancelled = 'cancelled';
@@ -63,16 +75,38 @@ class FirebaseAuthRepository implements AuthRepository {
   };
 
   @override
-  Future<Result<AccountUser>> signInWithGoogle() => _run(
-    // Always show Google's account chooser (pick or add an account), not a
-    // silent sign-in with the last one used.
-    () => _auth.signInWithProvider(
-      GoogleAuthProvider()
-        ..addScope('email')
-        ..addScope('profile')
-        ..setCustomParameters({'prompt': 'select_account'}),
-    ),
-  );
+  Future<Result<AccountUser>> signInWithGoogle() => _run(() async {
+    if (!_nativeGoogle) {
+      // Other platforms (desktop tests): Firebase's browser flow. Always
+      // show Google's account chooser, not a silent sign-in.
+      return await _auth.signInWithProvider(
+        GoogleAuthProvider()
+          ..addScope('email')
+          ..addScope('profile')
+          ..setCustomParameters({'prompt': 'select_account'}),
+      );
+    }
+    final sheet = GoogleSignIn.instance;
+    await (_googleReady ??= sheet.initialize(
+      clientId: defaultTargetPlatform == TargetPlatform.iOS ? google.ios : null,
+      serverClientId: google.web,
+    ));
+    try {
+      final account = await sheet.authenticate(scopeHint: const ['email', 'profile']);
+      final idToken = account.authentication.idToken;
+      if (idToken == null) throw FirebaseAuthException(code: 'invalid-credential');
+      return await _auth.signInWithCredential(GoogleAuthProvider.credential(idToken: idToken));
+    } on GoogleSignInException catch (e) {
+      debugPrint('Google sign-in: ${e.code} ${e.description}');
+      throw FirebaseAuthException(
+        code: switch (e.code) {
+          GoogleSignInExceptionCode.canceled || GoogleSignInExceptionCode.interrupted => cancelled,
+          GoogleSignInExceptionCode.uiUnavailable => 'network-request-failed',
+          _ => 'google-${e.code.name}',
+        },
+      );
+    }
+  });
 
   @override
   Future<Result<AccountUser>> signInWithApple() => _run(
@@ -123,7 +157,30 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Future<Result<void>> signOut() async {
+    // Forget the Google account too, so the next sign-in offers the chooser.
+    if (_nativeGoogle && _googleReady != null) {
+      try {
+        await GoogleSignIn.instance.signOut();
+      } on Object catch (e) {
+        debugPrint('Google sign-out: $e');
+      }
+    }
     await _auth.signOut();
     return const Result.success(null);
   }
+}
+
+/// OAuth client ids for native Google sign-in (not secrets: they are in
+/// GoogleService-Info.plist and google-services.json too).
+class GoogleClientIds {
+  const new({
+    this.ios = '913049305053-73cp00c1a335d91cpo8iksnodcgs6g2l.apps.googleusercontent.com',
+    this.web = '913049305053-79f8ncaaff3thn1h2niaqhpa1cdboc2q.apps.googleusercontent.com',
+  });
+
+  /// iOS client (CLIENT_ID in GoogleService-Info.plist).
+  final String ios;
+
+  /// Web client (client_type 3): Firebase checks the ID token against it.
+  final String web;
 }

@@ -6153,6 +6153,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bringing back your animals, workers and records.'**
   String get gettingFarmReadySub;
+
+  /// No description provided for @welcomeBackName.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back, {name}'**
+  String welcomeBackName(String name);
+
+  /// No description provided for @welcomeName.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome, {name}'**
+  String welcomeName(String name);
+
+  /// No description provided for @welcomeBackPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back'**
+  String get welcomeBackPlain;
+
+  /// No description provided for @openingFarmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening {farm}'**
+  String openingFarmTitle(String farm);
+
+  /// No description provided for @farmPickerOneSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Your farm is ready on this phone. Tap it to open.'**
+  String get farmPickerOneSub;
+
+  /// No description provided for @farmPickerManySub.
+  ///
+  /// In en, this message translates to:
+  /// **'You can open {count} farms. Pick the one to work on.'**
+  String farmPickerManySub(int count);
+
+  /// No description provided for @openFarmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open farm'**
+  String get openFarmButton;
+
+  /// No description provided for @placeDairyFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy farm'**
+  String get placeDairyFarm;
+
+  /// No description provided for @placeCentre.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk collection centre'**
+  String get placeCentre;
+
+  /// No description provided for @placeDairyAndCentre.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy farm and milk centre'**
+  String get placeDairyAndCentre;
+
+  /// No description provided for @herdCows.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 cow} other{{count} cows}}'**
+  String herdCows(int count);
+
+  /// No description provided for @herdBirds.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 bird} other{{count} birds}}'**
+  String herdBirds(int count);
+
+  /// No description provided for @herdPigs.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 pig} other{{count} pigs}}'**
+  String herdPigs(int count);
+
+  /// No description provided for @herdAnimals.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 animal} other{{count} animals}}'**
+  String herdAnimals(int count);
+
+  /// No description provided for @youAreRole.
+  ///
+  /// In en, this message translates to:
+  /// **'You: {role}'**
+  String youAreRole(String role);
+
+  /// No description provided for @freeTrialLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Free trial'**
+  String get freeTrialLabel;
+
+  /// No description provided for @trialDaysLeftOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{left} of {total} days left'**
+  String trialDaysLeftOf(int left, int total);
+
+  /// No description provided for @paidUntilDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid until {date}'**
+  String paidUntilDate(String date);
+
+  /// No description provided for @graceDaysToPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment due · {days, plural, =1{1 day} other{{days} days}} to pay'**
+  String graceDaysToPay(int days);
+
+  /// No description provided for @readOnlyPickerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial ended. You can look at records but not add new ones until you pay.'**
+  String get readOnlyPickerHint;
+
+  /// No description provided for @signedInAsEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String signedInAsEmail(String email);
+
+  /// No description provided for @useAnotherAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Use another account'**
+  String get useAnotherAccount;
+
+  /// No description provided for @noFarmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s set up your farm'**
+  String get noFarmTitle;
+
+  /// No description provided for @noFarmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It takes about 2 minutes. Your first {days} days are free.'**
+  String noFarmBody(int days);
+
+  /// No description provided for @setUpMyFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up my farm'**
+  String get setUpMyFarm;
+
+  /// No description provided for @joinFarmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Joining someone else\'s farm? Ask the owner to add your email, then tap Check again.'**
+  String get joinFarmHint;
+
+  /// No description provided for @checkAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get checkAgain;
+
+  /// No description provided for @placesOfflineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t load your farm'**
+  String get placesOfflineTitle;
+
+  /// No description provided for @placesOfflineBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone needs the internet once to download your farm. After that it works offline.'**
+  String get placesOfflineBody;
+
+  /// No description provided for @farmLimitReachedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This account already has a farm. To run more than one farm, ask us about the multi-farm plan.'**
+  String get farmLimitReachedBody;
+
+  /// No description provided for @talkToUsWhatsApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk to us on WhatsApp'**
+  String get talkToUsWhatsApp;
+
+  /// No description provided for @multiFarmWhatsAppMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello FarmTap, I want to run more than one farm. Please tell me about the multi-farm plan.'**
+  String get multiFarmWhatsAppMessage;
+
+  /// No description provided for @multiFarmQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Running more than one farm?'**
+  String get multiFarmQuestion;
+
+  /// No description provided for @multiFarmAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'One account runs one farm. Ask us about the multi-farm plan.'**
+  String get multiFarmAnswer;
 }
 
 class _AppLocalizationsDelegate

@@ -9,6 +9,10 @@ abstract final class AppRoutes {
   static const checkEmail = '/verify';
   static const farmPicker = '/farms';
 
+  /// A07 opening the remembered (or only) farm by itself: after the splash
+  /// and after signing in (decision 0015).
+  static const farmPickerAuto = '/farms?auto=1';
+
   // B — onboarding
   static const setup = '/setup';
   static const setupSector = '/setup/sector';

@@ -40,37 +40,47 @@ class FirestoreOnboardingRepository implements OnboardingRepository {
     final centre = setup.dairyType == DairyType.centre;
     try {
       final tenant = db.collection('tenants').doc(id);
-      // In order: the rules check the farm exists before the membership.
-      await tenant.set({
-        'ownerUid': me,
-        'name': setup.farmName.trim(),
-        'type': centre ? 'centre' : (setup.dairyType == DairyType.both ? 'both' : 'farm'),
-        'sector': setup.sector.name,
-        'district': setup.district,
-        'place': setup.district ?? '',
-        'village': setup.village,
-        'cows': setup.cows,
-        'contacts': {
-          'whatsapp': setup.whatsapp,
-          'sms': setup.sms,
-          'dailyReport': setup.dailyReport,
-          'smsAlerts': setup.smsAlerts,
-        },
-        'subscription': {'trialStartedAt': Timestamp.fromDate(start), 'trialEndsAt': Timestamp.fromDate(end)},
-        'createdAt': FieldValue.serverTimestamp(),
-        'owner': {'uid': me, 'name': account?.call()?.name ?? '', 'email': account?.call()?.email ?? ''},
-        // Victorbee reviews every new farm in the admin panel; the farm
-        // works on its trial meanwhile. Only the server changes this.
-        'review': {'status': 'pending'},
-      });
-      await tenant.collection('members').doc(me).set({'role': role.name, 'title': setup.roleTitle.trim()});
-      await db.collection('users').doc(me).set({
-        'memberships': FieldValue.arrayUnion([
-          {'tenantId': id, 'role': role.name},
-        ]),
-      }, SetOptions(merge: true));
+      // One batch: the rules count the farms an account owns (one unless on
+      // a multi-farm plan, decision 0015) by checking that `ownedFarms` goes
+      // up by one with each new farm.
+      final batch = db.batch()
+        ..set(tenant, {
+          'ownerUid': me,
+          'name': setup.farmName.trim(),
+          'type': centre ? 'centre' : (setup.dairyType == DairyType.both ? 'both' : 'farm'),
+          'sector': setup.sector.name,
+          'district': setup.district,
+          'place': setup.district ?? '',
+          'village': setup.village,
+          'cows': setup.cows,
+          'contacts': {
+            'whatsapp': setup.whatsapp,
+            'sms': setup.sms,
+            'dailyReport': setup.dailyReport,
+            'smsAlerts': setup.smsAlerts,
+          },
+          'subscription': {'trialStartedAt': Timestamp.fromDate(start), 'trialEndsAt': Timestamp.fromDate(end)},
+          'createdAt': FieldValue.serverTimestamp(),
+          'owner': {'uid': me, 'name': account?.call()?.name ?? '', 'email': account?.call()?.email ?? ''},
+          // Victorbee reviews every new farm in the admin panel; the farm
+          // works on its trial meanwhile. Only the server changes this.
+          'review': {'status': 'pending'},
+        })
+        ..set(tenant.collection('members').doc(me), {'role': role.name, 'title': setup.roleTitle.trim()})
+        ..set(db.collection('users').doc(me), {
+          'memberships': FieldValue.arrayUnion([
+            {'tenantId': id, 'role': role.name},
+          ]),
+          'ownedFarms': FieldValue.increment(1),
+        }, SetOptions(merge: true));
+      await batch.commit();
     } on FirebaseException catch (e) {
-      return Result.failure(e.code == 'unavailable' ? NetworkFailure(e.code) : UnexpectedFailure(e.code));
+      return Result.failure(switch (e.code) {
+        'unavailable' => NetworkFailure(e.code),
+        // Already owns a farm and is not on a multi-farm plan.
+        'permission-denied' => const PermissionFailure(farmLimitReached),
+        _ => UnexpectedFailure(e.code),
+      });
     }
     return Result.success(
       FarmMembership(
@@ -80,6 +90,10 @@ class FirestoreOnboardingRepository implements OnboardingRepository {
         kind: centre ? PlaceKind.collectionCentre : PlaceKind.dairyFarm,
         role: role,
         subscription: Subscription(trialStartedAt: start, trialEndsAt: end),
+        sector: setup.sector,
+        village: setup.village.trim().isEmpty ? null : setup.village.trim(),
+        herdSize: setup.cows,
+        withCentre: setup.dairyType == DairyType.both,
       ),
     );
   }

@@ -27,6 +27,10 @@ class FakeOnboardingRepository implements OnboardingRepository {
       role: setup.role == SetupRole.owner ? PlaceRole.owner : PlaceRole.manager,
       // A new farm's own trial: today + freeTrialDays (never another farm's date).
       subscription: Subscription(trialStartedAt: clock.today(), trialEndsAt: trialEndsOn()),
+      sector: setup.sector,
+      village: setup.village.trim().isEmpty ? null : setup.village.trim(),
+      herdSize: setup.cows,
+      withCentre: setup.dairyType == DairyType.both,
     ),
   );
 
