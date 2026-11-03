@@ -31,4 +31,17 @@ abstract interface class CentreRepository {
   Future<Result<void>> payOut(PayMethod method);
   Future<Result<Reconciliation>> reconciliation();
   Future<Result<void>> saveReconciliation(String explanation);
+
+  /// G07 edit: name, phone, village and SMS receipts (the card stays).
+  Future<Result<CentreFarmer>> updateFarmer(
+    String farmerId, {
+    required String name,
+    required String phone,
+    required String village,
+    required bool smsReceipts,
+  });
+
+  /// What the centre pays farmers per litre (G09 payments, statements).
+  double get pricePerLitre;
+  Future<Result<void>> setPricePerLitre(double ugx);
 }

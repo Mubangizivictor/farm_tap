@@ -158,6 +158,19 @@ class FarmReports {
     );
   }
 
+  /// G06: every supplier with this period's litres and what is owed.
+  Future<ExportTable> farmersTable(AppLocalizations l10n, FarmTapFormat f) async {
+    final farmers = (await centre?.farmers())?.data ?? const <CentreFarmer>[];
+    return ExportTable(
+      title: l10n.farmers,
+      headers: [l10n.name, l10n.cardLabel, l10n.phone, l10n.villageLabel, l10n.colThisPeriod, l10n.colOwed],
+      rows: [
+        for (final x in farmers)
+          [x.name, x.card ?? '', x.phone, x.village, f.litresValue(x.periodLitres), f.count(x.owed.round())],
+      ],
+    );
+  }
+
   /// The monthly farm report: summary, income, expenses, milk, treatments.
   Future<ExportReport> monthly(AppLocalizations l10n, FarmTapFormat f, {DateTime? month}) async {
     final m = (await money.month(month: month)).data!;

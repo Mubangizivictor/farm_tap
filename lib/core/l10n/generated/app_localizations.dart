@@ -6945,6 +6945,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add your cows and heifers in Herd first, then record heats and services here.'**
   String get addFemalesFirst;
+
+  /// No description provided for @editFarmer.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit farmer'**
+  String get editFarmer;
+
+  /// No description provided for @sendSmsReceipts.
+  ///
+  /// In en, this message translates to:
+  /// **'Send SMS receipts'**
+  String get sendSmsReceipts;
+
+  /// No description provided for @sendSmsReceiptsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A text after every delivery'**
+  String get sendSmsReceiptsHint;
+
+  /// No description provided for @priceSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Price saved: {price} per litre'**
+  String priceSaved(String price);
+
+  /// No description provided for @pricePerLitreHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What the centre pays farmers for each litre. Amounts owed update straight away.'**
+  String get pricePerLitreHint;
+
+  /// No description provided for @phoneCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number copied'**
+  String get phoneCopied;
 }
 
 class _AppLocalizationsDelegate

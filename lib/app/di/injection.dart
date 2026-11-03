@@ -17,6 +17,7 @@ import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
+import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/sms/sms_outbox.dart';
 import 'package:farm_tap/core/sync/connectivity_monitor.dart';
 import 'package:farm_tap/core/sync/data/fake/fake_remote_store.dart';
@@ -201,6 +202,7 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
         journal: getIt<RecordJournal>(),
         sms: samples ? null : SmsOutbox(getIt<RecordJournal>()),
         withSamples: samples,
+        verifyPin: samples ? null : _managerPinOk,
       ),
     )
     ..registerLazySingleton<MoneyRepository>(
@@ -394,6 +396,15 @@ Future<void> _configureOffline(TenantProvider tenants) async {
         collections: syncedCollections,
       ),
     );
+}
+
+/// Closing a centre session: a manager's PIN, or anyone signed in when the
+/// farm has no manager yet (the owner closes it).
+Future<bool> _managerPinOk(String pin) async {
+  final directory = getIt<StaffDirectory>();
+  final staff = (await directory.staff()).data ?? const <StaffMember>[];
+  if (!staff.any((s) => s.role == StaffRole.manager)) return true;
+  return (await directory.verifyManagerPin(pin)).data ?? false;
 }
 
 /// Every collection the phone pulls (ROADMAP 8, Dairy V1).

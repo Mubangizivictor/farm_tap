@@ -17,6 +17,7 @@ import 'package:farm_tap/core/auth/presentation/pages/farm_picker_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/forgot_password_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/sign_in_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/splash_page.dart';
+import 'package:farm_tap/core/export/table_export.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
 import 'package:farm_tap/core/onboarding/presentation/cubit/onboarding_cubit.dart';
@@ -32,6 +33,7 @@ import 'package:farm_tap/core/settings/presentation/pages/settings_page.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/breeding/presentation/pages/breeding_pages.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_collect_pages.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_farmers_pay_pages.dart';
@@ -149,13 +151,15 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
   sectionRoots[AppRoutes.farmers] = (context, state) => CentreFarmersPage(
     repo: deps.centre,
     onFarmer: (farmer) => context.push(AppRoutes.centreFarmer(farmer.id)),
-    onAdd: () => unawaited(showAddFarmerSheet(context, deps.centre)),
+    onAdd: () => showAddFarmerSheet(context, deps.centre),
+    onDownload: () => unawaited(_download(context, deps.reports.farmersTable, session.farm?.name ?? '')),
   );
   sectionRoots[AppRoutes.pay] = (context, state) => CentrePaymentsPage(
     repo: deps.centre,
     onSendSms: () => context.push(AppRoutes.paySms),
     onPaymentSheet: () => context.push(AppRoutes.payFarmers),
     onFarmer: (farmer) => context.go(AppRoutes.centreFarmer(farmer.id)),
+    onDownload: () => unawaited(_download(context, deps.reports.statementsTable, session.farm?.name ?? '')),
   );
   sectionRoots[AppRoutes.more] = (context, state) {
     final l10n = AppLocalizations.of(context);
@@ -860,4 +864,17 @@ Future<void> saveFirstWorker(StaffDirectory staff, FirstWorker w) async {
   )).data;
   final card = w.cardNumber;
   if (added != null && card != null) await staff.assignCard(added.id, card);
+}
+
+/// Makes a table from the farm's records and shares it (PDF or spreadsheet).
+Future<void> _download(
+  BuildContext context,
+  Future<ExportTable> Function(AppLocalizations, FarmTapFormat) make,
+  String farmName,
+) async {
+  final table = await make(
+    AppLocalizations.of(context),
+    FarmTapFormat(Localizations.localeOf(context).toLanguageTag()),
+  );
+  if (context.mounted) await exportTable(context, table, farmName: farmName);
 }

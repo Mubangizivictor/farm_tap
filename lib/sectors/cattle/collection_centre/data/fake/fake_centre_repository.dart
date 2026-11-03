@@ -11,7 +11,7 @@ import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_reposito
 /// With [withSamples] false (real data) the centre starts with no farmers and
 /// every total comes from its own records.
 class FakeCentreRepository implements CentreRepository, Restorable {
-  new(this.clock, {this.journal, this.sms, this.withSamples = true}) {
+  new(this.clock, {this.journal, this.sms, this.withSamples = true, this.verifyPin}) {
     final now = clock.now();
     _day = DateTime(now.year, now.month, now.day);
     if (!withSamples) {
@@ -144,9 +144,13 @@ class FakeCentreRepository implements CentreRepository, Restorable {
 
   /// Where SMS receipts to farmers are queued (none in demo builds).
   final SmsOutbox? sms;
+
+  /// Real data: checks the manager PIN that closes a session.
+  final Future<bool> Function(String pin)? verifyPin;
   late final DateTime _day;
   late final Map<String, List<Deduction>> _deductions;
-  static const double _price = 1100;
+  double _price = defaultPrice;
+  static const double defaultPrice = 1100;
 
   double _deducted(String farmerId) => (_deductions[farmerId] ?? const []).fold(0, (s, d) => s + d.amount);
   late List<CentreFarmer> _farmers;
@@ -240,7 +244,7 @@ class FakeCentreRepository implements CentreRepository, Restorable {
       card: card == null || card.isEmpty ? null : card.padLeft(4, '0'),
       village: village,
       phone: phone,
-      network: phone.contains(' 70') || phone.contains(' 75') ? MobileNetwork.airtel : MobileNetwork.mtn,
+      network: CentreFarmer.networkOf(phone),
       periodLitres: 0,
       usualLow: 0,
       usualHigh: 0,
@@ -326,12 +330,16 @@ class FakeCentreRepository implements CentreRepository, Restorable {
           card: b['card'] as String?,
           village: b['village'] as String? ?? '',
           phone: phone,
-          network: phone.contains(' 70') || phone.contains(' 75') ? MobileNetwork.airtel : MobileNetwork.mtn,
+          network: CentreFarmer.networkOf(phone),
           periodLitres: 0,
           usualLow: 0,
           usualHigh: 0,
+          smsReceipts: b['smsReceipts'] as bool? ?? true,
         ),
       ];
+    }
+    for (final r in await j.load('settings')) {
+      if (r.id == _priceDoc) _price = (r.body['pricePerLitre'] as num?)?.toDouble() ?? _price;
     }
     final known = {for (final d in _deliveries) d.id};
     for (final r in await j.load('deliveries')) {
@@ -361,6 +369,46 @@ class FakeCentreRepository implements CentreRepository, Restorable {
         ];
       }
     }
+  }
+
+  static const _priceDoc = 'centrePrice';
+
+  @override
+  double get pricePerLitre => _price;
+
+  @override
+  Future<Result<void>> setPricePerLitre(double ugx) async {
+    _price = ugx;
+    _farmers = [for (final x in _farmers) x.withOwed(_periodLitres(x) * _price - _deducted(x.id))];
+    await journal?.put('settings', _priceDoc, {'pricePerLitre': ugx});
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<CentreFarmer>> updateFarmer(
+    String farmerId, {
+    required String name,
+    required String phone,
+    required String village,
+    required bool smsReceipts,
+  }) async {
+    final i = _farmers.indexWhere((f) => f.id == farmerId);
+    if (i < 0) return const Result.failure(ValidationFailure('no-farmer'));
+    final f = _farmers[i].edited(name: name, phone: phone, village: village, sms: smsReceipts);
+    _farmers = [..._farmers]..[i] = f;
+    final j = journal;
+    if (j != null) {
+      // Keep fields other screens saved on the record (card, photo).
+      final old = (await j.store.get('farmers', farmerId))?.body ?? const <String, Object?>{};
+      await j.put('farmers', farmerId, {
+        ...old,
+        'name': name,
+        'phone': phone,
+        'village': village,
+        'smsReceipts': smsReceipts,
+      });
+    }
+    return Result.success(f);
   }
 
   static Map<String, Object?> _deliveryBody(Delivery d) => {
@@ -399,8 +447,9 @@ class FakeCentreRepository implements CentreRepository, Restorable {
 
   @override
   Future<Result<bool>> closeSession(String pin) async {
-    // Real data: the manager's own PIN check comes with centre staff.
-    if (withSamples && pin != managerPin) return const Result.success(false);
+    final check = verifyPin;
+    final ok = withSamples || check == null ? pin == managerPin : await check(pin);
+    if (!ok) return const Result.success(false);
     _closed = true;
     return const Result.success(true);
   }

@@ -73,6 +73,28 @@ class CentreFarmer {
     owed: value,
   );
 
+  /// The same farmer with edited details (G07 edit).
+  CentreFarmer edited({required String name, required String phone, required String village, required bool sms}) =>
+      CentreFarmer(
+        id: id,
+        name: name,
+        card: card,
+        village: village,
+        phone: phone,
+        network: networkOf(phone),
+        todayLitres: todayLitres,
+        periodLitres: periodLitres,
+        rejectedLitres: rejectedLitres,
+        usualLow: usualLow,
+        usualHigh: usualHigh,
+        smsReceipts: sms,
+        owed: owed,
+      );
+
+  /// Airtel numbers start 070/075; the rest are MTN.
+  static MobileNetwork networkOf(String phone) =>
+      phone.contains(' 70') || phone.contains(' 75') ? MobileNetwork.airtel : MobileNetwork.mtn;
+
   CentreFarmer withToday(double? litres, {double addPeriod = 0}) => CentreFarmer(
     id: id,
     name: name,

@@ -3058,5 +3058,18 @@
   "feedBrewersWaste": "Brewers' waste",
   "countFeedStock": "Count stock",
   "countFeedStockSub": "What is in the store now. Do this when you start, and whenever the numbers look wrong.",
-  "addFemalesFirst": "Add your cows and heifers in Herd first, then record heats and services here."
+  "addFemalesFirst": "Add your cows and heifers in Herd first, then record heats and services here.",
+  "editFarmer": "Edit farmer",
+  "sendSmsReceipts": "Send SMS receipts",
+  "sendSmsReceiptsHint": "A text after every delivery",
+  "priceSaved": "Price saved: {price} per litre",
+  "@priceSaved": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "pricePerLitreHint": "What the centre pays farmers for each litre. Amounts owed update straight away.",
+  "phoneCopied": "Phone number copied"
 }

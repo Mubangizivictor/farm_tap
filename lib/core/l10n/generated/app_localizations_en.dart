@@ -4033,4 +4033,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get addFemalesFirst =>
       'Add your cows and heifers in Herd first, then record heats and services here.';
+
+  @override
+  String get editFarmer => 'Edit farmer';
+
+  @override
+  String get sendSmsReceipts => 'Send SMS receipts';
+
+  @override
+  String get sendSmsReceiptsHint => 'A text after every delivery';
+
+  @override
+  String priceSaved(String price) {
+    return 'Price saved: $price per litre';
+  }
+
+  @override
+  String get pricePerLitreHint =>
+      'What the centre pays farmers for each litre. Amounts owed update straight away.';
+
+  @override
+  String get phoneCopied => 'Phone number copied';
 }
