@@ -1,0 +1,108 @@
+/* ============================================================================
+   FarmTap web design tokens (decision 0017, binding rule 6 for the web).
+   The ONLY file in webapp/ allowed to hold colours, sizes, fonts, radii and
+   durations. Mirrors lib/core/theme/ (Kraal palette, compact scale 0013).
+   Everything else uses var(--…). `npm run check:tokens` enforces it.
+   ========================================================================== */
+
+@font-face { font-family: 'Outfit'; src: url('/fonts/Outfit-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url('/fonts/Outfit-Medium.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url('/fonts/Outfit-SemiBold.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url('/fonts/Outfit-Bold.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url('/fonts/Outfit-ExtraBold.ttf') format('truetype'); font-weight: 800; font-display: swap; }
+
+:root {
+  /* ---- Raw palette (lib/core/theme/tokens/farmtap_palette.dart) ---- */
+  --p-green50: #E8F4EF; --p-green100: #CFE9DF; --p-green400: #5FB89A; --p-green500: #3A8B6E;
+  --p-green700: #1F5E4A; --p-green800: #135040; --p-green900: #0B2A20; --p-green950: #00382A; --p-green10: #C4EEDD;
+  --p-gold100: #FBE7B8; --p-gold150: #FFDFA0; --p-gold300: #F0B83A; --p-gold500: #C98A0E; --p-gold800: #5C4100;
+  --p-gold900: #3A2700; --p-gold925: #3D2A00; --p-gold950: #1E1400;
+  --p-white: #FFFFFF; --p-cream: #F7F5EF; --p-sand100: #F2F0E9; --p-sand200: #ECEAE3; --p-sand300: #E6E4DC;
+  --p-sand400: #E0DED6; --p-stone300: #C8CEC9; --p-stone500: #79827D; --p-stone700: #49524D; --p-ink: #1B1F1C;
+  --p-night0: #0A110E; --p-night: #0F1714; --p-night100: #141D19; --p-night200: #18221E; --p-night300: #1F2A25;
+  --p-night400: #27332D; --p-slate700: #3F4944; --p-slate500: #89938D; --p-slate300: #BFC9C3; --p-mist: #E3EAE6;
+  --p-blue50: #D3E4FF; --p-blue300: #9CC2FF; --p-blue600: #2F5D8C; --p-blue800: #16457A; --p-blue950: #002F65; --p-blue990: #001C38;
+  --p-success50: #DCEFDD; --p-success300: #7BD389; --p-success600: #2E7D32; --p-success800: #1E4D24; --p-success900: #0F3D12;
+  --p-warning50: #FFE7C2; --p-warning300: #FFB74D; --p-warning600: #B26A00; --p-warning800: #5A3C00; --p-warning950: #3E2600;
+  --p-danger50: #F9DEDC; --p-danger300: #F2B8B5; --p-danger600: #B3261E; --p-danger800: #8C1D18; --p-danger900: #601410; --p-danger950: #410E0B;
+  --p-scrim-light: rgba(0, 0, 0, 0.42); --p-scrim-dark: rgba(0, 0, 0, 0.6);
+
+  /* ---- Type (Outfit, farmtap_typography.dart) ---- */
+  --font: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fs-display: 30px; --fs-headline: 22px; --fs-title-lg: 18px; --fs-title: 16px; --fs-title-sm: 14px;
+  --fs-body: 14px; --fs-body-sm: 12px; --fs-label: 13px; --fs-label-sm: 11px; --fs-metric: 26px;
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700; --fw-extrabold: 800;
+  --lh-tight: 1.15; --lh: 1.4;
+
+  /* ---- Spacing (compact 4-pt grid, farmtap_spacing.dart) ---- */
+  --s-xxs: 2px; --s-xs: 4px; --s-sm: 6px; --s-md: 8px; --s-lg: 12px; --s-xl: 16px; --s-xxl: 24px; --s-xxxl: 32px;
+  --s-wide-top: 20px; --s-auth-top: 40px;
+
+  /* ---- Radii (farmtap_radii.dart) ---- */
+  --r-xs: 6px; --r-sm: 8px; --r-btn: 10px; --r-md: 12px; --r-card: 14px; --r-xl: 18px; --r-pill: 999px;
+
+  /* ---- Sizes ---- */
+  --z-touch: 44px; --z-btn: 40px; --z-input: 40px; --z-icon: 20px; --z-icon-sm: 16px; --z-avatar: 32px; --z-avatar-lg: 64px;
+  --z-sidebar: 232px; --z-rail: 72px; --z-topbar: 56px; --z-bottomnav: 60px; --z-content: 1200px; --z-auth: 400px;
+  --z-chart: 160px; --z-logo: 28px; --z-logo-lg: 72px; --z-border: 1px; --z-focus: 2px; --z-dot: 8px;
+  --z-menu: 240px; --z-dialog: 440px; --z-col-min: 280px; --z-stat-min: 160px; --z-shadow-y: 1px; --z-shadow-blur: 3px;
+
+  /* ---- Breakpoints are in app.css media queries: 600px (medium) and 1024px (wide), decision 0012 ---- */
+
+  /* ---- Motion (farmtap_motion.dart) ---- */
+  --d-fast: 120ms; --d-normal: 200ms; --d-spin: 1200ms; --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ---- Print ---- */
+  --print-margin: 12mm;
+}
+
+/* ---- Light roles (farmtap_color_schemes.dart, light) ---- */
+:root, :root[data-theme='light'] {
+  color-scheme: light;
+  --c-primary: var(--p-green700); --c-on-primary: var(--p-white);
+  --c-primary-container: var(--p-green100); --c-on-primary-container: var(--p-green900);
+  --c-secondary: var(--p-gold500); --c-secondary-container: var(--p-gold100); --c-on-secondary-container: var(--p-gold900);
+  --c-tertiary: var(--p-blue600); --c-tertiary-container: var(--p-blue50); --c-on-tertiary-container: var(--p-blue990);
+  --c-surface: var(--p-cream); --c-on-surface: var(--p-ink); --c-on-surface-variant: var(--p-stone700);
+  --c-container-low: var(--p-sand100); --c-container: var(--p-sand200); --c-container-high: var(--p-sand300); --c-container-highest: var(--p-sand400);
+  --c-card: var(--p-white); --c-outline: var(--p-stone500); --c-outline-variant: var(--p-stone300);
+  --c-success: var(--p-success600); --c-success-container: var(--p-success50); --c-on-success-container: var(--p-success900);
+  --c-warning: var(--p-warning600); --c-warning-container: var(--p-warning50); --c-on-warning-container: var(--p-warning950);
+  --c-danger: var(--p-danger600); --c-danger-container: var(--p-danger50); --c-on-danger-container: var(--p-danger950);
+  --c-scrim: var(--p-scrim-light); --c-shadow: rgba(0, 0, 0, 0.08);
+  --logo-mark: url('/brand/farmtap_mark_light.svg'); --logo-full: url('/brand/farmtap_horizontal_light.svg');
+}
+
+/* ---- Dark roles ---- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --c-primary: var(--p-green400); --c-on-primary: var(--p-green950);
+    --c-primary-container: var(--p-green800); --c-on-primary-container: var(--p-green10);
+    --c-secondary: var(--p-gold300); --c-secondary-container: var(--p-gold800); --c-on-secondary-container: var(--p-gold150);
+    --c-tertiary: var(--p-blue300); --c-tertiary-container: var(--p-blue800); --c-on-tertiary-container: var(--p-blue50);
+    --c-surface: var(--p-night); --c-on-surface: var(--p-mist); --c-on-surface-variant: var(--p-slate300);
+    --c-container-low: var(--p-night100); --c-container: var(--p-night200); --c-container-high: var(--p-night300); --c-container-highest: var(--p-night400);
+    --c-card: var(--p-night200); --c-outline: var(--p-slate500); --c-outline-variant: var(--p-slate700);
+    --c-success: var(--p-success300); --c-success-container: var(--p-success800); --c-on-success-container: var(--p-success50);
+    --c-warning: var(--p-warning300); --c-warning-container: var(--p-warning800); --c-on-warning-container: var(--p-warning50);
+    --c-danger: var(--p-danger300); --c-danger-container: var(--p-danger800); --c-on-danger-container: var(--p-danger50);
+    --c-scrim: var(--p-scrim-dark); --c-shadow: rgba(0, 0, 0, 0.4);
+    --logo-mark: url('/brand/farmtap_mark_dark.svg'); --logo-full: url('/brand/farmtap_horizontal_dark.svg');
+  }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --c-primary: var(--p-green400); --c-on-primary: var(--p-green950);
+  --c-primary-container: var(--p-green800); --c-on-primary-container: var(--p-green10);
+  --c-secondary: var(--p-gold300); --c-secondary-container: var(--p-gold800); --c-on-secondary-container: var(--p-gold150);
+  --c-tertiary: var(--p-blue300); --c-tertiary-container: var(--p-blue800); --c-on-tertiary-container: var(--p-blue50);
+  --c-surface: var(--p-night); --c-on-surface: var(--p-mist); --c-on-surface-variant: var(--p-slate300);
+  --c-container-low: var(--p-night100); --c-container: var(--p-night200); --c-container-high: var(--p-night300); --c-container-highest: var(--p-night400);
+  --c-card: var(--p-night200); --c-outline: var(--p-slate500); --c-outline-variant: var(--p-slate700);
+  --c-success: var(--p-success300); --c-success-container: var(--p-success800); --c-on-success-container: var(--p-success50);
+  --c-warning: var(--p-warning300); --c-warning-container: var(--p-warning800); --c-on-warning-container: var(--p-warning50);
+  --c-danger: var(--p-danger300); --c-danger-container: var(--p-danger800); --c-on-danger-container: var(--p-danger50);
+  --c-scrim: var(--p-scrim-dark); --c-shadow: rgba(0, 0, 0, 0.4);
+  --logo-mark: url('/brand/farmtap_mark_dark.svg'); --logo-full: url('/brand/farmtap_horizontal_dark.svg');
+}
