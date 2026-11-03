@@ -1,1 +1,40 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"farm-tap-1dd15","appId":"1:913049305053:android:ad2263ef78e2e04f2ac034","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"farm-tap-1dd15","appId":"1:913049305053:ios:9e1f48a1d76aebd92ac034","uploadDebugSymbols":true,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"farm-tap-1dd15","configurations":{"android":"1:913049305053:android:ad2263ef78e2e04f2ac034","ios":"1:913049305053:ios:9e1f48a1d76aebd92ac034"}}}}},"firestore":{"rules":"firestore.rules","indexes":"firestore.indexes.json"},"emulators":{"firestore":{"port":8080},"singleProjectMode":true}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "farm-tap-1dd15",
+          "appId": "1:913049305053:android:ad2263ef78e2e04f2ac034",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "farm-tap-1dd15",
+          "appId": "1:913049305053:ios:9e1f48a1d76aebd92ac034",
+          "uploadDebugSymbols": true,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "farm-tap-1dd15",
+          "configurations": {
+            "android": "1:913049305053:android:ad2263ef78e2e04f2ac034",
+            "ios": "1:913049305053:ios:9e1f48a1d76aebd92ac034"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "singleProjectMode": true
+  }
+}
