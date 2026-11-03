@@ -100,7 +100,7 @@ service cloud.firestore {
         // The owner's own first membership, right after creating the farm.
         allow create: if signedIn() && uid == request.auth.uid
           && get(/databases/$(database)/documents/tenants/$(t)).data.ownerUid == request.auth.uid
-          && request.resource.data.role == 'owner';
+          && request.resource.data.role in ['owner', 'manager'];
         allow update, delete: if member(t) && role(t) == 'owner' && uid != request.auth.uid;
       }
 

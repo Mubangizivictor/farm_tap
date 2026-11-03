@@ -1,20 +1,24 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_tap/app/flavor.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/audit/audit_logger.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
+import 'package:farm_tap/core/auth/data/firebase/firebase_auth_repository.dart';
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
 import 'package:farm_tap/core/database/isar_service.dart';
 import 'package:farm_tap/core/money/data/fake/fake_money_repository.dart';
 import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
+import 'package:farm_tap/core/onboarding/data/firebase/firestore_onboarding_repository.dart';
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/sync/connectivity_monitor.dart';
 import 'package:farm_tap/core/sync/data/fake/fake_remote_store.dart';
+import 'package:farm_tap/core/sync/data/firestore_remote_store.dart';
 import 'package:farm_tap/core/sync/data/isar/isar_record_store.dart';
 import 'package:farm_tap/core/sync/data/memory_record_store.dart';
 import 'package:farm_tap/core/sync/domain/local_record_store.dart';
@@ -23,12 +27,14 @@ import 'package:farm_tap/core/sync/domain/remote_store.dart';
 import 'package:farm_tap/core/sync/sync_engine.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/data/fake/fake_farm_membership_repository.dart';
+import 'package:farm_tap/core/tenancy/data/firebase/firestore_farm_membership_repository.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/id_generator.dart';
 import 'package:farm_tap/core/utils/logger.dart';
 import 'package:farm_tap/core/utils/trusted_clock.dart';
+import 'package:farm_tap/firebase_options.dart';
 import 'package:farm_tap/sectors/cattle/breeding/data/fake/fake_breeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/data/fake/fake_centre_repository.dart';
@@ -53,6 +59,7 @@ import 'package:farm_tap/sectors/cattle/owner_reports/data/fake/fake_daily_repor
 import 'package:farm_tap/sectors/cattle/owner_reports/domain/daily_report.dart';
 import 'package:farm_tap/sectors/cattle/workers/data/fake/fake_workers_repository.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -78,7 +85,9 @@ Future<void> configureDependencies(Flavor flavor) async {
       ..registerLazySingleton<AuthRepository>(FakeAuthRepository.new)
       ..registerLazySingleton<FarmMembershipRepository>(() => FakeFarmMembershipRepository(tenants))
       ..registerLazySingleton<OnboardingRepository>(() => FakeOnboardingRepository(getIt<Clock>()))
-      ..registerLazySingleton<FakeStaffAccessRepository>(() => FakeStaffAccessRepository(today: getIt<Clock>().today, now: getIt<Clock>().now))
+      ..registerLazySingleton<FakeStaffAccessRepository>(
+        () => FakeStaffAccessRepository(today: getIt<Clock>().today, now: getIt<Clock>().now),
+      )
       ..registerLazySingleton<StaffAccessRepository>(getIt.call<FakeStaffAccessRepository>)
       ..registerLazySingleton<StaffDirectory>(getIt.call<FakeStaffAccessRepository>)
       ..registerLazySingleton<TreatmentRepository>(() => FakeTreatmentRepository(getIt<Clock>()))
@@ -131,12 +140,26 @@ Future<void> configureDependencies(Flavor flavor) async {
         ),
       );
   } else {
-    // Backend phase: real Firebase auth / membership repositories go here.
+    // Backend phase (decision 0014): Firebase project farm-tap-1dd15.
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    final db = FirebaseFirestore.instance;
+    FirestoreRemoteStore.configure(db);
+    final prefs = await SharedPreferences.getInstance();
+    final auth = FirebaseAuthRepository();
+    String? uid() => auth.currentUser?.id;
     final isarService = IsarService();
     await isarService.init();
     getIt
       ..registerSingleton<IsarService>(isarService)
       ..registerSingleton<LocalRecordStore>(IsarRecordStore(isarService.isar))
+      ..registerSingleton<RemoteStore>(FirestoreRemoteStore(db))
+      ..registerSingleton<AuthRepository>(auth)
+      ..registerLazySingleton<FarmMembershipRepository>(
+        () => FirestoreFarmMembershipRepository(db: db, uid: uid, prefs: prefs, tenants: tenants),
+      )
+      ..registerLazySingleton<OnboardingRepository>(
+        () => FirestoreOnboardingRepository(db: db, clock: getIt<Clock>(), ids: getIt<IdGenerator>(), uid: uid),
+      )
       ..registerLazySingleton<HerdRepository>(
         () => HerdRepositoryImpl(
           isar: isarService.isar,
@@ -178,13 +201,13 @@ Future<void> _configureOffline(TenantProvider tenants) async {
   );
 
   if (!getIt.isRegistered<LocalRecordStore>()) getIt.registerSingleton<LocalRecordStore>(MemoryRecordStore());
+  // Demo build: a pretend cloud, so "Sync now" works without Firebase.
+  if (!getIt.isRegistered<RemoteStore>()) getIt.registerSingleton<RemoteStore>(FakeRemoteStore());
 
   final connectivity = DeviceConnectivity();
   await connectivity.start();
   getIt
     ..registerSingleton<ConnectivityMonitor>(connectivity)
-    // Phase 2 replaces this with the Firestore adapter.
-    ..registerSingleton<RemoteStore>(FakeRemoteStore())
     ..registerSingleton<SyncService>(
       SyncEngine(
         store: getIt<LocalRecordStore>(),

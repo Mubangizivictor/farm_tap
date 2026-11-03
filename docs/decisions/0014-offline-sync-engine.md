@@ -1,10 +1,10 @@
 # 0014 — Offline-first data layer and sync engine
 
-- Status: proposed (2026-11-03), waiting for the owner's OK
+- Status: accepted (2026-11-03): owner chose Phase 1 and 2 together, on Firebase project `farm-tap-1dd15` (dev)
 - Date: 2026-11-03
 - Decided by: Mubangizi Victor (owner)
 - Roadmap items: CORE-07 (staff unlock), CORE-08 (offline sync), CORE-09 (audit), CORE-10 (sync badge). Pulled forward from Week 2; no new scope.
-- Overrides: AGENTS.md §8 "no Isar writes in the UI phase" (decision 0011), for the data layer only.
+- Overrides: AGENTS.md §8 "no Isar writes / do not connect Firebase in the UI phase" (decision 0011), for the data layer only. The demo build (`useFakeData = true`) stays Firebase-free.
 
 ## Audit (branch `redesign/compact-ui-0013`, 3 Nov 2026)
 | Area | Today | Gap |
@@ -34,8 +34,8 @@ Build in two phases. Phase 1 needs no Firebase and can start now.
 7. **Trial clock guard**: store the latest time seen; if the phone clock goes backwards, use the latest time for trial and read-only.
 8. **Audit** (CORE-09): every write adds an audit entry in the same transaction.
 
-### Phase 2 — cloud (est. 3–4 days, after Firebase `farmtap-dev` exists)
-Firestore `RemoteStore` adapter, server `updatedAt`, security rules + rules tests, photo upload queue (compressed, after records, resumable). Owner/manager sign-in stays signed in on the farm phone; only the very first sign-in needs network.
+### Phase 2 — cloud (est. 3–4 days, Firebase `farm-tap-1dd15`; a separate prod project before launch)
+Firestore `RemoteStore` adapter, server `updatedAt`, security rules + rules tests (`firestore/`, emulator), Firebase Auth (Google, email; Apple when iOS ships), farm list cached on the phone, photo upload queue (compressed, after records, resumable). Owner/manager sign-in stays signed in on the farm phone; only the very first sign-in needs network.
 
 ## Why
 Binding rule 5 and the first selling claim ("works with no network") are not true yet: today a restart loses every record. Data loss is an approved reason for change (ROADMAP §18.1).

@@ -1003,6 +1003,7 @@ Warm introductions -> visit at the right time (milk centres after morning collec
 | 0008 | Dairy first and complete (V1 + V1.x) before any other sector | 31 Oct 2026 |
 | 0009 | IoT (FarmTap Sense) added: Phase 0 Bluetooth scale/printer, Phase 1 cold-chain pilot; no cattle GPS trackers | 31 Oct 2026 |
 | 0010 | Ask FarmTap AI via Firebase AI Logic in V1.1, with vet-safety and privacy rules | 31 Oct 2026 |
+| 0014 | Offline-first data layer: Isar record store + outbox + sync engine; Firestore rules; Phase 1 and 2 together | 3 Nov 2026 |
 
 ---
 
