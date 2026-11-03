@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
+import 'package:farm_tap/core/auth/domain/password_strength.dart';
+import 'package:farm_tap/core/auth/presentation/auth_error_text.dart';
 import 'package:farm_tap/core/auth/presentation/cubit/auth_action_cubit.dart';
 import 'package:farm_tap/core/auth/presentation/widgets/auth_widgets.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
@@ -29,14 +31,18 @@ class _EmailSignUpPageState extends State<EmailSignUpPage> {
   final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
+  final _confirm = TextEditingController();
   final _nameFocus = FocusNode();
   final _emailFocus = FocusNode();
   final _passwordFocus = FocusNode();
+  final _confirmFocus = FocusNode();
+  String? _suggested;
   final _cubit = AuthActionCubit();
   bool _agreed = false;
   String? _nameError;
   String? _emailError;
   String? _passwordError;
+  String? _confirmError;
   String? _agreeError;
 
   @override
@@ -51,14 +57,17 @@ class _EmailSignUpPageState extends State<EmailSignUpPage> {
     _passwordFocus.addListener(() {
       if (!_passwordFocus.hasFocus && _password.text.isNotEmpty) _validatePassword();
     });
+    _confirmFocus.addListener(() {
+      if (!_confirmFocus.hasFocus && _confirm.text.isNotEmpty) _validateConfirm();
+    });
   }
 
   @override
   void dispose() {
-    for (final c in [_name, _email, _password]) {
+    for (final c in [_name, _email, _password, _confirm]) {
       c.dispose();
     }
-    for (final f in [_nameFocus, _emailFocus, _passwordFocus]) {
+    for (final f in [_nameFocus, _emailFocus, _passwordFocus, _confirmFocus]) {
       f.dispose();
     }
     unawaited(_cubit.close());
@@ -78,12 +87,35 @@ class _EmailSignUpPageState extends State<EmailSignUpPage> {
   }
 
   bool _validatePassword() {
-    setState(() => _passwordError = _password.text.length >= 8 ? null : _l10n.passwordTooShort);
+    final p = _password.text;
+    setState(
+      () => _passwordError = p.length < PasswordRules.minLength
+          ? _l10n.passwordTooShort
+          : PasswordRules.meetsRules(p)
+          ? null
+          : _l10n.passwordWeak,
+    );
     return _passwordError == null;
   }
 
+  bool _validateConfirm() {
+    setState(() => _confirmError = _confirm.text == _password.text ? null : _l10n.passwordsDontMatch);
+    return _confirmError == null;
+  }
+
+  void _suggest() {
+    final p = PasswordRules.suggest();
+    _password.text = p;
+    _confirm.text = p;
+    setState(() {
+      _suggested = p;
+      _passwordError = null;
+      _confirmError = null;
+    });
+  }
+
   Future<void> _submit() async {
-    final ok = [_validateName(), _validateEmail(), _validatePassword()].every((v) => v);
+    final ok = [_validateName(), _validateEmail(), _validatePassword(), _validateConfirm()].every((v) => v);
     setState(() => _agreeError = _agreed ? null : _l10n.agreeTermsRequired);
     if (!ok || !_agreed) return;
     final email = _email.text.trim();
@@ -95,7 +127,15 @@ class _EmailSignUpPageState extends State<EmailSignUpPage> {
       await widget.auth.sendEmailVerification();
       widget.onCreated(email);
     } else {
-      setState(() => _emailError = _l10n.somethingWentWrongShort);
+      final f = result.failure;
+      final message = authErrorText(_l10n, f) ?? _l10n.somethingWentWrongShort;
+      setState(() {
+        if (f?.message == 'weak-password') {
+          _passwordError = message;
+        } else {
+          _emailError = message;
+        }
+      });
     }
   }
 
@@ -144,10 +184,41 @@ class _EmailSignUpPageState extends State<EmailSignUpPage> {
               controller: _password,
               focusNode: _passwordFocus,
               error: _passwordError,
-              helper: l10n.passwordRule,
+              helper: l10n.passwordRuleStrong,
+              password: true,
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.newPassword],
+              onChanged: (_) => setState(() {
+                _suggested = null;
+                if (_passwordError != null) _passwordError = null;
+              }),
+              onSubmitted: (_) => _confirmFocus.requestFocus(),
+            ),
+            if (_password.text.isNotEmpty) ...[
+              context.space.gapSm,
+              PasswordStrengthBar(strength: PasswordRules.strength(_password.text)),
+            ],
+            if (_suggested != null) ...[
+              context.space.gapXs,
+              SelectableText(l10n.suggestedPasswordNote(_suggested!), style: context.text.bodySmall),
+            ],
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: TextAction(label: l10n.suggestPassword, icon: Symbols.auto_awesome_rounded, onPressed: _suggest),
+            ),
+            context.space.gapSm,
+            FarmTapTextField(
+              label: l10n.confirmPasswordLabel,
+              icon: Symbols.key_rounded,
+              controller: _confirm,
+              focusNode: _confirmFocus,
+              error: _confirmError,
               password: true,
               textInputAction: TextInputAction.done,
               autofillHints: const [AutofillHints.newPassword],
+              onChanged: (_) {
+                if (_confirmError != null) setState(() => _confirmError = null);
+              },
             ),
             context.space.gapLg,
             InkWell(

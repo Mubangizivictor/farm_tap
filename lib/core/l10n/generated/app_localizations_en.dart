@@ -3349,4 +3349,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpOpenFailed => 'Could not open that on this phone.';
+
+  @override
+  String get authNoInternet => 'No internet. Connect and try again.';
+
+  @override
+  String get authProviderOff => 'This sign-in method is not switched on for FarmTap yet. Use Google or email for now.';
+
+  @override
+  String get authOtherMethod => 'This email already uses another sign-in. Use Google or email.';
+
+  @override
+  String get authEmailInUse => 'An account with this email already exists. Sign in instead.';
+
+  @override
+  String authFailedCode(String code) {
+    return 'That did not work ($code). Try again.';
+  }
+
+  @override
+  String get confirmPasswordLabel => 'Confirm password';
+
+  @override
+  String get passwordsDontMatch => 'The passwords do not match.';
+
+  @override
+  String get passwordRuleStrong => '8+ characters with a capital letter, a small letter and a number';
+
+  @override
+  String get passwordWeak => 'Add a capital letter, a small letter and a number.';
+
+  @override
+  String get passwordStrengthWeak => 'Weak';
+
+  @override
+  String get passwordStrengthFair => 'Fair';
+
+  @override
+  String get passwordStrengthGood => 'Good';
+
+  @override
+  String get passwordStrengthStrong => 'Strong';
+
+  @override
+  String get suggestPassword => 'Suggest a strong password';
+
+  @override
+  String suggestedPasswordNote(String password) {
+    return 'Suggested: $password. Save it somewhere safe.';
+  }
 }

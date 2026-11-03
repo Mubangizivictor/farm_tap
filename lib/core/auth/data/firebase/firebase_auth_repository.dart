@@ -5,6 +5,8 @@ import 'package:farm_tap/core/auth/domain/entities/account_user.dart';
 import 'package:farm_tap/core/error/failure.dart';
 import 'package:farm_tap/core/error/result.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 /// Firebase Auth: Google, Apple, email (binding rule 4; no phone sign-in).
 ///
@@ -15,6 +17,9 @@ class FirebaseAuthRepository implements AuthRepository {
   new([FirebaseAuth? auth]) : _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseAuth _auth;
+
+  /// Failure message when the person closed the sign-in sheet.
+  static const cancelled = 'cancelled';
 
   static AccountUser? _map(User? u) => u == null
       ? null
@@ -31,7 +36,14 @@ class FirebaseAuthRepository implements AuthRepository {
       final cred = await action();
       return Result.success(_map(cred.user)!);
     } on FirebaseAuthException catch (e) {
+      debugPrint('Sign-in failed: ${e.code} ${e.message}');
       return Result.failure(_failure(e.code));
+    } on PlatformException catch (e) {
+      debugPrint('Sign-in failed: ${e.code} ${e.message}');
+      return Result.failure(_failure(e.code));
+    } on Object catch (e) {
+      debugPrint('Sign-in failed: $e');
+      return Result.failure(UnexpectedFailure('$e'));
     }
   }
 
@@ -40,6 +52,13 @@ class FirebaseAuthRepository implements AuthRepository {
     'wrong-password' || 'invalid-credential' || 'user-not-found' || 'invalid-email' => ValidationFailure(code),
     'email-already-in-use' || 'weak-password' => ValidationFailure(code),
     'user-disabled' || 'operation-not-allowed' => PermissionFailure(code),
+    // The person closed the Apple / Google sheet: not an error.
+    'canceled' ||
+    'cancelled' ||
+    'web-context-canceled' ||
+    'web-context-cancelled' ||
+    'sign_in_canceled' => const ValidationFailure(cancelled),
+    'account-exists-with-different-credential' => ValidationFailure(code),
     _ => UnexpectedFailure(code),
   };
 
@@ -47,7 +66,13 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<Result<AccountUser>> signInWithGoogle() => _run(() => _auth.signInWithProvider(GoogleAuthProvider()));
 
   @override
-  Future<Result<AccountUser>> signInWithApple() => _run(() => _auth.signInWithProvider(AppleAuthProvider()));
+  Future<Result<AccountUser>> signInWithApple() => _run(
+    () => _auth.signInWithProvider(
+      AppleAuthProvider()
+        ..addScope('email')
+        ..addScope('name'),
+    ),
+  );
 
   @override
   Future<Result<AccountUser>> signInWithEmail({required String email, required String password}) =>

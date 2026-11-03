@@ -2678,5 +2678,34 @@
   "helpWhatsappSub": "Fastest; send a screenshot if something looks wrong",
   "helpCall": "Call us",
   "helpSms": "Send an SMS",
-  "helpOpenFailed": "Could not open that on this phone."
+  "helpOpenFailed": "Could not open that on this phone.",
+  "authNoInternet": "No internet. Connect and try again.",
+  "authProviderOff": "This sign-in method is not switched on for FarmTap yet. Use Google or email for now.",
+  "authOtherMethod": "This email already uses another sign-in. Use Google or email.",
+  "authEmailInUse": "An account with this email already exists. Sign in instead.",
+  "authFailedCode": "That did not work ({code}). Try again.",
+  "@authFailedCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmPasswordLabel": "Confirm password",
+  "passwordsDontMatch": "The passwords do not match.",
+  "passwordRuleStrong": "8+ characters with a capital letter, a small letter and a number",
+  "passwordWeak": "Add a capital letter, a small letter and a number.",
+  "passwordStrengthWeak": "Weak",
+  "passwordStrengthFair": "Fair",
+  "passwordStrengthGood": "Good",
+  "passwordStrengthStrong": "Strong",
+  "suggestPassword": "Suggest a strong password",
+  "suggestedPasswordNote": "Suggested: {password}. Save it somewhere safe.",
+  "@suggestedPasswordNote": {
+    "placeholders": {
+      "password": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -1,6 +1,7 @@
+import 'package:farm_tap/core/auth/domain/password_strength.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
-import 'package:farm_tap/core/ui/navigation_scope.dart';
+import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -116,3 +117,27 @@ class AuthBackButton extends StatelessWidget {
 
 /// Basic email check used for inline validation.
 bool looksLikeEmail(String value) => RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]{2,}$').hasMatch(value.trim());
+
+/// Thin bar + word under the sign-up password: Weak / Fair / Good / Strong.
+class PasswordStrengthBar extends StatelessWidget {
+  const new({required this.strength, super.key});
+
+  final PasswordStrength strength;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final (label, tone) = switch (strength) {
+      PasswordStrength.weak => (l10n.passwordStrengthWeak, FarmTapTone.danger),
+      PasswordStrength.fair => (l10n.passwordStrengthFair, FarmTapTone.warning),
+      PasswordStrength.good => (l10n.passwordStrengthGood, FarmTapTone.info),
+      PasswordStrength.strong => (l10n.passwordStrengthStrong, FarmTapTone.success),
+    };
+    return FarmTapProgress(
+      value: (strength.index + 1) / PasswordStrength.values.length,
+      thin: true,
+      trailingLabel: label,
+      color: tone.of(context).accent,
+    );
+  }
+}

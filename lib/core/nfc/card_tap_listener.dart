@@ -31,14 +31,14 @@ class _CardTapListenerState extends State<CardTapListener> {
   @override
   void initState() {
     super.initState();
-    if (widget.enabled) _join();
+    if (widget.enabled) _active.add(this);
   }
 
   /// Back on this page (iOS ends the reader after each card): read again.
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.enabled && (ModalRoute.of(context)?.isCurrent ?? true)) {
+    if (widget.enabled && _onScreen) {
       _sinceLast
         ..stop()
         ..reset();
@@ -54,8 +54,13 @@ class _CardTapListenerState extends State<CardTapListener> {
 
   void _join() {
     _active.add(this);
-    unawaited(CardReader.instance.start(_dispatch, prompt: widget.prompt));
+    // Only the page on screen starts the reader (on iOS that opens the scan
+    // sheet); pages kept alive in other tabs wait. didChangeDependencies
+    // starts it right after initState.
+    if (mounted && _onScreen) unawaited(CardReader.instance.start(_dispatch, prompt: widget.prompt));
   }
+
+  bool get _onScreen => (ModalRoute.of(context)?.isCurrent ?? true) && TickerMode.valuesOf(context).enabled;
 
   void _leave() {
     _active.remove(this);

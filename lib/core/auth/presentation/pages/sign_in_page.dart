@@ -1,5 +1,6 @@
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
 import 'package:farm_tap/core/auth/domain/entities/account_user.dart';
+import 'package:farm_tap/core/auth/presentation/auth_error_text.dart';
 import 'package:farm_tap/core/auth/presentation/cubit/auth_action_cubit.dart';
 import 'package:farm_tap/core/auth/presentation/widgets/auth_widgets.dart';
 import 'package:farm_tap/core/error/result.dart';
@@ -47,12 +48,9 @@ class _SignInView extends StatelessWidget {
     if (result.isSuccess) {
       onSignedIn();
     } else {
-      FarmTapToast.show(
-        context,
-        message: l10n.somethingWentWrongShort,
-        icon: Symbols.error_rounded,
-        tone: FarmTapTone.danger,
-      );
+      final message = authErrorText(l10n, result.failure);
+      if (message == null) return;
+      FarmTapToast.show(context, message: message, icon: Symbols.error_rounded, tone: FarmTapTone.danger);
     }
   }
 

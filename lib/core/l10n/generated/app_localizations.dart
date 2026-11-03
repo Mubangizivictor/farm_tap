@@ -5934,6 +5934,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not open that on this phone.'**
   String get helpOpenFailed;
+
+  /// No description provided for @authNoInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet. Connect and try again.'**
+  String get authNoInternet;
+
+  /// No description provided for @authProviderOff.
+  ///
+  /// In en, this message translates to:
+  /// **'This sign-in method is not switched on for FarmTap yet. Use Google or email for now.'**
+  String get authProviderOff;
+
+  /// No description provided for @authOtherMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'This email already uses another sign-in. Use Google or email.'**
+  String get authOtherMethod;
+
+  /// No description provided for @authEmailInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'An account with this email already exists. Sign in instead.'**
+  String get authEmailInUse;
+
+  /// No description provided for @authFailedCode.
+  ///
+  /// In en, this message translates to:
+  /// **'That did not work ({code}). Try again.'**
+  String authFailedCode(String code);
+
+  /// No description provided for @confirmPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPasswordLabel;
+
+  /// No description provided for @passwordsDontMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The passwords do not match.'**
+  String get passwordsDontMatch;
+
+  /// No description provided for @passwordRuleStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'8+ characters with a capital letter, a small letter and a number'**
+  String get passwordRuleStrong;
+
+  /// No description provided for @passwordWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a capital letter, a small letter and a number.'**
+  String get passwordWeak;
+
+  /// No description provided for @passwordStrengthWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak'**
+  String get passwordStrengthWeak;
+
+  /// No description provided for @passwordStrengthFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get passwordStrengthFair;
+
+  /// No description provided for @passwordStrengthGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get passwordStrengthGood;
+
+  /// No description provided for @passwordStrengthStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get passwordStrengthStrong;
+
+  /// No description provided for @suggestPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggest a strong password'**
+  String get suggestPassword;
+
+  /// No description provided for @suggestedPasswordNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested: {password}. Save it somewhere safe.'**
+  String suggestedPasswordNote(String password);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

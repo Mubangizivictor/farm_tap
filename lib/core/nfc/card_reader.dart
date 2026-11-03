@@ -47,28 +47,51 @@ class NfcCardReader implements CardReader {
     }
   }
 
+  static bool get _ios => !kIsWeb && Platform.isIOS;
+
   @override
   Future<void> start(ValueChanged<String> onCard, {String? prompt}) async {
     if (_running || !await available()) return;
     _running = true;
+    // iOS keeps a closed sheet's session until it is invalidated from here;
+    // without this the next start fails with "session already exists".
+    if (_ios) await _closeIos();
     try {
       await NfcManager.instance.startSession(
         pollingOptions: {NfcPollingOption.iso14443, NfcPollingOption.iso15693},
         alertMessageIos: prompt,
         // Android keeps listening while the page is open; iOS shows one
         // system sheet per card.
-        onSessionErrorIos: (_) => _running = false,
+        onSessionErrorIos: (_) {
+          _running = false;
+          unawaited(_closeIos());
+        },
         onDiscovered: (tag) {
           final number = cardNumber(tag);
-          if (number == null) return;
-          if (!kIsWeb && Platform.isIOS) {
+          if (_ios) {
             _running = false;
+            unawaited(number == null ? _closeIos(error: unsupportedCardIos) : _closeIos(message: cardReadIos));
           }
-          onCard(number);
+          if (number != null) onCard(number);
         },
       );
-    } on Object {
+    } on Object catch (e) {
+      debugPrint('NFC start failed: $e');
       _running = false;
+    }
+  }
+
+  /// Shown on the iOS sheet after a card is read.
+  static const cardReadIos = 'Card read';
+
+  /// Shown on the iOS sheet for a card FarmTap cannot read.
+  static const unsupportedCardIos = 'This card type is not supported. Use an NTAG card.';
+
+  static Future<void> _closeIos({String? message, String? error}) async {
+    try {
+      await NfcManager.instance.stopSession(alertMessageIos: message, errorMessageIos: error);
+    } on Object {
+      // No session open.
     }
   }
 
