@@ -50,7 +50,7 @@ class FarmSetup extends Equatable {
     this.village = '',
     this.cows,
     this.whatsapp = '',
-    this.smsSameAsWhatsapp = true,
+    this.smsSameAsWhatsapp = false,
     this.sms = '',
     this.dailyReport = true,
     this.smsAlerts = true,

@@ -78,6 +78,10 @@ void main() {
     expect(_location(router), AppRoutes.setupContacts);
     await tester.enterText(find.byType(TextField).first, '772451908');
     await next();
+    // SMS alerts are on, so the SMS line (can differ from WhatsApp) is needed.
+    expect(_location(router), AppRoutes.setupContacts);
+    await tester.enterText(find.byType(TextField).at(1), '701220334');
+    await next();
     expect(_location(router), AppRoutes.setupRole);
     await next();
     expect(_location(router), AppRoutes.setupStaff);

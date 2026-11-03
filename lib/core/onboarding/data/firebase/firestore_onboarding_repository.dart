@@ -52,7 +52,7 @@ class FirestoreOnboardingRepository implements OnboardingRepository {
         'cows': setup.cows,
         'contacts': {
           'whatsapp': setup.whatsapp,
-          'sms': setup.smsSameAsWhatsapp ? setup.whatsapp : setup.sms,
+          'sms': setup.sms,
           'dailyReport': setup.dailyReport,
           'smsAlerts': setup.smsAlerts,
         },

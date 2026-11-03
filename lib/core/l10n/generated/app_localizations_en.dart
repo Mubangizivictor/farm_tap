@@ -3398,4 +3398,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String suggestedPasswordNote(String password) {
     return 'Suggested: $password. Save it somewhere safe.';
   }
+
+  @override
+  String get copyWhatsappNumber => 'Same as WhatsApp';
+
+  @override
+  String get smsNumberHelp => 'Alerts go here. It can be a different line from WhatsApp.';
 }

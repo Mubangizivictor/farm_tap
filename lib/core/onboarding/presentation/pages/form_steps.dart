@@ -183,10 +183,10 @@ class _OnboardContactsPageState extends State<OnboardContactsPage> {
   late final FarmSetup _start = widget.cubit.state;
   late final _whatsapp = TextEditingController(text: _start.whatsapp);
   late final _sms = TextEditingController(text: _start.sms);
-  late bool _same = _start.smsSameAsWhatsapp;
   late bool _daily = _start.dailyReport;
   late bool _alerts = _start.smsAlerts;
   String? _error;
+  String? _smsError;
 
   bool get _dirty => _whatsapp.text != _start.whatsapp || _sms.text != _start.sms;
 
@@ -199,13 +199,19 @@ class _OnboardContactsPageState extends State<OnboardContactsPage> {
 
   void _continue() {
     final l10n = AppLocalizations.of(context);
-    setState(() => _error = UgPhoneFormatter.isComplete(_whatsapp.text) ? null : l10n.phoneIncomplete);
-    if (_error != null) return;
+    // WhatsApp and SMS are often different lines in Uganda: each has its own
+    // number. SMS is needed only when SMS alerts are on.
+    setState(() {
+      _error = UgPhoneFormatter.isComplete(_whatsapp.text) ? null : l10n.phoneIncomplete;
+      final needSms = _alerts || _sms.text.isNotEmpty;
+      _smsError = !needSms || UgPhoneFormatter.isComplete(_sms.text) ? null : l10n.phoneIncomplete;
+    });
+    if (_error != null || _smsError != null) return;
     widget.cubit.update(
       (s) => s.copyWith(
         whatsapp: _whatsapp.text,
-        sms: _same ? _whatsapp.text : _sms.text,
-        smsSameAsWhatsapp: _same,
+        sms: _sms.text,
+        smsSameAsWhatsapp: _sms.text == _whatsapp.text,
         dailyReport: _daily,
         smsAlerts: _alerts,
       ),
@@ -216,7 +222,6 @@ class _OnboardContactsPageState extends State<OnboardContactsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    if (_same) _sms.text = _whatsapp.text;
     return DiscardGuard(
       dirty: _dirty,
       child: OnboardingStep(
@@ -239,17 +244,31 @@ class _OnboardContactsPageState extends State<OnboardContactsPage> {
               inputFormatters: [UgPhoneFormatter()],
               onChanged: (_) => setState(() {}),
             ),
-            CheckRow(label: l10n.smsSameAsWhatsapp, value: _same, onChanged: (v) => setState(() => _same = v)),
+            context.space.gapLg,
             FarmTapTextField(
               label: l10n.smsNumberLabel,
               icon: Symbols.sms_rounded,
               prefixText: l10n.phonePrefix,
               controller: _sms,
-              enabled: !_same,
+              error: _smsError,
+              helper: l10n.smsNumberHelp,
               keyboardType: TextInputType.phone,
               inputFormatters: [UgPhoneFormatter()],
-              onChanged: (_) => setState(() {}),
+              onChanged: (_) => setState(() => _smsError = null),
             ),
+            if (_sms.text.isEmpty && _whatsapp.text.isNotEmpty)
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextAction(
+                  label: l10n.copyWhatsappNumber,
+                  icon: Symbols.content_copy_rounded,
+                  small: true,
+                  onPressed: () => setState(() {
+                    _sms.text = _whatsapp.text;
+                    _smsError = null;
+                  }),
+                ),
+              ),
             context.space.gapLg,
             FarmTapCard(
               children: [

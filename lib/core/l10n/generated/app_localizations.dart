@@ -6024,6 +6024,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Suggested: {password}. Save it somewhere safe.'**
   String suggestedPasswordNote(String password);
+
+  /// No description provided for @copyWhatsappNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Same as WhatsApp'**
+  String get copyWhatsappNumber;
+
+  /// No description provided for @smsNumberHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts go here. It can be a different line from WhatsApp.'**
+  String get smsNumberHelp;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

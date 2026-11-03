@@ -2707,5 +2707,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "copyWhatsappNumber": "Same as WhatsApp",
+  "smsNumberHelp": "Alerts go here. It can be a different line from WhatsApp."
 }
