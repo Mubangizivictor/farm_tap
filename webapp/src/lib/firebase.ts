@@ -15,9 +15,9 @@ const FIREBASE_CONFIG: FirebaseOptions = {
   messagingSenderId: '913049305053',
   projectId: 'farm-tap-1dd15',
   storageBucket: 'farm-tap-1dd15.firebasestorage.app',
-  // firebaseapp.com is the only domain Firebase auto-registers as an OAuth redirect URI.
-  // Using web.app here breaks redirect sign-in unless that URI is manually added in GCP.
-  authDomain: 'farm-tap-1dd15.firebaseapp.com',
+  // Custom domain as authDomain so the Google sign-in popup shows farmtap.victorbee.com,
+  // not firebaseapp.com. Requires this domain in Firebase Auth → Authorized domains.
+  authDomain: 'farmtap.victorbee.com',
 };
 
 /** Local testing against `firebase emulators:start` (auth 9099, firestore 8080). */
