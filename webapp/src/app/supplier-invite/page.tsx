@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, getDoc, writeBatch } from 'firebase/firestore';
 import { Icon } from '@/components/Icon';
 import { Loading } from '@/components/Loading';
 import { firebase } from '@/lib/firebase';
@@ -46,16 +46,32 @@ function AcceptInvite() {
     setBusy(true);
     try {
       const { db } = firebase();
-      // Link this user account to the farmer record
-      await updateDoc(doc(db, 'users', user.uid), {
-        farmerLinks: arrayUnion({ tenantId: invite.tenantId, farmerId: invite.farmerId }),
-      });
-      // Mark the invite as used
-      await updateDoc(doc(db, 'farmerInvites', code), { used: true, usedBy: user.uid, usedAt: new Date().toISOString() });
+      const me = await getDoc(doc(db, 'users', user.uid));
+      const links = ((me.data()?.farmerLinks as { tenantId: string; farmerId: string }[] | undefined) ?? []);
+      if (!links.some((l) => l.tenantId === invite.tenantId && l.farmerId === invite.farmerId)) {
+        // Link the account and use up the invite in one write: the rules
+        // accept the link only together with its unused invite.
+        const b = writeBatch(db);
+        b.set(
+          doc(db, 'users', user.uid),
+          // The centre's name too: a supplier cannot open the farm itself.
+          { farmerLinks: [...links, { tenantId: invite.tenantId, farmerId: invite.farmerId }], inviteCode: code, centreNames: { [invite.tenantId]: invite.farmName } },
+          { merge: true },
+        );
+        b.update(doc(db, 'farmerInvites', code), { used: true, usedBy: user.uid, usedAt: new Date().toISOString() });
+        await b.commit();
+      }
       setState('done');
       setTimeout(() => router.replace('/supplier/'), 1500);
     } catch (e) {
-      setErrorMsg((e as { message?: string }).message ?? 'Could not accept. Try again.');
+      const code = (e as { code?: string }).code;
+      setErrorMsg(
+        code === 'permission-denied'
+          ? 'This invite cannot be used any more. Ask the collection centre for a new link.'
+          : code === 'unavailable'
+            ? 'No internet. Check the connection and try again.'
+            : 'Could not accept the invite. Try again.',
+      );
       setBusy(false);
     }
   }
@@ -103,8 +119,8 @@ function AcceptInvite() {
           </div>
           {!user ? (
             <div className="stack" style={{ gap: 'var(--s-sm)', alignItems: 'center' }}>
-              <p className="small muted">Sign in with Google to accept this invite.</p>
-              <a className="btn" href={`/sign-in/?next=/supplier-invite/?code=${code}`}>Sign in with Google</a>
+              <p className="small muted">Sign in or make a free account to accept this invite.</p>
+              <a className="btn" href={`/sign-in/?next=${encodeURIComponent(`/supplier-invite/?code=${code}`)}`}>Sign in to accept</a>
             </div>
           ) : (
             <div className="stack" style={{ gap: 'var(--s-sm)', alignItems: 'center' }}>

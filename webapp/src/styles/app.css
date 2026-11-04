@@ -365,7 +365,7 @@ table.table { width: 100%; border-collapse: collapse; }
 @media (max-width: 599px) {
   .admin .content { padding: var(--s-md) var(--s-md) var(--s-lg); gap: var(--s-lg); }
   .admin .page-head { align-items: stretch; }
-  .admin .page-head > .row { width: 100%; }
+  .admin .page-head > .row, .admin .page-head > .head-actions { width: 100%; }
   .admin .page-head .search { flex: 1 1 100%; max-width: none; }
   .admin .topbar .admin-badge { display: none; }
   .admin .card { padding: var(--s-md) var(--s-lg); }
@@ -391,3 +391,169 @@ table.table { width: 100%; border-collapse: collapse; }
   .admin .menu-btn { display: none; }
 }
 .admin .row > .input.grow-field { width: auto; }
+
+/* ---- Farm app retouch (decision 0022): same even grids as the panel,
+   skeletons while loading, the logo as the loader, forms in dialogs that
+   become sheets on phones, tables that become cards on phones. ---- */
+.farm .content { max-width: var(--z-content-farm); gap: var(--s-xl); }
+.farm .card-head { flex-wrap: wrap; }
+.farm .card-head h2 { font-size: var(--fs-title); }
+.farm .card.stack { gap: var(--s-lg); }
+.farm .page-head { align-items: center; }
+.head-text { gap: var(--s-xxs); min-width: 0; }
+.head-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-md); }
+.search { position: relative; display: flex; align-items: center; max-width: var(--z-menu); flex: 1 1 var(--z-stat-min); }
+.search .icon { position: absolute; left: var(--s-lg); color: var(--c-on-surface-variant); pointer-events: none; }
+.search .input { padding-left: calc(var(--s-lg) * 2 + var(--z-icon-sm)); min-height: var(--z-avatar); }
+.btn .spinner.sm, .spinner.sm { width: var(--z-icon-sm); height: var(--z-icon-sm); border-width: var(--z-focus); }
+body.no-scroll { overflow: hidden; }
+
+/* Stat tiles that open a page. */
+a.card.stat.link { color: inherit; text-decoration: none; transition: border-color var(--d-fast) var(--ease), transform var(--d-fast) var(--ease); }
+a.card.stat.link:hover { border-color: var(--c-primary); }
+
+/* Loader: the FarmTap mark turning slowly and breathing. */
+.logo-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s-md); padding: var(--s-xl); }
+.logo-loader .logo-mark { width: var(--z-loader); height: var(--z-loader); }
+.logo-loader.sm .logo-mark { width: var(--z-avatar); height: var(--z-avatar); }
+.logo-loader.lg .logo-mark { width: var(--z-logo-lg); height: var(--z-logo-lg); }
+.spin-logo { animation: spin calc(var(--d-spin) * 3) linear infinite, pulse var(--d-pulse) var(--ease) infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) { .spin-logo, .skel, .spin-slow { animation: none; } }
+
+/* Skeletons. */
+.skel {
+  display: block; height: var(--z-skel-line); border-radius: var(--r-xs);
+  background: linear-gradient(90deg, var(--c-container) 0%, var(--c-container-high) 50%, var(--c-container) 100%);
+  background-size: 200% 100%; animation: shimmer var(--d-shimmer) linear infinite;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.skel-rows { display: flex; flex-direction: column; }
+.skel-row { display: flex; align-items: center; gap: var(--s-xxl); min-height: var(--z-skel-row); padding: 0 var(--s-lg); border-bottom: var(--z-border) solid var(--c-outline-variant); }
+.skel-row:last-child { border-bottom: 0; }
+.skel-row > .skel:first-child { flex: none; }
+.card .skel-rows .skel-row { padding: 0; }
+
+/* Empty states. */
+.empty { display: flex; flex-direction: column; align-items: center; gap: var(--s-md); }
+.empty-icon { width: var(--z-touch); height: var(--z-touch); border-radius: var(--r-pill); display: grid; place-items: center; background: var(--c-container); color: var(--c-on-surface-variant); }
+.card .empty { padding: var(--s-xl) var(--s-md); }
+
+/* Tabs on farm pages. */
+.farm .tabs { scrollbar-width: none; }
+.farm .tabs::-webkit-scrollbar { display: none; }
+.tab-count { margin-left: var(--s-xs); padding: 0 var(--s-sm); border-radius: var(--r-pill); background: var(--c-container); font-size: var(--fs-label-sm); color: var(--c-on-surface-variant); }
+.tabs button[aria-selected='true'] .tab-count { background: var(--c-primary-container); color: var(--c-on-primary-container); }
+.farm .seg { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.farm .seg button { white-space: nowrap; }
+.chips { display: flex; flex-wrap: wrap; gap: var(--s-xs); }
+button.chip { border: var(--z-border) solid transparent; cursor: pointer; }
+button.chip:hover { border-color: var(--c-outline-variant); }
+
+/* Forms. */
+.field.has-error .input { border-color: var(--c-danger); }
+.field small { font-size: var(--fs-body-sm); }
+.field em { font-style: normal; }
+textarea.input { min-height: calc(var(--z-input) * 2); resize: vertical; }
+.check-row { display: flex; align-items: center; gap: var(--s-md); cursor: pointer; }
+.check-row input { width: var(--z-icon-sm); height: var(--z-icon-sm); accent-color: var(--c-primary); }
+
+/* Dialogs: wider option; a sheet from the bottom on phones. */
+.dialog.lg { max-width: var(--z-dialog-lg); }
+.dialog-head { display: flex; align-items: flex-start; gap: var(--s-md); }
+.dialog-form { gap: var(--s-lg); }
+.dialog-body { gap: var(--s-lg); }
+.dialog .actions { flex-wrap: wrap; align-items: center; }
+.dialog .kv { gap: var(--s-sm) var(--s-xl); }
+.dialog:focus { outline: none; }
+
+/* Toasts. */
+.toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: var(--s-xl); z-index: 70; display: flex; flex-direction: column; gap: var(--s-md); align-items: center; pointer-events: none; }
+.toast {
+  display: flex; align-items: center; gap: var(--s-md); padding: var(--s-md) var(--s-xl); border-radius: var(--r-pill);
+  background: var(--c-on-surface); color: var(--c-surface); font-weight: var(--fw-medium); box-shadow: 0 var(--z-shadow-y) var(--z-shadow-blur) var(--c-shadow);
+  animation: toast-in var(--d-toast) var(--ease);
+}
+@keyframes toast-in { from { opacity: 0; transform: translateY(var(--s-md)); } to { opacity: 1; transform: none; } }
+
+/* Quick actions on Home. */
+.quick .btn { width: 100%; height: 100%; justify-content: flex-start; }
+
+/* Rows inside cards: actions on the right. */
+.list-row .acts { display: flex; gap: var(--s-xs); flex: none; }
+.row-btn { border: 0; background: none; padding: 0; color: inherit; text-align: left; cursor: pointer; font: inherit; }
+.row-btn:hover { color: var(--c-primary); }
+.table tbody tr.clickable:focus-visible { outline: var(--z-focus) solid var(--c-primary); outline-offset: calc(var(--z-focus) * -1); }
+.task-done { text-decoration: line-through; color: var(--c-on-surface-variant); }
+.sync-dot { display: inline-flex; align-items: center; gap: var(--s-xs); font-size: var(--fs-label-sm); color: var(--c-on-surface-variant); }
+.sync-dot::before { content: ''; width: var(--z-dot); height: var(--z-dot); border-radius: var(--r-pill); background: var(--c-success); }
+.sync-dot.off::before { background: var(--c-danger); }
+.farm .menu-btn { display: none; }
+
+@media (max-width: 599px) {
+  .farm .content { padding: var(--s-md) var(--s-md) var(--s-lg); gap: var(--s-lg); }
+  .farm .page-head { align-items: stretch; }
+  .farm .head-actions { width: 100%; }
+  .farm .head-actions .search { flex: 1 1 100%; max-width: none; }
+  .farm .head-actions .btn:not(.outline) { flex: 1 1 auto; }
+  .farm .card { padding: var(--s-md) var(--s-lg); }
+  .farm .table-wrap:has(.rt), .supplier .table-wrap:has(.rt) { border: 0; background: transparent; overflow: visible; }
+  .farm .table-wrap:has(.rt) .empty, .farm .table-wrap:has(.rt) .skel-rows { background: var(--c-card); border-radius: var(--r-card); border: var(--z-border) solid var(--c-outline-variant); }
+  .btn-text { display: none; }
+  .table.rt td.hide-rt { display: none; }
+  .farm .table.rt td.lead::before, .supplier .table.rt td.lead::before { display: none; }
+  .farm .print-btn { display: none; }
+  .scrim { place-items: end stretch; padding: 0; }
+  .dialog, .dialog.lg { max-width: none; max-height: 92vh; border-radius: var(--r-xl) var(--r-xl) 0 0; padding: var(--s-lg); }
+  .dialog .actions { position: sticky; bottom: calc(var(--s-lg) * -1); background: var(--c-card); padding: var(--s-md) 0; margin-bottom: calc(var(--s-lg) * -1); }
+  .dialog .actions .btn { flex: 1 1 auto; }
+  .toasts { bottom: calc(var(--z-bottomnav) + var(--s-md)); }
+}
+@media print {
+  .toasts, .quick { display: none !important; }
+}
+.more-scrim { z-index: 25; bottom: var(--z-bottomnav); }
+.chart-box { position: relative; }
+.chart-empty { position: absolute; inset: 0 0 var(--s-xxl) 0; display: grid; place-items: center; text-align: center; pointer-events: none; }
+
+/* A chip inside a column keeps its own width instead of stretching. */
+.stack > .chip { align-self: flex-start; }
+/* One short field next to its button, not a field the width of the page. */
+.inline-form.short .field { flex: 0 1 var(--z-col-min); }
+
+/* ---- Sidebar head: clickable logo and open/close button ---- */
+.side-head { display: flex; align-items: center; gap: var(--s-xs); padding: var(--s-xs) var(--s-sm); min-height: var(--z-touch); }
+.side-logo { display: flex; align-items: center; gap: var(--s-md); flex: 1 1 auto; min-width: 0; color: var(--c-on-surface); text-decoration: none; border: 0; background: none; padding: var(--s-xxs); margin: calc(var(--s-xxs) * -1); border-radius: var(--r-sm); cursor: pointer; }
+.side-logo:hover { background: var(--c-container); }
+.side-logo:focus-visible, .side-toggle:focus-visible { outline: var(--z-focus) solid var(--c-primary); outline-offset: var(--z-focus); }
+.side-logo .icon { display: none; }
+.side-toggle { flex: none; color: var(--c-on-surface-variant); }
+.side-head .wide-only { display: none; }
+/* Rail width (tablets): logo only, no toggle. */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .side-head { justify-content: center; padding: var(--s-xs) 0; }
+  .side-logo { flex: none; }
+  .side-toggle { display: none; }
+}
+/* Wide screens: the person can close the sidebar to icons. */
+@media (min-width: 1024px) {
+  .shell { transition: grid-template-columns var(--d-toast) ease; }
+  .shell.side-closed { grid-template-columns: var(--z-rail) 1fr; }
+  .shell.side-closed .sidebar { padding: var(--s-lg) var(--s-sm); }
+  .shell.side-closed .sidebar .nav a { justify-content: center; padding: 0; }
+  .shell.side-closed .sidebar .nav a span, .shell.side-closed .sidebar .brand-text, .shell.side-closed .sidebar .side-foot, .shell.side-closed .sidebar .nav-group { display: none; }
+  .shell.side-closed .side-head { justify-content: center; padding: var(--s-xs) 0; }
+  .shell.side-closed .side-head .rail-only { display: none; }
+  .shell.side-closed .side-head .wide-only { display: flex; flex: none; }
+  /* Like a chat app: the logo turns into the "open" icon on hover. */
+  .shell.side-closed .side-logo.wide-only:hover .logo-mark, .shell.side-closed .side-logo.wide-only:focus-visible .logo-mark { display: none; }
+  .shell.side-closed .side-logo.wide-only:hover .icon, .shell.side-closed .side-logo.wide-only:focus-visible .icon { display: block; }
+}
+@media (prefers-reduced-motion: reduce) { .shell { transition: none; } }
+.sidebar a.side-logo, .sidebar a.side-logo:hover { text-decoration: none; color: var(--c-on-surface); }
+
+/* ---- Supplier portal: one page, no sidebar ---- */
+.shell.supplier { grid-template-columns: 1fr !important; }
+.shell.supplier .main { padding-bottom: var(--s-xl); }
+.shell.supplier .content { max-width: var(--z-content); width: 100%; margin: 0 auto; }
+.full-screen .box .icon { width: var(--z-loader); height: var(--z-loader); color: var(--c-primary); }

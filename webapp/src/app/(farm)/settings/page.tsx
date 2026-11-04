@@ -2,13 +2,14 @@
 
 import { doc, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
+import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
-import { PageHead } from '@/components/ui';
-import { saveError } from '@/lib/data';
+import { Field, PageHead, Seg, Tabs, useSave, useToast } from '@/components/ui';
+import { saveError, upsertRecord, useRecords } from '@/lib/data';
 import { ugandaDistricts } from '@/lib/districts';
-import { manages, planState } from '@/lib/domain';
-import { date } from '@/lib/format';
+import { isCentre, manages, planState } from '@/lib/domain';
+import { date, ugx } from '@/lib/format';
 import { firebase } from '@/lib/firebase';
 import { farmKind, planText, roleName } from '@/lib/labels';
 import { useFarm, useSession, useTheme, type ThemeChoice } from '@/lib/session';
@@ -26,9 +27,13 @@ function FarmProfile() {
   const [sms, setSms] = useState(farm.sms);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const toast = useToast();
+  const phoneOk = (p: string) => !p.trim() || /^\+?[\d\s-]{9,16}$/.test(p.trim());
 
   async function save(ev: FormEvent) {
     ev.preventDefault();
+    if (!name.trim()) return setMsg({ ok: false, text: 'The farm needs a name.' });
+    if (!phoneOk(whatsapp) || !phoneOk(sms)) return setMsg({ ok: false, text: 'A phone number does not look right. Example: 0772 123 456.' });
     setBusy(true);
     setMsg(null);
     try {
@@ -41,6 +46,7 @@ function FarmProfile() {
         'contacts.sms': sms.trim(),
       });
       await reloadFarms();
+      toast('Farm details saved');
       setMsg({ ok: true, text: 'Saved. The phones show the new details next time they open the farm.' });
     } catch (e) {
       setMsg({ ok: false, text: saveError((e as { code?: string }).code) });
@@ -54,9 +60,8 @@ function FarmProfile() {
       <form className="stack" onSubmit={save}>
         <div className="card-head">
           <h2>Farm details</h2>
-          <span className="chip brand">{farmKind(farm)}</span>
         </div>
-        <div className="grid">
+        <Fit kind="fields" cols={[1, 2, 3, 3]}>
           <label className="field">
             <span>Name</span>
             <input className="input" value={name} onChange={(e) => setName(e.target.value)} disabled={!boss} required />
@@ -82,13 +87,18 @@ function FarmProfile() {
             <span>SMS alerts number</span>
             <input className="input" type="tel" value={sms} onChange={(e) => setSms(e.target.value)} disabled={!boss} />
           </label>
-        </div>
+          <label className="field">
+            <span>Farm type</span>
+            <input className="input" value={farmKind(farm)} disabled readOnly />
+          </label>
+        </Fit>
         {msg && <div className={`banner ${msg.ok ? 'ok' : 'bad'}`}>{msg.text}</div>}
         {boss ? (
           <div className="row">
             <button className="btn" disabled={busy || !online}>
               {busy ? 'Saving…' : 'Save details'}
             </button>
+            {!online && <span className="small muted">No internet: saving is off.</span>}
           </div>
         ) : (
           <p className="small muted">Only the owner or manager can change farm details.</p>
@@ -184,67 +194,144 @@ function HelpSection() {
   );
 }
 
+/** The centre's price per litre (settings/centrePrice), the same number the centre phone uses. */
+function CentrePrice() {
+  const farm = useFarm();
+  const { user, canSave } = useSession();
+  const toast = useToast();
+  const boss = manages(farm);
+  const settings = useRecords<{ pricePerLitre?: number }>(farm.id, 'settings');
+  const current = settings.data.find((r) => r.id === 'centrePrice')?.body.pricePerLitre;
+  const [price, setPrice] = useState('');
+  const { busy, error, setError, run } = useSave();
+  useEffect(() => {
+    if (current != null) setPrice(String(current));
+  }, [current]);
+
+  async function save(ev: FormEvent) {
+    ev.preventDefault();
+    if (!user) return;
+    const n = Number(price);
+    if (!Number.isInteger(n) || n <= 0) return setError('Type the price for one litre in whole shillings, e.g. 1200.');
+    if (await run(() => upsertRecord(firebase().db, farm.id, 'settings', 'centrePrice', user.uid, { pricePerLitre: n }))) toast(`Price set to ${ugx(n)} a litre`);
+  }
+
+  return (
+    <section className="card">
+      <form className="stack" onSubmit={save}>
+        <div className="card-head">
+          <h2>Milk price paid to suppliers</h2>
+          {current != null && <span className="chip brand">{ugx(current)} a litre</span>}
+        </div>
+        <p className="small muted">Used for supplier statements and payouts on the centre phone.</p>
+        <div className="inline-form short">
+          <Field label="Price per litre (UGX)" error={error || null}>
+            <input className="input" type="number" min={1} step={1} inputMode="numeric" value={price} onChange={(e) => setPrice(e.target.value)} disabled={!boss} />
+          </Field>
+          {boss && (
+            <button className="btn" disabled={busy || !canSave}>
+              {busy ? 'Saving…' : 'Save price'}
+            </button>
+          )}
+        </div>
+      </form>
+    </section>
+  );
+}
+
+type Tab = 'farm' | 'plan' | 'account' | 'help';
+const TABS: readonly (readonly [Tab, string])[] = [
+  ['farm', 'Farm'],
+  ['plan', 'Plan and payment'],
+  ['account', 'Your account'],
+  ['help', 'Help'],
+];
+
 export default function Settings() {
   const farm = useFarm();
   const { user, farms, signOut } = useSession();
   const router = useRouter();
   const [theme, setTheme] = useTheme();
+  const [tab, setTabState] = useState<Tab>('farm');
+
+  // The tab lives in the address (#plan), so a link can open it.
+  useEffect(() => {
+    const read = () => {
+      const h = window.location.hash.slice(1) as Tab;
+      if (TABS.some(([t]) => t === h)) setTabState(h);
+    };
+    read();
+    window.addEventListener('hashchange', read);
+    return () => window.removeEventListener('hashchange', read);
+  }, []);
+  const setTab = (t: Tab) => {
+    setTabState(t);
+    history.replaceState(null, '', `#${t}`);
+  };
 
   return (
     <>
-      <PageHead title="Settings" />
+      <PageHead title="Settings" subtitle={`${farm.name} · ${farmKind(farm)}`} />
+      <Tabs label="Settings" value={tab} onChange={setTab} items={TABS} />
 
-      <FarmProfile />
+      {tab === 'farm' && (
+        <>
+          <FarmProfile />
+          {isCentre(farm) && <CentrePrice />}
+        </>
+      )}
 
-      <div className="grid cols">
-        <SubscriptionSection />
+      {tab === 'plan' && <SubscriptionSection />}
 
-        <section className="card stack">
-          <div className="card-head">
-            <h2>You</h2>
-            <span className="chip brand">{roleName(farm)}</span>
-          </div>
-          <div className="row">
-            <span className="avatar lg">{user?.photoURL ? <img src={user.photoURL} alt="" referrerPolicy="no-referrer" /> : (user?.displayName || user?.email || '?').slice(0, 1).toUpperCase()}</span>
-            <div className="stack" style={{ gap: 'var(--s-xxs)' }}>
-              <strong>{user?.displayName || 'No name'}</strong>
-              <span className="small muted">{user?.email}</span>
+      {tab === 'account' && (
+        <Fit kind="cards" cols={[1, 2, 2, 2]}>
+          <section className="card stack">
+            <div className="card-head">
+              <h2>You</h2>
+              <span className="chip brand">{roleName(farm)}</span>
             </div>
-          </div>
-          <p className="small muted">This browser stays signed in until you sign out. Sign out on shared computers.</p>
-          <div className="row wrap">
-            {farms && farms.length > 1 && (
-              <button className="btn outline" onClick={() => router.push('/farms/')}>
-                <Icon name="switch" /> Switch place
+            <div className="row">
+              <span className="avatar lg">
+                {user?.photoURL ? <img src={user.photoURL} alt="" referrerPolicy="no-referrer" /> : (user?.displayName || user?.email || '?').slice(0, 1).toUpperCase()}
+              </span>
+              <div className="stack" style={{ gap: 'var(--s-xxs)' }}>
+                <strong>{user?.displayName || 'No name'}</strong>
+                <span className="small muted">{user?.email}</span>
+              </div>
+            </div>
+            <p className="small muted">This browser stays signed in until you sign out. Sign out on shared computers.</p>
+            <div className="row wrap">
+              {farms && farms.length > 1 && (
+                <button className="btn outline" onClick={() => router.push('/farms/')}>
+                  <Icon name="switch" /> Switch place
+                </button>
+              )}
+              <button className="btn outline" onClick={() => void signOut().then(() => router.replace('/sign-in/'))}>
+                <Icon name="logout" /> Sign out
               </button>
-            )}
-            <button className="btn outline" onClick={() => void signOut().then(() => router.replace('/sign-in/'))}>
-              <Icon name="logout" /> Sign out
-            </button>
-          </div>
-        </section>
+            </div>
+          </section>
 
-        <section className="card stack">
-          <div className="card-head">
-            <h2>Look</h2>
-          </div>
-          <div className="seg" role="group" aria-label="Theme">
-            {(
-              [
+          <section className="card stack">
+            <div className="card-head">
+              <h2>Look</h2>
+            </div>
+            <p className="small muted">Dark is easier on the eyes at night and saves battery on many phones.</p>
+            <Seg
+              label="Theme"
+              value={theme}
+              onChange={(v: ThemeChoice) => setTheme(v)}
+              items={[
                 ['device', 'Same as device'],
                 ['light', 'Light'],
                 ['dark', 'Dark'],
-              ] as [ThemeChoice, string][]
-            ).map(([v, l]) => (
-              <button key={v} aria-pressed={theme === v} onClick={() => setTheme(v)}>
-                {l}
-              </button>
-            ))}
-          </div>
-        </section>
+              ]}
+            />
+          </section>
+        </Fit>
+      )}
 
-        <HelpSection />
-      </div>
+      {tab === 'help' && <HelpSection />}
     </>
   );
 }

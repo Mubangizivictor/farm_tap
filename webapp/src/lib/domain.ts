@@ -122,12 +122,13 @@ export interface AnimalBody {
   sex: 'female' | 'male';
   breed: string;
   dateOfBirth: string;
-  status: 'active' | 'sold' | 'deceased' | 'transferred' | 'dead';
+  status: 'active' | 'sold' | 'deceased' | 'transferred';
   govIdTag?: string | null;
   dairyStatus: 'milking' | 'dry' | 'treated' | 'pregnant' | 'heifer' | 'calf' | 'bull';
   avatarIndex?: number;
   group?: string | null;
   motherTag?: string | null;
+  photo?: string | null;
 }
 
 export interface MilkBody {
@@ -146,9 +147,14 @@ export interface TreatmentBody {
   drugId: string;
   withdrawalDays: number;
   given: string;
-  dose?: string | number;
+  dose?: string | null;
   route?: string;
-  givenBy?: string;
+  givenBy?: string | null;
+  courseDays?: number;
+  animalDry?: boolean;
+  avatarIndex?: number;
+  note?: string | null;
+  photo?: string | null;
 }
 
 export interface ExpenseBody {
@@ -169,6 +175,13 @@ export interface StaffBody {
   since?: string | null;
   active?: boolean;
   photoUrl?: string | null;
+  department?: string | null;
+  nationalId?: string | null;
+  village?: string | null;
+  emergencyName?: string | null;
+  emergencyPhone?: string | null;
+  login?: string;
+  pinHash?: string;
 }
 
 export interface FarmerBody {
@@ -176,6 +189,10 @@ export interface FarmerBody {
   phone: string;
   village?: string;
   card?: string | null;
+  photo?: string | null;
+  photoUrl?: string | null;
+  since?: string | null;
+  smsReceipts?: boolean;
 }
 
 export interface DeliveryBody {
@@ -188,12 +205,19 @@ export interface DeliveryBody {
   note?: string | null;
 }
 
+/** Clock-in and clock-out events (phone: event 'in' | 'out', at; 'out' points at its 'in'). */
 export interface AttendanceBody {
   staffId: string;
+  event?: 'in' | 'out';
+  inId?: string;
+  method?: string;
   inAt?: string;
   outAt?: string | null;
   at?: string;
 }
+
+/** Clock-ins only: an 'out' event is not a second arrival. */
+export const isClockIn = (a: FarmRecord<AttendanceBody>) => !a.isDeleted && a.body.event !== 'out';
 
 export interface WageBody {
   staffId: string;
@@ -202,18 +226,64 @@ export interface WageBody {
   at: string;
 }
 
+/**
+ * A task as the phone saves it (sectors/cattle/workers, FarmTask): who does
+ * it (staffId), the day it is due, a worded time ("before 10:00") and when
+ * it was done. `note` and `priority` are web extras the phone keeps.
+ * Older web tasks used assignedTo/dueDate/status; [taskView] reads both.
+ */
 export interface TaskBody {
   title: string;
+  staffId: string;
+  due: string;
+  when: string;
+  doneAt: string | null;
+  note?: string | null;
+  priority?: 'normal' | 'high' | null;
+  // Older web shape (read only).
+  assignedTo?: string;
+  dueDate?: string;
+  status?: 'open' | 'done' | 'cancelled';
   description?: string;
-  assignedTo?: string;   // staffId
-  assignedToName?: string;
-  dueDate?: string;      // localIso date
-  status: 'open' | 'done' | 'cancelled';
-  priority: 'low' | 'normal' | 'high';
   completedAt?: string | null;
-  completedBy?: string | null;
-  completedByName?: string | null;
-  category?: string;     // 'milk' | 'health' | 'feeding' | 'general' | 'cleaning' | 'other'
+}
+
+export interface TaskView {
+  title: string;
+  staffId: string;
+  due: Date | null;
+  when: string;
+  doneAt: Date | null;
+  done: boolean;
+  note: string;
+  priority: 'normal' | 'high';
+}
+
+export function taskView(b: TaskBody): TaskView {
+  const doneAt = parseDate(b.doneAt ?? b.completedAt ?? null);
+  return {
+    title: b.title ?? '',
+    staffId: b.staffId ?? b.assignedTo ?? '',
+    due: parseDate(b.due ?? b.dueDate ?? null),
+    when: b.when ?? '',
+    doneAt,
+    done: doneAt != null || b.status === 'done' || b.status === 'cancelled',
+    note: b.note ?? b.description ?? '',
+    priority: b.priority === 'high' ? 'high' : 'normal',
+  };
+}
+
+/** Body for a task in the phone's shape, keeping fields it does not know. */
+export function taskBody(v: { title: string; staffId: string; due: Date; when: string; doneAt: Date | null; note?: string; priority?: 'normal' | 'high' }, iso: (d: Date) => string) {
+  return {
+    title: v.title,
+    staffId: v.staffId,
+    due: iso(v.due),
+    when: v.when,
+    doneAt: v.doneAt ? iso(v.doneAt) : null,
+    note: v.note?.trim() || null,
+    priority: v.priority ?? 'normal',
+  };
 }
 
 export interface MilkSaleBody {
@@ -221,7 +291,101 @@ export interface MilkSaleBody {
   litres: number;
   pricePerLitre: number;
   paid?: boolean;
-  kind?: string;
+  kind?: 'centre' | 'shop' | 'neighbours' | string;
+}
+
+/** A later "paid" or "not paid" mark on a milk sale (id `pay-<saleId>`). */
+export interface MilkSalePaymentBody {
+  saleId: string;
+  paid: boolean;
+}
+
+export const buyerKinds = ['centre', 'shop', 'neighbours'] as const;
+
+/** Paid, with a later mark from milkSalePayments winning (local_milk_repository). */
+export function salePaid(sale: FarmRecord<MilkSaleBody>, marks: FarmRecord<MilkSalePaymentBody>[]): boolean {
+  const m = marks.find((x) => !x.isDeleted && x.body.saleId === sale.id);
+  return m ? m.body.paid !== false : sale.body.paid === true;
+}
+
+export const saleValue = (s: MilkSaleBody) => (Number(s.litres) || 0) * (Number(s.pricePerLitre) || 0);
+
+/** Farm income that is not a milk sale (core/money IncomeSource). */
+export interface IncomeBody {
+  source: 'animalSale' | 'manure' | 'calfSale' | 'hire' | 'other' | string;
+  amount: number;
+  at: string;
+  note?: string | null;
+  sourceId?: string | null;
+}
+
+export const incomeSources = ['animalSale', 'calfSale', 'manure', 'hire', 'other'] as const;
+
+/** One card in the farm's register, id = 4-digit number (core/people LocalCardRegistry). */
+export interface NfcCardBody {
+  personId: string;
+  personType: 'staff' | 'farmer';
+  personName: string;
+  status: 'active' | 'returned' | 'lost';
+  chipId?: string | null;
+  issuedAt?: string | null;
+  endedAt?: string | null;
+}
+
+/** Staff roles on the phone (core/people StaffRole). */
+export const staffRoles = ['worker', 'herdsman', 'clerk', 'vet', 'manager'] as const;
+
+// ---------------------------------------------------------------- Health
+
+/** Conditions and routes the phone knows (health_models.dart). */
+export const conditions = ['mastitis', 'lame', 'fever', 'wound', 'eye', 'diarrhoea', 'other'] as const;
+export const drugRoutes = ['injection', 'oral', 'spray', 'pourOn'] as const;
+
+export interface Drug {
+  id: string;
+  name: string;
+  withdrawalDays: number;
+}
+
+/** The phone's starter drugs (LocalTreatmentRepository.starterDrugs). Same ids, so records match. */
+export const starterDrugs: Drug[] = [
+  { id: 'drug-penstrep', name: 'Penicillin-Streptomycin', withdrawalDays: 4 },
+  { id: 'drug-oxy', name: 'Oxytetracycline 20%', withdrawalDays: 8 },
+  { id: 'drug-albendazole', name: 'Albendazole dewormer', withdrawalDays: 3 },
+  { id: 'drug-acaricide', name: 'Acaricide (dip)', withdrawalDays: 0 },
+];
+
+export interface StockItemBody {
+  kind: string;
+  name?: string;
+  withdrawalDays?: number;
+  stock?: number;
+  unit?: string;
+}
+
+/** The farm's drugs: the ones saved in stock, then the starter ones not replaced. */
+export function drugsFrom(stock: FarmRecord<StockItemBody>[]): Drug[] {
+  const saved = stock
+    .filter((r) => !r.isDeleted && r.body.kind === 'drug')
+    .map((r) => ({ id: r.id, name: r.body.name ?? '', withdrawalDays: Number(r.body.withdrawalDays) || 0 }));
+  const ids = new Set(saved.map((d) => d.id));
+  return [...saved, ...starterDrugs.filter((d) => !ids.has(d.id))];
+}
+
+/** Next free tag in the phone's form, FT-001 (LocalHerdRepository.nextTag). */
+export function nextTag(animals: FarmRecord<AnimalBody>[]): string {
+  let max = 0;
+  for (const a of animals) {
+    const n = Number.parseInt((a.body.tagNumber ?? '').replace(/\D/g, ''), 10);
+    if (Number.isFinite(n) && n > max) max = n;
+  }
+  return `FT-${String(max + 1).padStart(3, '0')}`;
+}
+
+/** Another living animal already has this tag (the phone refuses it too). */
+export function tagTaken(animals: FarmRecord<AnimalBody>[], tag: string, exceptId?: string): boolean {
+  const t = tag.trim().toLowerCase();
+  return animals.some((a) => a.id !== exceptId && isActiveAnimal(a) && (a.body.tagNumber ?? '').toLowerCase() === t);
 }
 
 export const expenseCategories = ['feed', 'vet', 'breeding', 'wages', 'transport', 'fuel', 'equipment', 'other'] as const;
