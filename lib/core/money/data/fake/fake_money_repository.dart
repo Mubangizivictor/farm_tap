@@ -71,7 +71,8 @@ class FakeMoneyRepository implements MoneyRepository, Restorable {
       _expenses.add(
         Expense(
           id: r.id,
-          category: ExpenseCategory.values.byName(b['category']! as String),
+          // The web may add categories later; an unknown one shows as Other.
+          category: ExpenseCategory.values.asNameMap()[b['category']] ?? ExpenseCategory.other,
           amount: (b['amount']! as num).round(),
           at: DateTime.parse(b['at']! as String),
           note: b['note'] as String?,

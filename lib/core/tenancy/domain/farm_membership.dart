@@ -7,8 +7,10 @@ enum PlaceKind { dairyFarm, collectionCentre }
 
 enum PlaceRole { owner, manager, clerk, worker }
 
-/// Length of the free trial for a new farm (owner's decision, 3 Nov 2026).
-const freeTrialDays = 7;
+/// Length of the free trial for a new farm (Victor, 4 Nov 2026; decision
+/// 0023). The control panel can change it for new farms (platform/config
+/// trialDays); the server caps what a phone may set.
+const freeTrialDays = 14;
 
 /// What the farm may do today. Calculated from [Subscription], never stored.
 enum SubscriptionState { trial, active, grace, readOnly }
@@ -27,8 +29,9 @@ class Subscription extends Equatable {
   /// First day not covered by the last payment.
   final DateTime? paidUntil;
 
-  /// An overdue payment gets 7 days' grace before read-only.
-  static const graceDays = 7;
+  /// No grace (decision 0023): the farm locks the day its plan ends, the
+  /// same as firestore.rules. Support extends paid-until when needed.
+  static const graceDays = 0;
 
   static DateTime _day(DateTime d) => DateTime(d.year, d.month, d.day);
 

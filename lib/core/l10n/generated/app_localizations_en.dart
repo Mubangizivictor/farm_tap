@@ -303,7 +303,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signUpTitle => 'Create your account';
 
   @override
-  String get signUpSubtitle => 'You\'ll set up your farm next. 7 days free.';
+  String get signUpSubtitle => 'You\'ll set up your farm next. 14 days free.';
 
   @override
   String get fullNameLabel => 'Full name';
