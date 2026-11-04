@@ -198,6 +198,11 @@ service cloud.firestore {
           || request.resource.data.deletion.at == request.time)
         && farmLimit(request.resource.data) == farmLimit(resource.data)
         && request.resource.data.get('disabled', false) == resource.data.get('disabled', false)
+        // Profile photo: a small copy only (decision 0024); the full one is in file storage.
+        && (request.resource.data.get('photo', null) == null
+          || (request.resource.data.photo.keys().hasOnly(['thumb', 'url', 'updatedAt'])
+            && request.resource.data.photo.thumb is string
+            && request.resource.data.photo.thumb.size() < 200000))
         && ownedFarms(request.resource.data) >= ownedFarms(resource.data)
         && ownedFarms(request.resource.data) <= ownedFarms(resource.data) + 1;
     }

@@ -122,7 +122,7 @@ export const defaultConfig: PlatformConfig = {
   payments: { gateways: defaultGateways, manualNote: 'After paying, send the transaction ID to FarmTap support on WhatsApp.' },
   maps: { provider: 'none', appKey: '' },
   sms: { autoSendAvailable: false, pricePerSmsUgx: 35 },
-  legal: { termsUrl: '', privacyUrl: '' },
+  legal: { termsUrl: '/terms/', privacyUrl: '/privacy/' },
   defaultPlanId: '',
 };
 
@@ -192,7 +192,7 @@ export function configFromDoc(data: unknown): PlatformConfig {
     },
     maps: { provider: (['none', 'google', 'mapbox', 'openstreetmap'].includes(provider) ? provider : 'none') as PlatformConfig['maps']['provider'], appKey: str(maps.appKey, '') },
     sms: { autoSendAvailable: bool(sms.autoSendAvailable, false), pricePerSmsUgx: numv(sms.pricePerSmsUgx, D.sms.pricePerSmsUgx) },
-    legal: { termsUrl: str(legal.termsUrl, ''), privacyUrl: str(legal.privacyUrl, '') },
+    legal: { termsUrl: str(legal.termsUrl, '') || '/terms/', privacyUrl: str(legal.privacyUrl, '') || '/privacy/' },
     defaultPlanId: str(d.defaultPlanId, ''),
   };
 }

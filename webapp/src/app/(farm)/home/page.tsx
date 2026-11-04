@@ -1,5 +1,6 @@
 'use client';
 
+import { personPhotoSrc } from '@/lib/images';
 import Link from 'next/link';
 import { Fit } from '@/components/fit';
 import { Icon, type IconName } from '@/components/Icon';
@@ -341,7 +342,7 @@ export default function Home() {
             const inAt = a ? (parseDate(a.body.inAt ?? a.body.at) ?? recordDate(a)) : null;
             return (
               <div key={s.id} className="list-row">
-                <span className="avatar">{s.body.photoUrl ? <img src={s.body.photoUrl} alt="" /> : s.body.name.slice(0, 1).toUpperCase()}</span>
+                <span className="avatar">{personPhotoSrc(s.body) ? <img src={personPhotoSrc(s.body)!} alt="" /> : s.body.name.slice(0, 1).toUpperCase()}</span>
                 <div className="grow">
                   <div>{s.body.name}</div>
                   <div className="small muted">{s.body.title || words(s.body.role)}</div>

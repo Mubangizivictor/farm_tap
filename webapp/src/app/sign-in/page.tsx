@@ -98,7 +98,7 @@ export default function SignIn() {
   useEffect(() => {
     try {
       const next = new URLSearchParams(window.location.search).get('next');
-      if (next && /^\/supplier(-invite)?\//.test(next)) sessionStorage.setItem('farmtap.next', next);
+      if (next && /^\/(supplier|supplier-invite|delete-account)\//.test(next)) sessionStorage.setItem('farmtap.next', next);
     } catch {
       /* storage blocked: the start page still opens the farm */
     }

@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Icon, type IconName } from '@/components/Icon';
 import { SideHead, useSidebar } from '@/components/side';
 import { Loading } from '@/components/Loading';
+import { ClosedAccountScreen } from '@/components/account';
 import { ToastProvider } from '@/components/ui';
 import { hasHerd, isCentre, manages, planState, type Farm } from '@/lib/domain';
 import { date, initials } from '@/lib/format';
@@ -63,14 +64,14 @@ function ThemeSwitch() {
 }
 
 function UserMenu() {
-  const { user, canSwitch, signOut } = useSession();
+  const { user, canSwitch, signOut, photo } = useSession();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const name = user?.displayName || user?.email || '';
   return (
     <div className="rel">
       <button className="icon-btn" aria-label="Account" aria-expanded={open} onClick={() => setOpen(!open)}>
-        <span className="avatar">{user?.photoURL ? <img src={user.photoURL} alt="" referrerPolicy="no-referrer" /> : initials(name)}</span>
+        <span className="avatar">{photo ? <img src={photo} alt="" referrerPolicy="no-referrer" /> : initials(name)}</span>
       </button>
       {open && (
         <div className="menu" role="menu" onMouseLeave={() => setOpen(false)}>
@@ -165,6 +166,12 @@ function Banners({ farm }: { farm: Farm }) {
           <button className="icon-btn" aria-label="Dismiss" onClick={() => setRefreshDismissed(true)}><Icon name="close" /></button>
         </div>
       )}
+      {farm.closed && (
+        <div className="banner bad" role="status">
+          <Icon name="lock" />
+          <span className="grow">This farm was closed by its owner. You can look at records but not add new ones.</span>
+        </div>
+      )}
       {farm.farmStatus === 'suspended' && (
         <div className="banner bad" role="status">
           <Icon name="pause" />
@@ -254,7 +261,7 @@ function LockScreen({ farm, onView }: { farm: Farm; onView: () => void }) {
 }
 
 function FarmShell({ children }: { children: ReactNode }) {
-  const { user, farms, farm, online } = useSession();
+  const { user, farms, farm, online, closed } = useSession();
   const { config } = usePlatform();
   const router = useRouter();
   const path = usePathname();
@@ -279,6 +286,7 @@ function FarmShell({ children }: { children: ReactNode }) {
     }
   }, [farm]);
 
+  if (user && closed) return <ClosedAccountScreen />;
   if (!user || !farm) return <Loading />;
 
   // Maintenance mode: admins bypass
