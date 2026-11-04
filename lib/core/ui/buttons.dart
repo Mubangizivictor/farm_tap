@@ -177,7 +177,8 @@ class TextAction extends StatelessWidget {
                     children: [
                       Icon(icon, fill: 1, size: context.sizes.iconMd, color: style?.color),
                       context.space.gapSm,
-                      Text(label, style: style),
+                      // Long labels wrap instead of overflowing (large text).
+                      Flexible(child: Text(label, style: style, textAlign: TextAlign.center)),
                     ],
                   ),
           ),
