@@ -90,7 +90,19 @@ export interface PlatformConfig {
   sms: { autoSendAvailable: boolean; pricePerSmsUgx: number };
   legal: { termsUrl: string; privacyUrl: string };
   defaultPlanId: string;
+  /** Server jobs that need the paid server plan (decision 0024); all off until switched on. */
+  server: Record<ServerSwitch, boolean>;
 }
+
+export const serverSwitchList = [
+  { key: 'alerts', label: 'Daily reminders', hint: 'Phone notifications, and SMS or WhatsApp queued for duties, vaccinations, calving and plan endings.' },
+  { key: 'autoSms', label: 'Automatic SMS', hint: 'Sends queued SMS through the SMS company (APIs and keys, SMS).' },
+  { key: 'whatsappApi', label: 'Automatic WhatsApp', hint: 'Sends queued WhatsApp messages through the WhatsApp Business API.' },
+  { key: 'billingPdf', label: 'Receipt PDFs on the server', hint: 'Keeps a PDF copy of every receipt, invoice and refund note in file storage.' },
+  { key: 'refundsApi', label: 'Refunds through providers', hint: 'Approved refunds are sent through MTN, Airtel or card automatically.' },
+  { key: 'accountErase', label: 'Erase after 90 days', hint: 'Deleted accounts are erased for good 90 days after they were closed.' },
+] as const;
+export type ServerSwitch = (typeof serverSwitchList)[number]['key'];
 
 export const defaultGateways: Gateway[] = [
   { id: 'mtn', name: 'MTN Mobile Money', enabled: false, hidden: false, api: true, payCode: '', accountName: 'Victorbee Technologies', instructions: 'Dial *165*3#, choose MoMoPay, enter the pay code and the amount.' },
@@ -124,6 +136,7 @@ export const defaultConfig: PlatformConfig = {
   sms: { autoSendAvailable: false, pricePerSmsUgx: 35 },
   legal: { termsUrl: '/terms/', privacyUrl: '/privacy/' },
   defaultPlanId: '',
+  server: { alerts: false, autoSms: false, whatsappApi: false, billingPdf: false, refundsApi: false, accountErase: false },
 };
 
 const obj = (v: unknown): Record<string, unknown> => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
@@ -194,6 +207,7 @@ export function configFromDoc(data: unknown): PlatformConfig {
     sms: { autoSendAvailable: bool(sms.autoSendAvailable, false), pricePerSmsUgx: numv(sms.pricePerSmsUgx, D.sms.pricePerSmsUgx) },
     legal: { termsUrl: str(legal.termsUrl, '') || '/terms/', privacyUrl: str(legal.privacyUrl, '') || '/privacy/' },
     defaultPlanId: str(d.defaultPlanId, ''),
+    server: Object.fromEntries(serverSwitchList.map((x) => [x.key, bool(obj(d.server)[x.key], false)])) as Record<ServerSwitch, boolean>,
   };
 }
 
@@ -407,6 +421,10 @@ export const secretList = [
   { key: 'airtel_callback_token', group: 'Airtel Money', label: 'Callback secret (any long random text, also set in the Airtel portal callback URL)' },
   { key: 'mtn_callback_token', group: 'MTN MoMo', label: 'Callback secret (any long random text)' },
   { key: 'maps_server_key', group: 'Maps', label: 'Server key (geocoding, district lookup)' },
+  { key: 'whatsapp_token', group: 'WhatsApp', label: 'WhatsApp Business API permanent access token' },
+  { key: 'mtn_disbursement_key', group: 'Refunds', label: 'MTN MoMo Disbursement subscription key (Ocp-Apim)' },
+  { key: 'mtn_disbursement_user', group: 'Refunds', label: 'MTN MoMo Disbursement API user (UUID)' },
+  { key: 'mtn_disbursement_api_key', group: 'Refunds', label: 'MTN MoMo Disbursement API key' },
 ] as const;
 
 /** "sk_live_abcd1234" -> "••••1234". Never shows more than four characters. */

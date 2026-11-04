@@ -39,7 +39,7 @@ export const defaultSite: SiteContent = {
     { icon: 'farmers', title: 'Collection centres', text: 'Receive milk by card, send receipts, pay farmers and print statements.' },
     { icon: 'money', title: 'Money and reports', text: 'Every cost linked to its work. Profit, cost of a litre and monthly reports in PDF or Excel.' },
   ],
-  steps: ['Sign in with Google, Apple or email', 'Set up your farm in 2 minutes', 'Record from day one: the first 14 days are free'],
+  steps: ['Sign in with Google, Apple or email', 'Set up your farm in 2 minutes', 'Record from day one: the first {trialDays} days are free'],
   faq: [
     { q: 'Does FarmTap work without internet?', a: 'Yes. The phone app saves everything on the phone and sends it when the network comes back.' },
     { q: 'Can my workers use it?', a: 'Yes. Each worker gets a card and a PIN, and only sees the work you allow.' },

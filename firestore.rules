@@ -253,7 +253,10 @@ service cloud.firestore {
       allow update: if audited()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(adminFarmKeys())
         && (can('farms') || (can('finance')
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['subscription', 'planId', 'billing', 'smsCredits', 'lastAudit'])));
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['subscription', 'planId', 'billing', 'smsCredits', 'lastAudit']))
+          // Restoring a deleted account (Users access) reopens its farms.
+          || (can('users') && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['closure', 'lastAudit'])
+            && request.resource.data.get('closure', null) == null));
       // Onboarding: the signer creates the farm as its owner, on trial.
       allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.subscription.keys().hasOnly(['trialStartedAt', 'trialEndsAt'])

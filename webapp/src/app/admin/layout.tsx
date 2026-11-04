@@ -24,11 +24,16 @@ const nav: NavItem[] = [
   { href: '/admin/farms/', label: 'Farms', icon: 'home', any: ['farms', 'support', 'finance', 'users'], group: 'Business' },
   { href: '/admin/money/', label: 'Payments', icon: 'receipt', any: ['finance'], group: 'Business' },
   { href: '/admin/plans/', label: 'Plans and SMS', icon: 'tag', any: ['finance'], group: 'Business' },
+  { href: '/admin/refunds/', label: 'Receipts and refunds', icon: 'receipt', any: ['finance'], group: 'Business' },
   { href: '/admin/users/', label: 'Users', icon: 'workers', any: ['users', 'support'], group: 'People' },
+  { href: '/admin/deletions/', label: 'Deleted accounts', icon: 'refresh', any: ['users', 'support'], group: 'People' },
   { href: '/admin/announce/', label: 'Announcements', icon: 'megaphone', any: ['messages'], group: 'People' },
   { href: '/admin/staff/', label: 'Admin staff', icon: 'shield', any: ['staff'], group: 'People' },
   { href: '/admin/settings/', label: 'App settings', icon: 'settings', any: ['settings'], group: 'Platform' },
   { href: '/admin/integrations/', label: 'APIs and keys', icon: 'key', any: ['settings', 'secrets'], group: 'Platform' },
+  { href: '/admin/branding/', label: 'Brand and documents', icon: 'edit', any: ['settings'], group: 'Platform' },
+  { href: '/admin/legal/', label: 'Legal documents', icon: 'shield', any: ['settings'], group: 'Platform' },
+  { href: '/admin/website/', label: 'Website', icon: 'globe', any: ['settings'], group: 'Platform' },
   { href: '/admin/audit/', label: 'Audit log', icon: 'list', any: ['audit'], group: 'Platform' },
 ];
 

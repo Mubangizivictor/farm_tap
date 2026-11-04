@@ -28,6 +28,7 @@ export default function Landing() {
   const wa = cfg?.support.whatsapp ?? phone;
   const trial = cfg?.trialDays ?? 14;
   const start = user ? '/start/' : '/sign-in/';
+  const steps = (site?.steps ?? []).map((x) => x.replaceAll('{trialDays}', String(trial)));
 
   return (
     <PublicShell>
@@ -75,7 +76,7 @@ export default function Landing() {
           <div className="logo-mark" />
           <strong>Tap. Record. Grow.</strong>
           <ul className="hero-ticks">
-            {(site?.steps ?? []).map((s) => (
+            {steps.map((s) => (
               <li key={s}>
                 <Icon name="check" /> {s}
               </li>
@@ -143,7 +144,7 @@ export default function Landing() {
       <section className="sec">
         <h2>Start in three steps</h2>
         <ol className="steps">
-          {(site?.steps ?? []).map((s) => (
+          {steps.map((s) => (
             <li key={s}>{s}</li>
           ))}
         </ol>

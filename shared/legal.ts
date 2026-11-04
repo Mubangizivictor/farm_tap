@@ -173,7 +173,7 @@ const TERMS = `These Terms of Use are the agreement between you and **{company}*
 - The owner of a farm decides who joins it and what each person can do, and can remove people at any time.
 
 ## 3. Free trial, plans and payment
-- A new farm gets a **free trial** (14 days unless we announce otherwise). No payment details are needed for the trial.
+- A new farm gets a **free trial** (the number of days shown when you sign up). No payment details are needed for the trial.
 - After the trial, a **paid plan** is needed to keep adding records. The plans and prices are shown in the app and on our website, in Uganda shillings (UGX), and may include taxes as shown.
 - You can pay with MTN Mobile Money, Airtel Money, card, or any other way shown in the app. A plan starts when the payment is confirmed and runs for the period paid.
 - **When a plan or trial ends and is not paid, the farm becomes read-only:** you can still open and download your records, but you cannot add or change them until you pay. There is no automatic renewal: you choose when to pay again.

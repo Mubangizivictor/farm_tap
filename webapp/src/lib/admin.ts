@@ -81,6 +81,8 @@ export interface Integrations {
   sms: { provider: 'none' | 'africastalking' | 'twilio'; username: string; senderId: string };
   payments: { mode: 'sandbox' | 'live'; callbackUrl: string; mtnEnvironment: string; airtelCountry: string };
   maps: { provider: string };
+  /** WhatsApp Business API (decision 0024): the sending number's id and the approved template. */
+  whatsapp: { phoneNumberId: string; template: string; language: string };
   secrets: Record<string, SecretInfo>;
 }
 
@@ -105,6 +107,11 @@ export async function loadIntegrations(): Promise<Integrations> {
       airtelCountry: pay.airtelCountry ?? 'UG',
     },
     maps: { provider: ((d.maps ?? {}) as Record<string, string>).provider ?? 'none' },
+    whatsapp: {
+      phoneNumberId: String((d.whatsapp as Record<string, unknown> | undefined)?.phoneNumberId ?? ''),
+      template: String((d.whatsapp as Record<string, unknown> | undefined)?.template ?? ''),
+      language: String((d.whatsapp as Record<string, unknown> | undefined)?.language ?? 'en'),
+    },
     secrets,
   };
 }

@@ -99,3 +99,12 @@
 .stack.tight { gap: var(--s-xxs); }
 .field.short { max-width: var(--z-col-min); }
 .list-row.wrap { flex-wrap: wrap; }
+.split-2-1 { display: grid; gap: var(--s-lg); grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 1024px) {
+  .split-2-1 { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+}
+.site-row { align-items: flex-end; padding-bottom: var(--s-md); border-bottom: var(--z-border) solid var(--c-outline-variant); }
+.site-row .field { min-width: var(--z-stat-min); }
+.site-row .grow { flex: 1; }
+.site-icon { max-width: var(--z-stat-min); }
+.how-list { margin: 0; padding-left: var(--s-xl); display: flex; flex-direction: column; gap: var(--s-sm); line-height: var(--lh); }
