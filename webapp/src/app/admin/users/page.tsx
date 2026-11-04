@@ -89,7 +89,7 @@ function Accounts() {
       </div>
       <MsgBanner msg={act.msg} />
       <div className="table-wrap">
-        <table className="table">
+        <table className="table rt">
           <thead>
             <tr>
               <th>Person</th>
@@ -102,13 +102,13 @@ function Accounts() {
           <tbody>
             {list.map((a) => (
               <tr key={a.uid}>
-                <td>
+                <td className="lead">
                   <div className="stack" style={{ gap: 0 }}>
                     <strong>{a.name || 'No name'}</strong>
                     <span className="small muted">{a.email || a.phone || a.uid}</span>
                   </div>
                 </td>
-                <td style={{ whiteSpace: 'normal' }}>
+                <td className="wide" data-label="Farms" style={{ whiteSpace: 'normal' }}>
                   {a.farms.map((f) => (
                     <Link key={f.id} href={`/admin/farm/?id=${f.id}`} className="chip brand" style={{ marginRight: 'var(--s-xs)', textDecoration: 'none' }}>
                       {f.name}
@@ -116,9 +116,9 @@ function Accounts() {
                   ))}
                   {!a.farms.length && <span className="muted small">None</span>}
                 </td>
-                <td>{a.worker ? 'Worker (phone + PIN)' : a.ownedFarms ? `Owner${a.farmLimit > 1 ? `, up to ${a.farmLimit} farms` : ''}` : 'Manager'}</td>
-                <td>{a.disabled ? <span className="chip bad" title={a.disabledReason}>Disabled</span> : <span className="chip ok">Active</span>}</td>
-                <td className="r">
+                <td data-label="Kind">{a.worker ? 'Worker (phone + PIN)' : a.ownedFarms ? `Owner${a.farmLimit > 1 ? `, up to ${a.farmLimit} farms` : ''}` : 'Manager'}</td>
+                <td data-label="Status">{a.disabled ? <span className="chip bad" title={a.disabledReason}>Disabled</span> : <span className="chip ok">Active</span>}</td>
+                <td className="r acts">
                   {can('users') &&
                     (a.disabled ? (
                       <button className="btn sm outline" disabled={act.busy} onClick={() => void setDisabled(a, false)}>
@@ -159,8 +159,8 @@ function Waitlist() {
   });
   return (
     <>
-      <div className="row">
-        <span className="small muted grow">People who asked for a sector that is not open yet. Tell them first when it opens.</span>
+      <div className="row wrap">
+        <span className="small muted grow-field">People who asked for a sector that is not open yet. Tell them first when it opens.</span>
         <button
           className="btn sm outline"
           onClick={() =>
@@ -171,7 +171,7 @@ function Waitlist() {
         </button>
       </div>
       <div className="table-wrap">
-        <table className="table">
+        <table className="table rt">
           <thead>
             <tr>
               <th>Name</th>
@@ -183,16 +183,18 @@ function Waitlist() {
           <tbody>
             {(list.data ?? []).map((w) => (
               <tr key={w.id}>
-                <td>{w.name}</td>
-                <td>
+                <td className="lead">
+                  <strong>{w.name || 'No name'}</strong>
+                </td>
+                <td data-label="WhatsApp">
                   {w.whatsapp && (
                     <a href={`https://wa.me/${w.whatsapp.replace(/\D/g, '').replace(/^0/, '256')}`} target="_blank" rel="noreferrer">
                       {w.whatsapp}
                     </a>
                   )}
                 </td>
-                <td>{sectorName[w.sector ?? ''] ?? w.sector}</td>
-                <td>{shortDate(parseDate(w.createdAt))}</td>
+                <td data-label="Sector">{sectorName[w.sector ?? ''] ?? w.sector}</td>
+                <td data-label="Joined">{shortDate(parseDate(w.createdAt))}</td>
               </tr>
             ))}
           </tbody>

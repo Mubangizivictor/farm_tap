@@ -2,7 +2,7 @@
 
 import { doc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { useEffect, useState, type FormEvent } from 'react';
-import { MsgBanner, Need, Toggle, useAction, useLoad } from '@/components/admin';
+import { Anchor, Fit, JumpNav, MsgBanner, Need, Toggle, useAction, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
 import { Dialog, PageHead } from '@/components/ui';
 import { adminChange, loadConfig, loadIntegrations, setOp, type Integrations, type Op } from '@/lib/admin';
@@ -10,6 +10,14 @@ import { useAdmin } from '@/lib/adminSession';
 import { firebase } from '@/lib/firebase';
 import { date } from '@/lib/format';
 import { defaultConfig, maskSecret, secretList, secretNameOk, type Gateway, type PlatformConfig } from '@/lib/platform';
+
+const sections = [
+  ['sms-provider', 'SMS'],
+  ['payments', 'Payments'],
+  ['payment-keys', 'Payment keys'],
+  ['maps', 'Maps'],
+  ['other-keys', 'Other keys'],
+] as const;
 
 function SetSecret({ name, onClose, onSaved }: { name: string; onClose: () => void; onSaved: () => void }) {
   const { actor } = useAdmin();
@@ -141,14 +149,15 @@ export default function IntegrationsPage() {
         </button>
       </PageHead>
       <MsgBanner msg={act.msg} />
+      <JumpNav items={sections} />
 
       {i && (
-        <section className="card stack">
+        <section id="sms-provider" className="card stack anchor">
           <div className="card-head">
             <h2>SMS provider</h2>
             <span className={`chip ${i.sms.provider === 'none' ? '' : 'ok'}`}>{i.sms.provider === 'none' ? 'Free: farms send from their phone' : 'Automatic'}</span>
           </div>
-          <div className="grid">
+          <Fit cols={[1, 3, 3, 3]}>
             <label className="field">
               <span>Provider</span>
               <select className="input" value={i.sms.provider} onChange={(e) => setI({ ...i, sms: { ...i.sms, provider: e.target.value as Integrations['sms']['provider'] } })}>
@@ -165,70 +174,87 @@ export default function IntegrationsPage() {
               <span>{i.sms.provider === 'twilio' ? 'From number' : 'Sender ID'}</span>
               <input className="input" value={i.sms.senderId} onChange={(e) => setI({ ...i, sms: { ...i.sms, senderId: e.target.value.trim() } })} placeholder="FARMTAP" />
             </label>
-          </div>
+          </Fit>
           <div className="list">{keyRows('SMS')}</div>
-          <p className="small muted">Automatic sending also needs the Firebase Blaze plan and the server job deployed, and each farm switched on (Farms, SMS).</p>
+          <p className="small muted">Automatic sending also needs the paid server plan and the sending job switched on, and each farm switched on (Farms, SMS).</p>
         </section>
       )}
 
-      <section className="card stack">
-        <div className="card-head">
-          <h2>Payment options farmers see</h2>
-          {i && (
+      <Anchor
+        id="payments"
+        title="Payment options farmers see"
+        hint={
+          i && (
             <select className="input" style={{ width: 'auto' }} value={i.payments.mode} onChange={(e) => setI({ ...i, payments: { ...i.payments, mode: e.target.value as 'sandbox' | 'live' } })} aria-label="Mode">
               <option value="sandbox">Test mode (sandbox)</option>
               <option value="live">Live money</option>
             </select>
-          )}
-        </div>
-        {c.payments.gateways.map((g, idx) => (
-          <div key={g.id} className="card flat stack">
-            <Toggle label={g.name} hint={g.enabled ? 'Shown in the apps' : 'Hidden'} checked={g.enabled} disabled={!can('settings')} onChange={(enabled) => gw(idx, { enabled })} />
-            {g.enabled && (
-              <div className="grid">
-                <label className="field">
-                  <span>Name shown</span>
-                  <input className="input" value={g.name} onChange={(e) => gw(idx, { name: e.target.value })} />
-                </label>
-                <label className="field">
-                  <span>{g.id === 'bank' ? 'Account number' : g.id === 'card' ? 'Payment page link' : 'Pay code or number'}</span>
-                  <input className="input" value={g.payCode} onChange={(e) => gw(idx, { payCode: e.target.value })} />
-                </label>
-                <label className="field">
-                  <span>Account name</span>
-                  <input className="input" value={g.accountName} onChange={(e) => gw(idx, { accountName: e.target.value })} />
-                </label>
-                <label className="field" style={{ gridColumn: '1 / -1' }}>
-                  <span>How to pay (simple steps)</span>
-                  <input className="input" value={g.instructions} onChange={(e) => gw(idx, { instructions: e.target.value })} />
-                </label>
-              </div>
+          )
+        }
+      >
+        <Fit cols={[1, 2, 2, 3]}>
+          {c.payments.gateways.map((g, idx) => (
+            <section key={g.id} className="card stack">
+              <Toggle label={g.name} hint={g.enabled ? 'Shown in the apps' : 'Hidden'} checked={g.enabled} disabled={!can('settings')} onChange={(enabled) => gw(idx, { enabled })} />
+              {g.enabled && (
+                <>
+                  <label className="field">
+                    <span>Name shown</span>
+                    <input className="input" value={g.name} onChange={(e) => gw(idx, { name: e.target.value })} />
+                  </label>
+                  <label className="field">
+                    <span>{g.id === 'bank' ? 'Account number' : g.id === 'card' ? 'Payment page link' : 'Pay code or number'}</span>
+                    <input className="input" value={g.payCode} onChange={(e) => gw(idx, { payCode: e.target.value })} />
+                  </label>
+                  <label className="field">
+                    <span>Account name</span>
+                    <input className="input" value={g.accountName} onChange={(e) => gw(idx, { accountName: e.target.value })} />
+                  </label>
+                  <label className="field">
+                    <span>How to pay (simple steps)</span>
+                    <input className="input" value={g.instructions} onChange={(e) => gw(idx, { instructions: e.target.value })} />
+                  </label>
+                </>
+              )}
+            </section>
+          ))}
+        </Fit>
+        <section className="card">
+          <Fit cols={[1, 2, 2, 2]}>
+            <label className="field">
+              <span>After paying (shown under the options)</span>
+              <input className="input" value={c.payments.manualNote} onChange={(e) => setC({ ...c, payments: { ...c.payments, manualNote: e.target.value } })} />
+            </label>
+            {i && (
+              <label className="field">
+                <span>Payment callback URL (from your server code, when you add the APIs)</span>
+                <input className="input" type="url" value={i.payments.callbackUrl} onChange={(e) => setI({ ...i, payments: { ...i.payments, callbackUrl: e.target.value.trim() } })} />
+              </label>
             )}
+          </Fit>
+        </section>
+      </Anchor>
+
+      <section id="payment-keys" className="card anchor">
+        <div className="card-head">
+          <h2>Payment API keys</h2>
+          <span className="small muted">MTN MoMo, Airtel Money and card</span>
+        </div>
+        <div className="split-c">
+          <div className="list">
+            {keyRows('MTN MoMo')}
+            {keyRows('Airtel Money')}
+            {keyRows('Card (Flutterwave)')}
           </div>
-        ))}
-        <label className="field">
-          <span>After paying (shown under the options)</span>
-          <input className="input" value={c.payments.manualNote} onChange={(e) => setC({ ...c, payments: { ...c.payments, manualNote: e.target.value } })} />
-        </label>
-        {i && (
-          <label className="field">
-            <span>Payment callback URL (from your Cloud Function, when you add the APIs)</span>
-            <input className="input" type="url" value={i.payments.callbackUrl} onChange={(e) => setI({ ...i, payments: { ...i.payments, callbackUrl: e.target.value.trim() } })} />
-          </label>
-        )}
-        <h3>Payment API keys</h3>
-        <div className="list">
-          {keyRows('MTN MoMo')}
-          {keyRows('Airtel Money')}
-          {keyRows('Card (Flutterwave)')}
         </div>
       </section>
 
-      <section className="card stack">
+      <Fit cols={[1, 1, 2, 2]}>
+      <section id="maps" className="card stack anchor">
         <div className="card-head">
           <h2>Maps and location</h2>
         </div>
-        <div className="grid">
+        <Fit cols={[1, 2, 2, 2]}>
           <label className="field">
             <span>Map provider</span>
             <select className="input" value={c.maps.provider} onChange={(e) => setC({ ...c, maps: { ...c.maps, provider: e.target.value as PlatformConfig['maps']['provider'] } })}>
@@ -242,12 +268,12 @@ export default function IntegrationsPage() {
             <span>App key (restricted to the FarmTap apps; the phones can read it)</span>
             <input className="input mono" value={c.maps.appKey} onChange={(e) => setC({ ...c, maps: { ...c.maps, appKey: e.target.value.trim() } })} />
           </label>
-        </div>
+        </Fit>
         <p className="small muted">Put only a key restricted to the FarmTap app IDs and website here. Keys with billing power go below.</p>
         <div className="list">{keyRows('Maps')}</div>
       </section>
 
-      <section className="card stack">
+      <section id="other-keys" className="card stack anchor">
         <div className="card-head">
           <h2>Other API keys</h2>
           {can('secrets') && (
@@ -263,6 +289,7 @@ export default function IntegrationsPage() {
           {!custom.length && <p className="small muted">Any other provider you add later (for example a new SMS or payment company).</p>}
         </div>
       </section>
+      </Fit>
 
       {secret !== null && <SetSecret name={secret} onClose={() => setSecret(null)} onSaved={integ.reload} />}
     </Need>

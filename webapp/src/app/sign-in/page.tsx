@@ -43,7 +43,7 @@ function message(code: string): string {
     case 'auth/invalid-oauth-client-id':
       return 'This sign-in is not set up for the web yet. Use Google or Email for now.';
     case 'auth/unauthorized-domain':
-      return 'This web address is not allowed to sign in yet. Add it in Firebase → Authentication → Authorized domains.';
+      return 'This web address is not allowed to sign in yet. Ask the FarmTap team to allow this address.';
     case 'auth/network-request-failed':
       return 'No internet. Check your connection and try again.';
     case 'auth/too-many-requests':
@@ -180,7 +180,7 @@ export default function SignIn() {
           {!firebaseConfigured && (
             <div className="banner warn">
               <Icon name="alert" />
-              <span className="grow">Sign-in is not connected yet. Add the Firebase web settings in webapp/.env.local.</span>
+              <span className="grow">Sign-in is not connected yet. Ask the FarmTap team to finish the web setup.</span>
             </div>
           )}
 

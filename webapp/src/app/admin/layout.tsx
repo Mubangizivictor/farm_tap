@@ -98,15 +98,45 @@ function NotStaff() {
   );
 }
 
+function NavLinks({ items, current }: { items: NavItem[]; current: (href: string) => 'page' | undefined }) {
+  const groups = [...new Set(items.map((i) => i.group))];
+  return (
+    <nav className="nav" aria-label="Control panel">
+      {groups.map((g) => (
+        <div key={g} className="stack" style={{ gap: 'var(--s-xxs)' }}>
+          <div className="nav-group">{g}</div>
+          {items
+            .filter((i) => i.group === g)
+            .map((n) => (
+              <Link key={n.href} href={n.href} aria-current={current(n.href)} title={n.label}>
+                <Icon name={n.icon} />
+                <span>{n.label}</span>
+              </Link>
+            ))}
+        </div>
+      ))}
+    </nav>
+  );
+}
+
 function Shell({ children }: { children: ReactNode }) {
   const { user, signOut, online } = useSession();
   const { me } = useAdmin();
   const path = usePathname();
   const router = useRouter();
-  const [more, setMore] = useState(false);
+  const [drawer, setDrawer] = useState(false);
   const [userMenu, setUserMenu] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
-  useEffect(() => setMore(false), [path]);
+  useEffect(() => {
+    setDrawer(false);
+    setUserMenu(false);
+  }, [path]);
+  useEffect(() => {
+    if (!drawer && !userMenu) return;
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && (setDrawer(false), setUserMenu(false));
+    window.addEventListener('keydown', esc);
+    return () => window.removeEventListener('keydown', esc);
+  }, [drawer, userMenu]);
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -119,31 +149,18 @@ function Shell({ children }: { children: ReactNode }) {
   if (!me || !me.active) return <NotStaff />;
 
   const items = nav.filter((n) => n.any.length === 0 || me.role === 'owner' || n.any.some((p) => me.perms.includes(p)));
-  const current = (href: string) => (path === href || path === href.slice(0, -1) ? 'page' : undefined);
-  const groups = [...new Set(items.map((i) => i.group))];
+  const current = (href: string) => (path === href || path === href.slice(0, -1) || (href === '/admin/farms/' && path.startsWith('/admin/farm')) ? 'page' : undefined);
+  const here = items.find((n) => current(n.href));
+  const quick = items.slice(0, 4);
 
   return (
-    <div className="shell">
+    <div className="shell admin">
       <aside className="sidebar">
         <div className="row" style={{ padding: 'var(--s-xs) var(--s-sm)' }}>
           <div className="logo-mark" aria-hidden />
           <strong className="brand-text">FarmTap</strong>
         </div>
-        <nav className="nav" aria-label="Control panel">
-          {groups.map((g) => (
-            <div key={g} className="stack" style={{ gap: 'var(--s-xxs)' }}>
-              <div className="nav-group">{g}</div>
-              {items
-                .filter((i) => i.group === g)
-                .map((n) => (
-                  <Link key={n.href} href={n.href} aria-current={current(n.href)} title={n.label}>
-                    <Icon name={n.icon} />
-                    <span>{n.label}</span>
-                  </Link>
-                ))}
-            </div>
-          ))}
-        </nav>
+        <NavLinks items={items} current={current} />
         <div className="grow" />
         <div className="side-foot card flat small">
           <strong>{me.name || user?.email}</strong>
@@ -153,9 +170,13 @@ function Shell({ children }: { children: ReactNode }) {
 
       <div className="main">
         <header className="topbar">
-          <div className="logo-mark show-sm-only" aria-hidden />
-          <div className="stack grow" style={{ gap: 0 }}>
-            <span className="farm-name">Control panel</span>
+          <button className="icon-btn menu-btn" aria-label="Open menu" aria-expanded={drawer} onClick={() => setDrawer(true)}>
+            <Icon name="menu" />
+          </button>
+          <div className="stack grow" style={{ gap: 0, minWidth: 0 }}>
+            <span className="farm-name">
+              Control panel<span className="show-sm-only">{here && here.href !== '/admin/' ? ` · ${here.label}` : ''}</span>
+            </span>
             <span className="small muted hide-sm">FarmTap platform, Victorbee Technologies</span>
           </div>
           <span className="admin-badge">
@@ -164,46 +185,22 @@ function Shell({ children }: { children: ReactNode }) {
           <Link href="/" className="btn sm outline hide-sm" title="Open my farm">
             My farm
           </Link>
-          <div style={{ position: 'relative' }}>
-            <button
-              className="icon-btn"
-              aria-label="Account menu"
-              title={me.name || user?.email || ''}
-              onClick={() => setUserMenu((v) => !v)}
-            >
+          <div className="rel">
+            <button className="icon-btn" aria-label="Account menu" aria-expanded={userMenu} title={me.name || user?.email || ''} onClick={() => setUserMenu((v) => !v)}>
               <span className="avatar">{initials(me.name || user?.email || '')}</span>
             </button>
             {userMenu && (
               <>
-                <div
-                  style={{ position: 'fixed', inset: 0, zIndex: 99 }}
-                  onClick={() => setUserMenu(false)}
-                  aria-hidden
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    right: 0,
-                    top: 'calc(100% + 8px)',
-                    minWidth: 200,
-                    background: 'var(--surface-2, #1a1a2e)',
-                    border: '1px solid var(--border, rgba(255,255,255,0.1))',
-                    borderRadius: 10,
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
-                    zIndex: 100,
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border, rgba(255,255,255,0.08))' }}>
-                    <div style={{ fontWeight: 600, fontSize: 14 }}>{me.name || user?.email}</div>
-                    <div style={{ fontSize: 12, opacity: 0.5 }}>{user?.email}</div>
+                <div className="drawer-scrim" style={{ background: 'transparent' }} onClick={() => setUserMenu(false)} aria-hidden />
+                <div className="menu" role="menu" style={{ zIndex: 62 }}>
+                  <div className="stack" style={{ gap: 0, padding: 'var(--s-md) var(--s-lg)' }}>
+                    <strong>{me.name || user?.email}</strong>
+                    <span className="small muted">{user?.email}</span>
                   </div>
-                  <button
-                    className="btn ghost sm"
-                    disabled={signingOut}
-                    style={{ width: '100%', borderRadius: 0, justifyContent: 'flex-start', padding: '10px 14px' }}
-                    onClick={() => void handleSignOut()}
-                  >
+                  <Link href="/" role="menuitem">
+                    <Icon name="home" /> My farm
+                  </Link>
+                  <button role="menuitem" disabled={signingOut} onClick={() => void handleSignOut()}>
                     <Icon name="logout" /> {signingOut ? 'Signing out…' : 'Sign out'}
                   </button>
                 </div>
@@ -222,26 +219,38 @@ function Shell({ children }: { children: ReactNode }) {
         </div>
       </div>
 
-      {more && (
-        <div className="more-sheet nav" role="menu">
-          {items.slice(4).map((n) => (
-            <Link key={n.href} href={n.href} aria-current={current(n.href)}>
-              <Icon name={n.icon} />
-              <span>{n.label}</span>
-            </Link>
-          ))}
-        </div>
+      {drawer && (
+        <>
+          <div className="drawer-scrim" onClick={() => setDrawer(false)} aria-hidden />
+          <aside className="drawer" role="dialog" aria-modal="true" aria-label="Menu">
+            <div className="row between">
+              <div className="row">
+                <div className="logo-mark" aria-hidden />
+                <strong>FarmTap</strong>
+              </div>
+              <button className="icon-btn" aria-label="Close menu" onClick={() => setDrawer(false)}>
+                <Icon name="close" />
+              </button>
+            </div>
+            <NavLinks items={items} current={current} />
+            <div className="grow" />
+            <div className="card flat small">
+              <strong>{me.name || user?.email}</strong>
+              <div className="muted">{me.role === 'owner' ? 'Owner, full access' : `${me.role}: ${me.perms.length} areas`}</div>
+            </div>
+          </aside>
+        </>
       )}
-      <nav className="bottomnav" aria-label="Control panel">
-        {items.slice(0, 4).map((n) => (
+      <nav className="bottomnav" aria-label="Control panel shortcuts">
+        {quick.map((n) => (
           <Link key={n.href} href={n.href} aria-current={current(n.href)}>
             <Icon name={n.icon} />
             {n.label.split(' ')[0]}
           </Link>
         ))}
-        <button onClick={() => setMore(!more)} aria-expanded={more}>
-          <Icon name="more" />
-          More
+        <button onClick={() => setDrawer(true)} aria-expanded={drawer}>
+          <Icon name="menu" />
+          Menu
         </button>
       </nav>
     </div>

@@ -103,7 +103,7 @@ export default function AdminFarms() {
       <LoadError code={farms.error} />
 
       <div className="table-wrap">
-        <table className="table">
+        <table className="table rt">
           <thead>
             <tr>
               <th>Farm</th>
@@ -120,7 +120,7 @@ export default function AdminFarms() {
               const st = farmStatus(f, now);
               return (
                 <tr key={f.id} className="clickable" onClick={() => router.push(`/admin/farm/?id=${f.id}`)}>
-                  <td>
+                  <td className="lead">
                     <div className="stack" style={{ gap: 0 }}>
                       <strong>{f.name}</strong>
                       <span className="small muted">
@@ -129,22 +129,22 @@ export default function AdminFarms() {
                       </span>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Owner">
                     <div className="stack" style={{ gap: 0 }}>
                       <span>{f.owner.name || '—'}</span>
                       <span className="small muted">{f.owner.email || f.whatsapp}</span>
                     </div>
                   </td>
-                  <td>{sectorName[f.sector] ?? f.sector}</td>
-                  <td>
+                  <td data-label="Sector">{sectorName[f.sector] ?? f.sector}</td>
+                  <td data-label="Status">
                     <div className="row wrap" style={{ gap: 'var(--s-xs)' }}>
                       <span className={`chip ${st.tone}`}>{st.text}</span>
                       {f.review === 'pending' && <span className="chip warn">Review</span>}
                     </div>
                   </td>
-                  <td>{planOf(f, plans.data ?? []).name}</td>
-                  <td>{shortDate(f.createdAt)}</td>
-                  <td>{f.lastSeenAt ? shortDate(f.lastSeenAt) : <span className="muted">—</span>}</td>
+                  <td data-label="Plan">{planOf(f, plans.data ?? []).name}</td>
+                  <td data-label="Created">{shortDate(f.createdAt)}</td>
+                  <td data-label="Last seen">{f.lastSeenAt ? shortDate(f.lastSeenAt) : <span className="muted">—</span>}</td>
                 </tr>
               );
             })}

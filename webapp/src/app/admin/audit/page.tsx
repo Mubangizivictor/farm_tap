@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MsgBanner, Need, useLoad } from '@/components/admin';
+import { Need, useLoad } from '@/components/admin';
 import { Empty, PageHead } from '@/components/ui';
 import { loadAudit, type AuditEntry } from '@/lib/admin';
 import { date } from '@/lib/format';
@@ -91,11 +91,9 @@ export default function AuditPage() {
           <Icon name="export" /> Export CSV
         </button>
       </PageHead>
-      <MsgBanner msg={null} />
-
-      <div className="row wrap" style={{ gap: 'var(--s-sm)', marginBottom: 'var(--s-md)' }}>
+      <div className="row wrap">
         <input
-          className="input grow"
+          className="input grow-field"
           placeholder="Search by person, action or target…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -110,9 +108,9 @@ export default function AuditPage() {
         </select>
       </div>
 
-      <section className="card">
+      <section className="stack">
         <div className="table-wrap">
-          <table className="table">
+          <table className="table rt">
             <thead>
               <tr>
                 <th>Time</th>
@@ -125,18 +123,18 @@ export default function AuditPage() {
             <tbody>
               {rows.map((e) => (
                 <tr key={e.id}>
-                  <td className="mono small" style={{ whiteSpace: 'nowrap' }}>
+                  <td className="mono small" data-label="Time" style={{ whiteSpace: 'nowrap' }}>
                     {date(e.at)}
                   </td>
-                  <td>
+                  <td data-label="Who">
                     <strong>{e.byName}</strong>
                   </td>
-                  <td>
+                  <td className="wide" data-label="Action">
                     <span className="chip">{actionGroup(e.action)}</span>{' '}
                     <span className="small">{actionLabel(e.action)}</span>
                   </td>
-                  <td className="mono small">{e.target}</td>
-                  <td className="small muted">
+                  <td className="mono small wide" data-label="Target" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{e.target}</td>
+                  <td className="small muted wide" data-label="Details" style={{ whiteSpace: 'normal' }}>
                     {e.details
                       ? Object.entries(e.details)
                           .slice(0, 3)
@@ -148,8 +146,8 @@ export default function AuditPage() {
               ))}
             </tbody>
           </table>
+          {audit.data && !rows.length && <Empty>{q || group ? 'No matching entries.' : 'No audit entries yet.'}</Empty>}
         </div>
-        {audit.data && !rows.length && <Empty>{q || group ? 'No matching entries.' : 'No audit entries yet.'}</Empty>}
       </section>
     </Need>
   );
