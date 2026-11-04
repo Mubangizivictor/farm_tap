@@ -57,8 +57,13 @@ export default function AdminSignIn() {
       const g = new GoogleAuthProvider();
       g.setCustomParameters({ prompt: 'select_account' });
       await signInWithRedirect(firebase().auth, g);
-    } catch {
-      setError('Could not start sign-in. Try again.');
+    } catch (e) {
+      const code = (e as { code?: string }).code ?? '';
+      if (code === 'auth/unauthorized-domain') {
+        setError('This domain is not authorised in Firebase. Add farm-tap-1dd15.web.app to Firebase → Authentication → Settings → Authorized domains.');
+      } else {
+        setError(`Could not start sign-in (${code || 'unknown error'}). Try again.`);
+      }
       setBusy(false);
     }
   }
