@@ -84,6 +84,11 @@ class RecordJournal {
 
   /// This farm's saved records of [collection] (not deleted).
   Future<List<SyncRecord>> load(String collection) => store.all(tenantId(), collection);
+
+  /// Like [load], with deleted records too, so a list rebuilt after a sync
+  /// drops what another phone or the web app removed.
+  Future<List<SyncRecord>> loadWithDeleted(String collection) =>
+      store.all(tenantId(), collection, includeDeleted: true);
 }
 
 /// A repository that reloads its saved records when the app starts

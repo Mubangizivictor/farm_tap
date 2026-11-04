@@ -152,6 +152,27 @@ class CentreFarmer {
     since: since,
   );
 
+  /// Name, phone, village or receipts changed (on the web or another phone).
+  CentreFarmer withDetails({required String name, required String phone, required String village, required bool smsReceipts}) =>
+      CentreFarmer(
+        id: id,
+        name: name,
+        card: card,
+        village: village,
+        phone: phone,
+        network: CentreFarmer.networkOf(phone),
+        todayLitres: todayLitres,
+        periodLitres: periodLitres,
+        rejectedLitres: rejectedLitres,
+        usualLow: usualLow,
+        usualHigh: usualHigh,
+        smsReceipts: smsReceipts,
+        owed: owed,
+        photo: photo,
+        photoUrl: photoUrl,
+        since: since,
+      );
+
   /// "MS-55120": the supplier number printed on the card.
   String get supplierCode {
     var h = 0x811c9dc5;

@@ -84,6 +84,46 @@ class FirestoreRemoteStore implements RemoteStore {
     );
   }
 
+  @override
+  Stream<void> changes(String tenantId, List<String> collections) {
+    // One small listener per collection on its newest document: a change
+    // costs one read, an idle farm costs nothing after the first snapshot.
+    final out = StreamController<void>();
+    final subs = <StreamSubscription<Object?>>[];
+    out
+      ..onListen = () {
+        for (final c in collections) {
+          var first = true;
+          subs.add(
+            _col(tenantId, c)
+                .orderBy(serverTimeField, descending: true)
+                .limit(1)
+                .snapshots()
+                .listen(
+                  (snap) {
+                    // The first snapshot is what is already there.
+                    if (first) {
+                      first = false;
+                      return;
+                    }
+                    if (snap.metadata.hasPendingWrites) return;
+                    out.add(null);
+                  },
+                  // Permission or network trouble on one collection: the
+                  // periodic pull still covers it.
+                  onError: (Object _) {},
+                ),
+          );
+        }
+      }
+      ..onCancel = () async {
+        for (final s in subs) {
+          await s.cancel();
+        }
+      };
+    return out.stream;
+  }
+
   static Map<String, Object?> _toDoc(SyncRecord r) => {...r.toJson(), serverTimeField: FieldValue.serverTimestamp()};
 
   static SyncRecord _fromDoc(Map<String, dynamic> data) =>

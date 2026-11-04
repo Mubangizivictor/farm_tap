@@ -33,4 +33,11 @@ abstract class RemoteStore {
   Future<PushResult> push(String tenantId, List<SyncRecord> records);
 
   Future<PullPage> pull(String tenantId, String collection, {String? cursor, int limit});
+
+  /// Fires when a record of [collections] changes in the cloud (another
+  /// phone, or the web app), so the engine pulls within seconds instead of
+  /// waiting for the next periodic pull. Never fires for what was already
+  /// there when listening started. May end or error; the engine just
+  /// listens again on its next run.
+  Stream<void> changes(String tenantId, List<String> collections);
 }

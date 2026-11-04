@@ -10,6 +10,7 @@ import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_models.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
+import 'package:flutter/foundation.dart';
 
 /// UI phase: every worker clocked in on each earlier day this month; today
 /// Tom 6:02, Amos 5:45, Joy 6:10 and Rita 6:30 are in (4 of 6). Advances
@@ -114,6 +115,9 @@ class FakeWorkersRepository implements WorkersRepository, Restorable {
   final MilkRepository milk;
   final List<AttendanceRecord> _attendance = [];
   final List<FarmTask> _tasks = [];
+
+  /// Saved task bodies by id, so an edit keeps fields this phone does not use.
+  final Map<String, Map<String, Object?>> _taskBodies = {};
   final List<StaffPayment> _payments = [];
   var _next = 1;
 
@@ -206,18 +210,16 @@ class FakeWorkersRepository implements WorkersRepository, Restorable {
   Future<void> restore() async {
     final j = journal;
     if (j == null) return;
-    for (final r in await j.load('tasks')) {
-      final b = r.body;
-      final done = b['doneAt'] as String?;
-      final t = FarmTask(
-        id: r.id,
-        title: b['title']! as String,
-        staffId: b['staffId']! as String,
-        due: DateTime.parse(b['due']! as String),
-        when: b['when']! as String,
-        doneAt: done == null ? null : DateTime.parse(done),
-      );
+    for (final r in await j.loadWithDeleted('tasks')) {
       final i = _tasks.indexWhere((x) => x.id == r.id);
+      final t = r.isDeleted ? null : taskFromBody(r.id, r.body, now: clock.now());
+      if (t == null) {
+        // Removed on the web or another phone (or unreadable): not shown.
+        if (i >= 0) _tasks.removeAt(i);
+        _taskBodies.remove(r.id);
+        continue;
+      }
+      _taskBodies[r.id] = r.body;
       if (i >= 0) {
         _tasks[i] = t;
       } else {
@@ -274,9 +276,39 @@ class FakeWorkersRepository implements WorkersRepository, Restorable {
     final i = _tasks.indexWhere((t) => t.id == taskId);
     if (i >= 0) {
       _tasks[i] = _tasks[i].withDone(done ? clock.now() : null);
-      await journal?.put('tasks', taskId, _taskBody(_tasks[i]));
+      // Keep what the web app added (a note, how urgent) when ticking.
+      final body = {...?_taskBodies[taskId], ..._taskBody(_tasks[i])};
+      _taskBodies[taskId] = body;
+      await journal?.put('tasks', taskId, body);
     }
     return const Result.success(null);
+  }
+
+  /// A task from its saved body. Reads the phone's shape and the older web
+  /// shape (assignedTo, dueDate, status); null when it has no title or no
+  /// worker, so one odd record never stops the farm from opening.
+  @visibleForTesting
+  static FarmTask? taskFromBody(String id, Map<String, Object?> b, {required DateTime now}) {
+    String? text(Object? v) => v is String && v.trim().isNotEmpty ? v : null;
+    final title = text(b['title']);
+    final staffId = text(b['staffId']) ?? text(b['assignedTo']);
+    if (title == null || staffId == null) return null;
+    final dueRaw = DateTime.tryParse(text(b['due']) ?? text(b['dueDate']) ?? '');
+    // A due date with no time means the end of that working day.
+    final due = dueRaw == null
+        ? null
+        : (dueRaw.hour == 0 && dueRaw.minute == 0 ? DateTime(dueRaw.year, dueRaw.month, dueRaw.day, 18) : dueRaw);
+    final doneAt =
+        DateTime.tryParse(text(b['doneAt']) ?? text(b['completedAt']) ?? '') ??
+        (b['status'] == 'done' && due != null ? due : null);
+    return FarmTask(
+      id: id,
+      title: title,
+      staffId: staffId,
+      due: due ?? now,
+      when: text(b['when']) ?? '',
+      doneAt: doneAt,
+    );
   }
 
   static Map<String, Object?> _taskBody(FarmTask t) => {
