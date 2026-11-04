@@ -7,12 +7,14 @@ import { connectFirestoreEmulator, getFirestore, type Firestore } from 'firebase
 // Same Firebase project as the phone app (farm-tap-1dd15). Online only
 // (decision 0017): Firestore keeps its default memory cache, nothing is
 // stored for offline use.
-const options: FirebaseOptions = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? 'farm-tap-1dd15',
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+// Firebase web API keys are intentionally public — security is enforced by
+// Firestore Security Rules and Authentication, not by keeping this key secret.
+const FIREBASE_CONFIG: FirebaseOptions = {
+  apiKey: 'AIzaSyAA_Ydlo-YTC9jzqFBqwEpYSGFiDv4hTVg',
+  appId: '1:913049305053:web:35fb9d4efe7448362ac034',
+  messagingSenderId: '913049305053',
+  projectId: 'farm-tap-1dd15',
+  storageBucket: 'farm-tap-1dd15.firebasestorage.app',
   // firebaseapp.com is the only domain Firebase auto-registers as an OAuth redirect URI.
   // Using web.app here breaks redirect sign-in unless that URI is manually added in GCP.
   authDomain: 'farm-tap-1dd15.firebaseapp.com',
@@ -21,15 +23,18 @@ const options: FirebaseOptions = {
 /** Local testing against `firebase emulators:start` (auth 9099, firestore 8080). */
 const emulators = process.env.NEXT_PUBLIC_FIREBASE_EMULATORS === 'true';
 
-/** False until Victor pastes the web app config into webapp/.env.local. */
-export const firebaseConfigured = emulators || Boolean(options.apiKey && options.appId);
+const options: FirebaseOptions = emulators
+  ? { ...FIREBASE_CONFIG, apiKey: 'demo-key', projectId: 'demo-farmtap' }
+  : FIREBASE_CONFIG;
+
+export const firebaseConfigured = true;
 
 let auth: Auth | undefined;
 let db: Firestore | undefined;
 
 export function firebase(): { auth: Auth; db: Firestore } {
   if (!auth || !db) {
-    const app = getApps().length ? getApp() : initializeApp(emulators ? { ...options, apiKey: options.apiKey || 'demo-key', projectId: 'demo-farmtap' } : options);
+    const app = getApps().length ? getApp() : initializeApp(options);
     auth = getAuth(app);
     // Stay signed in on this browser until the person signs out.
     void setPersistence(auth, browserLocalPersistence);
