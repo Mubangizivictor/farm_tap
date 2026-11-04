@@ -286,8 +286,9 @@ export function longDate(iso: string): string {
 // ---------------------------------------------------------------- Markdown
 
 export type Inline = { text: string; bold: boolean }[];
+export type Heading = { type: 'h1' | 'h2' | 'h3'; text: string; id: string };
 export type Block =
-  | { type: 'h1' | 'h2' | 'h3'; text: string; id: string }
+  | Heading
   | { type: 'p'; lines: Inline[] }
   | { type: 'ul'; items: Inline[] };
 
@@ -358,4 +359,4 @@ export function parseMarkdown(md: string): Block[] {
 }
 
 /** The ## headings, for the table of contents. */
-export const contents = (blocks: Block[]) => blocks.filter((b): b is Extract<Block, { type: 'h2' }> => b.type === 'h2');
+export const contents = (blocks: Block[]) => blocks.filter((b): b is Heading => b.type === 'h2');

@@ -87,7 +87,7 @@ function NotStaff() {
           </>
         )}
         <div className="row">
-          <button className="btn ghost sm" onClick={() => router.push('/')}>
+          <button className="btn ghost sm" onClick={() => router.push('/start/')}>
             Back to my farm
           </button>
           <button className="btn ghost sm" onClick={() => void signOut().then(() => router.replace('/admin-sign-in/'))}>
@@ -181,7 +181,7 @@ function Shell({ children }: { children: ReactNode }) {
           <span className="admin-badge">
             <Icon name="shield" className="icon" /> Admin
           </span>
-          <Link href="/" className="btn sm outline hide-sm" title="Open my farm">
+          <Link href="/start/" className="btn sm outline hide-sm" title="Open my farm">
             My farm
           </Link>
           <div className="rel">
@@ -196,7 +196,7 @@ function Shell({ children }: { children: ReactNode }) {
                     <strong>{me.name || user?.email}</strong>
                     <span className="small muted">{user?.email}</span>
                   </div>
-                  <Link href="/" role="menuitem">
+                  <Link href="/start/" role="menuitem">
                     <Icon name="home" /> My farm
                   </Link>
                   <button role="menuitem" disabled={signingOut} onClick={() => void handleSignOut()}>
