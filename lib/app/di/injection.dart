@@ -2,7 +2,11 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:farm_tap/app/flavor.dart';
+import 'package:farm_tap/app/session/reminder_viewer.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
+import 'package:farm_tap/core/account/account_repository.dart';
+import 'package:farm_tap/core/alerts/farm_reminders.dart';
+import 'package:farm_tap/core/alerts/push_tokens.dart';
 import 'package:farm_tap/core/audit/audit_logger.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_staff_login_repository.dart';
@@ -10,6 +14,7 @@ import 'package:farm_tap/core/auth/data/firebase/firebase_auth_repository.dart';
 import 'package:farm_tap/core/auth/data/firebase/firebase_staff_login_repository.dart';
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
 import 'package:farm_tap/core/auth/domain/staff_login_repository.dart';
+import 'package:farm_tap/core/billing/billing_repository.dart';
 import 'package:farm_tap/core/database/isar_service.dart';
 import 'package:farm_tap/core/media/photo_store.dart';
 import 'package:farm_tap/core/money/data/fake/fake_money_repository.dart';
@@ -69,6 +74,7 @@ import 'package:farm_tap/sectors/cattle/milk/data/local/local_milk_repository.da
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/money/data/fake/fake_farm_money_repository.dart';
 import 'package:farm_tap/sectors/cattle/money/domain/farm_money_repository.dart';
+import 'package:farm_tap/sectors/cattle/operations/data/operations_repository.dart';
 import 'package:farm_tap/sectors/cattle/owner_reports/data/fake/fake_daily_report_repository.dart';
 import 'package:farm_tap/sectors/cattle/owner_reports/domain/daily_report.dart';
 import 'package:farm_tap/sectors/cattle/workers/data/fake/fake_workers_repository.dart';
@@ -295,6 +301,31 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
 
   await _configureOffline(tenants);
 
+  // Decision 0024: contacts, roster, feeds store, vaccinations, reminders,
+  // paying for FarmTap and the person's own account.
+  final reminderPrefs = useFakeData ? null : await SharedPreferences.getInstance();
+  getIt
+    ..registerLazySingleton<OperationsRepository>(
+      () => OperationsRepository(journal: getIt<RecordJournal>(), clock: getIt<Clock>()),
+    )
+    ..registerLazySingleton<FarmReminders>(
+      () => FarmReminders(
+        journal: getIt<RecordJournal>(),
+        clock: getIt<Clock>(),
+        outbox: getIt.isRegistered<SmsOutbox>() ? getIt<SmsOutbox>() : null,
+        prefs: reminderPrefs,
+      ),
+    )
+    ..registerLazySingleton<BillingRepository>(
+      () => useFakeData
+          ? FakeBillingRepository(now: getIt<Clock>().now)
+          : FirebaseBillingRepository(journal: getIt<RecordJournal>()),
+    )
+    ..registerLazySingleton<AccountRepository>(
+      () => useFakeData ? FakeAccountRepository(now: getIt<Clock>().now) : FirebaseAccountRepository(),
+    )
+    ..registerLazySingleton<PushTokens>(() => PushTokens(deviceId: _deviceId));
+
   getIt.registerLazySingleton(
     () => SessionController(auth: getIt<AuthRepository>(), clock: getIt<Clock>(), trialClock: getIt<TrustedClock>()),
   );
@@ -302,6 +333,7 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
     // No farm is open until the person picks or creates one.
     tenants.currentTenantId = '';
     _followOpenFarm(tenants);
+    _followAccount();
   }
 
   // Herd use cases and bloc
@@ -357,7 +389,7 @@ void _followOpenFarm(InMemoryTenantProvider tenants) {
     }
     if (id == tenants.currentTenantId) return;
     tenants.currentTenantId = id;
-    unawaited(restoreSavedRecords().then((_) => sync.sync()));
+    unawaited(restoreSavedRecords().then((_) => sync.sync()).then((_) => _runReminders()));
   });
   // Photos upload under the open farm once Firebase Storage is switched on.
   PhotoStore.instance.tenantId = () => tenants.currentTenantId;
@@ -365,10 +397,50 @@ void _followOpenFarm(InMemoryTenantProvider tenants) {
   var wasSyncing = false;
   sync.watch().listen((s) {
     if (wasSyncing && !s.syncing && tenants.currentTenantId.isNotEmpty) {
-      unawaited(restoreSavedRecords());
+      unawaited(restoreSavedRecords().then((_) => _runReminders()));
       unawaited(PhotoStore.instance.uploadPending());
     }
     wasSyncing = s.syncing;
+  });
+}
+
+/// Today's reminders on this phone (decision 0024): shown once each and,
+/// on an owner's or manager's phone, queued as free WhatsApp / SMS.
+Future<void> _runReminders() async {
+  try {
+    final session = getIt<SessionController>();
+    if (session.farm == null || session.readOnly) return;
+    await getIt<FarmReminders>().run(reminderViewer(session));
+  } on Object catch (e, s) {
+    getIt<AppLogger>().e('reminders failed', e, s);
+  }
+}
+
+/// After signing in: is the account closed, its photo, and this phone's
+/// push token (so the server's reminder job can reach it once switched on).
+void _followAccount() {
+  final session = getIt<SessionController>();
+  String? last;
+  session.beforeSignOut = () async {
+    final uid = session.auth.currentUser?.id;
+    if (uid != null) await getIt<PushTokens>().forget(uid);
+  };
+  session.auth.userChanges.listen((user) {
+    final uid = user?.id;
+    if (uid == null || uid == last) {
+      last = uid;
+      return;
+    }
+    last = uid;
+    if (user!.isStaffLogin) return;
+    unawaited(() async {
+      try {
+        session.setProfile(await getIt<AccountRepository>().profile(uid));
+      } on Object catch (e, s) {
+        getIt<AppLogger>().e('profile not read', e, s);
+      }
+      await getIt<PushTokens>().register(uid);
+    }());
   });
 }
 
@@ -385,6 +457,9 @@ String _me() {
 const _lastSeenKey = 'trustedClock.lastSeen';
 const _deviceIdKey = 'device.id';
 
+/// This installed app's id (set while configuring the offline store).
+String _deviceId = 'demo-phone';
+
 /// Decision 0014: the phone's record store, the sync engine and the
 /// rollback-proof trial clock. The demo build keeps records in memory; the
 /// backend build stores them in Isar (registered above).
@@ -396,6 +471,7 @@ Future<void> _configureOffline(TenantProvider tenants) async {
   final storedDeviceId = prefs?.getString(_deviceIdKey);
   final deviceId = storedDeviceId ?? (useFakeData ? 'demo-phone' : getIt<IdGenerator>().generate());
   if (storedDeviceId == null) await prefs?.setString(_deviceIdKey, deviceId);
+  _deviceId = deviceId;
   getIt.registerSingleton<TrustedClock>(
     TrustedClock(
       getIt<Clock>(),
@@ -466,6 +542,11 @@ const List<String> syncedCollections = [
   'milkUse',
   'milkSalePayments',
   'reconciliations',
+  // Decision 0024 (same collections as the web).
+  'contacts',
+  'duties',
+  'absences',
+  'feedTypes',
 ];
 
 /// Reloads what was saved on this phone before the first screen shows
@@ -483,6 +564,7 @@ Future<void> restoreSavedRecords() async {
     getIt<TreatmentRepository>(),
     getIt<MilkRepository>(),
     getIt<CentreRepository>(),
+    getIt<OperationsRepository>(),
   ];
   for (final r in repos) {
     if (r is! Restorable) continue;

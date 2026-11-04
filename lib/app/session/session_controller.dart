@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:farm_tap/core/account/account_repository.dart';
 import 'package:farm_tap/core/auth/domain/auth_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
@@ -13,7 +14,11 @@ class SessionController extends ChangeNotifier {
   /// [clock].
   new({required this.auth, required this.clock, Clock? trialClock}) : trialClock = trialClock ?? clock {
     _sub = auth.userChanges.listen((user) {
-      if (user == null) _farm = null;
+      if (user == null) {
+        _farm = null;
+        _closed = null;
+        _photo = null;
+      }
       notifyListeners();
     });
   }
@@ -25,6 +30,44 @@ class SessionController extends ChangeNotifier {
   FarmMembership? _farm;
   bool _locked = false;
   StaffMember? _staff;
+  AccountClosure? _closed;
+  String? _photo;
+  bool _viewingLocked = false;
+
+  /// The account was closed (decision 0024): only the closed screen shows.
+  AccountClosure? get closed => _closed;
+
+  /// The person's own picture (base64), shown on More and Settings.
+  String? get photo => _photo;
+
+  /// Read from the account after signing in, and after a change.
+  void setProfile(AccountProfile p) {
+    _closed = p.closed;
+    _photo = p.photo;
+    notifyListeners();
+  }
+
+  void setPhoto(String? photo) {
+    _photo = photo;
+    notifyListeners();
+  }
+
+  /// An owner or manager chose "Look at my records" on the locked screen.
+  bool get viewingLocked => _viewingLocked;
+
+  void viewLocked() {
+    _viewingLocked = true;
+    notifyListeners();
+  }
+
+  /// After a payment: the new dates unlock the farm straight away.
+  void updateSubscription(Subscription s) {
+    final f = _farm;
+    if (f == null) return;
+    _farm = f.withSubscription(s);
+    _viewingLocked = false;
+    notifyListeners();
+  }
 
   bool get signedIn => auth.currentUser != null;
   FarmMembership? get farm => _farm;
@@ -60,6 +103,7 @@ class SessionController extends ChangeNotifier {
 
   void openFarm(FarmMembership farm) {
     _farm = farm;
+    _viewingLocked = false;
     notifyListeners();
   }
 
@@ -76,10 +120,22 @@ class SessionController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Runs before signing out while still signed in (this phone stops
+  /// getting the account's reminders).
+  Future<void> Function()? beforeSignOut;
+
   Future<void> signOut() async {
+    try {
+      await beforeSignOut?.call();
+    } on Object {
+      // Never blocks signing out.
+    }
     _farm = null;
     _locked = false;
     _staff = null;
+    _closed = null;
+    _photo = null;
+    _viewingLocked = false;
     await auth.signOut();
   }
 

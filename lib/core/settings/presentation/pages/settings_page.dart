@@ -1,4 +1,7 @@
 // N02 Settings: account, farm, appearance (phone / light / dark), sounds.
+import 'dart:async';
+
+import 'package:farm_tap/core/account/presentation/account_pages.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/theme/theme.dart';
@@ -15,7 +18,23 @@ class SettingsPage extends StatelessWidget {
     required this.farmName,
     required this.onSignOut,
     super.key,
+    this.photo,
+    this.onPhoto,
+    this.onReminders,
+    this.onSubscription,
+    this.onDeleteAccount,
   });
+
+  /// The person's own picture (base64).
+  final String? photo;
+
+  /// Take or choose a profile photo; null hides it (workers on a farm phone).
+  final VoidCallback? onPhoto;
+  final VoidCallback? onReminders;
+  final VoidCallback? onSubscription;
+
+  /// Close the account (decision 0024); null for workers without an account.
+  final VoidCallback? onDeleteAccount;
 
   final String name;
   final String email;
@@ -40,10 +59,18 @@ class SettingsPage extends StatelessWidget {
           ListCard(
             children: [
               RecordTile(
-                leading: PersonAvatar(name: name, size: context.sizes.avatarMd),
+                leading: PersonAvatar(name: name, photo: photo, size: context.sizes.avatarMd),
                 title: name,
                 subtitle: email.isEmpty ? role : '$role · $email',
+                trailing: onPhoto == null
+                    ? null
+                    : IconButton(
+                        tooltip: l10n.profilePhoto,
+                        icon: Icon(Symbols.photo_camera_rounded, color: context.colors.primary),
+                        onPressed: onPhoto,
+                      ),
                 showChevron: false,
+                onTap: onPhoto,
               ),
               if (farmName.isNotEmpty)
                 RecordTile(
@@ -84,6 +111,58 @@ class SettingsPage extends StatelessWidget {
                 ],
               ),
             ),
+          if (onReminders != null || onSubscription != null) ...[
+            context.space.gapLg,
+            ListCard(
+              children: [
+                if (onSubscription != null)
+                  RecordTile(
+                    leading: IconBubble(
+                      icon: Symbols.savings_rounded,
+                      tone: FarmTapTone.gold,
+                      size: context.sizes.bubbleMd,
+                    ),
+                    title: l10n.subscriptionLabel,
+                    onTap: onSubscription,
+                  ),
+                if (onReminders != null)
+                  RecordTile(
+                    leading: IconBubble(icon: Symbols.notifications_rounded, size: context.sizes.bubbleMd),
+                    title: l10n.remindersTitle,
+                    subtitle: l10n.remindersSub,
+                    onTap: onReminders,
+                  ),
+              ],
+            ),
+          ],
+          context.space.gapLg,
+          SectionLabel(l10n.legalTitle),
+          context.space.gapSm,
+          ListCard(
+            children: [
+              RecordTile(
+                leading: IconBubble(icon: Symbols.shield_rounded, tone: FarmTapTone.info, size: context.sizes.bubbleMd),
+                title: l10n.privacyPolicy,
+                onTap: () => unawaited(openSite(privacyUrl)),
+              ),
+              RecordTile(
+                leading: IconBubble(icon: Symbols.gavel_rounded, tone: FarmTapTone.info, size: context.sizes.bubbleMd),
+                title: l10n.termsOfUse,
+                onTap: () => unawaited(openSite(termsUrl)),
+              ),
+              if (onDeleteAccount != null)
+                RecordTile(
+                  leading: IconBubble(
+                    icon: Symbols.delete_forever_rounded,
+                    tone: FarmTapTone.danger,
+                    size: context.sizes.bubbleMd,
+                  ),
+                  title: l10n.deleteTitle,
+                  subtitle: l10n.deleteSub,
+                  onTap: onDeleteAccount,
+                ),
+            ],
+          ),
           context.space.gapLg,
           FarmTapButton(
             label: l10n.signOutLabel,

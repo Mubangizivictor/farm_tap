@@ -1,6 +1,9 @@
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
+import 'package:farm_tap/core/account/account_repository.dart';
+import 'package:farm_tap/core/alerts/farm_reminders.dart';
 import 'package:farm_tap/core/auth/domain/staff_login_repository.dart';
+import 'package:farm_tap/core/billing/billing_repository.dart';
 import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/onboarding/domain/onboarding_repository.dart';
 import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
@@ -20,6 +23,7 @@ import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 import 'package:farm_tap/sectors/cattle/home/domain/home_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/money/domain/farm_money_repository.dart';
+import 'package:farm_tap/sectors/cattle/operations/data/operations_repository.dart';
 import 'package:farm_tap/sectors/cattle/owner_reports/domain/daily_report.dart';
 import 'package:farm_tap/sectors/cattle/owner_reports/presentation/farm_reports.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
@@ -50,6 +54,10 @@ class AppDependencies {
     this._photos,
     this.staffLogin,
     this.outbox,
+    this.operations,
+    this.reminders,
+    this._billing,
+    this._account,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -75,9 +83,30 @@ class AppDependencies {
     photos: getIt<PersonPhotoStore>(),
     staffLogin: getIt<StaffLoginRepository>(),
     outbox: getIt.isRegistered<SmsOutbox>() ? getIt<SmsOutbox>() : null,
+    operations: getIt<OperationsRepository>(),
+    reminders: getIt<FarmReminders>(),
+    billing: getIt<BillingRepository>(),
+    account: getIt<AccountRepository>(),
   );
 
   final CardRegistry? _cards;
+  final BillingRepository? _billing;
+  final AccountRepository? _account;
+
+  /// Contacts, duty roster, feeds store and vaccinations (decision 0024);
+  /// null in tests that do not need them.
+  final OperationsRepository? operations;
+
+  /// Farm reminders on this phone; null in tests.
+  final FarmReminders? reminders;
+
+  /// Plans, payments and receipts; tests get the sample plans.
+  BillingRepository get billing => _billing ?? _fakeBilling;
+  static final _fakeBilling = FakeBillingRepository();
+
+  /// Profile photo and closing the account; tests get one in memory.
+  AccountRepository get account => _account ?? _fakeAccount;
+  static final _fakeAccount = FakeAccountRepository();
   final PersonPhotoStore? _photos;
 
   /// Every card on the farm (decision 0016); tests may leave it out and get
@@ -114,6 +143,7 @@ class AppDependencies {
   /// L03 / L01 exports, built from the repositories above.
   FarmReports get reports =>
       FarmReports(money: farmMoney, milk: milk, treatments: treatments, centre: session.isCentre ? centre : null);
+
   /// Messages waiting to be sent (decision 0015); null in the demo.
   final SmsOutbox? outbox;
 }

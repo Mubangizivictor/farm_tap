@@ -4704,4 +4704,720 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get receiptWaiting => 'Receipt ready to send';
+
+  @override
+  String get opsContacts => 'Contacts';
+
+  @override
+  String get opsAddContact => 'Add contact';
+
+  @override
+  String get opsEditContact => 'Edit contact';
+
+  @override
+  String get opsContactKind => 'Who is this';
+
+  @override
+  String get opsContactNeeds =>
+      'Add a name and a phone number of at least 9 digits.';
+
+  @override
+  String get opsContactOrg => 'Business or clinic (optional)';
+
+  @override
+  String get opsContactPlace => 'Where they are (optional)';
+
+  @override
+  String get opsShowWorkers => 'Workers can see this contact';
+
+  @override
+  String get opsSearchContacts => 'Search contacts';
+
+  @override
+  String get opsNoContacts => 'No contacts yet';
+
+  @override
+  String get opsNoContactsBody =>
+      'Keep your vet, AI technician, feed suppliers and buyers here so anyone on the farm can call them.';
+
+  @override
+  String get opsWhatsapp => 'WhatsApp';
+
+  @override
+  String get opsKindVet => 'Vets';
+
+  @override
+  String get opsKindAi => 'AI technicians';
+
+  @override
+  String get opsKindFeed => 'Feed suppliers';
+
+  @override
+  String get opsKindAgrovet => 'Agrovet shops';
+
+  @override
+  String get opsKindBuyer => 'Buyers';
+
+  @override
+  String get opsKindTransport => 'Transport';
+
+  @override
+  String get opsKindEmergency => 'Emergency';
+
+  @override
+  String get opsKindOther => 'Other';
+
+  @override
+  String get opsRoster => 'Duty roster';
+
+  @override
+  String get opsAddDuty => 'Add duty';
+
+  @override
+  String get opsEditDuty => 'Edit duty';
+
+  @override
+  String get opsDutyNeeds => 'Pick who does it and on which days.';
+
+  @override
+  String get opsNoDuties => 'No duties yet';
+
+  @override
+  String get opsNoDutiesBody =>
+      'Give each job a person and the days they do it. Stand-ins cover when someone is away.';
+
+  @override
+  String get opsNothingThatDay => 'No duties on this day.';
+
+  @override
+  String get opsTomorrow => 'Tomorrow';
+
+  @override
+  String get opsYou => 'You';
+
+  @override
+  String opsNobodyOn(String name) {
+    return '$name is away and nobody stands in';
+  }
+
+  @override
+  String opsStandsIn(String who, String colleague) {
+    return '$who stands in for $colleague';
+  }
+
+  @override
+  String get opsAway => 'Away';
+
+  @override
+  String get opsAddAway => 'Add';
+
+  @override
+  String get opsNobodyAway => 'Nobody is away.';
+
+  @override
+  String get opsAddWorkersFirst => 'Add workers first, then give them duties.';
+
+  @override
+  String get opsJob => 'Job';
+
+  @override
+  String get opsJobName => 'Name of the job';
+
+  @override
+  String get opsWho => 'Who does it';
+
+  @override
+  String get opsStandIn => 'Stand-in when away';
+
+  @override
+  String get opsNoStandIn => 'No stand-in';
+
+  @override
+  String get opsShift => 'When';
+
+  @override
+  String get opsEveryDay => 'Every day';
+
+  @override
+  String get opsSomeDays => 'Some days';
+
+  @override
+  String get opsWhichDays => 'Which days';
+
+  @override
+  String get opsFrom => 'From';
+
+  @override
+  String get opsTo => 'To';
+
+  @override
+  String get opsReason => 'Reason (optional)';
+
+  @override
+  String get opsDutyMilking => 'Milking';
+
+  @override
+  String get opsDutyFeeding => 'Feeding';
+
+  @override
+  String get opsDutyHealth => 'Health checks';
+
+  @override
+  String get opsDutyCleaning => 'Cleaning';
+
+  @override
+  String get opsDutyGrazing => 'Grazing';
+
+  @override
+  String get opsDutySecurity => 'Security';
+
+  @override
+  String get opsDutyCollection => 'Milk collection';
+
+  @override
+  String get opsDutyManager => 'Manager on duty';
+
+  @override
+  String get opsDutyOther => 'Other job';
+
+  @override
+  String get opsShiftMorning => 'Morning';
+
+  @override
+  String get opsShiftAfternoon => 'Afternoon';
+
+  @override
+  String get opsShiftEvening => 'Evening';
+
+  @override
+  String get opsShiftNight => 'Night';
+
+  @override
+  String get opsShiftAllDay => 'All day';
+
+  @override
+  String get opsFeedStore => 'Feeds store';
+
+  @override
+  String get opsAddFeed => 'Add feed';
+
+  @override
+  String get opsEditFeed => 'Edit feed';
+
+  @override
+  String get opsBuyOrFeed => 'Record buying or feeding';
+
+  @override
+  String get opsInStore => 'In the store';
+
+  @override
+  String get opsNoFeeds => 'No feeds yet';
+
+  @override
+  String get opsNoFeedsBody =>
+      'Add the feeds you use. FarmTap works out how long each one lasts.';
+
+  @override
+  String get opsNoUseYet => 'No feeding recorded yet';
+
+  @override
+  String get opsLow => 'Low';
+
+  @override
+  String opsLastsDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Lasts about $days days',
+      one: 'Lasts about 1 day',
+      zero: 'Runs out today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String opsRunningLow(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count feeds running low',
+      one: '1 feed running low',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get opsCountStore => 'Count the store';
+
+  @override
+  String get opsCountStoreSub => 'Set what is really left';
+
+  @override
+  String opsHowMuchLeft(String unit) {
+    return 'How much is left ($unit)';
+  }
+
+  @override
+  String get opsFeedName => 'Feed name';
+
+  @override
+  String get opsFeedNameHint => 'For example dairy meal';
+
+  @override
+  String get opsUnit => 'Unit';
+
+  @override
+  String get opsUnitHint => 'kg, bags or bales';
+
+  @override
+  String get opsLowAt => 'Warn me when below (optional)';
+
+  @override
+  String get opsVaccinations => 'Vaccinations';
+
+  @override
+  String get opsRecordVaccination => 'Record vaccination';
+
+  @override
+  String get opsNoVaccinations => 'No vaccinations yet';
+
+  @override
+  String get opsNoVaccinationsBody =>
+      'Record each vaccination and FarmTap reminds you when the next dose is due.';
+
+  @override
+  String get opsNextDoses => 'Next doses';
+
+  @override
+  String get opsGiven => 'Given';
+
+  @override
+  String get opsOverdue => 'Overdue';
+
+  @override
+  String get opsSoon => 'Soon';
+
+  @override
+  String get opsVaccine => 'Vaccine';
+
+  @override
+  String get opsWholeHerd => 'Whole herd';
+
+  @override
+  String get opsWholeHerdNote =>
+      'Leave animals empty to record it for the whole herd.';
+
+  @override
+  String get opsGivenOn => 'Given on';
+
+  @override
+  String get opsNextDue => 'Next dose due (optional)';
+
+  @override
+  String get opsCostUgx => 'Cost in UGX (optional)';
+
+  @override
+  String get opsVet => 'Vet (optional)';
+
+  @override
+  String get opsNoVet => 'No vet';
+
+  @override
+  String get opsRemoveVaccination => 'Remove this vaccination?';
+
+  @override
+  String get opsRemoveVaccinationBody =>
+      'Its cost is removed from your spending too.';
+
+  @override
+  String opsUgx(int amount) {
+    final intl.NumberFormat amountNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String amountString = amountNumberFormat.format(amount);
+
+    return 'UGX $amountString';
+  }
+
+  @override
+  String opsAnimals(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count animals',
+      one: '1 animal',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get opsNoDate => 'No date';
+
+  @override
+  String get opsClear => 'Clear';
+
+  @override
+  String get opsRemove => 'Remove';
+
+  @override
+  String get opsViewOnly => 'Only owners and managers can change this.';
+
+  @override
+  String get remindersTitle => 'Reminders';
+
+  @override
+  String get remindersSub => 'Duties, vaccinations, calving and your plan';
+
+  @override
+  String get remindersToday => 'Today';
+
+  @override
+  String get remindersNone => 'Nothing to remind you of today';
+
+  @override
+  String get remindersNoneBody =>
+      'Duties, vaccinations, calving and plan reminders show here on the day.';
+
+  @override
+  String get remindersWhat => 'Remind about';
+
+  @override
+  String get remindersDuties => 'Duties for each worker';
+
+  @override
+  String get remindersVaccinations => 'Vaccinations due';
+
+  @override
+  String get remindersCalving => 'Calving, pregnancy checks and heat';
+
+  @override
+  String get remindersPlan => 'Free trial and plan ending';
+
+  @override
+  String get remindersHow => 'How';
+
+  @override
+  String get remindersPush => 'Notifications on this phone';
+
+  @override
+  String get remindersPushSub => 'Shown once each day';
+
+  @override
+  String get remindersWhatsapp => 'WhatsApp to workers';
+
+  @override
+  String get remindersWhatsappSub => 'Ready to send from this phone, free';
+
+  @override
+  String get remindersSms => 'SMS to workers';
+
+  @override
+  String get remindersSmsSub => 'Sent from this phone at your normal SMS rate';
+
+  @override
+  String get remindersHour => 'Remind at';
+
+  @override
+  String get remindersFreeNote =>
+      'Messages go from your own phone, so FarmTap charges nothing for them.';
+
+  @override
+  String get subscriptionTitle => 'Plan and payment';
+
+  @override
+  String get payChoosePlan => 'Choose a plan';
+
+  @override
+  String payPerMonth(String amount) {
+    return '$amount a month';
+  }
+
+  @override
+  String get payHow => 'How to pay';
+
+  @override
+  String get payPhone => 'Mobile Money number';
+
+  @override
+  String get payPhoneNeeded =>
+      'Enter an MTN or Airtel number, like 0772 123 456.';
+
+  @override
+  String payAmount(String amount) {
+    return 'Pay $amount';
+  }
+
+  @override
+  String get payMobileNote =>
+      'A prompt comes to that phone. Enter your Mobile Money PIN to pay.';
+
+  @override
+  String get payCardNote =>
+      'A secure card page opens. Come back here when you have paid.';
+
+  @override
+  String get payByHand => 'Pay, then send us the transaction ID';
+
+  @override
+  String payByHandAmount(String amount) {
+    return 'Amount: $amount';
+  }
+
+  @override
+  String get payAccountName => 'Account name';
+
+  @override
+  String get payCode => 'Account or pay code';
+
+  @override
+  String get payReference => 'Transaction ID';
+
+  @override
+  String get payReferenceHint => 'From your payment message';
+
+  @override
+  String get payReferenceNeeded =>
+      'Enter the transaction ID from your payment message.';
+
+  @override
+  String get paySendDetails => 'Send payment details';
+
+  @override
+  String get payWaiting => 'Waiting for your payment';
+
+  @override
+  String get payWaitingPhone =>
+      'Check your phone and enter your Mobile Money PIN. This page updates by itself.';
+
+  @override
+  String get payWaitingCard =>
+      'Finish paying on the card page. This page updates by itself.';
+
+  @override
+  String get payCheckNow => 'Check now';
+
+  @override
+  String get payDone => 'Payment received';
+
+  @override
+  String get payDoneBody =>
+      'Thank you. Your farm is open and your receipt is below.';
+
+  @override
+  String get payClaimSent => 'Payment details sent';
+
+  @override
+  String get payClaimSentBody =>
+      'FarmTap checks your payment and opens your farm, usually within a few hours.';
+
+  @override
+  String get payFailed => 'Payment not finished';
+
+  @override
+  String get payFailedBody =>
+      'Nothing was taken. Try again, or pay another way.';
+
+  @override
+  String get payTryAgain => 'Try again';
+
+  @override
+  String get payNotStarted =>
+      'The payment could not start. Check your internet and try again.';
+
+  @override
+  String get paySoon => 'Paying in the app is coming soon';
+
+  @override
+  String paySoonBody(String phone) {
+    return 'For now, WhatsApp or call FarmTap on $phone to pay.';
+  }
+
+  @override
+  String get payAskOwner => 'Only the owner or a manager pays';
+
+  @override
+  String get payAskOwnerBody =>
+      'Ask them to pay for FarmTap. Recording starts again as soon as the payment is confirmed.';
+
+  @override
+  String get payActive => 'Your plan is active';
+
+  @override
+  String payPaidUntil(String date) {
+    return 'Paid until $date';
+  }
+
+  @override
+  String payTrialEnds(String date) {
+    return 'Your free trial ends on $date';
+  }
+
+  @override
+  String get payLockedBody =>
+      'Choose a plan and pay to record again. Your records are safe.';
+
+  @override
+  String get payReceipts => 'Receipts and invoices';
+
+  @override
+  String get payNoReceipts => 'Your receipts show here after each payment.';
+
+  @override
+  String get payReceipt => 'Receipt (PDF)';
+
+  @override
+  String get payInvoice => 'Invoice (PDF)';
+
+  @override
+  String get payRefundNote => 'Refund note (PDF)';
+
+  @override
+  String get payReceiptFailed => 'The PDF could not be made. Try again.';
+
+  @override
+  String get payHelp => 'Need help paying?';
+
+  @override
+  String payHelpMessage(String farm) {
+    return 'Hello FarmTap, I want to pay for $farm.';
+  }
+
+  @override
+  String get lockedTrialTitle => 'Your free trial has ended';
+
+  @override
+  String get lockedPlanTitle => 'Your FarmTap plan has ended';
+
+  @override
+  String lockedBody(String farm) {
+    return 'Nothing can be added or changed on $farm until it is paid for. Your records are safe and nothing is deleted.';
+  }
+
+  @override
+  String get lockedPay => 'Choose a plan and pay';
+
+  @override
+  String get lockedView => 'Look at my records';
+
+  @override
+  String get lockedOtherFarm => 'Open another farm';
+
+  @override
+  String get readOnlyBannerTitle => 'Read only';
+
+  @override
+  String get readOnlyBannerBody =>
+      'Your plan has ended. Pay to record again; anything saved now will not be kept.';
+
+  @override
+  String get profilePhoto => 'Profile photo';
+
+  @override
+  String get profilePhotoBody =>
+      'Shown on your account on this phone and the web.';
+
+  @override
+  String get profilePhotoRemove => 'Remove photo';
+
+  @override
+  String get legalTitle => 'Legal';
+
+  @override
+  String get privacyPolicy => 'Privacy policy';
+
+  @override
+  String get termsOfUse => 'Terms of use';
+
+  @override
+  String get deleteTitle => 'Delete my account';
+
+  @override
+  String get deleteSub => 'Kept 90 days, then erased';
+
+  @override
+  String get deleteWarnTitle => 'This closes your account';
+
+  @override
+  String get deleteWarnBody => 'Read what happens before you go on.';
+
+  @override
+  String get deleteWhatHappens => 'What happens';
+
+  @override
+  String get deleteWhat1 =>
+      'You are signed out on every phone and computer, and cannot sign in again.';
+
+  @override
+  String get deleteWhat2 =>
+      'Every farm you own closes with it: nobody can open or record on it.';
+
+  @override
+  String get deleteWhat3 =>
+      'Your workers and managers lose access to those farms.';
+
+  @override
+  String get deleteWhat4 => 'Any time left on your plan is not refunded.';
+
+  @override
+  String get deleteWhat5 =>
+      'For 90 days FarmTap keeps everything, so support can bring it back if you change your mind.';
+
+  @override
+  String get deleteWhat6 =>
+      'After 90 days your account, farms and records are erased for good.';
+
+  @override
+  String get deleteInstead =>
+      'Only want to stop paying? You do not need to delete anything: the farm turns read-only and your records stay safe.';
+
+  @override
+  String get deleteContinue => 'I still want to delete';
+
+  @override
+  String get deleteUnderstand =>
+      'I understand my farms close and are erased after 90 days';
+
+  @override
+  String get deleteTypeLabel => 'Type DELETE to confirm';
+
+  @override
+  String get deleteTypeNeeded => 'Type the word DELETE.';
+
+  @override
+  String get deleteReason => 'Why are you leaving? (optional)';
+
+  @override
+  String get deleteNow => 'Delete my account';
+
+  @override
+  String get deleteKeep => 'Keep my account';
+
+  @override
+  String get deleteLastTitle => 'Delete your account now?';
+
+  @override
+  String get deleteLastBody =>
+      'You are signed out straight away. Support can restore it within 90 days.';
+
+  @override
+  String get deleteFailed =>
+      'Your account was not deleted. Check your internet and try again.';
+
+  @override
+  String get closedTitle => 'This account is closed';
+
+  @override
+  String closedBody(String date) {
+    return 'It can be brought back until $date. After that it is erased for good.';
+  }
+
+  @override
+  String get closedBodySoon =>
+      'It can be brought back for 90 days. After that it is erased for good.';
+
+  @override
+  String get closedRestore => 'Ask FarmTap to bring it back';
+
+  @override
+  String get closedRestoreMessage =>
+      'Hello FarmTap, I closed my account and want it back.';
 }

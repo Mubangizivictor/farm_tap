@@ -15,6 +15,14 @@ enum MoreTarget {
   scan,
   feeding,
   breeding,
+
+  /// Decision 0024: the farm's contacts, duty roster, feeds store,
+  /// vaccinations and reminders.
+  contacts,
+  roster,
+  feedStore,
+  vaccinations,
+  reminders,
   workers,
   money,
   reports,
@@ -103,6 +111,10 @@ class MorePage extends StatelessWidget {
                 (MoreTarget.me, Symbols.badge_rounded, l10n.myPageTitle, FarmTapTone.primary),
                 (MoreTarget.feeding, Symbols.grass_rounded, l10n.feeding, FarmTapTone.gold),
                 (MoreTarget.breeding, Symbols.favorite_rounded, l10n.breeding, FarmTapTone.danger),
+                (MoreTarget.vaccinations, Symbols.vaccines_rounded, l10n.opsVaccinations, FarmTapTone.info),
+                (MoreTarget.feedStore, Symbols.inventory_2_rounded, l10n.opsFeedStore, FarmTapTone.gold),
+                (MoreTarget.roster, Symbols.calendar_month_rounded, l10n.opsRoster, FarmTapTone.primary),
+                (MoreTarget.contacts, Symbols.contact_phone_rounded, l10n.opsContacts, FarmTapTone.info),
                 (MoreTarget.workers, Symbols.groups_rounded, l10n.workers, FarmTapTone.info),
                 (MoreTarget.money, Symbols.account_balance_wallet_rounded, l10n.money, FarmTapTone.primary),
                 (MoreTarget.reports, Symbols.bar_chart_rounded, l10n.reports, FarmTapTone.primary),
@@ -122,6 +134,14 @@ class MorePage extends StatelessWidget {
                   l10n.subscriptionLabel,
                   FarmTapTone.gold,
                   subtitle: trialDaysLeft == null ? null : l10n.trialDaysLeftShort(trialDaysLeft!),
+                ),
+              if (shows(MoreTarget.reminders))
+                row(
+                  MoreTarget.reminders,
+                  Symbols.notifications_rounded,
+                  l10n.remindersTitle,
+                  FarmTapTone.primary,
+                  subtitle: l10n.remindersSub,
                 ),
               if (shows(MoreTarget.messages))
                 row(MoreTarget.messages, Symbols.sms_rounded, l10n.messagesToSend, FarmTapTone.primary),

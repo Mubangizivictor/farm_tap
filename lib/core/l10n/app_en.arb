@@ -3520,5 +3520,330 @@
       }
     }
   },
-  "receiptWaiting": "Receipt ready to send"
+  "receiptWaiting": "Receipt ready to send",
+  "opsContacts": "Contacts",
+  "opsAddContact": "Add contact",
+  "opsEditContact": "Edit contact",
+  "opsContactKind": "Who is this",
+  "opsContactNeeds": "Add a name and a phone number of at least 9 digits.",
+  "opsContactOrg": "Business or clinic (optional)",
+  "opsContactPlace": "Where they are (optional)",
+  "opsShowWorkers": "Workers can see this contact",
+  "opsSearchContacts": "Search contacts",
+  "opsNoContacts": "No contacts yet",
+  "opsNoContactsBody": "Keep your vet, AI technician, feed suppliers and buyers here so anyone on the farm can call them.",
+  "opsWhatsapp": "WhatsApp",
+  "opsKindVet": "Vets",
+  "opsKindAi": "AI technicians",
+  "opsKindFeed": "Feed suppliers",
+  "opsKindAgrovet": "Agrovet shops",
+  "opsKindBuyer": "Buyers",
+  "opsKindTransport": "Transport",
+  "opsKindEmergency": "Emergency",
+  "opsKindOther": "Other",
+  "opsRoster": "Duty roster",
+  "opsAddDuty": "Add duty",
+  "opsEditDuty": "Edit duty",
+  "opsDutyNeeds": "Pick who does it and on which days.",
+  "opsNoDuties": "No duties yet",
+  "opsNoDutiesBody": "Give each job a person and the days they do it. Stand-ins cover when someone is away.",
+  "opsNothingThatDay": "No duties on this day.",
+  "opsTomorrow": "Tomorrow",
+  "opsYou": "You",
+  "opsNobodyOn": "{name} is away and nobody stands in",
+  "@opsNobodyOn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "opsStandsIn": "{who} stands in for {colleague}",
+  "@opsStandsIn": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "colleague": {
+        "type": "String"
+      }
+    }
+  },
+  "opsAway": "Away",
+  "opsAddAway": "Add",
+  "opsNobodyAway": "Nobody is away.",
+  "opsAddWorkersFirst": "Add workers first, then give them duties.",
+  "opsJob": "Job",
+  "opsJobName": "Name of the job",
+  "opsWho": "Who does it",
+  "opsStandIn": "Stand-in when away",
+  "opsNoStandIn": "No stand-in",
+  "opsShift": "When",
+  "opsEveryDay": "Every day",
+  "opsSomeDays": "Some days",
+  "opsWhichDays": "Which days",
+  "opsFrom": "From",
+  "opsTo": "To",
+  "opsReason": "Reason (optional)",
+  "opsDutyMilking": "Milking",
+  "opsDutyFeeding": "Feeding",
+  "opsDutyHealth": "Health checks",
+  "opsDutyCleaning": "Cleaning",
+  "opsDutyGrazing": "Grazing",
+  "opsDutySecurity": "Security",
+  "opsDutyCollection": "Milk collection",
+  "opsDutyManager": "Manager on duty",
+  "opsDutyOther": "Other job",
+  "opsShiftMorning": "Morning",
+  "opsShiftAfternoon": "Afternoon",
+  "opsShiftEvening": "Evening",
+  "opsShiftNight": "Night",
+  "opsShiftAllDay": "All day",
+  "opsFeedStore": "Feeds store",
+  "opsAddFeed": "Add feed",
+  "opsEditFeed": "Edit feed",
+  "opsBuyOrFeed": "Record buying or feeding",
+  "opsInStore": "In the store",
+  "opsNoFeeds": "No feeds yet",
+  "opsNoFeedsBody": "Add the feeds you use. FarmTap works out how long each one lasts.",
+  "opsNoUseYet": "No feeding recorded yet",
+  "opsLow": "Low",
+  "opsLastsDays": "{days, plural, =0{Runs out today} =1{Lasts about 1 day} other{Lasts about {days} days}}",
+  "@opsLastsDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "opsRunningLow": "{count, plural, =1{1 feed running low} other{{count} feeds running low}}",
+  "@opsRunningLow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "opsCountStore": "Count the store",
+  "opsCountStoreSub": "Set what is really left",
+  "opsHowMuchLeft": "How much is left ({unit})",
+  "@opsHowMuchLeft": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "opsFeedName": "Feed name",
+  "opsFeedNameHint": "For example dairy meal",
+  "opsUnit": "Unit",
+  "opsUnitHint": "kg, bags or bales",
+  "opsLowAt": "Warn me when below (optional)",
+  "opsVaccinations": "Vaccinations",
+  "opsRecordVaccination": "Record vaccination",
+  "opsNoVaccinations": "No vaccinations yet",
+  "opsNoVaccinationsBody": "Record each vaccination and FarmTap reminds you when the next dose is due.",
+  "opsNextDoses": "Next doses",
+  "opsGiven": "Given",
+  "opsOverdue": "Overdue",
+  "opsSoon": "Soon",
+  "opsVaccine": "Vaccine",
+  "opsWholeHerd": "Whole herd",
+  "opsWholeHerdNote": "Leave animals empty to record it for the whole herd.",
+  "opsGivenOn": "Given on",
+  "opsNextDue": "Next dose due (optional)",
+  "opsCostUgx": "Cost in UGX (optional)",
+  "opsVet": "Vet (optional)",
+  "opsNoVet": "No vet",
+  "opsRemoveVaccination": "Remove this vaccination?",
+  "opsRemoveVaccinationBody": "Its cost is removed from your spending too.",
+  "opsUgx": "UGX {amount}",
+  "@opsUgx": {
+    "placeholders": {
+      "amount": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "opsAnimals": "{count, plural, =1{1 animal} other{{count} animals}}",
+  "@opsAnimals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "opsNoDate": "No date",
+  "opsClear": "Clear",
+  "opsRemove": "Remove",
+  "opsViewOnly": "Only owners and managers can change this.",
+  "remindersTitle": "Reminders",
+  "remindersSub": "Duties, vaccinations, calving and your plan",
+  "remindersToday": "Today",
+  "remindersNone": "Nothing to remind you of today",
+  "remindersNoneBody": "Duties, vaccinations, calving and plan reminders show here on the day.",
+  "remindersWhat": "Remind about",
+  "remindersDuties": "Duties for each worker",
+  "remindersVaccinations": "Vaccinations due",
+  "remindersCalving": "Calving, pregnancy checks and heat",
+  "remindersPlan": "Free trial and plan ending",
+  "remindersHow": "How",
+  "remindersPush": "Notifications on this phone",
+  "remindersPushSub": "Shown once each day",
+  "remindersWhatsapp": "WhatsApp to workers",
+  "remindersWhatsappSub": "Ready to send from this phone, free",
+  "remindersSms": "SMS to workers",
+  "remindersSmsSub": "Sent from this phone at your normal SMS rate",
+  "remindersHour": "Remind at",
+  "remindersFreeNote": "Messages go from your own phone, so FarmTap charges nothing for them.",
+  "subscriptionTitle": "Plan and payment",
+  "payChoosePlan": "Choose a plan",
+  "payPerMonth": "{amount} a month",
+  "@payPerMonth": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payHow": "How to pay",
+  "payPhone": "Mobile Money number",
+  "payPhoneNeeded": "Enter an MTN or Airtel number, like 0772 123 456.",
+  "payAmount": "Pay {amount}",
+  "@payAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payMobileNote": "A prompt comes to that phone. Enter your Mobile Money PIN to pay.",
+  "payCardNote": "A secure card page opens. Come back here when you have paid.",
+  "payByHand": "Pay, then send us the transaction ID",
+  "payByHandAmount": "Amount: {amount}",
+  "@payByHandAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payAccountName": "Account name",
+  "payCode": "Account or pay code",
+  "payReference": "Transaction ID",
+  "payReferenceHint": "From your payment message",
+  "payReferenceNeeded": "Enter the transaction ID from your payment message.",
+  "paySendDetails": "Send payment details",
+  "payWaiting": "Waiting for your payment",
+  "payWaitingPhone": "Check your phone and enter your Mobile Money PIN. This page updates by itself.",
+  "payWaitingCard": "Finish paying on the card page. This page updates by itself.",
+  "payCheckNow": "Check now",
+  "payDone": "Payment received",
+  "payDoneBody": "Thank you. Your farm is open and your receipt is below.",
+  "payClaimSent": "Payment details sent",
+  "payClaimSentBody": "FarmTap checks your payment and opens your farm, usually within a few hours.",
+  "payFailed": "Payment not finished",
+  "payFailedBody": "Nothing was taken. Try again, or pay another way.",
+  "payTryAgain": "Try again",
+  "payNotStarted": "The payment could not start. Check your internet and try again.",
+  "paySoon": "Paying in the app is coming soon",
+  "paySoonBody": "For now, WhatsApp or call FarmTap on {phone} to pay.",
+  "@paySoonBody": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "payAskOwner": "Only the owner or a manager pays",
+  "payAskOwnerBody": "Ask them to pay for FarmTap. Recording starts again as soon as the payment is confirmed.",
+  "payActive": "Your plan is active",
+  "payPaidUntil": "Paid until {date}",
+  "@payPaidUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "payTrialEnds": "Your free trial ends on {date}",
+  "@payTrialEnds": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "payLockedBody": "Choose a plan and pay to record again. Your records are safe.",
+  "payReceipts": "Receipts and invoices",
+  "payNoReceipts": "Your receipts show here after each payment.",
+  "payReceipt": "Receipt (PDF)",
+  "payInvoice": "Invoice (PDF)",
+  "payRefundNote": "Refund note (PDF)",
+  "payReceiptFailed": "The PDF could not be made. Try again.",
+  "payHelp": "Need help paying?",
+  "payHelpMessage": "Hello FarmTap, I want to pay for {farm}.",
+  "@payHelpMessage": {
+    "placeholders": {
+      "farm": {
+        "type": "String"
+      }
+    }
+  },
+  "lockedTrialTitle": "Your free trial has ended",
+  "lockedPlanTitle": "Your FarmTap plan has ended",
+  "lockedBody": "Nothing can be added or changed on {farm} until it is paid for. Your records are safe and nothing is deleted.",
+  "@lockedBody": {
+    "placeholders": {
+      "farm": {
+        "type": "String"
+      }
+    }
+  },
+  "lockedPay": "Choose a plan and pay",
+  "lockedView": "Look at my records",
+  "lockedOtherFarm": "Open another farm",
+  "readOnlyBannerTitle": "Read only",
+  "readOnlyBannerBody": "Your plan has ended. Pay to record again; anything saved now will not be kept.",
+  "profilePhoto": "Profile photo",
+  "profilePhotoBody": "Shown on your account on this phone and the web.",
+  "profilePhotoRemove": "Remove photo",
+  "legalTitle": "Legal",
+  "privacyPolicy": "Privacy policy",
+  "termsOfUse": "Terms of use",
+  "deleteTitle": "Delete my account",
+  "deleteSub": "Kept 90 days, then erased",
+  "deleteWarnTitle": "This closes your account",
+  "deleteWarnBody": "Read what happens before you go on.",
+  "deleteWhatHappens": "What happens",
+  "deleteWhat1": "You are signed out on every phone and computer, and cannot sign in again.",
+  "deleteWhat2": "Every farm you own closes with it: nobody can open or record on it.",
+  "deleteWhat3": "Your workers and managers lose access to those farms.",
+  "deleteWhat4": "Any time left on your plan is not refunded.",
+  "deleteWhat5": "For 90 days FarmTap keeps everything, so support can bring it back if you change your mind.",
+  "deleteWhat6": "After 90 days your account, farms and records are erased for good.",
+  "deleteInstead": "Only want to stop paying? You do not need to delete anything: the farm turns read-only and your records stay safe.",
+  "deleteContinue": "I still want to delete",
+  "deleteUnderstand": "I understand my farms close and are erased after 90 days",
+  "deleteTypeLabel": "Type DELETE to confirm",
+  "deleteTypeNeeded": "Type the word DELETE.",
+  "deleteReason": "Why are you leaving? (optional)",
+  "deleteNow": "Delete my account",
+  "deleteKeep": "Keep my account",
+  "deleteLastTitle": "Delete your account now?",
+  "deleteLastBody": "You are signed out straight away. Support can restore it within 90 days.",
+  "deleteFailed": "Your account was not deleted. Check your internet and try again.",
+  "closedTitle": "This account is closed",
+  "closedBody": "It can be brought back until {date}. After that it is erased for good.",
+  "@closedBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "closedBodySoon": "It can be brought back for 90 days. After that it is erased for good.",
+  "closedRestore": "Ask FarmTap to bring it back",
+  "closedRestoreMessage": "Hello FarmTap, I closed my account and want it back."
 }

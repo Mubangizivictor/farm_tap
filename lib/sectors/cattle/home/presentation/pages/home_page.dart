@@ -24,6 +24,7 @@ class HomePage extends StatefulWidget {
     super.key,
     this.staff,
     this.trialDaysLeft,
+    this.readOnly = false,
     this.onLock,
     this.onRefresh,
     this.today,
@@ -38,6 +39,9 @@ class HomePage extends StatefulWidget {
   /// Worker who unlocked the phone: shows the worker home (D02).
   final StaffMember? staff;
   final int? trialDaysLeft;
+
+  /// The plan ended and the owner chose to look at the records (M05).
+  final bool readOnly;
   final ValueChanged<HomeTarget> onOpen;
   final VoidCallback? onLock;
   final Future<void> Function()? onRefresh;
@@ -107,6 +111,17 @@ class _HomePageState extends State<HomePage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (widget.readOnly) ...[
+              FarmTapBanner(
+                tone: FarmTapTone.danger,
+                icon: Symbols.lock_rounded,
+                title: l10n.readOnlyBannerTitle,
+                message: l10n.readOnlyBannerBody,
+                actionLabel: l10n.payNow,
+                onAction: () => widget.onOpen(HomeTarget.pay),
+              ),
+              context.space.gapLg,
+            ],
             if (online && widget.trialDaysLeft != null) ...[
               TrialBanner(daysLeft: widget.trialDaysLeft!, onPay: () => widget.onOpen(HomeTarget.pay)),
               context.space.gapLg,
