@@ -104,7 +104,16 @@ function Shell({ children }: { children: ReactNode }) {
   const path = usePathname();
   const router = useRouter();
   const [more, setMore] = useState(false);
+  const [userMenu, setUserMenu] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   useEffect(() => setMore(false), [path]);
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    setUserMenu(false);
+    await signOut();
+    router.replace('/admin-sign-in/');
+  }
 
   if (me === undefined) return <Loading />;
   if (!me || !me.active) return <NotStaff />;
@@ -155,9 +164,52 @@ function Shell({ children }: { children: ReactNode }) {
           <Link href="/" className="btn sm outline hide-sm" title="Open my farm">
             My farm
           </Link>
-          <button className="icon-btn" aria-label="Sign out" title="Sign out" onClick={() => void signOut().then(() => router.replace('/admin-sign-in/'))}>
-            <span className="avatar">{initials(me.name || user?.email || '')}</span>
-          </button>
+          <div style={{ position: 'relative' }}>
+            <button
+              className="icon-btn"
+              aria-label="Account menu"
+              title={me.name || user?.email || ''}
+              onClick={() => setUserMenu((v) => !v)}
+            >
+              <span className="avatar">{initials(me.name || user?.email || '')}</span>
+            </button>
+            {userMenu && (
+              <>
+                <div
+                  style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+                  onClick={() => setUserMenu(false)}
+                  aria-hidden
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: 'calc(100% + 8px)',
+                    minWidth: 200,
+                    background: 'var(--surface-2, #1a1a2e)',
+                    border: '1px solid var(--border, rgba(255,255,255,0.1))',
+                    borderRadius: 10,
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+                    zIndex: 100,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border, rgba(255,255,255,0.08))' }}>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{me.name || user?.email}</div>
+                    <div style={{ fontSize: 12, opacity: 0.5 }}>{user?.email}</div>
+                  </div>
+                  <button
+                    className="btn ghost sm"
+                    disabled={signingOut}
+                    style={{ width: '100%', borderRadius: 0, justifyContent: 'flex-start', padding: '10px 14px' }}
+                    onClick={() => void handleSignOut()}
+                  >
+                    <Icon name="logout" /> {signingOut ? 'Signing out…' : 'Sign out'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </header>
         <div className="content">
           {!online && (
