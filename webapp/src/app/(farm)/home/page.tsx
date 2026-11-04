@@ -5,6 +5,7 @@ import { Fit } from '@/components/fit';
 import { Icon, type IconName } from '@/components/Icon';
 import { CardHead, Change, Empty, ExportButtons, LoadError, PageHead, SkelCard, SkelRows, Stat } from '@/components/ui';
 import { MilkChart } from '@/components/MilkChart';
+import { TodayOnFarm } from '@/components/farm';
 import { addDays, localIso, parseDate, sameDay, startOfDay } from '@/lib/dates';
 import { useRecords } from '@/lib/data';
 import {
@@ -320,6 +321,7 @@ export default function Home() {
         </div>
       )}
     </section>,
+    <TodayOnFarm key="duty" />,
     <section key="staff" className="card">
       <CardHead title="Workers today">
         <Link href="/workers/" className="small no-print">

@@ -3,11 +3,23 @@
 import { useEffect, useState } from 'react';
 import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
-import { CardHead, Empty, ExportButtons, Field, FormDialog, LoadError, PageHead, SearchBox, SkelRows, Stat, Tabs, useSave, useToast } from '@/components/ui';
+import { CardHead, ConfirmDialog, Empty, ExportButtons, Field, FormDialog, LoadError, PageHead, SearchBox, SkelRows, Stat, Tabs, useSave, useToast } from '@/components/ui';
 import { downloadCsv } from '@/lib/csv';
 import { addDays, dayKey, localIso, parseDate, startOfDay } from '@/lib/dates';
-import { addRecord, useRecords } from '@/lib/data';
+import { useRecords } from '@/lib/data';
+import { CallButtons } from '@/components/farm';
+import { expensesOf, removeWithExpenses, saveWithExpense } from '@/lib/linked';
 import {
+  alive,
+  commonVaccines,
+  manages,
+  payMethodName,
+  payMethods,
+  type ContactBody,
+  type ExpenseBody,
+  type FarmRecord,
+  type PayMethod,
+  type VaccinationBody,
   animalLabel,
   conditions,
   drugRoutes,
@@ -21,7 +33,7 @@ import {
   type StockItemBody,
   type TreatmentBody,
 } from '@/lib/domain';
-import { count, date, shortDate, words } from '@/lib/format';
+import { count, date, shortDate, ugx, words } from '@/lib/format';
 import { firebase } from '@/lib/firebase';
 import { useFarm, useSession } from '@/lib/session';
 import { useOpenFromUrl } from '@/lib/useOpen';
@@ -30,11 +42,13 @@ function RecordTreatment({
   animals,
   drugs,
   startAnimal,
+  vets,
   onClose,
 }: {
   animals: { id: string; label: string; body: AnimalBody }[];
   drugs: Drug[];
   startAnimal: string;
+  vets: FarmRecord<ContactBody>[];
   onClose: () => void;
 }) {
   const farm = useFarm();
@@ -50,7 +64,11 @@ function RecordTreatment({
     route: 'injection',
     givenBy: user?.displayName ?? '',
     note: '',
+    vetId: '',
+    cost: '',
+    payMethod: 'cash',
   });
+  const boss = manages(farm);
   const { busy, error, setError, run } = useSave();
   // The herd may still be loading when the dialog opens from an animal's page.
   useEffect(() => {
@@ -70,8 +88,11 @@ function RecordTreatment({
     if (givenDay > new Date()) return setError('The day given cannot be in the future.');
     // Given today: now. Given earlier: that day at noon, like a typed date on the phone.
     const at = f.given === today ? new Date() : new Date(givenDay.getFullYear(), givenDay.getMonth(), givenDay.getDate(), 12);
+    const cost = boss && f.cost.trim() ? Number(f.cost) : 0;
+    if (cost && (!Number.isInteger(cost) || cost < 0)) return setError('Type the cost in whole shillings, e.g. 35000.');
+    const vet = vets.find((v) => v.id === f.vetId);
     const ok = await run(() =>
-      addRecord(firebase().db, farm.id, 'treatments', user.uid, {
+      saveWithExpense(firebase().db, farm.id, user.uid, { collection: 'treatments', body: {
         animalId: a.id,
         animalName: a.body.name?.trim() || a.body.tagNumber,
         tag: a.body.tagNumber,
@@ -84,10 +105,12 @@ function RecordTreatment({
         courseDays: 3,
         dose: f.dose.trim() || null,
         route: f.route,
-        givenBy: f.givenBy.trim() || null,
+        givenBy: f.givenBy.trim() || vet?.body.name || null,
         photo: null,
         note: f.note.trim() || null,
-      }),
+        cost: cost || null,
+        vetId: vet?.id ?? null,
+      } }, 'treatment', cost ? { category: 'vet', amount: cost, at: localIso(at), note: `${a.label} · ${words(f.condition)}`, supplierId: vet?.id ?? null, payMethod: f.payMethod as PayMethod } : null),
     );
     if (ok) {
       toast(drug.withdrawalDays ? `Saved. ${a.label}: milk not for sale until ${shortDate(safe)}` : `Treatment saved for ${a.label}`);
@@ -153,9 +176,38 @@ function RecordTreatment({
             ))}
           </select>
         </Field>
+        {vets.length > 0 && (
+          <Field label="Vet (optional)">
+            <select className="input" value={f.vetId} onChange={set('vetId')}>
+              <option value="">No vet</option>
+              {vets.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.body.name}
+                  {v.body.org ? ` · ${v.body.org}` : ''}
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
         <Field label="Given by (optional)">
           <input className="input" value={f.givenBy} onChange={set('givenBy')} placeholder="e.g. the vet’s name" />
         </Field>
+        {boss && (
+          <Field label="Cost, UGX (optional)" hint="Drugs and the vet’s fee. Goes to Money as a health expense.">
+            <input className="input" type="number" min={0} step={500} inputMode="numeric" value={f.cost} onChange={set('cost')} />
+          </Field>
+        )}
+        {boss && Number(f.cost) > 0 && (
+          <Field label="Paid by">
+            <select className="input" value={f.payMethod} onChange={set('payMethod')}>
+              {payMethods.map((m) => (
+                <option key={m} value={m}>
+                  {payMethodName[m]}
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
         <Field label="Note (optional)">
           <input className="input" value={f.note} onChange={set('note')} />
         </Field>
@@ -164,7 +216,111 @@ function RecordTreatment({
   );
 }
 
-type Tab = 'withdrawal' | 'all';
+function RecordVaccination({ animals, vets, onClose }: { animals: { id: string; label: string }[]; vets: FarmRecord<ContactBody>[]; onClose: () => void }) {
+  const farm = useFarm();
+  const { user, canSave, online } = useSession();
+  const toast = useToast();
+  const today = dayKey(new Date());
+  const [f, setF] = useState({ vaccine: commonVaccines[0] as string, custom: '', whole: true, ids: [] as string[], given: today, nextDue: dayKey(addDays(new Date(), 180)), cost: '', vetId: '', payMethod: 'cash', note: '' });
+  const { busy, error, setError, run } = useSave();
+
+  async function save() {
+    if (!user) return;
+    const vaccine = f.vaccine === 'other' ? f.custom.trim() : f.vaccine;
+    if (!vaccine) return setError('Type the vaccine.');
+    if (!f.whole && f.ids.length === 0) return setError('Choose the animals, or the whole herd.');
+    const given = parseDate(f.given);
+    if (!given || given > new Date()) return setError('Choose the day it was given.');
+    const cost = f.cost.trim() ? Number(f.cost) : 0;
+    if (cost && (!Number.isInteger(cost) || cost < 0)) return setError('Type the cost in whole shillings.');
+    const at = localIso(new Date(given.getFullYear(), given.getMonth(), given.getDate(), 12));
+    const vet = vets.find((v) => v.id === f.vetId);
+    const ok = await run(() =>
+      saveWithExpense(
+        firebase().db,
+        farm.id,
+        user.uid,
+        { collection: 'vaccinations', body: { vaccine, animalIds: f.whole ? [] : f.ids, given: at, nextDue: f.nextDue ? localIso(parseDate(f.nextDue)!) : null, cost: cost || null, vetId: vet?.id ?? null, note: f.note.trim() || null } },
+        'vaccination',
+        cost ? { category: 'vet', amount: cost, at, note: `${vaccine} · ${f.whole ? 'whole herd' : `${f.ids.length} animals`}`, supplierId: vet?.id ?? null, payMethod: f.payMethod as PayMethod } : null,
+      ),
+    );
+    if (ok) {
+      toast(`${vaccine} saved${f.nextDue ? `. Next due ${shortDate(parseDate(f.nextDue))}` : ''}`);
+      onClose();
+    }
+  }
+
+  return (
+    <FormDialog title="Record vaccination" subtitle="FarmTap reminds everyone on Home when the next one is due." onClose={onClose} onSubmit={save} busy={busy} error={error} canSave={canSave} online={online} submit="Save vaccination" size="lg">
+      <Fit kind="fields" cols={[1, 2, 2, 2]}>
+        <Field label="Vaccine">
+          <select className="input" value={f.vaccine} onChange={(e) => setF({ ...f, vaccine: e.target.value })}>
+            {commonVaccines.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+            <option value="other">Other…</option>
+          </select>
+        </Field>
+        {f.vaccine === 'other' && (
+          <Field label="Which vaccine">
+            <input className="input" value={f.custom} onChange={(e) => setF({ ...f, custom: e.target.value })} />
+          </Field>
+        )}
+        <Field label="Day given">
+          <input className="input" type="date" max={today} value={f.given} onChange={(e) => setF({ ...f, given: e.target.value })} />
+        </Field>
+        <Field label="Next one due (optional)">
+          <input className="input" type="date" min={today} value={f.nextDue} onChange={(e) => setF({ ...f, nextDue: e.target.value })} />
+        </Field>
+        {vets.length > 0 && (
+          <Field label="Vet (optional)">
+            <select className="input" value={f.vetId} onChange={(e) => setF({ ...f, vetId: e.target.value })}>
+              <option value="">No vet</option>
+              {vets.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.body.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
+        <Field label="Cost, UGX (optional)" hint="Goes to Money as a health expense.">
+          <input className="input" type="number" min={0} step={500} inputMode="numeric" value={f.cost} onChange={(e) => setF({ ...f, cost: e.target.value })} />
+        </Field>
+        {Number(f.cost) > 0 && (
+          <Field label="Paid by">
+            <select className="input" value={f.payMethod} onChange={(e) => setF({ ...f, payMethod: e.target.value })}>
+              {payMethods.map((m) => (
+                <option key={m} value={m}>
+                  {payMethodName[m]}
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
+      </Fit>
+      <label className="check-row">
+        <input type="checkbox" checked={f.whole} onChange={(e) => setF({ ...f, whole: e.target.checked })} />
+        <span>The whole herd</span>
+      </label>
+      {!f.whole && (
+        <div className="pick-grid">
+          {animals.map((a) => (
+            <label key={a.id} className={`pick ${f.ids.includes(a.id) ? 'on' : ''}`}>
+              <input type="checkbox" checked={f.ids.includes(a.id)} onChange={(e) => setF({ ...f, ids: e.target.checked ? [...f.ids, a.id] : f.ids.filter((x) => x !== a.id) })} />
+              {a.label}
+            </label>
+          ))}
+        </div>
+      )}
+    </FormDialog>
+  );
+}
+
+type Tab = 'withdrawal' | 'all' | 'vaccines';
 
 export default function Health() {
   const farm = useFarm();
@@ -173,6 +329,24 @@ export default function Health() {
   const treatments = useRecords<TreatmentBody>(farm.id, 'treatments');
   const animals = useRecords<AnimalBody>(farm.id, 'animals');
   const stock = useRecords<StockItemBody>(farm.id, 'stockItems');
+  const contacts = useRecords<ContactBody>(farm.id, 'contacts');
+  const vaccinations = useRecords<VaccinationBody>(farm.id, 'vaccinations');
+  const boss = manages(farm);
+  const expenses = useRecords<ExpenseBody>(boss ? farm.id : null, 'expenses');
+  const { user } = useSession();
+  const toast = useToast();
+  const [vaccinating, setVaccinating] = useState(false);
+  const [removing, setRemoving] = useState<FarmRecord<TreatmentBody> | FarmRecord<VaccinationBody> | null>(null);
+  const del = useSave();
+  const vets = alive(contacts.data).filter((c) => c.body.kind === 'vet' && (boss || c.body.showWorkers !== false));
+  const vaxList = alive(vaccinations.data).sort((a, b) => recordDate(b, 'given').getTime() - recordDate(a, 'given').getTime());
+  // The latest dose of each vaccine says when the next is due.
+  const nextByVaccine = new Map<string, { due: Date; rec: FarmRecord<VaccinationBody> }>();
+  for (const v of vaxList) {
+    const due = parseDate(v.body.nextDue);
+    if (due && !nextByVaccine.has(v.body.vaccine)) nextByVaccine.set(v.body.vaccine, { due, rec: v });
+  }
+  const dueSoon = [...nextByVaccine.values()].filter((x) => x.due <= addDays(now, 14)).sort((a, b) => a.due.getTime() - b.due.getTime());
   const [q, setQ] = useState('');
   const [tab, setTab] = useState<Tab>('all');
   const [adding, setAdding] = useOpenFromUrl();
@@ -229,10 +403,51 @@ export default function Health() {
       <PageHead title="Health" subtitle="Milk from a treated animal must not be sold until its safe day.">
         <SearchBox value={q} onChange={setQ} placeholder="Search animal, problem, drug" />
         <ExportButtons onCsv={csv} />
+        {boss && (
+          <button className="btn sm outline" onClick={() => setVaccinating(true)} disabled={!canSave}>
+            <Icon name="calendar" /> Vaccination
+          </button>
+        )}
         <button className="btn sm" onClick={() => setAdding(true)} disabled={!canSave || herd.length === 0} title={herd.length ? undefined : 'Add animals first'}>
           <Icon name="plus" /> Record treatment
         </button>
       </PageHead>
+      {vets.length > 0 ? (
+        <section className="card emergency">
+          <div className="row wrap">
+            <div className="icon-chip bad">
+              <Icon name="phone" />
+            </div>
+            <div className="grow stack" style={{ gap: 0 }}>
+              <strong>Vet: {vets[0].body.name}</strong>
+              <span className="small muted">
+                {vets[0].body.org ? `${vets[0].body.org} · ` : ''}
+                {vets[0].body.phone}
+                {vets.length > 1 ? ` · ${vets.length - 1} more under Contacts` : ''}
+              </span>
+            </div>
+            <CallButtons phone={vets[0].body.phone} />
+          </div>
+        </section>
+      ) : (
+        boss && (
+          <div className="banner info">
+            <Icon name="phone" />
+            <span className="grow">Add your vet under Contacts so workers can call them from here.</span>
+            <a className="btn sm outline" href="/contacts/?new=1">
+              Add vet
+            </a>
+          </div>
+        )
+      )}
+      {dueSoon.length > 0 && (
+        <div className="banner warn">
+          <Icon name="calendar" />
+          <span className="grow">
+            {dueSoon.map((d) => `${d.rec.body.vaccine}: ${d.due < startOfDay(now) ? 'overdue since' : 'due'} ${shortDate(d.due)}`).join(' · ')}
+          </span>
+        </div>
+      )}
       <LoadError code={treatments.error ?? animals.error} />
 
       <Fit kind="stats" cols={[2, 3, 3, 3]}>
@@ -273,8 +488,64 @@ export default function Health() {
         </section>
       )}
 
-      <Tabs label="Treatments" value={tab} onChange={setTab} items={[['all', 'All treatments', sorted.length], ['withdrawal', 'On withdrawal', active.length]]} />
+      <Tabs
+        label="Treatments"
+        value={tab}
+        onChange={setTab}
+        items={[
+          ['all', 'All treatments', sorted.length],
+          ['withdrawal', 'On withdrawal', active.length],
+          ['vaccines', 'Vaccinations', vaxList.length],
+        ]}
+      />
 
+      {tab === 'vaccines' && (
+        <div className="table-wrap">
+          <table className="table rt">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Vaccine</th>
+                <th>Animals</th>
+                <th>Next due</th>
+                {boss && <th className="r">Cost</th>}
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {vaxList.map((v) => {
+                const due = parseDate(v.body.nextDue);
+                return (
+                  <tr key={v.id}>
+                    <td data-label="Date">{date(parseDate(v.body.given))}</td>
+                    <td data-label="Vaccine" className="lead">
+                      <strong>{v.body.vaccine}</strong>
+                    </td>
+                    <td data-label="Animals">{v.body.animalIds?.length ? `${v.body.animalIds.length} animals` : 'Whole herd'}</td>
+                    <td data-label="Next due">{due ? <span className={`chip ${due <= addDays(now, 14) ? 'warn' : ''}`}>{date(due)}</span> : '–'}</td>
+                    {boss && (
+                      <td data-label="Cost" className="r">
+                        {v.body.cost ? ugx(v.body.cost) : '–'}
+                      </td>
+                    )}
+                    <td className="acts r">
+                      {boss && canSave && (
+                        <button className="icon-btn" aria-label="Remove vaccination" onClick={() => setRemoving(v)}>
+                          <Icon name="close" />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {!vaccinations.loading && vaxList.length === 0 && <Empty icon="calendar">No vaccinations recorded yet.</Empty>}
+          {vaccinations.loading && <SkelRows rows={3} cols={4} />}
+        </div>
+      )}
+
+      {tab !== 'vaccines' && (
       <div className="table-wrap">
         <table className="table rt">
           <thead>
@@ -285,6 +556,8 @@ export default function Health() {
               <th>Drug</th>
               <th>Given by</th>
               <th>Milk safe from</th>
+              {boss && <th className="r">Cost</th>}
+              {boss && <th />}
             </tr>
           </thead>
           <tbody>
@@ -313,6 +586,20 @@ export default function Health() {
                       <span className="chip ok">Safe since {shortDate(s)}</span>
                     )}
                   </td>
+                  {boss && (
+                    <td data-label="Cost" className="r">
+                      {t.body.cost ? ugx(t.body.cost) : '–'}
+                    </td>
+                  )}
+                  {boss && (
+                    <td className="acts r">
+                      {canSave && (
+                        <button className="icon-btn" aria-label="Remove treatment" title="Remove a mistake (and its cost in Money)" onClick={() => setRemoving(t)}>
+                          <Icon name="close" />
+                        </button>
+                      )}
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -337,8 +624,29 @@ export default function Health() {
           </Empty>
         )}
       </div>
+      )}
 
-      {adding && <RecordTreatment animals={herd} drugs={drugs} startAnimal={startAnimal} onClose={() => setAdding(false)} />}
+      {adding && <RecordTreatment animals={herd} drugs={drugs} startAnimal={startAnimal} vets={vets} onClose={() => setAdding(false)} />}
+      {vaccinating && <RecordVaccination animals={herd} vets={vets} onClose={() => setVaccinating(false)} />}
+      {removing && (
+        <ConfirmDialog
+          title="Remove this record?"
+          confirm="Remove"
+          danger
+          busy={del.busy}
+          error={del.error}
+          onClose={() => setRemoving(null)}
+          onConfirm={async () => {
+            if (!user) return;
+            if (await del.run(() => removeWithExpenses(firebase().db, farm.id, user.uid, removing, expensesOf(removing.id, expenses.data)))) {
+              toast('Removed, and its cost from Money');
+              setRemoving(null);
+            }
+          }}
+        >
+          Use this only for a mistake. Its cost is removed from Money too, and the phones stop showing it.
+        </ConfirmDialog>
+      )}
     </>
   );
 }

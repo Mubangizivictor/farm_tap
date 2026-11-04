@@ -103,7 +103,7 @@ service cloud.firestore {
       return c in ['staff', 'nfcCards', 'settings', 'paymentPeriods', 'farmerStatements',
         'deductions', 'payouts', 'expenses', 'income', 'wages', 'payments', 'tasks',
         // Decision 0023: who to call, who is on duty, feed types, vaccinations.
-        'contacts', 'duties', 'feedTypes', 'vaccinations'];
+        'contacts', 'duties', 'absences', 'feedTypes', 'vaccinations'];
     }
 
     // A subscription payment is only ever submitted from the app; Victorbee

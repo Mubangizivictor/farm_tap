@@ -26,6 +26,8 @@
   --p-warning50: #FFE7C2; --p-warning300: #FFB74D; --p-warning600: #B26A00; --p-warning800: #5A3C00; --p-warning950: #3E2600;
   --p-danger50: #F9DEDC; --p-danger300: #F2B8B5; --p-danger600: #B3261E; --p-danger800: #8C1D18; --p-danger900: #601410; --p-danger950: #410E0B;
   --p-scrim-light: rgba(0, 0, 0, 0.42); --p-scrim-dark: rgba(0, 0, 0, 0.6);
+  /* Payment network marks (decision 0023): MTN yellow, Airtel red, card blue. */
+  --p-mtn: #FFCB05; --p-on-mtn: #1B1F1C; --p-airtel: #E40000; --p-on-airtel: #FFFFFF; --p-card: #1A1F71; --p-on-card: #FFFFFF;
 
   /* ---- Type (Outfit, farmtap_typography.dart) ---- */
   --font: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -45,6 +47,7 @@
   /* ---- Sizes ---- */
   --z-touch: 44px; --z-btn: 40px; --z-input: 40px; --z-icon: 20px; --z-icon-sm: 16px; --z-avatar: 32px; --z-avatar-lg: 64px;
   --z-sidebar: 232px; --z-rail: 72px; --z-topbar: 56px; --z-bottomnav: 60px; --z-content: 1200px; --z-content-admin: 1440px; --z-drawer: 280px; --z-jump: 44px; --z-auth: 400px;
+  --z-plan-min: 240px; --z-lock: 520px; --z-tile-min: 150px; --z-pay-logo: 44px; --z-lock-icon: 72px; --z-plan-ribbon: 22px;
   --z-chart: 160px; --z-logo: 28px; --z-logo-lg: 72px; --z-border: 1px; --z-focus: 2px; --z-dot: 8px;
   --z-menu: 240px; --z-dialog: 440px; --z-dialog-lg: 640px; --z-content-farm: 1440px; --z-skel-line: 12px; --z-skel-value: 26px; --z-skel-row: 40px; --z-loader: 48px; --z-col-min: 280px; --z-stat-min: 160px; --z-shadow-y: 1px; --z-shadow-blur: 3px;
 

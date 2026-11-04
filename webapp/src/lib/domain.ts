@@ -326,6 +326,27 @@ export const shiftName: Record<DutyBody['shift'], string> = {
 export const dutyLabel = (d: DutyBody) => (d.activity === 'other' ? d.label?.trim() || 'Other' : dutyName[d.activity] ?? words2(d.activity));
 const words2 = (k: string) => k.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
 
+/** Someone away (leave, sick, off) for whole days, both ends included. */
+export interface AbsenceBody {
+  staffId: string;
+  from: string;
+  to: string;
+  reason?: string | null;
+}
+
+/** Staff ids away on [day]. */
+export function awayOn(absences: FarmRecord<AbsenceBody>[], day: Date): Set<string> {
+  const k = startOfDay(day).getTime();
+  const out = new Set<string>();
+  for (const a of absences) {
+    if (a.isDeleted) continue;
+    const from = parseDate(a.body.from);
+    const to = parseDate(a.body.to) ?? from;
+    if (from && to && startOfDay(from).getTime() <= k && k <= startOfDay(to).getTime()) out.add(a.body.staffId);
+  }
+  return out;
+}
+
 export const onDay = (d: DutyBody, day: Date) => !d.days?.length || d.days.includes(day.getDay());
 
 /**

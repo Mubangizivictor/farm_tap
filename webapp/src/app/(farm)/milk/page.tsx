@@ -64,17 +64,32 @@ function RecordMilk({ onClose, cows, blocked }: { onClose: () => void; cows: { i
   const [mode, setMode] = useState<'total' | 'cow'>('total');
   const [total, setTotal] = useState('');
   const [perCow, setPerCow] = useState<Record<string, string>>({});
+  // Not every cow is milked every day: the recorder ticks the ones milked now.
+  const [milked, setMilked] = useState<Set<string>>(() => new Set(cows.map((c) => c.id)));
+  const [count, setCount] = useState(String(cows.length || ''));
+  const [naming, setNaming] = useState(false);
   const { busy, error, setError, run } = useSave();
+  const toggle = (id: string) =>
+    setMilked((m) => {
+      const n = new Set(m);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      if (naming) setCount(String(n.size));
+      return n;
+    });
 
-  const entered = Object.entries(perCow).filter(([, v]) => Number(v) > 0);
+  const entered = Object.entries(perCow).filter(([id, v]) => milked.has(id) && Number(v) > 0);
   const sum = entered.reduce((t, [, v]) => t + Number(v), 0);
 
   async function save() {
     if (!user) return;
+    const howMany = naming ? milked.size : Number(count) || null;
     if (mode === 'total') {
       const l = Number(total);
       if (!(l > 0)) return setError('Type the litres, more than 0.');
       if (l > MAX_HERD_L) return setError(`${num1(l)} L looks too much for one milking. Check the number.`);
+      if (howMany != null && (!Number.isInteger(howMany) || howMany < 1)) return setError('Type how many cows were milked, or leave it empty.');
+      if (howMany && l / howMany > MAX_ANIMAL_L) return setError(`${num1(l / howMany)} L a cow looks too much. Check the litres or the number of cows.`);
     } else {
       if (!entered.length) return setError('Type the litres for at least one animal.');
       const big = entered.find(([, v]) => Number(v) > MAX_ANIMAL_L);
@@ -84,7 +99,14 @@ function RecordMilk({ onClose, cows, blocked }: { onClose: () => void; cows: { i
     const by = recorder(user);
     const ok = await run(async () => {
       if (mode === 'total') {
-        await addRecord(db, farm.id, 'milkRecords', user.uid, { animalId: null, session, litres: Number(total), recordedBy: by });
+        await addRecord(db, farm.id, 'milkRecords', user.uid, {
+          animalId: null,
+          session,
+          litres: Number(total),
+          recordedBy: by,
+          cowsMilked: howMany,
+          cowIds: naming ? [...milked] : null,
+        });
       } else {
         await Promise.all(
           entered.map(([cowId, v]) =>
@@ -127,50 +149,125 @@ function RecordMilk({ onClose, cows, blocked }: { onClose: () => void; cows: { i
             setMode(m);
             setError('');
           }}
-          items={cows.length ? [['total', 'Herd total'], ['cow', 'Each animal']] : [['total', 'Herd total']]}
+          items={cows.length ? [['total', 'Total litres'], ['cow', 'Each cow']] : [['total', 'Total litres']]}
         />
       </Fit>
       {mode === 'total' ? (
-        <Field label="Litres for the whole herd" hint="Use a dot for parts of a litre, e.g. 42.5">
-          <input
-            className="input"
-            type="number"
-            min={0.1}
-            max={MAX_HERD_L}
-            step={0.1}
-            inputMode="decimal"
-            required
-            value={total}
-            onChange={(e) => setTotal(e.target.value)}
-            autoFocus
-          />
-        </Field>
-      ) : (
-        <div className="list">
-          {cows.map((c) => (
-            <label key={c.id} className="list-row">
-              <span className="grow">
-                {c.label}
-                {blocked.has(c.id) && <span className="chip bad">Not for sale</span>}
-              </span>
+        <>
+          <Fit kind="fields" cols={[1, 2, 2, 2]}>
+            <Field label="Litres from the cows milked" hint="Use a dot for parts of a litre, e.g. 42.5">
               <input
                 className="input"
-                style={{ maxWidth: 'var(--z-stat-min)' }}
                 type="number"
-                min={0}
-                max={MAX_ANIMAL_L}
+                min={0.1}
+                max={MAX_HERD_L}
                 step={0.1}
                 inputMode="decimal"
-                placeholder="Litres"
-                aria-label={`Litres from ${c.label}`}
-                value={perCow[c.id] ?? ''}
-                onChange={(e) => setPerCow({ ...perCow, [c.id]: e.target.value })}
+                required
+                value={total}
+                onChange={(e) => setTotal(e.target.value)}
+                autoFocus
               />
+            </Field>
+            <Field label="How many cows were milked" hint={cows.length ? `${cows.length} cows are milking in the herd list.` : undefined}>
+              <input className="input" type="number" min={1} step={1} inputMode="numeric" value={count} disabled={naming} onChange={(e) => setCount(e.target.value)} />
+            </Field>
+          </Fit>
+          {cows.length > 0 && (
+            <label className="check-row">
+              <input type="checkbox" checked={naming} onChange={(e) => (setNaming(e.target.checked), e.target.checked && setCount(String(milked.size)))} />
+              <span>Name the cows that were milked</span>
             </label>
-          ))}
-        </div>
+          )}
+          {naming && <CowPicker cows={cows} milked={milked} toggle={toggle} setAll={(all) => (setMilked(new Set(all ? cows.map((c) => c.id) : [])), setCount(String(all ? cows.length : 0)))} blocked={blocked} />}
+          {Number(total) > 0 && (naming ? milked.size : Number(count)) > 0 && (
+            <p className="small muted">About {num1(Number(total) / (naming ? milked.size : Number(count)))} L a cow.</p>
+          )}
+        </>
+      ) : (
+        <>
+          <p className="small muted">Untick the cows not milked this time (dry, sick, away, calving). Only ticked cows are saved.</p>
+          <div className="row wrap">
+            <button type="button" className="btn sm ghost" onClick={() => setMilked(new Set(cows.map((c) => c.id)))}>
+              Tick all
+            </button>
+            <button type="button" className="btn sm ghost" onClick={() => setMilked(new Set())}>
+              Untick all
+            </button>
+            <span className="small muted">
+              {milked.size} of {cows.length} cows milked
+            </span>
+          </div>
+          <div className="list">
+            {cows.map((c) => {
+              const on = milked.has(c.id);
+              return (
+                <div key={c.id} className={`list-row ${on ? '' : 'dim'}`}>
+                  <input type="checkbox" checked={on} onChange={() => toggle(c.id)} aria-label={`${c.label} milked`} />
+                  <span className="grow">
+                    {c.label}
+                    {blocked.has(c.id) && <span className="chip bad">Not for sale</span>}
+                  </span>
+                  <input
+                    className="input"
+                    style={{ maxWidth: 'var(--z-stat-min)' }}
+                    type="number"
+                    min={0}
+                    max={MAX_ANIMAL_L}
+                    step={0.1}
+                    inputMode="decimal"
+                    placeholder={on ? 'Litres' : 'Not milked'}
+                    disabled={!on}
+                    aria-label={`Litres from ${c.label}`}
+                    value={perCow[c.id] ?? ''}
+                    onChange={(e) => setPerCow({ ...perCow, [c.id]: e.target.value })}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </FormDialog>
+  );
+}
+
+function CowPicker({
+  cows,
+  milked,
+  toggle,
+  setAll,
+  blocked,
+}: {
+  cows: { id: string; label: string }[];
+  milked: Set<string>;
+  toggle: (id: string) => void;
+  setAll: (all: boolean) => void;
+  blocked: Set<string>;
+}) {
+  return (
+    <div className="stack">
+      <div className="row wrap">
+        <button type="button" className="btn sm ghost" onClick={() => setAll(true)}>
+          All
+        </button>
+        <button type="button" className="btn sm ghost" onClick={() => setAll(false)}>
+          None
+        </button>
+        <span className="small muted">
+          {milked.size} of {cows.length} ticked
+        </span>
+      </div>
+      <div className="pick-grid">
+        {cows.map((c) => (
+          <label key={c.id} className={`pick ${milked.has(c.id) ? 'on' : ''}`}>
+            <input type="checkbox" checked={milked.has(c.id)} onChange={() => toggle(c.id)} />
+            {c.label}
+            {blocked.has(c.id) ? ' ⚠' : ''}
+          </label>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -617,7 +714,9 @@ export default function Milk() {
                   </td>
                   <td data-label="Session">{words(r.body.session)}</td>
                   <td data-label="Animal">
-                    {name(r.body.animalId)} {r.body.notForSale && <span className="chip bad">Not for sale</span>}
+                    {name(r.body.animalId)}
+                    {!r.body.animalId && r.body.cowsMilked ? <span className="small muted"> · {r.body.cowsMilked} cows milked</span> : null}{' '}
+                    {r.body.notForSale && <span className="chip bad">Not for sale</span>}
                   </td>
                   <td data-label="Recorded by">{r.body.recordedBy || '–'}</td>
                   <td data-label="Litres" className="r">
