@@ -142,6 +142,19 @@ service cloud.firestore {
     // only goes up, by one, with each farm the account creates.
     function ownedFarms(d) { return d.get('ownedFarms', 0); }
     function farmLimit(d) { return d.get('farmLimit', 1); }
+    function linksBefore() { return resource == null ? [] : resource.data.get('farmerLinks', []); }
+    function linksUnchanged() { return request.resource.data.get('farmerLinks', []) == linksBefore(); }
+    // A supplier links their account to a farmer record only with an unused
+    // invite, marked used by them in the same write (supplier-invite page).
+    function linkFromInvite(uid) {
+      let code = request.resource.data.get('inviteCode', '');
+      let path = /databases/$(database)/documents/farmerInvites/$(code);
+      let inv = get(path).data;
+      return code is string && code.size() > 0
+        && inv.used == false
+        && request.resource.data.farmerLinks == linksBefore().concat([{'tenantId': inv.tenantId, 'farmerId': inv.farmerId}])
+        && getAfter(path).data.get('usedBy', '') == uid;
+    }
 
     match /users/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
@@ -153,8 +166,10 @@ service cloud.firestore {
       allow create: if signedIn() && request.auth.uid == uid
         && !('farmLimit' in request.resource.data)
         && !('disabled' in request.resource.data)
-        && ownedFarms(request.resource.data) <= 1;
+        && ownedFarms(request.resource.data) <= 1
+        && (linksUnchanged() || linkFromInvite(uid));
       allow update: if signedIn() && request.auth.uid == uid
+        && (linksUnchanged() || linkFromInvite(uid))
         && farmLimit(request.resource.data) == farmLimit(resource.data)
         && request.resource.data.get('disabled', false) == resource.data.get('disabled', false)
         && ownedFarms(request.resource.data) >= ownedFarms(resource.data)
@@ -255,14 +270,15 @@ service cloud.firestore {
           // Append-only: only the same version again (a retried send), or
           // the one soft delete (Undo on a delivery), with nothing else changed.
           && (!appendOnly(c) || request.resource.data.version == resource.data.version || softDelete());
-        // Workers may mark tasks done/open (status update only).
+        // Workers may mark tasks done/open (status update only). The phone
+        // ticks a task with doneAt; older web tasks used status/completedAt.
         allow update: if c == 'tasks' && member(t) && canWrite(t)
           && validRecord(t, c, id)
           && request.resource.data.createdBy == resource.data.createdBy
           && request.resource.data.diff(resource.data).affectedKeys()
-              .hasOnly(['body', 'updatedAt', 'updatedBy', 'version', 'serverUpdatedAt'])
+              .hasOnly(['body', 'updatedAt', 'updatedBy', 'version', 'deviceId', 'serverUpdatedAt'])
           && request.resource.data.body.diff(resource.data.body).affectedKeys()
-              .hasOnly(['status', 'completedAt', 'completedBy', 'completedByName']);
+              .hasOnly(['doneAt', 'status', 'completedAt', 'completedBy', 'completedByName']);
         allow delete: if false;
       }
     }
@@ -365,21 +381,19 @@ service cloud.firestore {
       // Public read so the invite page can look up the code without sign-in.
       allow get: if true;
       // Managers of the linked tenant write invites.
-      allow create, update: if signedIn()
-        && exists(/databases/$(database)/documents/tenants/$(request.resource.data.tenantId)/members/$(request.auth.uid))
-        && manages(/databases/$(database)/documents/tenants/$(request.resource.data.tenantId));
+      allow create, update: if manages(request.resource.data.tenantId);
+      // The farmer accepts it once, together with linking their account.
+      allow update: if signedIn()
+        && resource.data.used == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'usedBy', 'usedAt'])
+        && request.resource.data.used == true
+        && request.resource.data.usedBy == request.auth.uid
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('inviteCode', '') == code;
       allow delete: if false;
     }
 
-    // A farmer who has accepted an invite can link their uid.
-    // users/{uid}.farmerLinks is an array; the farm's delivery reads check it.
-    match /users/{uid} {
-      allow read: if signedIn() && uid == request.auth.uid;
-      // Allow adding a farmerLinks entry when a valid, unused invite exists.
-      allow update: if signedIn() && uid == request.auth.uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['farmerLinks'])
-        && request.resource.data.farmerLinks.size() == resource.data.get('farmerLinks', []).size() + 1;
-    }
+    // users/{uid}.farmerLinks is an array, added to only with an invite
+    // (linkFromInvite, above); the farm's delivery reads check it.
 
     // Suppliers may read their own deliveries across the tenant they're linked to.
     match /tenants/{t}/deliveries/{id} {
