@@ -284,3 +284,110 @@ table.table { width: 100%; border-collapse: collapse; }
 .full-screen { min-height: 100vh; display: grid; place-items: center; padding: var(--s-xl); text-align: center; }
 .full-screen .box { max-width: var(--z-auth); display: flex; flex-direction: column; gap: var(--s-lg); align-items: center; }
 .bars.money .bar { background: var(--c-secondary); }
+
+/* ---- Control panel layout (admin retouch) ----
+   Even grids: .fit is a wrapping flex row; each .fit-i gets --k0..--k3, the
+   number of items in its row at each container width tier (lib/fit.ts), so
+   rows are always full. Tier widths: 560, 900, 1200 (container queries,
+   which, like @media, cannot read variables). */
+.fit-c { container-type: inline-size; min-width: 0; }
+.fit { display: flex; flex-wrap: wrap; gap: var(--s-lg); }
+.fit-i {
+  --k: var(--k0);
+  flex: 1 1 calc((100% - (var(--k) - 1) * var(--s-lg)) / var(--k) - var(--z-border));
+  min-width: 0; display: flex; flex-direction: column;
+}
+.fit-i > * { flex: 1 1 auto; min-width: 0; }
+@container (min-width: 560px) { .fit-i { --k: var(--k1); } } /* theme-guard: ignore */
+@container (min-width: 900px) { .fit-i { --k: var(--k2); } } /* theme-guard: ignore */
+@container (min-width: 1200px) { .fit-i { --k: var(--k3); } } /* theme-guard: ignore */
+
+/* Lists of toggles or rows: two columns when the card is wide. */
+.split-c { container-type: inline-size; min-width: 0; }
+.split-c > .list { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--s-xxl); }
+@container (min-width: 760px) { /* theme-guard: ignore */
+  .split-c > .list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .split-c > .list > :nth-last-child(2):nth-child(odd) { border-bottom: 0; }
+}
+
+.admin .content { max-width: var(--z-content-admin); gap: var(--s-xl); }
+.admin .card-head { flex-wrap: wrap; }
+.admin .card-head h2 { font-size: var(--fs-title); }
+.admin .card.stack { gap: var(--s-lg); }
+.admin .page-head { align-items: center; }
+.admin .seg { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.admin .seg button { white-space: nowrap; }
+.admin .kv { gap: var(--s-sm) var(--s-xl); }
+.admin .grow-field { flex: 1 1 var(--z-stat-min); }
+.inline-form { display: flex; flex-wrap: wrap; gap: var(--s-md); align-items: flex-end; }
+.inline-form .field { flex: 1 1 var(--z-stat-min); min-width: 0; }
+.inline-form .btn { flex: none; }
+.btn-row { display: flex; flex-wrap: wrap; gap: var(--s-md); }
+.sub-head { font-size: var(--fs-label-sm); font-weight: var(--fw-semibold); text-transform: uppercase; letter-spacing: 0.04em; color: var(--c-on-surface-variant); }
+.divide { border-top: var(--z-border) solid var(--c-outline-variant); padding-top: var(--s-lg); }
+
+/* Sticky jump links and the sections they point to. */
+.jump {
+  position: sticky; top: var(--z-topbar); z-index: 10; display: flex; gap: var(--s-xs); align-items: center;
+  min-height: var(--z-jump); margin: calc(var(--s-xs) * -1) 0; padding: var(--s-xs) 0;
+  overflow-x: auto; scrollbar-width: none; background: var(--c-surface);
+  border-bottom: var(--z-border) solid var(--c-outline-variant);
+}
+.jump::-webkit-scrollbar, .admin .seg::-webkit-scrollbar { display: none; }
+.jump a {
+  flex: none; padding: var(--s-xs) var(--s-lg); border-radius: var(--r-pill); white-space: nowrap;
+  color: var(--c-on-surface-variant); font-weight: var(--fw-medium); font-size: var(--fs-label); text-decoration: none;
+  border: var(--z-border) solid var(--c-outline-variant); background: var(--c-card);
+}
+.jump a:hover { color: var(--c-on-surface); text-decoration: none; }
+.jump a[aria-current='true'] { background: var(--c-primary-container); color: var(--c-on-primary-container); border-color: transparent; font-weight: var(--fw-semibold); }
+.anchor { scroll-margin-top: calc(var(--z-topbar) + var(--z-jump) + var(--s-lg)); gap: var(--s-lg); }
+.anchor-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-md); flex-wrap: wrap; }
+.anchor-head h2 { font-size: var(--fs-title-lg); }
+
+/* Sticky tabs on the farm page. */
+.admin .tabs.sticky { position: sticky; top: var(--z-topbar); z-index: 10; background: var(--c-surface); scrollbar-width: none; }
+
+/* Menu drawer (phones and tablets). */
+.drawer-scrim { position: fixed; inset: 0; z-index: 60; background: var(--c-scrim); }
+.drawer {
+  position: fixed; top: 0; bottom: 0; left: 0; z-index: 61; width: var(--z-drawer); max-width: 85vw;
+  display: flex; flex-direction: column; gap: var(--s-lg); padding: var(--s-lg); overflow-y: auto;
+  background: var(--c-container-low); border-right: var(--z-border) solid var(--c-outline-variant);
+  animation: drawer-in var(--d-normal) var(--ease);
+}
+.drawer .nav-group { display: block; }
+@keyframes drawer-in { from { transform: translateX(-100%); } to { transform: none; } }
+.admin .menu-btn { display: inline-grid; }
+.admin .bottomnav { grid-template-columns: repeat(5, 1fr); }
+
+/* Tables become cards on phones: give each <td> a data-label. */
+@media (max-width: 599px) {
+  .admin .content { padding: var(--s-md) var(--s-md) var(--s-lg); gap: var(--s-lg); }
+  .admin .page-head { align-items: stretch; }
+  .admin .page-head > .row { width: 100%; }
+  .admin .page-head .search { flex: 1 1 100%; max-width: none; }
+  .admin .topbar .admin-badge { display: none; }
+  .admin .card { padding: var(--s-md) var(--s-lg); }
+  .admin .table-wrap:has(.rt) { border: 0; background: transparent; overflow: visible; }
+  .table.rt, .table.rt tbody { display: block; }
+  .table.rt thead { display: none; }
+  .table.rt tr {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-sm) var(--s-lg);
+    padding: var(--s-md) var(--s-lg); margin-bottom: var(--s-md); border-radius: var(--r-card);
+    background: var(--c-card); border: var(--z-border) solid var(--c-outline-variant);
+  }
+  .table.rt td { display: block; padding: 0; border: 0; white-space: normal; text-align: left; min-width: 0; overflow-wrap: anywhere; }
+  .table.rt td[data-label]::before {
+    content: attr(data-label); display: block; font-family: var(--font); font-size: var(--fs-label-sm); font-weight: var(--fw-semibold);
+    text-transform: uppercase; letter-spacing: 0.04em; color: var(--c-on-surface-variant);
+  }
+  .table.rt td.lead, .table.rt td.wide, .table.rt td.acts { grid-column: 1 / -1; }
+  .table.rt td.acts:empty { display: none; }
+  .table.rt td.acts .row { justify-content: flex-start !important; flex-wrap: wrap; }
+  .table.rt tbody tr:hover { background: var(--c-card); }
+}
+@media (min-width: 1024px) {
+  .admin .menu-btn { display: none; }
+}
+.admin .row > .input.grow-field { width: auto; }

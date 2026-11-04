@@ -4,7 +4,7 @@ import { Timestamp, collection, deleteField, doc, getDocs, query, where } from '
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
-import { Confirm, MsgBanner, Need, Tri, useAction, useLoad } from '@/components/admin';
+import { Confirm, Fit, MsgBanner, Need, Tri, useAction, useLoad } from '@/components/admin';
 import { RecordPayment } from '@/components/adminPayment';
 import { Icon } from '@/components/Icon';
 import { Loading } from '@/components/Loading';
@@ -64,14 +64,14 @@ function Summary({ f, reload }: { f: AdminFarm; reload: () => void }) {
   return (
     <>
       <MsgBanner msg={act.msg} />
-      <div className="grid">
+      <Fit kind="stats" cols={[2, 4, 4, 4]}>
         <Stat icon="shield" label="Status" value={<span className={`chip ${st.tone}`}>{st.text}</span>} hint={f.review ? `Review: ${f.review}` : 'Reviewed before the panel'} />
         <Stat icon="tag" label="Plan" value={plan.name} hint={`${ugx(plan.priceUgx)} / ${plan.months === 1 ? 'month' : `${plan.months} months`}`} tone="gold" />
         <Stat icon="calendar" label={f.paidUntil ? 'Paid until' : 'Trial ends'} value={date(f.paidUntil ?? f.trialEndsAt) || '—'} hint={p.kind === 'trial' ? `${p.daysLeft} days left` : p.kind === 'grace' ? `${p.daysLeft} days of grace left` : ''} tone="info" />
         <Stat icon="sms" label="SMS credits" value={String(f.smsCredits)} hint={f.autoSend ? 'Automatic SMS on' : 'Sends from the phone (free)'} />
-      </div>
+      </Fit>
 
-      <div className="grid cols">
+      <Fit>
         <section className="card stack">
           <div className="card-head">
             <h2>Farm</h2>
@@ -113,7 +113,7 @@ function Summary({ f, reload }: { f: AdminFarm; reload: () => void }) {
             <dt>Farm limit</dt>
             <dd>{Number(owner.data?.farmLimit ?? 1)} farm(s)</dd>
           </dl>
-          <div className="row wrap">
+          <div className="btn-row" style={{ marginTop: 'auto' }}>
             {f.whatsapp && (
               <a className="btn sm outline" href={wa(f.whatsapp)} target="_blank" rel="noreferrer">
                 <Icon name="whatsapp" /> WhatsApp
@@ -141,13 +141,12 @@ function Summary({ f, reload }: { f: AdminFarm; reload: () => void }) {
             )}
           </div>
         </section>
-      </div>
 
-      <section className="card stack">
-        <div className="card-head">
-          <h2>Actions</h2>
-        </div>
-        <div className="row wrap">
+        <section className="card stack">
+          <div className="card-head">
+            <h2>Actions</h2>
+          </div>
+          <div className="btn-row">
           {can('farms') && f.review !== 'approved' && (
             <button className="btn" disabled={act.busy} onClick={() => void change('farm.approve', { review: { status: 'approved', at: Timestamp.now(), by: actor.name } }, {}, 'Farm approved.')}>
               <Icon name="check" /> Approve
@@ -176,14 +175,13 @@ function Summary({ f, reload }: { f: AdminFarm; reload: () => void }) {
         </div>
 
         {(can('farms') || can('finance')) && (
-          <div className="row wrap">
-            <label className="field" style={{ width: 'auto' }}>
+          <div className="inline-form divide">
+            <label className="field">
               <span>Extend the trial by (days)</span>
-              <input className="input" type="number" min={1} max={90} value={extend} onChange={(e) => setExtend(Number(e.target.value) || 1)} style={{ width: 'auto' }} />
+              <input className="input" type="number" min={1} max={90} value={extend} onChange={(e) => setExtend(Number(e.target.value) || 1)} />
             </label>
             <button
               className="btn outline"
-              style={{ alignSelf: 'flex-end' }}
               disabled={act.busy}
               onClick={() => {
                 const base = f.trialEndsAt && f.trialEndsAt > now ? f.trialEndsAt : now;
@@ -193,8 +191,11 @@ function Summary({ f, reload }: { f: AdminFarm; reload: () => void }) {
             >
               Extend trial
             </button>
-            {(can('farms') || can('finance')) && (
-              <label className="field" style={{ width: 'auto' }}>
+          </div>
+        )}
+        {(can('farms') || can('finance')) && (
+          <div className="inline-form">
+              <label className="field">
                 <span>Plan</span>
                 <select className="input" value={f.planId} onChange={(e) => void change('farm.plan', { planId: e.target.value }, { planId: e.target.value }, 'Plan changed.')}>
                   <option value="">Default</option>
@@ -206,11 +207,11 @@ function Summary({ f, reload }: { f: AdminFarm; reload: () => void }) {
                   ))}
                 </select>
               </label>
-            )}
           </div>
         )}
         {f.status === 'suspended' && f.suspendedReason && <p className="small muted">Suspended because: {f.suspendedReason}</p>}
-      </section>
+        </section>
+      </Fit>
 
       {ask && (
         <Confirm
@@ -262,6 +263,7 @@ function Features({ f, reload }: { f: AdminFarm; reload: () => void }) {
         <span className="small muted">Default comes from the {plan.name} plan, then the app settings</span>
       </div>
       <MsgBanner msg={act.msg} />
+      <div className="split-c">
       <div className="list">
         {featureList.map((ft) => (
           <div key={ft.key} className="list-row wrap">
@@ -282,6 +284,7 @@ function Features({ f, reload }: { f: AdminFarm; reload: () => void }) {
             />
           </div>
         ))}
+      </div>
       </div>
       {can('farms') && (
         <div className="row">
@@ -319,6 +322,7 @@ function Sms({ f, reload }: { f: AdminFarm; reload: () => void }) {
   return (
     <>
       <MsgBanner msg={act.msg} />
+      <Fit cols={[1, 1, 2, 2]}>
       <section className="card stack">
         <div className="card-head">
           <h2>SMS for this farm</h2>
@@ -340,14 +344,13 @@ function Sms({ f, reload }: { f: AdminFarm; reload: () => void }) {
           />
         </label>
         {(can('farms') || can('finance')) && (
-          <div className="row wrap">
-            <label className="field" style={{ width: 'auto' }}>
+          <div className="inline-form">
+            <label className="field">
               <span>Add or remove credits (free top-up or correction)</span>
               <input className="input" type="number" value={add} onChange={(e) => setAdd(Math.round(Number(e.target.value) || 0))} />
             </label>
             <button
               className="btn outline"
-              style={{ alignSelf: 'flex-end' }}
               disabled={act.busy || !add}
               onClick={() =>
                 void act.run(
@@ -378,6 +381,7 @@ function Sms({ f, reload }: { f: AdminFarm; reload: () => void }) {
           {outbox.data && !outbox.data.length && <Empty>No messages yet.</Empty>}
         </div>
       </section>
+      </Fit>
     </>
   );
 }
@@ -450,7 +454,7 @@ function People({ f }: { f: AdminFarm }) {
           <span className="small muted">Read from the farm&apos;s records</span>
         </div>
         <div className="table-wrap">
-          <table className="table">
+          <table className="table rt">
             <thead>
               <tr>
                 <th>Name</th>
@@ -470,12 +474,14 @@ function People({ f }: { f: AdminFarm }) {
                   const name = String(s.body.name ?? '');
                   return (
                     <tr key={s.id}>
-                      <td>{name}</td>
-                      <td>{String(s.body.title || s.body.role || '')}</td>
-                      <td>{String(s.body.phone ?? '')}</td>
-                      <td>{card ? <span className="mono">{card.id}</span> : <span className="muted">—</span>}</td>
-                      <td>{pin ? (pin.body.mustChange ? <span className="chip warn">Temporary</span> : <span className="chip ok">Own PIN</span>) : '—'}</td>
-                      <td className="r">
+                      <td className="lead">
+                        <strong>{name}</strong>
+                      </td>
+                      <td data-label="Role">{String(s.body.title || s.body.role || '')}</td>
+                      <td data-label="Phone">{String(s.body.phone ?? '') || '—'}</td>
+                      <td data-label="Card">{card ? <span className="mono">{card.id}</span> : <span className="muted">—</span>}</td>
+                      <td data-label="PIN">{pin ? (pin.body.mustChange ? <span className="chip warn">Temporary</span> : <span className="chip ok">Own PIN</span>) : '—'}</td>
+                      <td className="r acts">
                         {can('users') && (
                           <div className="row" style={{ justifyContent: 'flex-end' }}>
                             {pin && (
@@ -528,7 +534,7 @@ function Records({ f }: { f: AdminFarm }) {
     <section className="card stack">
       <div className="card-head">
         <h2>Records (read only)</h2>
-        <select className="input" style={{ width: 'auto' }} value={c} onChange={(e) => setC(e.target.value)}>
+        <select className="input" style={{ width: 'auto', maxWidth: '100%' }} value={c} onChange={(e) => setC(e.target.value)} aria-label="Kind of record">
           {lookCollections.map(([k, v]) => (
             <option key={k} value={k}>
               {v}
@@ -538,7 +544,7 @@ function Records({ f }: { f: AdminFarm }) {
       </div>
       <p className="small muted">The latest 50, newest first. You can look; you cannot change a farm&apos;s records.</p>
       <div className="table-wrap">
-        <table className="table">
+        <table className="table rt">
           <thead>
             <tr>
               <th>When</th>
@@ -549,8 +555,8 @@ function Records({ f }: { f: AdminFarm }) {
           <tbody>
             {(recs.data ?? []).map((r) => (
               <tr key={r.id}>
-                <td>{shortDate(parseDate(r.createdAt))} {time(parseDate(r.createdAt))}</td>
-                <td className="small" style={{ whiteSpace: 'normal' }}>
+                <td data-label="When">{shortDate(parseDate(r.createdAt))} {time(parseDate(r.createdAt))}</td>
+                <td className="small wide" data-label="Details" style={{ whiteSpace: 'normal' }}>
                   {Object.entries(r.body)
                     .filter(([k, v]) => v != null && v !== '' && !/hash|photo|url/i.test(k))
                     .slice(0, 6)
@@ -558,7 +564,7 @@ function Records({ f }: { f: AdminFarm }) {
                     .join(' · ')}
                   {r.isDeleted && <span className="chip bad">Deleted</span>}
                 </td>
-                <td className="small muted">{r.createdBy}</td>
+                <td className="small muted" data-label="By">{r.createdBy}</td>
               </tr>
             ))}
           </tbody>
@@ -585,7 +591,7 @@ function Notes({ f }: { f: AdminFarm }) {
   }, [f.id]);
 
   return (
-    <div className="grid cols">
+    <Fit cols={[1, 1, 2, 2]}>
       <section className="card stack">
         <div className="card-head">
           <h2>Support notes</h2>
@@ -646,7 +652,7 @@ function Notes({ f }: { f: AdminFarm }) {
           </div>
         </section>
       )}
-    </div>
+    </Fit>
   );
 }
 
@@ -664,7 +670,7 @@ function FarmView() {
           All farms
         </Link>
       </PageHead>
-      <div className="tabs" role="tablist">
+      <div className="tabs sticky" role="tablist">
         {tabs.map((t) => (
           <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}>
             {t}

@@ -2,7 +2,7 @@
 
 import { Timestamp, collection, doc, getDocs } from 'firebase/firestore';
 import { useState, type FormEvent } from 'react';
-import { MsgBanner, Need, fromDateInput, toDateInput, useAction, useLoad } from '@/components/admin';
+import { Fit, MsgBanner, Need, fromDateInput, toDateInput, useAction, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
 import { Empty, PageHead } from '@/components/ui';
 import { adminChange, loadAllFarms, setOp, updateOp } from '@/lib/admin';
@@ -78,7 +78,7 @@ export default function Announce() {
     <Need perm="messages">
       <PageHead title="Announcements" subtitle="Notices shown at the top of the web app and the phone app" />
       <MsgBanner msg={act.msg} />
-      <div className="grid cols">
+      <Fit cols={[1, 1, 2, 2]}>
         <section className="card">
           <form className="stack" onSubmit={send}>
             <div className="card-head">
@@ -92,7 +92,7 @@ export default function Announce() {
               <span>Message</span>
               <textarea className="input" rows={3} value={body} onChange={(e) => setBody(e.target.value)} maxLength={400} placeholder="Short and simple. Many readers are on a small phone." />
             </label>
-            <div className="grid">
+            <Fit cols={[1, 2, 2, 3]}>
               <label className="field">
                 <span>Who sees it</span>
                 <select className="input" value={kind} onChange={(e) => setKind(e.target.value as typeof kind)}>
@@ -141,7 +141,7 @@ export default function Announce() {
                 <span>Until (optional)</span>
                 <input className="input" type="date" value={ends} onChange={(e) => setEnds(e.target.value)} />
               </label>
-            </div>
+            </Fit>
             {title && (
               <div className={`banner ${level}`}>
                 <Icon name={level === 'warn' ? 'alert' : 'megaphone'} />
@@ -166,8 +166,8 @@ export default function Announce() {
             {(list.data ?? []).map((a) => {
               const live = a.active && (!a.endsAt || a.endsAt > now) && (!a.startsAt || a.startsAt <= now);
               return (
-                <div key={a.id} className="list-row" style={{ alignItems: 'flex-start' }}>
-                  <div className="stack grow" style={{ gap: 'var(--s-xxs)' }}>
+                <div key={a.id} className="list-row wrap" style={{ alignItems: 'flex-start' }}>
+                  <div className="stack grow-field" style={{ gap: 'var(--s-xxs)', minWidth: 0 }}>
                     <strong>{a.title}</strong>
                     {a.body && <span className="small">{a.body}</span>}
                     <span className="small muted">
@@ -187,7 +187,7 @@ export default function Announce() {
             {list.data && !list.data.length && <Empty>No announcements yet.</Empty>}
           </div>
         </section>
-      </div>
+      </Fit>
     </Need>
   );
 }

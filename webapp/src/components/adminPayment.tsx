@@ -7,7 +7,7 @@ import { useAdmin } from '@/lib/adminSession';
 import { firebase } from '@/lib/firebase';
 import { date, ugx } from '@/lib/format';
 import type { Plan, SmsPackage } from '@/lib/platform';
-import { adminError, fromDateInput, toDateInput } from './admin';
+import { Fit, adminError, fromDateInput, toDateInput } from './admin';
 import { Dialog } from './ui';
 
 /**
@@ -134,7 +134,7 @@ export function RecordPayment({
           </button>
         </div>
         {kind === 'subscription' ? (
-          <div className="grid">
+          <Fit cols={[1, 2, 2, 2]}>
             <label className="field">
               <span>Plan</span>
               <select className="input" value={planId} onChange={(e) => setPlanId(e.target.value)}>
@@ -150,7 +150,7 @@ export function RecordPayment({
               <span>Periods paid</span>
               <input className="input" type="number" min={1} max={36} value={periods} onChange={(e) => setPeriods(Math.max(1, Number(e.target.value) || 1))} />
             </label>
-          </div>
+          </Fit>
         ) : (
           <label className="field">
             <span>SMS package</span>
@@ -165,7 +165,7 @@ export function RecordPayment({
             </select>
           </label>
         )}
-        <div className="grid">
+        <Fit cols={[1, 2, 2, 2]}>
           <label className="field">
             <span>Amount received (UGX)</span>
             <input className="input" inputMode="numeric" placeholder={String(suggested || '')} value={amount} onChange={(e) => setAmount(e.target.value)} />
@@ -188,7 +188,7 @@ export function RecordPayment({
             <span>Paid on</span>
             <input className="input" type="date" value={paidOn} onChange={(e) => setPaidOn(e.target.value)} />
           </label>
-        </div>
+        </Fit>
         <label className="field">
           <span>Note (optional)</span>
           <input className="input" value={note} onChange={(e) => setNote(e.target.value)} />

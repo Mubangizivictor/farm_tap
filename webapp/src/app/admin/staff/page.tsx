@@ -72,7 +72,7 @@ function Invite({ onClose, onSaved }: { onClose: () => void; onSaved: () => void
         </label>
         <PermPicker role={role} perms={perms} onChange={(r, p) => (setRole(r), setPerms(p))} />
         <MsgBanner msg={act.msg?.ok ? null : act.msg} />
-        <p className="small muted">Then send them the link: farm-tap-1dd15.web.app/admin. They sign in with this address and press Accept.</p>
+        <p className="small muted">Then send them the link: farmtap.victorbee.com/admin. They sign in with this address and press Accept.</p>
         <div className="actions">
           <button type="button" className="btn outline" onClick={onClose}>
             Cancel
@@ -135,7 +135,7 @@ export default function Staff() {
       </PageHead>
       <MsgBanner msg={act.msg} />
       <div className="table-wrap">
-        <table className="table">
+        <table className="table rt">
           <thead>
             <tr>
               <th>Person</th>
@@ -148,7 +148,7 @@ export default function Staff() {
           <tbody>
             {(staff.data ?? []).map((s) => (
               <tr key={s.uid}>
-                <td>
+                <td className="lead">
                   <div className="row">
                     <span className="avatar">{initials(s.name || s.email)}</span>
                     <div className="stack" style={{ gap: 0 }}>
@@ -157,12 +157,12 @@ export default function Staff() {
                     </div>
                   </div>
                 </td>
-                <td>{s.role === 'owner' ? 'Owner' : (rolePresets[s.role]?.label ?? s.role)}</td>
-                <td style={{ whiteSpace: 'normal' }} className="small">
+                <td data-label="Role">{s.role === 'owner' ? 'Owner' : (rolePresets[s.role]?.label ?? s.role)}</td>
+                <td style={{ whiteSpace: 'normal' }} className="small wide" data-label="Can do">
                   {s.role === 'owner' ? 'Everything' : s.perms.map((p) => permissionList.find((x) => x.key === p)?.label ?? p).join(', ') || 'Nothing'}
                 </td>
-                <td>{s.active ? <span className="chip ok">On</span> : <span className="chip">Off</span>}</td>
-                <td className="r">
+                <td data-label="Status">{s.active ? <span className="chip ok">On</span> : <span className="chip">Off</span>}</td>
+                <td className="r acts">
                   {s.role !== 'owner' && s.uid !== me?.uid && (
                     <div className="row" style={{ justifyContent: 'flex-end' }}>
                       <button className="btn sm outline" onClick={() => setEditing(s)}>
@@ -188,8 +188,8 @@ export default function Staff() {
           {(invites.data ?? [])
             .filter((i) => i.active && !(staff.data ?? []).some((s) => s.email === i.email))
             .map((i) => (
-              <div key={i.email} className="list-row">
-                <span className="grow">
+              <div key={i.email} className="list-row wrap">
+                <span className="grow-field" style={{ minWidth: 0, overflowWrap: 'anywhere' }}>
                   <strong>{i.name || i.email}</strong> <span className="small muted">{i.email}</span>
                 </span>
                 <span className="chip">{rolePresets[i.role]?.label ?? i.role}</span>
@@ -209,7 +209,7 @@ export default function Staff() {
           {invites.data && !invites.data.some((i) => i.active) && <Empty>No invites waiting.</Empty>}
         </div>
       </section>
-      <p className="small muted">The owner account is set once in the Firebase console and cannot be changed or removed from here. Nobody can change their own access.</p>
+      <p className="small muted">The owner account is set once in the database console and cannot be changed or removed from here. Nobody can change their own access.</p>
 
       {inviting && <Invite onClose={() => setInviting(false)} onSaved={invites.reload} />}
       {editing && <Edit s={editing} onClose={() => setEditing(null)} onSaved={staff.reload} />}

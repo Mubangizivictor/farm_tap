@@ -3,7 +3,7 @@
 import { collectionGroup, doc, getDocs, query, where } from 'firebase/firestore';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { Confirm, MsgBanner, Need, useAction, useLoad } from '@/components/admin';
+import { Confirm, Fit, MsgBanner, Need, useAction, useLoad } from '@/components/admin';
 import { RecordPayment } from '@/components/adminPayment';
 import { Icon } from '@/components/Icon';
 import { Empty, LoadError, PageHead, SearchBox, Stat } from '@/components/ui';
@@ -70,14 +70,14 @@ export default function Money() {
       <MsgBanner msg={act.msg} />
       <LoadError code={pays.error} />
 
-      <div className="grid">
+      <Fit kind="stats" cols={[2, 4, 4, 4]}>
         <Stat icon="money" label="MRR" value={ugx(mrr)} hint={`${paying.length} paying farms`} tone="gold" />
         <Stat icon="receipt" label="This month" value={ugx(sum(monthStart))} hint={`Last month ${ugx(sum(lastMonthStart, monthStart))}`} tone="gold" />
         <Stat icon="alert" label="Overdue" value={String(overdue.length)} hint="In the 7 days of grace" tone={overdue.length ? 'warn' : undefined} />
         <Stat icon="chart" label="All time" value={ugx(sum(new Date(0)))} hint={`${ok.length} payments`} />
-      </div>
+      </Fit>
 
-      <div className="grid cols">
+      <Fit>
         <section className="card">
           <div className="card-head">
             <h2>This month by method</h2>
@@ -112,7 +112,7 @@ export default function Money() {
               );
             })}
             {claims.data && !claims.data.length && <Empty>No claims waiting.</Empty>}
-            {claims.error && <p className="small muted">Could not load claims. Deploy the Firestore indexes (see the setup steps).</p>}
+            {claims.error && <p className="small muted">Could not load claims. The database indexes are not set up yet (see the setup steps).</p>}
           </div>
         </section>
         <section className="card">
@@ -129,14 +129,14 @@ export default function Money() {
             {!overdue.length && <Empty>Nobody is overdue.</Empty>}
           </div>
         </section>
-      </div>
+      </Fit>
 
       <div className="table-wrap">
-        <table className="table">
+        <table className="table rt">
           <thead>
             <tr>
-              <th>Paid on</th>
               <th>Farm</th>
+              <th>Paid on</th>
               <th>For</th>
               <th className="r">Amount</th>
               <th>Method</th>
@@ -148,16 +148,18 @@ export default function Money() {
           <tbody>
             {list.map((p) => (
               <tr key={p.id} style={p.status === 'void' ? { opacity: 0.5 } : undefined}>
-                <td>{shortDate(p.paidAt)}</td>
-                <td>
-                  <Link href={`/admin/farm/?id=${p.tenantId}`}>{p.farmName}</Link>
+                <td className="lead">
+                  <Link href={`/admin/farm/?id=${p.tenantId}`}>
+                    <strong>{p.farmName}</strong>
+                  </Link>
                 </td>
-                <td>{p.kind === 'sms' ? `${p.smsCredits} SMS` : `${p.months} month${p.months === 1 ? '' : 's'}, to ${shortDate(p.newPaidUntil)}`}</td>
-                <td className="r">{ugx(p.amountUgx)}</td>
-                <td>{paymentMethods[p.method] ?? p.method}</td>
-                <td className="mono">{p.reference}</td>
-                <td className="small muted">{p.recordedByName}</td>
-                <td className="r">
+                <td data-label="Paid on">{shortDate(p.paidAt)}</td>
+                <td data-label="For">{p.kind === 'sms' ? `${p.smsCredits} SMS` : `${p.months} month${p.months === 1 ? '' : 's'}, to ${shortDate(p.newPaidUntil)}`}</td>
+                <td className="r" data-label="Amount">{ugx(p.amountUgx)}</td>
+                <td data-label="Method">{paymentMethods[p.method] ?? p.method}</td>
+                <td className="mono" data-label="Transaction ID">{p.reference || '—'}</td>
+                <td className="small muted" data-label="Recorded by">{p.recordedByName}</td>
+                <td className="r acts">
                   {p.status === 'void' ? (
                     <span className="chip bad" title={p.voidReason}>
                       Void

@@ -73,7 +73,7 @@ export default function AdminSignIn() {
       const code = (e as { code?: string }).code ?? '';
       if (code !== 'auth/popup-closed-by-user' && code !== 'auth/cancelled-popup-request') {
         if (code === 'auth/unauthorized-domain') {
-          setError('This domain is not authorised in Firebase. Add it under Firebase → Authentication → Settings → Authorized domains.');
+          setError('This web address is not allowed to sign in yet. Add it to the allowed sign-in addresses in the project console.');
         } else {
           setError(`Sign-in failed (${code || 'unknown error'}). Try again.`);
         }

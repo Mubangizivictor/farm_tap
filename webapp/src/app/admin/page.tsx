@@ -2,7 +2,7 @@
 
 import { collection, getDocs } from 'firebase/firestore';
 import Link from 'next/link';
-import { useLoad } from '@/components/admin';
+import { Fit, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
 import { Empty, PageHead, Stat } from '@/components/ui';
 import { loadAllFarms, loadPayments, loadPlans, type AdminFarm } from '@/lib/admin';
@@ -72,17 +72,17 @@ export default function Overview() {
       <PageHead title={`Hello${me?.name ? `, ${me.name.split(' ')[0]}` : ''}`} subtitle="How FarmTap is doing today." />
 
       {seeFarms && (
-        <div className="grid">
+        <Fit kind="stats">
           <Stat icon="home" label="Farms" value={count(live.length)} hint={`${newThisWeek} new this week · ${activeWeek} active`} />
           <Stat icon="check" label="Paying" value={count(paid.length)} hint={overdue.length ? `${overdue.length} overdue` : 'None overdue'} tone={overdue.length ? 'warn' : undefined} />
           <Stat icon="clock" label="On trial" value={count(trials.length)} hint={`${endingSoon.length} end in 3 days`} tone="info" />
           {can('finance') && <Stat icon="money" label="MRR" value={ugx(mrr)} hint="Monthly value of paying farms" tone="gold" />}
           {can('finance') && <Stat icon="receipt" label="This month" value={ugx(thisMonth)} hint={`${count(smsSold)} SMS credits sold in total`} tone="gold" />}
           <Stat icon="shield" label="To review" value={count(pending.length)} hint="New farms waiting" tone={pending.length ? 'warn' : undefined} />
-        </div>
+        </Fit>
       )}
 
-      <div className="grid cols">
+      <Fit>
         {can('finance') && (
           <section className="card">
             <div className="card-head">
@@ -173,7 +173,7 @@ export default function Overview() {
             )}
           </section>
         )}
-      </div>
+      </Fit>
 
       {!seeFarms && !can('finance') && <Empty>Use the menu to open the areas your role covers.</Empty>}
     </>

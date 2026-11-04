@@ -2,7 +2,7 @@
 
 import { collection, doc } from 'firebase/firestore';
 import { useState, type FormEvent } from 'react';
-import { MsgBanner, Need, Toggle, Tri, adminError, useAction, useLoad } from '@/components/admin';
+import { Anchor, Fit, MsgBanner, Need, Toggle, Tri, adminError, useAction, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
 import { Dialog, Empty, PageHead } from '@/components/ui';
 import { adminChange, loadConfig, loadPlans, loadSmsPackages, setOp } from '@/lib/admin';
@@ -48,7 +48,7 @@ function PlanEditor({ plan, onClose, onSaved }: { plan: Plan | null; onClose: ()
           <span>Name farmers see</span>
           <input className="input" value={p.name} onChange={(e) => set('name', e.target.value)} placeholder="e.g. Standard, Centre, Yearly" required />
         </label>
-        <div className="grid">
+        <Fit cols={[2, 2, 3, 3]}>
           <label className="field">
             <span>Price (UGX)</span>
             <input className="input" inputMode="numeric" value={p.priceUgx || ''} onChange={(e) => set('priceUgx', toInt(e.target.value))} />
@@ -79,7 +79,7 @@ function PlanEditor({ plan, onClose, onSaved }: { plan: Plan | null; onClose: ()
             <span>Order in the list</span>
             <input className="input" type="number" value={p.sort} onChange={(e) => set('sort', Number(e.target.value) || 0)} />
           </label>
-        </div>
+        </Fit>
         <label className="field">
           <span>Short description</span>
           <input className="input" value={p.description} onChange={(e) => set('description', e.target.value)} placeholder="What the farmer gets" />
@@ -137,7 +137,7 @@ function PackageEditor({ pkg, onClose, onSaved }: { pkg: SmsPackage | null; onCl
           <span>Name</span>
           <input className="input" value={p.name} onChange={(e) => setP({ ...p, name: e.target.value })} placeholder="e.g. Starter 100" />
         </label>
-        <div className="grid">
+        <Fit cols={[2, 2, 2, 2]}>
           <label className="field">
             <span>SMS credits</span>
             <input className="input" inputMode="numeric" value={p.credits || ''} onChange={(e) => setP({ ...p, credits: toInt(e.target.value) })} />
@@ -146,7 +146,7 @@ function PackageEditor({ pkg, onClose, onSaved }: { pkg: SmsPackage | null; onCl
             <span>Price (UGX)</span>
             <input className="input" inputMode="numeric" value={p.priceUgx || ''} onChange={(e) => setP({ ...p, priceUgx: toInt(e.target.value) })} />
           </label>
-        </div>
+        </Fit>
         <p className="small muted">{p.credits ? `${ugx(p.priceUgx / p.credits)} per SMS to the farmer.` : ''}</p>
         <Toggle label="Offered to farmers" checked={p.active} onChange={(v) => setP({ ...p, active: v })} />
         <MsgBanner msg={act.msg?.ok ? null : act.msg} />
@@ -186,7 +186,8 @@ export default function Plans() {
         </div>
       )}
 
-      <div className="grid cols">
+      <Anchor id="plans" title="Plans" hint="What a farm pays for FarmTap">
+      <Fit>
         {(plans.data ?? []).map((p) => (
           <section key={p.id} className="card stack" style={p.active ? undefined : { opacity: 0.6 }}>
             <div className="card-head">
@@ -211,7 +212,7 @@ export default function Plans() {
                 </span>
               ))}
             </div>
-            <div className="row">
+            <div className="row between" style={{ marginTop: 'auto' }}>
               <button className="btn sm outline" onClick={() => setEdit(p)}>
                 Edit
               </button>
@@ -219,16 +220,20 @@ export default function Plans() {
             </div>
           </section>
         ))}
-      </div>
+      </Fit>
+      </Anchor>
 
-      <div className="page-head">
-        <h2>SMS packages</h2>
-        <button className="btn sm outline" onClick={() => setEditPkg('new')}>
-          <Icon name="plus" /> New package
-        </button>
-      </div>
+      <Anchor
+        id="sms-packages"
+        title="SMS packages"
+        hint={
+          <button className="btn sm outline" onClick={() => setEditPkg('new')}>
+            <Icon name="plus" /> New package
+          </button>
+        }
+      >
       <div className="table-wrap">
-        <table className="table">
+        <table className="table rt">
           <thead>
             <tr>
               <th>Package</th>
@@ -242,14 +247,16 @@ export default function Plans() {
           <tbody>
             {(pkgs.data ?? []).map((p) => (
               <tr key={p.id}>
-                <td>{p.name}</td>
-                <td className="r">{p.credits}</td>
-                <td className="r">{ugx(p.priceUgx)}</td>
-                <td className="r">{p.credits ? ugx(p.priceUgx / p.credits) : '—'}</td>
-                <td>
+                <td className="lead">
+                  <strong>{p.name}</strong>
+                </td>
+                <td className="r" data-label="SMS">{p.credits}</td>
+                <td className="r" data-label="Price">{ugx(p.priceUgx)}</td>
+                <td className="r" data-label="Per SMS">{p.credits ? ugx(p.priceUgx / p.credits) : '—'}</td>
+                <td data-label="Status">
                   <span className={`chip ${p.active ? 'ok' : ''}`}>{p.active ? 'Offered' : 'Hidden'}</span>
                 </td>
-                <td className="r">
+                <td className="r acts">
                   <button className="btn sm ghost" onClick={() => setEditPkg(p)}>
                     Edit
                   </button>
@@ -260,6 +267,7 @@ export default function Plans() {
         </table>
         {pkgs.data && !pkgs.data.length && <Empty>No SMS packages yet. Add one so farms can buy automatic SMS.</Empty>}
       </div>
+      </Anchor>
 
       {edit && <PlanEditor plan={edit === 'new' ? null : edit} onClose={() => setEdit(null)} onSaved={plans.reload} />}
       {editPkg && <PackageEditor pkg={editPkg === 'new' ? null : editPkg} onClose={() => setEditPkg(null)} onSaved={pkgs.reload} />}
