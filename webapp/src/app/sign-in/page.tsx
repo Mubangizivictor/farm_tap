@@ -121,15 +121,10 @@ export default function SignIn() {
       provider = a;
     }
     try {
-      await signInWithPopup(firebase().auth, provider);
+      await signInWithRedirect(firebase().auth, provider);
     } catch (e) {
       const code = (e as { code: string }).code;
-      if (code === 'auth/popup-blocked') {
-        await signInWithRedirect(firebase().auth, provider);
-        return;
-      }
       setError(message(code));
-    } finally {
       setBusy(null);
     }
   }
