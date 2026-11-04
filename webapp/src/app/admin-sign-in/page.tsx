@@ -1,6 +1,7 @@
 'use client';
 
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Loading } from '@/components/Loading';
@@ -38,12 +39,36 @@ export default function AdminSignIn() {
       const g = new GoogleAuthProvider();
       g.setCustomParameters({ prompt: 'select_account' });
       const result = await signInWithPopup(firebase().auth, g);
-      if (!ALLOWED.includes(result.user.email ?? '')) {
+      const { uid, email } = result.user;
+
+      if (!ALLOWED.includes(email ?? '')) {
         void signOut();
         setError('That Google account is not authorised. Only Victorbee staff can sign in here.');
         setBusy(false);
+        return;
       }
-      // Successful sign-in: the user useEffect handles navigation to /admin/
+
+      // Verify the platformAdmins document is readable before navigating.
+      try {
+        const snap = await getDoc(doc(firebase().db, 'platformAdmins', uid));
+        if (!snap.exists()) {
+          setError(`No admin record found for UID: ${uid} — create platformAdmins/${uid} in Firestore with { role: "owner", active: true, name: "Victor", email: "${email}", perms: [] }`);
+          setBusy(false);
+          return;
+        }
+        const d = snap.data();
+        if (d.active !== true) {
+          setError(`Admin account exists but is not active (active=${String(d.active)}). Set active: true in Firestore.`);
+          setBusy(false);
+          return;
+        }
+        // All good — navigate.
+        router.replace('/admin/');
+      } catch (fsErr) {
+        const code = (fsErr as { code?: string }).code ?? 'unknown';
+        setError(`Signed in as ${email} (UID: ${uid}) but cannot read admin record: ${code}. Check Firestore Security Rules allow read on platformAdmins/${uid}.`);
+        setBusy(false);
+      }
     } catch (e) {
       const code = (e as { code?: string }).code ?? '';
       if (code !== 'auth/popup-closed-by-user' && code !== 'auth/cancelled-popup-request') {
