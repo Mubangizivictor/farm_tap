@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Icon, type IconName } from '@/components/Icon';
+import { SideHead, useSidebar } from '@/components/side';
 import { Loading } from '@/components/Loading';
+import { ToastProvider } from '@/components/ui';
 import { hasHerd, isCentre, manages, planState, type Farm } from '@/lib/domain';
 import { date, initials } from '@/lib/format';
 import { farmKind, planText } from '@/lib/labels';
@@ -27,7 +29,7 @@ function navFor(f: Farm, cfg: PlatformConfig): NavItem[] {
   return [
     { href: '/home/', label: 'Home', icon: 'home' as const },
     ...(hasHerd(f) && feat('milk') ? [{ href: '/milk/', label: 'Milk', icon: 'drop' as const }] : []),
-    ...(hasHerd(f) && feat('herd') ? [{ href: '/herd/', label: 'Herd', icon: 'cow' as const }] : []),
+    ...(hasHerd(f) && feat('herd') ? [{ href: '/herd/', label: 'Herd', icon: 'tag' as const }] : []),
     ...(hasHerd(f) && feat('health') ? [{ href: '/health/', label: 'Health', icon: 'health' as const }] : []),
     ...(isCentre(f) ? [{ href: '/farmers/', label: 'Suppliers', icon: 'truck' as const }] : []),
     { href: '/workers/', label: 'Workers', icon: 'workers' as const },
@@ -200,13 +202,14 @@ function Banners({ farm }: { farm: Farm }) {
 }
 
 function FarmShell({ children }: { children: ReactNode }) {
-  const { user, farms, farm } = useSession();
+  const { user, farms, farm, online } = useSession();
   const { config } = usePlatform();
   const router = useRouter();
   const path = usePathname();
   const [more, setMore] = useState(false);
   const isAdmin = useIsPlatformAdmin();
   const seenRef = useRef(false);
+  const side = useSidebar();
 
   useEffect(() => {
     if (user === null) router.replace('/sign-in/');
@@ -243,12 +246,9 @@ function FarmShell({ children }: { children: ReactNode }) {
   const phoneMore = nav.slice(4);
 
   return (
-    <div className="shell">
+    <div className={`shell farm ${side.closed ? 'side-closed' : ''}`}>
       <aside className="sidebar">
-        <div className="row" style={{ padding: 'var(--s-xs) var(--s-sm)' }}>
-          <div className="logo-mark" aria-hidden />
-          <strong className="brand-text">FarmTap</strong>
-        </div>
+        <SideHead home="/home/" closed={side.closed} onToggle={side.toggle} />
         <nav className="nav" aria-label="Main">
           {nav.map((n) => (
             <Link key={n.href} href={n.href} aria-current={current(n.href)} title={n.label}>
@@ -280,7 +280,10 @@ function FarmShell({ children }: { children: ReactNode }) {
               {farm.place ? ` · ${farm.place}` : ''}
             </span>
           </div>
-          <Link href="/settings/" className={`chip ${plan.tone} hide-sm`} style={{ textDecoration: 'none' }}>
+          <span className={`sync-dot hide-sm ${online ? '' : 'off'}`} title={online ? 'Changes from the farm phones show here as they sync' : 'No internet'}>
+            {online ? 'Live' : 'Offline'}
+          </span>
+          <Link href="/settings/#plan" className={`chip ${plan.tone} hide-sm`} style={{ textDecoration: 'none' }}>
             {plan.text}
           </Link>
           <UserMenu isAdmin={isAdmin} />
@@ -291,6 +294,7 @@ function FarmShell({ children }: { children: ReactNode }) {
         </div>
       </div>
 
+      {more && <div className="drawer-scrim more-scrim" onClick={() => setMore(false)} aria-hidden />}
       {more && (
         <div className="more-sheet nav" role="menu">
           {phoneMore.map((n) => (
@@ -320,7 +324,9 @@ function FarmShell({ children }: { children: ReactNode }) {
 export default function FarmLayout({ children }: { children: ReactNode }) {
   return (
     <PlatformProvider>
-      <FarmShell>{children}</FarmShell>
+      <ToastProvider>
+        <FarmShell>{children}</FarmShell>
+      </ToastProvider>
     </PlatformProvider>
   );
 }

@@ -32,8 +32,17 @@ class FakeRemoteStore implements RemoteStore {
   /// Every record the "cloud" holds, for tests.
   List<SyncRecord> get records => [for (final d in _docs.values) d.record];
 
+  final _changes = StreamController<String>.broadcast();
+
   /// Another phone's edit arriving in the cloud.
-  void serverWrite(SyncRecord record) => _docs['${record.tenantId}/${record.key}'] = _Doc(record, ++_seq);
+  void serverWrite(SyncRecord record) {
+    _docs['${record.tenantId}/${record.key}'] = _Doc(record, ++_seq);
+    _changes.add('${record.tenantId}/${record.collection}');
+  }
+
+  @override
+  Stream<void> changes(String tenantId, List<String> collections) =>
+      _changes.stream.where((k) => collections.any((c) => k == '$tenantId/$c')).map((_) {});
 
   @override
   Future<PushResult> push(String tenantId, List<SyncRecord> records) async {

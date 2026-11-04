@@ -44,3 +44,6 @@ export function words(key: string | null | undefined): string {
   const s = key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').toLowerCase();
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+/** "1 entry", "3 entries": a count with the right word after it. */
+export const plural = (n: number, one: string, many: string) => `${whole.format(n)} ${n === 1 ? one : many}`;

@@ -91,6 +91,15 @@ describe('append-only and soft delete', () => {
     await assertSucceeds(setDoc(ref, rec('animals', 'a1', { version: 2, body: { name: 'Bihogo' } })));
   });
 
+  test('a worker ticks a task done from their phone, but cannot rewrite it', async () => {
+    const task = { title: 'Spray the calves', staffId: 'staff-amos', due: '2026-11-07T18:00:00.000', when: '', doneAt: null };
+    await assertSucceeds(setDoc(doc(as('owner'), `tenants/${T}/tasks/k1`), rec('tasks', 'k1', { body: task })));
+    const db = as('worker');
+    const ref = doc(db, `tenants/${T}/tasks/k1`);
+    await assertSucceeds(setDoc(ref, rec('tasks', 'k1', { version: 2, deviceId: 'phone-b', body: { ...task, doneAt: '2026-11-07T15:00:00.000' } })));
+    await assertFails(setDoc(ref, rec('tasks', 'k1', { version: 3, body: { ...task, title: 'Nothing' } })));
+  });
+
   test('nobody hard-deletes', async () => {
     const db = as('owner');
     const ref = doc(db, `tenants/${T}/animals/a1`);
@@ -399,3 +408,43 @@ describe('platform control panel (decision 0020)', () => {
     await assertSucceeds(audited(db, doc(db, `tenants/${T}/staffPins/s1`), rec('staffPins', 's1', { version: 2, body: { pinHash: 'y', mustChange: true } }), undefined, false));
   });
 });
+
+describe('supplier portal invites', () => {
+  const invite = { tenantId: T, farmerId: 'farmer-1', farmerName: 'John', farmName: 'Rwemera', createdAt: '2026-11-04T08:00:00.000', expiresAt: '2026-11-11T08:00:00.000', used: false };
+  const accept = (db, uid, code, links = [{ tenantId: T, farmerId: 'farmer-1' }]) => {
+    const b = writeBatch(db);
+    b.set(doc(db, `users/${uid}`), { farmerLinks: links, inviteCode: code }, { merge: true });
+    b.update(doc(db, `farmerInvites/${code}`), { used: true, usedBy: uid, usedAt: '2026-11-04T09:00:00.000' });
+    return b.commit();
+  };
+  beforeEach(async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, `tenants/${T}/deliveries/d1`), rec('deliveries', 'd1', { body: { farmerId: 'farmer-1', litres: 20 } }));
+      await setDoc(doc(db, `tenants/${T}/deliveries/d2`), rec('deliveries', 'd2', { body: { farmerId: 'farmer-2', litres: 15 } }));
+    });
+  });
+
+  test('a manager makes an invite; a worker cannot', async () => {
+    await assertSucceeds(setDoc(doc(as('owner'), 'farmerInvites/ABC123'), invite));
+    await assertFails(setDoc(doc(as('worker'), 'farmerInvites/XYZ999'), invite));
+  });
+
+  test('the farmer accepts once and then sees only their own deliveries', async () => {
+    await setDoc(doc(as('owner'), 'farmerInvites/ABC123'), invite);
+    const db = as('john');
+    await assertSucceeds(accept(db, 'john', 'ABC123'));
+    await assertSucceeds(getDoc(doc(db, `tenants/${T}/deliveries/d1`)));
+    await assertFails(getDoc(doc(db, `tenants/${T}/deliveries/d2`)));
+    // Used: nobody can accept it again.
+    await assertFails(accept(as('rose'), 'rose', 'ABC123'));
+  });
+
+  test('nobody links themselves to a farmer without an invite', async () => {
+    await assertFails(setDoc(doc(as('mallory'), 'users/mallory'), { farmerLinks: [{ tenantId: T, farmerId: 'farmer-2' }] }));
+    await setDoc(doc(as('owner'), 'farmerInvites/ABC123'), invite);
+    // An invite for farmer-1 cannot be used to link farmer-2.
+    await assertFails(accept(as('mallory'), 'mallory', 'ABC123', [{ tenantId: T, farmerId: 'farmer-2' }]));
+  });
+});
+

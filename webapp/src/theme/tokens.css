@@ -46,12 +46,12 @@
   --z-touch: 44px; --z-btn: 40px; --z-input: 40px; --z-icon: 20px; --z-icon-sm: 16px; --z-avatar: 32px; --z-avatar-lg: 64px;
   --z-sidebar: 232px; --z-rail: 72px; --z-topbar: 56px; --z-bottomnav: 60px; --z-content: 1200px; --z-content-admin: 1440px; --z-drawer: 280px; --z-jump: 44px; --z-auth: 400px;
   --z-chart: 160px; --z-logo: 28px; --z-logo-lg: 72px; --z-border: 1px; --z-focus: 2px; --z-dot: 8px;
-  --z-menu: 240px; --z-dialog: 440px; --z-col-min: 280px; --z-stat-min: 160px; --z-shadow-y: 1px; --z-shadow-blur: 3px;
+  --z-menu: 240px; --z-dialog: 440px; --z-dialog-lg: 640px; --z-content-farm: 1440px; --z-skel-line: 12px; --z-skel-value: 26px; --z-skel-row: 40px; --z-loader: 48px; --z-col-min: 280px; --z-stat-min: 160px; --z-shadow-y: 1px; --z-shadow-blur: 3px;
 
   /* ---- Breakpoints are in app.css media queries: 600px (medium) and 1024px (wide), decision 0012 ---- */
 
   /* ---- Motion (farmtap_motion.dart) ---- */
-  --d-fast: 120ms; --d-normal: 200ms; --d-spin: 1200ms; --ease: cubic-bezier(0.2, 0, 0, 1);
+  --d-fast: 120ms; --d-normal: 200ms; --d-spin: 1200ms; --d-shimmer: 1400ms; --d-pulse: 1600ms; --d-toast: 240ms; --ease: cubic-bezier(0.2, 0, 0, 1);
 
   /* ---- Print ---- */
   --print-margin: 12mm;

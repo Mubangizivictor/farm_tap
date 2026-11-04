@@ -56,7 +56,7 @@ function message(code: string): string {
 }
 
 const features = [
-  { icon: 'drop' as const, title: 'Every litre counted', text: 'Milk, deliveries and payments in one place.' },
+  { icon: 'list' as const, title: 'Every record kept', text: 'Animals, production and sales in one place.' },
   { icon: 'workers' as const, title: 'Your team, on record', text: 'Who came, who worked, who was paid.' },
   { icon: 'money' as const, title: 'Know your money', text: 'What came in, what went out, this month.' },
 ];
@@ -91,6 +91,16 @@ export default function SignIn() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
+
+  // Sent here by the supplier pages (?next=/supplier/…): go back there after.
+  useEffect(() => {
+    try {
+      const next = new URLSearchParams(window.location.search).get('next');
+      if (next && /^\/supplier(-invite)?\//.test(next)) sessionStorage.setItem('farmtap.next', next);
+    } catch {
+      /* storage blocked: the start page still opens the farm */
+    }
+  }, []);
 
   // Already signed in on this browser: never ask again (go to the farm).
   useEffect(() => {

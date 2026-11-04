@@ -28,6 +28,7 @@ class SyncEngine implements SyncService {
     this.pullPageSize = 100,
     this.debounce = const Duration(seconds: 5), // theme-guard: ignore (network timing, not UI)
     this.periodic = const Duration(minutes: 15),
+    this.liveDelay = const Duration(seconds: 3), // theme-guard: ignore (network timing, not UI)
     this.onConflicts,
   });
 
@@ -47,6 +48,10 @@ class SyncEngine implements SyncService {
   final int pullPageSize;
   final Duration debounce;
   final Duration periodic;
+
+  /// Wait after a cloud change before pulling, so a burst of edits (the web
+  /// saving a form, a batch from another phone) is one pull.
+  final Duration liveDelay;
   final void Function(List<SyncConflict>)? onConflicts;
 
   SyncSnapshot _current = const SyncSnapshot(online: false);
@@ -55,6 +60,9 @@ class SyncEngine implements SyncService {
   Timer? _debounceTimer;
   Timer? _retryTimer;
   Timer? _periodicTimer;
+  Timer? _liveTimer;
+  StreamSubscription<void>? _live;
+  String _liveKey = '';
   Future<void>? _running;
   bool _again = false;
   bool _againPull = false;
@@ -76,6 +84,7 @@ class SyncEngine implements SyncService {
       )
       ..add(store.changes().listen((_) => unawaited(_onStoreChange())));
     _periodicTimer = Timer.periodic(periodic, (_) => unawaited(_trigger(pull: true)));
+    _listenLive();
     await _refreshCounts();
     if (connectivity.online) await _trigger(pull: true);
   }
@@ -100,6 +109,8 @@ class SyncEngine implements SyncService {
     _debounceTimer?.cancel();
     _retryTimer?.cancel();
     _periodicTimer?.cancel();
+    _liveTimer?.cancel();
+    unawaited(_live?.cancel());
     for (final s in _subs) {
       unawaited(s.cancel());
     }
@@ -137,7 +148,35 @@ class SyncEngine implements SyncService {
     }
   }
 
+  /// Listens for cloud changes on the open farm(s); again when they change.
+  void _listenLive() {
+    final open = tenants().where((t) => t.isNotEmpty).toList();
+    final key = open.join(',');
+    if (key == _liveKey && _live != null) return;
+    _liveKey = key;
+    unawaited(_live?.cancel());
+    _live = null;
+    if (open.isEmpty) return;
+    final streams = [for (final t in open) remote.changes(t, collections)];
+    final merged = StreamController<void>();
+    final subs = [
+      for (final s in streams)
+        s.listen(merged.add, onError: (Object _) {}, onDone: () {}),
+    ];
+    merged.onCancel = () async {
+      for (final s in subs) {
+        await s.cancel();
+      }
+    };
+    _live = merged.stream.listen((_) {
+      if (!connectivity.online) return;
+      _liveTimer?.cancel();
+      _liveTimer = Timer(liveDelay, () => unawaited(_trigger(pull: true)));
+    });
+  }
+
   Future<void> _run({required bool pull}) async {
+    _listenLive();
     if (!connectivity.online) {
       await _refreshCounts();
       return;

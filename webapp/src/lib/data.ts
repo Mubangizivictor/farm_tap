@@ -113,23 +113,69 @@ export async function addRecord(
   return id;
 }
 
-/** Update an existing record (partial body merge). */
-export async function updateRecord(
+/**
+ * Saves a new version of a record, the way the phone's RecordJournal.put
+ * does: the whole body is replaced (so pass the full body; use
+ * [mergeBody] to start from the stored one), version goes up by one.
+ * Only for collections that may change (not milk, money or deliveries,
+ * which are append-only: a correction there is a new record).
+ */
+export async function putRecord(
+  db: Firestore,
+  tenantId: string,
+  rec: FarmRecord<object>,
+  uid: string,
+  body: Record<string, unknown>,
+): Promise<void> {
+  const now = localIso(new Date());
+  await updateDoc(doc(db, 'tenants', tenantId, rec.collection, rec.id), {
+    body,
+    updatedAt: now,
+    updatedBy: uid,
+    deviceId: webDeviceId(),
+    version: (rec.version ?? 1) + 1,
+    serverUpdatedAt: serverTimestamp(),
+  });
+}
+
+/** The stored body with [patch] on top (keeps fields the web does not show, like the PIN). */
+export const mergeBody = (rec: FarmRecord<object>, patch: Record<string, unknown>) => ({
+  ...(rec.body as Record<string, unknown>),
+  ...patch,
+});
+
+/**
+ * Creates the record, or saves a new version when it already exists
+ * (records with a fixed id, like `nfcCards/{number}` or `staffPins/{staffId}`).
+ */
+export async function upsertRecord(
   db: Firestore,
   tenantId: string,
   name: string,
   id: string,
   uid: string,
-  bodyPatch: Record<string, unknown>,
-  currentVersion: number,
+  body: Record<string, unknown>,
 ): Promise<void> {
+  const snap = await getDoc(doc(db, 'tenants', tenantId, name, id));
+  if (!snap.exists()) {
+    await addRecord(db, tenantId, name, uid, body, id);
+    return;
+  }
+  await putRecord(db, tenantId, snap.data() as FarmRecord<object>, uid, body);
+}
+
+/**
+ * Soft delete (the phone's RecordJournal.remove): the record stays, marked
+ * deleted, body unchanged. Allowed for every collection, append-only too.
+ */
+export async function removeRecord(db: Firestore, tenantId: string, rec: FarmRecord<object>, uid: string): Promise<void> {
   const now = localIso(new Date());
-  const ref = doc(db, 'tenants', tenantId, name, id);
-  await updateDoc(ref, {
-    body: bodyPatch,
+  await updateDoc(doc(db, 'tenants', tenantId, rec.collection, rec.id), {
+    isDeleted: true,
     updatedAt: now,
     updatedBy: uid,
-    version: currentVersion + 1,
+    deviceId: webDeviceId(),
+    version: (rec.version ?? 1) + 1,
     serverUpdatedAt: serverTimestamp(),
   });
 }
@@ -141,6 +187,9 @@ export function saveError(code: string | undefined): string {
       return 'You are not allowed to save this. Only the owner or manager can, and not after the free trial ends.';
     case 'unavailable':
       return 'No internet. Check your connection and try again.';
+    case 'failed-precondition':
+    case 'not-found':
+      return 'This record changed or was removed on another device. Close it and open it again.';
     default:
       return 'Could not save. Try again.';
   }

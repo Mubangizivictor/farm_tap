@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Icon, type IconName } from '@/components/Icon';
+import { SideHead, useSidebar } from '@/components/side';
 import { Loading } from '@/components/Loading';
 import { AdminProvider, useAdmin } from '@/lib/adminSession';
 import { initials } from '@/lib/format';
@@ -127,6 +128,7 @@ function Shell({ children }: { children: ReactNode }) {
   const [drawer, setDrawer] = useState(false);
   const [userMenu, setUserMenu] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const side = useSidebar();
   useEffect(() => {
     setDrawer(false);
     setUserMenu(false);
@@ -154,12 +156,9 @@ function Shell({ children }: { children: ReactNode }) {
   const quick = items.slice(0, 4);
 
   return (
-    <div className="shell admin">
+    <div className={`shell admin ${side.closed ? 'side-closed' : ''}`}>
       <aside className="sidebar">
-        <div className="row" style={{ padding: 'var(--s-xs) var(--s-sm)' }}>
-          <div className="logo-mark" aria-hidden />
-          <strong className="brand-text">FarmTap</strong>
-        </div>
+        <SideHead home="/admin/" closed={side.closed} onToggle={side.toggle} />
         <NavLinks items={items} current={current} />
         <div className="grow" />
         <div className="side-foot card flat small">

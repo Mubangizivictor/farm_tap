@@ -1,271 +1,311 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import Link from 'next/link';
+import { useState } from 'react';
+import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
-import { Dialog, Empty, PageHead } from '@/components/ui';
-import { addRecord, saveError, updateRecord, useRecords } from '@/lib/data';
-import { localIso } from '@/lib/dates';
-import { manages, planState, type FarmRecord, type StaffBody, type TaskBody } from '@/lib/domain';
-import { date, shortDate, words } from '@/lib/format';
+import { ConfirmDialog, Empty, Field, FormDialog, LoadError, PageHead, SearchBox, Seg, SkelRows, Stat, Tabs, useSave, useToast } from '@/components/ui';
+import { downloadCsv } from '@/lib/csv';
+import { addDays, dayKey, localIso, parseDate, sameDay, startOfDay } from '@/lib/dates';
+import { addRecord, mergeBody, putRecord, removeRecord, useRecords } from '@/lib/data';
+import { manages, taskBody, taskView, type FarmRecord, type StaffBody, type TaskBody, type TaskView } from '@/lib/domain';
+import { count, date, shortDate, time } from '@/lib/format';
 import { firebase } from '@/lib/firebase';
 import { useFarm, useSession } from '@/lib/session';
+import { useOpenFromUrl } from '@/lib/useOpen';
 
-const CATEGORIES = [
-  { value: 'milk', label: 'Milking' },
-  { value: 'health', label: 'Animal health' },
-  { value: 'feeding', label: 'Feeding' },
-  { value: 'cleaning', label: 'Cleaning' },
-  { value: 'general', label: 'General' },
-  { value: 'other', label: 'Other' },
-];
+/** The phone saves a task as due at 18:00 on its day (workers_pages.dart). */
+const dueAt = (day: Date) => new Date(day.getFullYear(), day.getMonth(), day.getDate(), 18);
 
-const PRIORITIES = [
-  { value: 'low', label: 'Low', chip: '' },
-  { value: 'normal', label: 'Normal', chip: 'brand' },
-  { value: 'high', label: 'High', chip: 'bad' },
-];
-
-function categoryIcon(cat?: string) {
-  const m: Record<string, 'drop' | 'health' | 'feed' | 'refresh' | 'flag' | 'check'> = {
-    milk: 'drop',
-    health: 'health',
-    feeding: 'feed',
-    cleaning: 'refresh',
-    general: 'flag',
-  };
-  return m[cat ?? ''] ?? 'check';
-}
-
-function AddTask({
-  staff,
-  onClose,
-  onSaved,
-}: {
-  staff: FarmRecord<StaffBody>[];
-  onClose: () => void;
-  onSaved: () => void;
-}) {
+function TaskForm({ t, staff, onClose }: { t?: FarmRecord<TaskBody>; staff: FarmRecord<StaffBody>[]; onClose: () => void }) {
   const farm = useFarm();
-  const { user } = useSession();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [assignedTo, setAssignedTo] = useState('');
-  const [dueDate, setDueDate] = useState(localIso(new Date()));
-  const [priority, setPriority] = useState<'low' | 'normal' | 'high'>('normal');
-  const [category, setCategory] = useState('general');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const activeStaff = staff.filter((s) => s.body.active !== false);
-  const chosen = activeStaff.find((s) => s.id === assignedTo);
+  const { user, canSave, online } = useSession();
+  const toast = useToast();
+  const v = t ? taskView(t.body) : null;
+  const [f, setF] = useState({
+    title: v?.title ?? '',
+    staffId: v?.staffId && staff.some((s) => s.id === v.staffId) ? v.staffId : staff.length === 1 ? staff[0].id : '',
+    due: dayKey(v?.due ?? new Date()),
+    when: v?.when ?? '',
+    priority: v?.priority ?? 'normal',
+    note: v?.note ?? '',
+  });
+  const { busy, error, setError, run } = useSave();
+  const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
 
-  async function save(ev: FormEvent) {
-    ev.preventDefault();
+  async function save() {
     if (!user) return;
-    setBusy(true);
-    setError('');
-    try {
-      const { db } = firebase();
-      const body: TaskBody = {
-        title: title.trim(),
-        description: description.trim() || undefined,
-        assignedTo: assignedTo || undefined,
-        assignedToName: chosen?.body.name,
-        dueDate,
-        status: 'open',
-        priority,
-        category,
-      };
-      await addRecord(db, farm.id, 'tasks', user.uid, body as unknown as Record<string, unknown>);
-      onSaved();
+    if (!f.title.trim()) return setError('Say what needs doing.');
+    if (!f.staffId) return setError('Choose who will do it.');
+    const day = parseDate(f.due);
+    if (!day) return setError('Choose the day it is due.');
+    const body = taskBody(
+      { title: f.title.trim(), staffId: f.staffId, due: dueAt(day), when: f.when.trim(), doneAt: v?.doneAt ?? null, note: f.note, priority: f.priority as 'normal' | 'high' },
+      localIso,
+    );
+    const { db } = firebase();
+    const ok = await run(() => (t ? putRecord(db, farm.id, t, user.uid, mergeBody(t, body)) : addRecord(db, farm.id, 'tasks', user.uid, body)));
+    if (ok) {
+      const who = staff.find((s) => s.id === f.staffId)?.body.name ?? '';
+      toast(t ? 'Task saved' : `Task given to ${who}`);
       onClose();
-    } catch (e) {
-      setError(saveError((e as { code?: string }).code));
-      setBusy(false);
     }
   }
 
   return (
-    <Dialog title="New task" onClose={onClose}>
-      <form className="stack" onSubmit={save}>
-        <label className="field">
-          <span>Task</span>
-          <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Clean the milking parlour" />
-        </label>
-        <label className="field">
-          <span>Details (optional)</span>
-          <textarea className="input" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
-        </label>
-        <div className="grid">
-          <label className="field">
-            <span>Category</span>
-            <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
-              {CATEGORIES.map((c) => (
-                <option key={c.value} value={c.value}>{c.label}</option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            <span>Priority</span>
-            <select className="input" value={priority} onChange={(e) => setPriority(e.target.value as 'low' | 'normal' | 'high')}>
-              {PRIORITIES.map((p) => (
-                <option key={p.value} value={p.value}>{p.label}</option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            <span>Due date</span>
-            <input className="input" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-          </label>
-          <label className="field">
-            <span>Assign to</span>
-            <select className="input" value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
-              <option value="">Anyone</option>
-              {activeStaff.map((s) => (
-                <option key={s.id} value={s.id}>{s.body.name}</option>
-              ))}
-            </select>
-          </label>
-        </div>
-        {error && <div className="banner bad">{error}</div>}
-        <div className="actions">
-          <button type="button" className="btn outline" onClick={onClose}>Cancel</button>
-          <button className="btn" disabled={busy}>Add task</button>
-        </div>
-      </form>
-    </Dialog>
+    <FormDialog
+      title={t ? 'Edit task' : 'New task'}
+      subtitle="The worker sees it on the farm phone after the next sync."
+      onClose={onClose}
+      onSubmit={save}
+      busy={busy}
+      error={error}
+      canSave={canSave}
+      online={online}
+      submit={t ? 'Save changes' : 'Add task'}
+    >
+      <Field label="What needs doing">
+        <input className="input" required value={f.title} onChange={set('title')} autoFocus placeholder="e.g. Spray the calves" maxLength={120} />
+      </Field>
+      <Fit kind="fields" cols={[1, 2, 2, 2]}>
+        <Field label="Who">
+          <select className="input" required value={f.staffId} onChange={set('staffId')}>
+            <option value="">Choose a worker…</option>
+            {staff.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.body.name}
+                {s.body.title ? ` (${s.body.title})` : ''}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Day">
+          <input className="input" type="date" required min={t ? undefined : dayKey(new Date())} value={f.due} onChange={set('due')} />
+        </Field>
+        <Field label="When (optional)" hint="e.g. before 10:00, after evening milking">
+          <input className="input" value={f.when} onChange={set('when')} maxLength={60} />
+        </Field>
+        <Field label="How urgent">
+          <Seg label="How urgent" value={f.priority} onChange={(p) => setF({ ...f, priority: p })} items={[['normal', 'Normal'], ['high', 'Urgent']]} />
+        </Field>
+      </Fit>
+      <Field label="Note (optional)">
+        <textarea className="input" value={f.note} onChange={set('note')} rows={2} maxLength={500} />
+      </Field>
+    </FormDialog>
   );
 }
 
-function TaskRow({
-  task,
-  canManage,
-  onToggle,
-}: {
-  task: FarmRecord<TaskBody>;
-  canManage: boolean;
-  onToggle: () => void;
-}) {
-  const b = task.body;
-  const done = b.status === 'done';
-  const overdue = !done && b.dueDate && b.dueDate < localIso(new Date());
-  const pri = PRIORITIES.find((p) => p.value === b.priority);
-  return (
-    <div className={`list-row wrap ${done ? 'muted' : ''}`} style={{ opacity: done ? 0.6 : 1 }}>
-      <button
-        className={`chip ${done ? 'ok' : overdue ? 'bad' : pri?.chip ?? ''}`}
-        style={{ cursor: 'pointer', border: 0 }}
-        onClick={onToggle}
-        title={done ? 'Mark open' : 'Mark done'}
-      >
-        <Icon name={done ? 'check' : categoryIcon(b.category)} className="icon" />
-      </button>
-      <div className="stack grow" style={{ gap: 'var(--s-xxs)' }}>
-        <span style={{ textDecoration: done ? 'line-through' : undefined }}>{b.title}</span>
-        {b.description && <span className="small muted">{b.description}</span>}
-        <span className="small muted">
-          {b.assignedToName ? `${b.assignedToName} · ` : ''}
-          {b.dueDate ? (overdue ? `Overdue (${shortDate(new Date(b.dueDate))})` : `Due ${shortDate(new Date(b.dueDate))}`) : 'No due date'}
-          {done && b.completedByName ? ` · Done by ${b.completedByName}` : ''}
-        </span>
-      </div>
-      {b.priority === 'high' && !done && <span className="chip bad">Urgent</span>}
-      {canManage && <span className="small muted">{words(b.category ?? 'general')}</span>}
-    </div>
-  );
-}
+type Tab = 'open' | 'today' | 'late' | 'done';
 
-export default function TasksPage() {
+export default function Tasks() {
   const farm = useFarm();
-  const { user, online } = useSession();
-  const isBoss = manages(farm);
+  const { user, canSave } = useSession();
+  const toast = useToast();
+  const boss = manages(farm);
   const tasks = useRecords<TaskBody>(farm.id, 'tasks');
   const staff = useRecords<StaffBody>(farm.id, 'staff');
-  const [adding, setAdding] = useState(false);
-  const [filter, setFilter] = useState<'open' | 'done' | 'mine'>('open');
+  const [tab, setTab] = useState<Tab>('open');
+  const [who, setWho] = useState('');
+  const [q, setQ] = useState('');
+  const [adding, setAdding] = useOpenFromUrl();
+  const [editing, setEditing] = useState<FarmRecord<TaskBody> | null>(null);
+  const [removing, setRemoving] = useState<FarmRecord<TaskBody> | null>(null);
+  const toggleSave = useSave();
+  const removeSave = useSave();
   const now = new Date();
-  const plan = planState(farm.subscription, now);
-  const canWrite = plan.kind !== 'readOnly';
+  const today = startOfDay(now);
 
-  const myName = staff.data.find((s) => s.body.phone === (user?.email ?? ''))?.body.name ?? user?.displayName ?? '';
+  const team = staff.data.filter((s) => s.body.active !== false).sort((a, b) => a.body.name.localeCompare(b.body.name));
+  const staffName = (id: string) => staff.data.find((s) => s.id === id)?.body.name ?? '';
+  const all = tasks.data.map((r) => ({ r, v: taskView(r.body) }));
+  const isLate = (v: TaskView) => !v.done && v.due != null && v.due < now && !sameDay(v.due, now);
+  const open = all.filter((t) => !t.v.done);
+  const dueToday = open.filter((t) => t.v.due && sameDay(t.v.due, now));
+  const late = open.filter((t) => isLate(t.v));
+  const done = all.filter((t) => t.v.done).sort((a, b) => (b.v.doneAt?.getTime() ?? 0) - (a.v.doneAt?.getTime() ?? 0));
+  const doneWeek = done.filter((t) => t.v.doneAt && t.v.doneAt >= addDays(today, -6));
+  const list = (tab === 'open' ? open : tab === 'today' ? dueToday : tab === 'late' ? late : done)
+    .filter((t) => !who || t.v.staffId === who)
+    .filter((t) => !q || `${t.v.title} ${t.v.note} ${staffName(t.v.staffId)}`.toLowerCase().includes(q.toLowerCase()))
+    .sort((a, b) =>
+      tab === 'done'
+        ? 0
+        : a.v.priority !== b.v.priority
+          ? a.v.priority === 'high'
+            ? -1
+            : 1
+          : (a.v.due?.getTime() ?? 0) - (b.v.due?.getTime() ?? 0),
+    );
 
-  const rows = tasks.data
-    .filter((t) => !t.isDeleted)
-    .filter((t) => {
-      if (filter === 'done') return t.body.status === 'done';
-      if (filter === 'mine') return t.body.status === 'open' && (!t.body.assignedTo || t.body.assignedToName === myName);
-      return t.body.status === 'open';
-    })
-    .sort((a, b) => {
-      // High priority first, then by due date
-      const pa = a.body.priority === 'high' ? 0 : a.body.priority === 'normal' ? 1 : 2;
-      const pb = b.body.priority === 'high' ? 0 : b.body.priority === 'normal' ? 1 : 2;
-      if (pa !== pb) return pa - pb;
-      return (a.body.dueDate ?? '9999') < (b.body.dueDate ?? '9999') ? -1 : 1;
+  async function toggle(r: FarmRecord<TaskBody>, v: TaskView) {
+    if (!user) return;
+    const doneAt = v.done ? null : new Date();
+    const body = mergeBody(r, {
+      ...taskBody({ title: v.title, staffId: v.staffId, due: v.due ?? dueAt(now), when: v.when, doneAt, note: v.note, priority: v.priority }, localIso),
+      // Older web tasks: keep their own status in step.
+      ...(r.body.status ? { status: doneAt ? 'done' : 'open', completedAt: doneAt ? localIso(doneAt) : null } : {}),
     });
-
-  async function toggleTask(task: FarmRecord<TaskBody>) {
-    if (!user || !online) return;
-    const { db } = firebase();
-    const done = task.body.status !== 'done';
-    const patch: Partial<TaskBody> = {
-      ...task.body,
-      status: done ? 'done' : 'open',
-      completedAt: done ? localIso(new Date()) : null,
-      completedBy: done ? user.uid : null,
-      completedByName: done ? (user.displayName ?? user.email ?? '') : null,
-    };
-    try {
-      await updateRecord(db, farm.id, 'tasks', task.id, user.uid, patch as unknown as Record<string, unknown>, task.version);
-    } catch {
-      // silent — the list will stay in sync via onSnapshot
-    }
+    if (await toggleSave.run(() => putRecord(firebase().db, farm.id, r, user.uid, body))) toast(doneAt ? `Done: ${v.title}` : `Opened again: ${v.title}`);
   }
 
-  const openCount = tasks.data.filter((t) => t.body.status === 'open').length;
-  const overdueCount = tasks.data.filter((t) => t.body.status === 'open' && t.body.dueDate && t.body.dueDate < localIso(now)).length;
+  const csv = () =>
+    downloadCsv(
+      `${farm.name}-tasks-${dayKey(now)}`,
+      ['Task', 'Who', 'Day', 'When', 'Urgent', 'Done', 'Note'],
+      list.map(({ v }) => [v.title, staffName(v.staffId), v.due ? dayKey(v.due) : '', v.when, v.priority === 'high' ? 'Yes' : '', v.doneAt ? `${dayKey(v.doneAt)} ${time(v.doneAt)}` : '', v.note]),
+    );
 
   return (
     <>
-      <PageHead title="Tasks" subtitle="Assign and track daily work">
-        {isBoss && canWrite && (
-          <button className="btn sm" onClick={() => setAdding(true)}>
+      <PageHead title="Tasks" subtitle="Give work to your workers. They see it and tick it off on the farm phone.">
+        <SearchBox value={q} onChange={setQ} placeholder="Search tasks" />
+        <button className="btn outline sm" onClick={csv} title="Download for Excel">
+          <Icon name="download" /> <span className="btn-text">CSV</span>
+        </button>
+        {boss && (
+          <button className="btn sm" onClick={() => setAdding(true)} disabled={!canSave || team.length === 0} title={team.length ? undefined : 'Add a worker first'}>
             <Icon name="plus" /> Add task
           </button>
         )}
       </PageHead>
+      <LoadError code={tasks.error ?? staff.error} />
+      {toggleSave.error && <div className="banner bad">{toggleSave.error}</div>}
 
-      {overdueCount > 0 && (
-        <div className="banner bad">
-          <Icon name="alert" />
-          <span className="grow">{overdueCount} overdue task{overdueCount === 1 ? '' : 's'}.</span>
-        </div>
-      )}
+      <Fit kind="stats">
+        <Stat loading={tasks.loading} icon="list" label="Open" value={count(open.length)} hint={`${dueToday.length} due today`} />
+        <Stat loading={tasks.loading} icon="alert" label="Overdue" value={count(late.length)} hint={late.length ? 'Past their day' : 'Nothing late'} tone={late.length ? 'bad' : undefined} />
+        <Stat loading={tasks.loading} icon="check" label="Done, 7 days" value={count(doneWeek.length)} tone="gold" />
+      </Fit>
 
-      <div className="row" style={{ gap: 'var(--s-xs)', marginBottom: 'var(--s-md)' }}>
-        <div className="seg" role="group" aria-label="Filter tasks">
-          <button aria-pressed={filter === 'open'} onClick={() => setFilter('open')}>Open ({openCount})</button>
-          <button aria-pressed={filter === 'mine'} onClick={() => setFilter('mine')}>Mine</button>
-          <button aria-pressed={filter === 'done'} onClick={() => setFilter('done')}>Done</button>
-        </div>
+      <div className="row wrap between no-print">
+        <Tabs
+          label="Tasks"
+          value={tab}
+          onChange={setTab}
+          items={[
+            ['open', 'Open', open.length],
+            ['today', 'Today', dueToday.length],
+            ['late', 'Overdue', late.length],
+            ['done', 'Done', done.length],
+          ]}
+        />
+        {team.length > 1 && (
+          <select className="input" style={{ width: 'auto' }} value={who} onChange={(e) => setWho(e.target.value)} aria-label="Worker">
+            <option value="">Everyone</option>
+            {team.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.body.name}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
-      <section className="card">
-        <div className="list">
-          {rows.map((task) => (
-            <TaskRow
-              key={task.id}
-              task={task}
-              canManage={isBoss}
-              onToggle={() => canWrite && void toggleTask(task)}
-            />
-          ))}
-          {rows.length === 0 && <Empty>{filter === 'done' ? 'No completed tasks.' : 'No open tasks. Good work!'}</Empty>}
-        </div>
-      </section>
+      <div className="table-wrap">
+        <table className="table rt">
+          <thead>
+            <tr>
+              <th aria-label="Done" />
+              <th>Task</th>
+              <th>Who</th>
+              <th>Day</th>
+              <th>{tab === 'done' ? 'Done' : 'When'}</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {list.map(({ r, v }) => (
+              <tr key={r.id}>
+                <td className="acts" data-label="">
+                  <label className="check-row" title={v.done ? 'Mark not done' : 'Mark done'}>
+                    <input type="checkbox" checked={v.done} disabled={!canSave || toggleSave.busy} onChange={() => void toggle(r, v)} aria-label={v.done ? `Mark ${v.title} not done` : `Mark ${v.title} done`} />
+                    <span className="show-sm-only small">{v.done ? 'Done' : 'Mark done'}</span>
+                  </label>
+                </td>
+                <td data-label="Task" className="lead wide">
+                  <span className={v.done ? 'task-done' : ''}>
+                    <strong>{v.title}</strong>
+                  </span>{' '}
+                  {v.priority === 'high' && !v.done && <span className="chip bad">Urgent</span>}
+                  {v.note && <div className="small muted">{v.note}</div>}
+                </td>
+                <td data-label="Who">{staffName(v.staffId) || <span className="muted">Not set</span>}</td>
+                <td data-label="Day">
+                  {v.due ? (
+                    isLate(v) ? (
+                      <span className="chip bad">Overdue · {shortDate(v.due)}</span>
+                    ) : sameDay(v.due, now) ? (
+                      <span className="chip warn">Today</span>
+                    ) : (
+                      date(v.due)
+                    )
+                  ) : (
+                    '–'
+                  )}
+                </td>
+                <td data-label={tab === 'done' ? 'Done' : 'When'}>{tab === 'done' ? (v.doneAt ? `${shortDate(v.doneAt)} ${time(v.doneAt)}` : 'Done') : v.when || '–'}</td>
+                <td className="acts">
+                  {boss && canSave && (
+                    <div className="row" style={{ gap: 'var(--s-xs)', justifyContent: 'flex-end' }}>
+                      <button className="btn sm outline" onClick={() => setEditing(r)}>
+                        Edit
+                      </button>
+                      <button className="icon-btn" aria-label={`Remove ${v.title}`} title="Remove" onClick={() => setRemoving(r)}>
+                        <Icon name="close" />
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {(tasks.loading || staff.loading) && <SkelRows rows={4} cols={5} />}
+        {!tasks.loading && !staff.loading && list.length === 0 && (
+          <Empty
+            icon="check"
+            action={
+              boss && canSave && tab === 'open' && !q ? (
+                team.length ? (
+                  <button className="btn sm" onClick={() => setAdding(true)}>
+                    <Icon name="plus" /> Add task
+                  </button>
+                ) : (
+                  <Link className="btn sm" href="/workers/?new=1">
+                    <Icon name="plus" /> Add a worker first
+                  </Link>
+                )
+              ) : null
+            }
+          >
+            {q || who ? 'No task matches.' : tab === 'done' ? 'Nothing done yet.' : tab === 'late' ? 'Nothing is overdue.' : tab === 'today' ? 'Nothing due today.' : team.length ? 'No open tasks. Good work!' : 'Tasks go to workers. Add your workers first.'}
+          </Empty>
+        )}
+      </div>
 
-      {adding && staff.data && (
-        <AddTask staff={staff.data} onClose={() => setAdding(false)} onSaved={() => {}} />
+      {adding && <TaskForm staff={team} onClose={() => setAdding(false)} />}
+      {editing && <TaskForm t={editing} staff={team} onClose={() => setEditing(null)} />}
+      {removing && (
+        <ConfirmDialog
+          title="Remove this task?"
+          confirm="Remove"
+          danger
+          busy={removeSave.busy}
+          error={removeSave.error}
+          onClose={() => setRemoving(null)}
+          onConfirm={async () => {
+            if (!user) return;
+            if (await removeSave.run(() => removeRecord(firebase().db, farm.id, removing, user.uid))) {
+              toast('Task removed');
+              setRemoving(null);
+            }
+          }}
+        >
+          “{taskView(removing.body).title}” will be removed here and from the farm phones.
+        </ConfirmDialog>
       )}
     </>
   );
 }
+

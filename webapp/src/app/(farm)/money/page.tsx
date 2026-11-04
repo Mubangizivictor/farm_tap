@@ -1,123 +1,164 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import Link from 'next/link';
+import { useState } from 'react';
+import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
-import { Dialog, Empty, ExportButtons, LoadError, PageHead, SaveHint, Stat } from '@/components/ui';
+import { CardHead, ConfirmDialog, Empty, ExportButtons, Field, FormDialog, LoadError, PageHead, SkelRows, Stat, Tabs, useSave, useToast } from '@/components/ui';
 import { downloadCsv } from '@/lib/csv';
 import { dayKey, localIso, parseDate } from '@/lib/dates';
-import { addRecord, saveError, useRecords } from '@/lib/data';
-import { alive, expenseCategories, manages, recordDate, type ExpenseBody, type MilkSaleBody } from '@/lib/domain';
-import { date, litres, ugx, words } from '@/lib/format';
+import { addRecord, removeRecord, useRecords } from '@/lib/data';
+import {
+  alive,
+  expenseCategories,
+  incomeSources,
+  manages,
+  recordDate,
+  salePaid,
+  saleValue,
+  type ExpenseBody,
+  type FarmRecord,
+  type IncomeBody,
+  type MilkSaleBody,
+  type MilkSalePaymentBody,
+} from '@/lib/domain';
+import { litres, shortDate, ugx, words, plural } from '@/lib/format';
 import { firebase } from '@/lib/firebase';
 import { useFarm, useSession } from '@/lib/session';
+import { useOpenFromUrl } from '@/lib/useOpen';
 
 const monthName = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' });
+const sourceText = (s: string) => (s === 'animalSale' ? 'Animal sold' : s === 'calfSale' ? 'Calf sold' : words(s));
+/** Biggest single entry we accept without a typing mistake (UGX 100 million). */
+const MAX_UGX = 100_000_000;
 
-function AddExpense({ onClose }: { onClose: () => void }) {
+/** Keeps the time of day so today's entries sort in order. */
+function atFor(day: string): Date {
+  const picked = parseDate(day) ?? new Date();
+  const now = new Date();
+  return new Date(picked.getFullYear(), picked.getMonth(), picked.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+}
+
+function MoneyForm({ kind, onClose }: { kind: 'expense' | 'income'; onClose: () => void }) {
   const farm = useFarm();
   const { user, canSave, online } = useSession();
-  const [category, setCategory] = useState<string>('feed');
+  const toast = useToast();
+  const [category, setCategory] = useState<string>(kind === 'expense' ? 'feed' : 'manure');
   const [amount, setAmount] = useState('');
   const [day, setDay] = useState(dayKey(new Date()));
   const [note, setNote] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
+  const { busy, error, setError, run } = useSave();
+  const options = kind === 'expense' ? expenseCategories.filter((c) => c !== 'wages') : incomeSources;
 
-  async function save(ev: FormEvent) {
-    ev.preventDefault();
+  async function save() {
     if (!user) return;
-    setBusy(true);
-    try {
-      const picked = parseDate(day) ?? new Date();
-      const now = new Date();
-      // Keep the time of day so today's entries sort in order.
-      const at = new Date(picked.getFullYear(), picked.getMonth(), picked.getDate(), now.getHours(), now.getMinutes());
-      await addRecord(firebase().db, farm.id, 'expenses', user.uid, {
-        category,
-        amount: Math.round(Number(amount)),
-        at: localIso(at),
-        note: note.trim() || null,
-        sourceId: null,
-      });
+    const n = Number(amount);
+    if (!Number.isInteger(n) || n <= 0) return setError('Type the amount in whole shillings, more than 0.');
+    if (n > MAX_UGX) return setError(`${ugx(n)} looks too big. Check the number.`);
+    if (!parseDate(day)) return setError('Choose the date.');
+    const at = localIso(atFor(day));
+    const ok = await run(() =>
+      kind === 'expense'
+        ? addRecord(firebase().db, farm.id, 'expenses', user.uid, { category, amount: n, at, note: note.trim() || null, sourceId: null, photo: null })
+        : addRecord(firebase().db, farm.id, 'income', user.uid, { source: category, amount: n, at, note: note.trim() || null, sourceId: null }),
+    );
+    if (ok) {
+      toast(`${kind === 'expense' ? 'Expense' : 'Income'} saved: ${ugx(n)}`);
       onClose();
-    } catch (e) {
-      setError(saveError((e as { code?: string }).code));
-      setBusy(false);
     }
   }
 
   return (
-    <Dialog title="Add expense" onClose={onClose}>
-      <form className="stack" onSubmit={save}>
-        <div className="field">
-          <span>What for?</span>
-          <div className="row wrap">
-            {expenseCategories.map((c) => (
-              <button type="button" key={c} className={`chip ${category === c ? 'brand' : ''}`} style={{ border: 0, cursor: 'pointer' }} onClick={() => setCategory(c)}>
-                {words(c)}
-              </button>
-            ))}
-          </div>
+    <FormDialog
+      title={kind === 'expense' ? 'Add expense' : 'Add income'}
+      subtitle={kind === 'income' ? 'Money the farm earned that is not a milk sale. Record milk sales on the Milk page.' : 'Farm spending only. Wages are paid from Workers.'}
+      onClose={onClose}
+      onSubmit={save}
+      busy={busy}
+      error={error}
+      canSave={canSave}
+      online={online}
+      submit={Number(amount) > 0 ? `Save ${ugx(Number(amount))}` : 'Save'}
+    >
+      <Field label={kind === 'expense' ? 'What for?' : 'From what?'}>
+        <div className="chips" role="group">
+          {options.map((c) => (
+            <button type="button" key={c} className={`chip ${category === c ? 'brand' : ''}`} aria-pressed={category === c} onClick={() => setCategory(c)}>
+              {kind === 'expense' ? words(c) : sourceText(c)}
+            </button>
+          ))}
         </div>
-        <label className="field">
-          <span>Amount (UGX)</span>
+      </Field>
+      <Fit kind="fields" cols={[1, 2, 2, 2]}>
+        <Field label="Amount (UGX)">
           <input className="input" type="number" min={1} step={1} inputMode="numeric" required value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus />
-        </label>
-        <label className="field">
-          <span>Date</span>
+        </Field>
+        <Field label="Date">
           <input className="input" type="date" max={dayKey(new Date())} required value={day} onChange={(e) => setDay(e.target.value)} />
-        </label>
-        <label className="field">
-          <span>Note (optional)</span>
-          <input className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. 10 bags of dairy meal" />
-        </label>
-        {error && <p className="error-text">{error}</p>}
-        <SaveHint canSave={canSave} online={online} />
-        <div className="actions">
-          <button type="button" className="btn outline" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="btn" disabled={busy || !canSave}>
-            {busy ? 'Saving…' : 'Save expense'}
-          </button>
-        </div>
-      </form>
-    </Dialog>
+        </Field>
+      </Fit>
+      <Field label="Note (optional)">
+        <input className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder={kind === 'expense' ? 'e.g. 10 bags of dairy meal' : 'e.g. 3 trips of manure'} maxLength={200} />
+      </Field>
+    </FormDialog>
   );
 }
+
+type Tab = 'expenses' | 'income' | 'sales';
 
 /** Farm money only (binding rule 8: household money is never mixed in). */
 export default function Money() {
   const farm = useFarm();
-  const { canSave } = useSession();
+  const { user, canSave } = useSession();
+  const toast = useToast();
   const [offset, setOffset] = useState(0);
-  const [adding, setAdding] = useState(false);
+  const [tab, setTab] = useState<Tab>('expenses');
+  const [adding, setAdding] = useOpenFromUrl();
+  const [addingIncome, setAddingIncome] = useOpenFromUrl('income');
+  const [removing, setRemoving] = useState<FarmRecord<ExpenseBody | IncomeBody> | null>(null);
+  const removeSave = useSave();
+  const boss = manages(farm);
   const now = new Date();
   const from = new Date(now.getFullYear(), now.getMonth() + offset, 1);
   const to = new Date(from.getFullYear(), from.getMonth() + 1, 1);
-  const expenses = useRecords<ExpenseBody>(farm.id, 'expenses', localIso(new Date(from.getFullYear(), from.getMonth() - 1, 1)));
-  const sales = useRecords<MilkSaleBody>(farm.id, 'milkSales', localIso(new Date(from.getFullYear(), from.getMonth() - 1, 1)));
+  // Money dates are the `at` field (an entry can be for an earlier day), so read from a month earlier.
+  const since = localIso(new Date(from.getFullYear(), from.getMonth() - 1, 1));
+  const expenses = useRecords<ExpenseBody>(boss ? farm.id : null, 'expenses', since);
+  const income = useRecords<IncomeBody>(boss ? farm.id : null, 'income', since);
+  const sales = useRecords<MilkSaleBody>(boss ? farm.id : null, 'milkSales', since);
+  const marks = useRecords<MilkSalePaymentBody>(boss ? farm.id : null, 'milkSalePayments');
 
-  if (!manages(farm)) return <Empty>Only the owner or manager can see money.</Empty>;
+  if (!boss) return <Empty icon="lock">Only the owner or manager can see money.</Empty>;
 
+  const within = (d: Date) => d >= from && d < to;
   const inMonth = alive(expenses.data)
-    .filter((e) => {
-      const at = recordDate(e, 'at');
-      return at >= from && at < to;
-    })
+    .filter((e) => within(recordDate(e, 'at')))
     .sort((a, b) => recordDate(b, 'at').getTime() - recordDate(a, 'at').getTime());
+  const incomeIn = alive(income.data)
+    .filter((e) => within(recordDate(e, 'at')))
+    .sort((a, b) => recordDate(b, 'at').getTime() - recordDate(a, 'at').getTime());
+  const salesIn = alive(sales.data)
+    .filter((s) => within(recordDate(s)))
+    .sort((a, b) => recordDate(b).getTime() - recordDate(a).getTime());
   const spent = inMonth.reduce((t, e) => t + (Number(e.body.amount) || 0), 0);
-  const salesIn = alive(sales.data).filter((s) => {
-    const at = recordDate(s);
-    return at >= from && at < to;
-  });
-  const income = salesIn.reduce((t, s) => t + (Number(s.body.litres) || 0) * (Number(s.body.pricePerLitre) || 0), 0);
-  const unpaid = salesIn.filter((s) => !s.body.paid).reduce((t, s) => t + (Number(s.body.litres) || 0) * (Number(s.body.pricePerLitre) || 0), 0);
+  const milkIncome = salesIn.reduce((t, s) => t + saleValue(s.body), 0);
+  const otherIncome = incomeIn.reduce((t, e) => t + (Number(e.body.amount) || 0), 0);
+  const unpaid = salesIn.filter((s) => !salePaid(s, marks.data)).reduce((t, s) => t + saleValue(s.body), 0);
   const soldLitres = salesIn.reduce((t, s) => t + (Number(s.body.litres) || 0), 0);
+  const left = milkIncome + otherIncome - spent;
   const byCat = new Map<string, number>();
   for (const e of inMonth) byCat.set(e.body.category, (byCat.get(e.body.category) ?? 0) + (Number(e.body.amount) || 0));
   const cats = [...byCat.entries()].sort((a, b) => b[1] - a[1]);
   const biggest = Math.max(...cats.map((c) => c[1]), 1);
+  const buyers = new Map<string, { value: number; unpaid: number; litres: number }>();
+  for (const s of salesIn) {
+    const b = buyers.get(s.body.buyer) ?? { value: 0, unpaid: 0, litres: 0 };
+    b.value += saleValue(s.body);
+    b.litres += Number(s.body.litres) || 0;
+    if (!salePaid(s, marks.data)) b.unpaid += saleValue(s.body);
+    buyers.set(s.body.buyer, b);
+  }
+  const loading = expenses.loading || income.loading || sales.loading;
 
   const csv = () =>
     downloadCsv(
@@ -125,12 +166,13 @@ export default function Money() {
       ['Date', 'Type', 'Category / buyer', 'Amount (UGX)', 'Note'],
       [
         ...inMonth.map((e) => [dayKey(recordDate(e, 'at')), 'Expense', words(e.body.category), -Number(e.body.amount), e.body.note ?? '']),
+        ...incomeIn.map((e) => [dayKey(recordDate(e, 'at')), 'Income', sourceText(e.body.source), Number(e.body.amount), e.body.note ?? '']),
         ...salesIn.map((s) => [
           dayKey(recordDate(s)),
           'Milk sale',
           s.body.buyer,
-          Math.round(Number(s.body.litres) * Number(s.body.pricePerLitre)),
-          `${s.body.litres} L at ${s.body.pricePerLitre}${s.body.paid ? '' : ' (not paid yet)'}`,
+          Math.round(saleValue(s.body)),
+          `${s.body.litres} L at ${s.body.pricePerLitre}${salePaid(s, marks.data) ? '' : ' (not paid yet)'}`,
         ]),
       ],
     );
@@ -138,7 +180,7 @@ export default function Money() {
   return (
     <>
       <PageHead title="Money" subtitle="Farm money only. Household money stays out of FarmTap.">
-        <div className="row">
+        <div className="row month-nav">
           <button className="icon-btn" aria-label="Previous month" onClick={() => setOffset(offset - 1)} style={{ transform: 'scaleX(-1)' }}>
             <Icon name="chevron" />
           </button>
@@ -148,31 +190,36 @@ export default function Money() {
           </button>
         </div>
         <ExportButtons onCsv={csv} />
+        <button className="btn sm outline" onClick={() => setAddingIncome(true)} disabled={!canSave}>
+          <Icon name="plus" /> Add income
+        </button>
         <button className="btn sm" onClick={() => setAdding(true)} disabled={!canSave}>
           <Icon name="plus" /> Add expense
         </button>
       </PageHead>
-      <LoadError code={expenses.error} />
+      <LoadError code={expenses.error ?? income.error ?? sales.error} />
 
-      <div className="grid">
-        <Stat icon="drop" label="Milk sales" value={ugx(income)} hint={`${litres(soldLitres)} sold${unpaid ? ` · ${ugx(unpaid)} not paid yet` : ''}`} />
-        <Stat icon="money" label="Spent" value={ugx(spent)} hint={`${inMonth.length} expenses`} tone="warn" />
+      <Fit kind="stats" cols={[2, 2, 4, 4]}>
+        <Stat loading={sales.loading} icon="drop" label="Milk sales" value={ugx(milkIncome)} hint={`${litres(soldLitres)} sold${unpaid ? ` · ${ugx(unpaid)} not paid yet` : ''}`} />
+        <Stat loading={income.loading} icon="money" label="Other income" value={ugx(otherIncome)} hint={plural(incomeIn.length, 'entry', 'entries')} tone="info" />
+        <Stat loading={expenses.loading} icon="receipt" label="Spent" value={ugx(spent)} hint={plural(inMonth.length, 'expense', 'expenses')} tone="warn" />
         <Stat
+          loading={loading}
           icon="check"
           label="Left over"
-          value={ugx(income - spent)}
-          hint={income - spent >= 0 ? 'Milk sales minus spending' : 'Spending is more than milk sales'}
-          tone={income - spent >= 0 ? 'gold' : 'bad'}
+          value={`${left < 0 ? '−' : ''}${ugx(Math.abs(left))}`}
+          hint="Income minus spending"
+          tone={left < 0 ? 'bad' : 'gold'}
         />
-      </div>
+      </Fit>
 
-      <div className="grid cols">
+      <Fit kind="cards" cols={[1, 2, 2, 2]}>
         <section className="card">
-          <div className="card-head">
-            <h2>Where the money went</h2>
-          </div>
-          {cats.length === 0 ? (
-            <p className="muted">No spending recorded this month.</p>
+          <CardHead title="Where the money went" />
+          {expenses.loading ? (
+            <SkelRows rows={4} cols={2} />
+          ) : cats.length === 0 ? (
+            <Empty icon="receipt">No spending recorded this month.</Empty>
           ) : (
             <div className="stack">
               {cats.map(([c, v]) => (
@@ -180,11 +227,11 @@ export default function Money() {
                   <div className="row between small">
                     <span>{words(c)}</span>
                     <span className="num">
-                      {ugx(v)} · {Math.round((v / spent) * 100)}%
+                      {ugx(v)} · {Math.round((v / Math.max(spent, 1)) * 100)}%
                     </span>
                   </div>
                   <div className="split">
-                    <span className="a" style={{ width: `${(v / biggest) * 100}%` }} />
+                    <span className="b" style={{ width: `${(v / biggest) * 100}%` }} />
                   </div>
                 </div>
               ))}
@@ -192,57 +239,163 @@ export default function Money() {
           )}
         </section>
         <section className="card">
-          <div className="card-head">
-            <h2>Milk buyers</h2>
-          </div>
-          {salesIn.length === 0 ? (
-            <p className="muted">No milk sales recorded this month. They are recorded on the phone (Milk → Sales).</p>
+          <CardHead title="Milk buyers">
+            <Link className="small no-print" href="/milk/?sale=1">
+              Record a sale
+            </Link>
+          </CardHead>
+          {sales.loading ? (
+            <SkelRows rows={3} cols={2} />
+          ) : buyers.size === 0 ? (
+            <Empty icon="drop">No milk sales recorded this month.</Empty>
           ) : (
             <div className="list">
-              {[...new Set(salesIn.map((s) => s.body.buyer))].map((b) => {
-                const mine = salesIn.filter((s) => s.body.buyer === b);
-                const amt = mine.reduce((t, s) => t + s.body.litres * s.body.pricePerLitre, 0);
-                const owed = mine.filter((s) => !s.body.paid).reduce((t, s) => t + s.body.litres * s.body.pricePerLitre, 0);
-                return (
-                  <div key={b} className="list-row">
-                    <span className="grow">{b}</span>
-                    <span className="num">{ugx(amt)}</span>
-                    {owed > 0 ? <span className="chip warn">Owes {ugx(owed)}</span> : <span className="chip ok">Paid</span>}
+              {[...buyers.entries()]
+                .sort((a, b) => b[1].value - a[1].value)
+                .map(([name, b]) => (
+                  <div key={name} className="list-row">
+                    <div className="grow">
+                      <div>{name}</div>
+                      <div className="small muted">{litres(b.litres)}</div>
+                    </div>
+                    <span className="num">{ugx(b.value)}</span>
+                    {b.unpaid > 0 ? <span className="chip warn">{ugx(b.unpaid)} owed</span> : <span className="chip ok">Paid</span>}
                   </div>
-                );
-              })}
+                ))}
             </div>
           )}
         </section>
-      </div>
+      </Fit>
+
+      <Tabs
+        label="Entries"
+        value={tab}
+        onChange={setTab}
+        items={[
+          ['expenses', 'Expenses', inMonth.length],
+          ['income', 'Other income', incomeIn.length],
+          ['sales', 'Milk sales', salesIn.length],
+        ]}
+      />
 
       <div className="table-wrap">
-        <table className="table">
+        <table className="table rt">
           <thead>
             <tr>
               <th>Date</th>
-              <th>Category</th>
-              <th>Note</th>
+              <th>{tab === 'sales' ? 'Buyer' : tab === 'income' ? 'From' : 'Category'}</th>
+              <th>{tab === 'sales' ? 'Litres' : 'Note'}</th>
               <th className="r">Amount</th>
+              <th />
             </tr>
           </thead>
           <tbody>
-            {inMonth.map((e) => (
-              <tr key={e.id}>
-                <td>{date(recordDate(e, 'at'))}</td>
-                <td>
-                  <span className="chip">{words(e.body.category)}</span>
-                </td>
-                <td>{e.body.note || '–'}</td>
-                <td className="r">{ugx(e.body.amount)}</td>
-              </tr>
-            ))}
+            {tab === 'expenses' &&
+              inMonth.map((e) => (
+                <tr key={e.id}>
+                  <td data-label="Date">{shortDate(recordDate(e, 'at'))}</td>
+                  <td data-label="Category" className="lead">
+                    <strong>{words(e.body.category)}</strong>
+                  </td>
+                  <td data-label="Note" className="wide">
+                    {e.body.note || '–'}
+                  </td>
+                  <td data-label="Amount" className="r">
+                    <strong>{ugx(e.body.amount)}</strong>
+                  </td>
+                  <td className="acts r">
+                    {canSave &&
+                      (e.body.sourceId ? (
+                        <span className="small muted" title="Made by a wage payment or a feed purchase on the phone">
+                          Automatic
+                        </span>
+                      ) : (
+                        <button className="icon-btn" aria-label="Remove expense" title="Remove a mistake" onClick={() => setRemoving(e)}>
+                          <Icon name="close" />
+                        </button>
+                      ))}
+                  </td>
+                </tr>
+              ))}
+            {tab === 'income' &&
+              incomeIn.map((e) => (
+                <tr key={e.id}>
+                  <td data-label="Date">{shortDate(recordDate(e, 'at'))}</td>
+                  <td data-label="From" className="lead">
+                    <strong>{sourceText(e.body.source)}</strong>
+                  </td>
+                  <td data-label="Note" className="wide">
+                    {e.body.note || '–'}
+                  </td>
+                  <td data-label="Amount" className="r">
+                    <strong>{ugx(e.body.amount)}</strong>
+                  </td>
+                  <td className="acts r">
+                    {canSave && !e.body.sourceId && (
+                      <button className="icon-btn" aria-label="Remove income" title="Remove a mistake" onClick={() => setRemoving(e)}>
+                        <Icon name="close" />
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            {tab === 'sales' &&
+              salesIn.map((s) => (
+                <tr key={s.id}>
+                  <td data-label="Date">{shortDate(recordDate(s))}</td>
+                  <td data-label="Buyer" className="lead">
+                    <strong>{s.body.buyer}</strong>
+                  </td>
+                  <td data-label="Litres">
+                    {litres(s.body.litres)} at {ugx(s.body.pricePerLitre)}
+                  </td>
+                  <td data-label="Amount" className="r">
+                    <strong>{ugx(saleValue(s.body))}</strong>
+                  </td>
+                  <td className="acts r">{salePaid(s, marks.data) ? <span className="chip ok">Paid</span> : <span className="chip warn">Not paid</span>}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
-        {!expenses.loading && inMonth.length === 0 && <Empty>No expenses in {monthName.format(from)}.</Empty>}
+        {loading && <SkelRows rows={4} cols={4} />}
+        {!loading && (tab === 'expenses' ? inMonth : tab === 'income' ? incomeIn : salesIn).length === 0 && (
+          <Empty
+            icon="receipt"
+            action={
+              canSave &&
+              tab !== 'sales' && (
+                <button className="btn sm" onClick={() => (tab === 'income' ? setAddingIncome(true) : setAdding(true))}>
+                  <Icon name="plus" /> {tab === 'income' ? 'Add income' : 'Add expense'}
+                </button>
+              )
+            }
+          >
+            Nothing in {monthName.format(from)}.
+          </Empty>
+        )}
       </div>
 
-      {adding && <AddExpense onClose={() => setAdding(false)} />}
+      {adding && <MoneyForm kind="expense" onClose={() => setAdding(false)} />}
+      {addingIncome && <MoneyForm kind="income" onClose={() => setAddingIncome(false)} />}
+      {removing && (
+        <ConfirmDialog
+          title="Remove this entry?"
+          confirm="Remove"
+          danger
+          busy={removeSave.busy}
+          error={removeSave.error}
+          onClose={() => setRemoving(null)}
+          onConfirm={async () => {
+            if (!user) return;
+            if (await removeSave.run(() => removeRecord(firebase().db, farm.id, removing, user.uid))) {
+              toast('Entry removed');
+              setRemoving(null);
+            }
+          }}
+        >
+          {ugx(removing.body.amount)} on {shortDate(recordDate(removing, 'at'))}. Use this only for a mistake. It is removed on the farm phones too.
+        </ConfirmDialog>
+      )}
     </>
   );
 }

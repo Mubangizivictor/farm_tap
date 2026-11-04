@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:farm_tap/core/error/failure.dart';
 import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/people/data/local_card_registry.dart';
@@ -427,11 +429,19 @@ class FakeCentreRepository implements CentreRepository, Restorable {
     for (final r in await j.load('farmers')) {
       final b = r.body;
       if (farmerIds.contains(r.id)) {
-        // Card and photo can change after the farmer was added.
+        // Card, photo and details can change after the farmer was added
+        // (here, on another phone, or on the web).
         _farmers = [
           for (final x in _farmers)
             if (x.id == r.id)
-              x.withCard(b['card'] as String?, photo: b['photo'] as String?, photoUrl: b['photoUrl'] as String?)
+              x
+                  .withCard(b['card'] as String?, photo: b['photo'] as String?, photoUrl: b['photoUrl'] as String?)
+                  .withDetails(
+                    name: b['name'] as String? ?? x.name,
+                    phone: b['phone'] as String? ?? x.phone,
+                    village: b['village'] as String? ?? x.village,
+                    smsReceipts: b['smsReceipts'] as bool? ?? x.smsReceipts,
+                  )
             else
               x,
         ];
@@ -461,7 +471,20 @@ class FakeCentreRepository implements CentreRepository, Restorable {
       if (r.id == _priceDoc) _price = (r.body['pricePerLitre'] as num?)?.toDouble() ?? _price;
     }
     final known = {for (final d in _deliveries) d.id};
-    for (final r in await j.load('deliveries')) {
+    for (final r in await j.loadWithDeleted('deliveries')) {
+      if (r.isDeleted) {
+        // Undone on another phone or the web: take it off the lists.
+        final gone = _deliveries.where((d) => d.id == r.id).firstOrNull;
+        if (gone == null) continue;
+        _deliveries = [for (final d in _deliveries) if (d.id != r.id) d];
+        if (gone.rejectReason == null && !gone.at.isBefore(_day)) {
+          _farmers = [
+            for (final x in _farmers)
+              if (x.id == gone.farmerId) x.withToday(max(0, (x.todayLitres ?? 0) - gone.litres)) else x,
+          ];
+        }
+        continue;
+      }
       if (known.contains(r.id)) continue;
       final b = r.body;
       final f = _farmers.where((f) => f.id == b['farmerId']).firstOrNull;

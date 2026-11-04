@@ -8,7 +8,8 @@ export function MilkChart({ days }: { days: { day: Date; litres: number }[] }) {
   const recorded = days.filter((d) => d.litres > 0).length;
   const today = new Date();
   return (
-    <div className="stack">
+    <div className="stack chart-box">
+      {total === 0 && <div className="chart-empty small muted">No milk recorded in these days yet.</div>}
       <div className="bars" role="img" aria-label={`Milk per day for ${days.length} days, total ${litres(total)}`}>
         {days.map((d) => {
           const isToday = sameDay(d.day, today);
