@@ -1,19 +1,20 @@
 'use client';
 
 import { doc, updateDoc } from 'firebase/firestore';
+import { sendPasswordResetEmail, updateProfile } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
 import { PlansSection } from '@/components/plans';
-import { Field, PageHead, Seg, Tabs, useSave, useToast } from '@/components/ui';
+import { Field, PageHead, Tabs, useSave, useToast } from '@/components/ui';
 import { saveError, upsertRecord, useRecords } from '@/lib/data';
 import { ugandaDistricts } from '@/lib/districts';
 import { isCentre, manages, planState } from '@/lib/domain';
 import { date, ugx } from '@/lib/format';
 import { firebase } from '@/lib/firebase';
 import { farmKind, planText, roleName } from '@/lib/labels';
-import { useFarm, useSession, useTheme, type ThemeChoice } from '@/lib/session';
+import { useFarm, useSession } from '@/lib/session';
 import { supportWhatsAppLink } from '@/lib/support';
 import { usePlatform } from '@/lib/usePlatform';
 
@@ -200,10 +201,6 @@ const TABS: readonly (readonly [Tab, string])[] = [
 
 export default function Settings() {
   const farm = useFarm();
-  const { user, canSwitch, signOut } = useSession();
-  const { config } = usePlatform();
-  const router = useRouter();
-  const [theme, setTheme] = useTheme();
   const [tab, setTabState] = useState<Tab>('farm');
 
   // The tab lives in the address (#plan), so a link can open it.
@@ -235,82 +232,164 @@ export default function Settings() {
 
       {tab === 'plan' && <PlansSection farm={farm} />}
 
-      {tab === 'account' && (
-        <Fit kind="cards" cols={[1, 2, 2, 2]}>
-          <section className="card stack">
-            <div className="card-head">
-              <h2>You</h2>
-              <span className="chip brand">{roleName(farm)}</span>
-            </div>
-            <div className="row">
-              <span className="avatar lg">
-                {user?.photoURL ? <img src={user.photoURL} alt="" referrerPolicy="no-referrer" /> : (user?.displayName || user?.email || '?').slice(0, 1).toUpperCase()}
-              </span>
-              <div className="stack" style={{ gap: 'var(--s-xxs)' }}>
-                <strong>{user?.displayName || 'No name'}</strong>
-                <span className="small muted">{user?.email}</span>
-              </div>
-            </div>
-            <p className="small muted">This browser stays signed in until you sign out. Sign out on shared computers.</p>
-            <div className="row wrap">
-              {canSwitch && (
-                <button className="btn outline" onClick={() => router.push('/farms/')}>
-                  <Icon name="switch" /> Switch farm
-                </button>
-              )}
-              <button className="btn outline" onClick={() => void signOut().then(() => router.replace('/sign-in/'))}>
-                <Icon name="logout" /> Sign out
-              </button>
-            </div>
-          </section>
-
-          <section className="card stack">
-            <div className="card-head">
-              <h2>Farms on this account</h2>
-            </div>
-            {canSwitch ? (
-              <p className="small">
-                This account has more than one farm. <strong>Switch farm</strong> closes {farm.name} and opens another one. Each farm keeps its own animals,
-                records, workers, cards and plan; nothing is shared or mixed between them.
-              </p>
-            ) : (
-              <p className="small">
-                One account runs one farm. To add a second farm or a collection centre, contact FarmTap: we raise your farm limit, and each farm then has its
-                own plan.
-              </p>
-            )}
-            {!canSwitch && (
-              <div className="row wrap">
-                <a className="btn outline" href={supportWhatsAppLink(`Hello FarmTap, I want to add another farm to my account (${user?.email ?? ''}).`)} target="_blank" rel="noreferrer">
-                  <Icon name="whatsapp" /> Ask for another farm
-                </a>
-                <a className="btn ghost" href={`tel:${(config.support.phone || '+256793128137').replace(/\s/g, '')}`}>
-                  <Icon name="phone" /> {config.support.phone || '+256 793 128 137'}
-                </a>
-              </div>
-            )}
-          </section>
-
-          <section className="card stack">
-            <div className="card-head">
-              <h2>Look</h2>
-            </div>
-            <p className="small muted">Dark is easier on the eyes at night and saves battery on many phones.</p>
-            <Seg
-              label="Theme"
-              value={theme}
-              onChange={(v: ThemeChoice) => setTheme(v)}
-              items={[
-                ['device', 'Same as device'],
-                ['light', 'Light'],
-                ['dark', 'Dark'],
-              ]}
-            />
-          </section>
-        </Fit>
-      )}
+      {tab === 'account' && <AccountSection />}
 
       {tab === 'help' && <HelpSection />}
     </>
+  );
+}
+
+const providerName: Record<string, string> = { 'google.com': 'Google', 'apple.com': 'Apple', password: 'Email and password', phone: 'Phone number' };
+
+/**
+ * Your account (web). Name, email, theme, switch and sign out already sit in
+ * the profile menu at the top, so this tab holds what that menu cannot:
+ * editing your name, how you sign in, farms on the account, and your data.
+ */
+function AccountSection() {
+  const farm = useFarm();
+  const { user, canSwitch, reloadFarms } = useSession();
+  const { config } = usePlatform();
+  const router = useRouter();
+  const toast = useToast();
+  const save = useSave();
+  const [name, setName] = useState(user?.displayName ?? '');
+  const [resetSent, setResetSent] = useState(false);
+  const methods = (user?.providerData ?? []).map((p) => providerName[p.providerId] ?? p.providerId);
+  const hasPassword = (user?.providerData ?? []).some((p) => p.providerId === 'password');
+  const phone = config.support.phone || '+256 793 128 137';
+  const ask = (text: string) => supportWhatsAppLink(`Hello FarmTap, ${text} My account: ${user?.email ?? ''}. Farm: ${farm.name}.`);
+  const when = (iso?: string) => (iso ? date(new Date(iso)) : '–');
+
+  async function saveName(ev: FormEvent) {
+    ev.preventDefault();
+    if (!user || !name.trim()) return;
+    const ok = await save.run(async () => {
+      await updateProfile(user, { displayName: name.trim() });
+      await reloadFarms();
+    });
+    if (ok) toast('Name saved');
+  }
+
+  async function sendReset() {
+    if (!user?.email) return;
+    const ok = await save.run(() => sendPasswordResetEmail(firebase().auth, user.email!));
+    if (ok) setResetSent(true);
+  }
+
+  return (
+    <Fit kind="cards" cols={[1, 2, 2, 2]}>
+      <section className="card">
+        <form className="stack" onSubmit={saveName}>
+          <div className="card-head">
+            <h2>Your name</h2>
+            <span className="chip brand">{roleName(farm)}</span>
+          </div>
+          <p className="small muted">Workers see this name on tasks, the duty roster and payments you record.</p>
+          <Field label="Full name" error={save.error || null}>
+            <input className="input" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="For example Victor Mubangizi" required />
+          </Field>
+          <div className="row">
+            <button className="btn" type="submit" disabled={save.busy || !name.trim() || name.trim() === (user?.displayName ?? '')}>
+              {save.busy ? 'Saving…' : 'Save name'}
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section className="card stack">
+        <div className="card-head">
+          <h2>Sign-in and security</h2>
+        </div>
+        <div className="list">
+          <div className="list-row">
+            <span className="grow">Signs in with</span>
+            <strong>{methods.join(', ') || '–'}</strong>
+          </div>
+          <div className="list-row">
+            <span className="grow">Last sign-in</span>
+            <span>{when(user?.metadata.lastSignInTime)}</span>
+          </div>
+          <div className="list-row">
+            <span className="grow">Account made</span>
+            <span>{when(user?.metadata.creationTime)}</span>
+          </div>
+        </div>
+        {hasPassword ? (
+          resetSent ? (
+            <p className="small up">We sent a link to {user?.email}. Open it to choose a new password.</p>
+          ) : (
+            <div className="row">
+              <button className="btn outline" onClick={() => void sendReset()} disabled={save.busy}>
+                <Icon name="key" /> Change password
+              </button>
+            </div>
+          )
+        ) : (
+          <p className="small muted">Your password is kept by {methods[0] || 'your sign-in provider'}, not FarmTap.</p>
+        )}
+        <p className="small muted">This browser stays signed in until you sign out from the picture at the top. Sign out on shared computers.</p>
+      </section>
+
+      <section className="card stack">
+        <div className="card-head">
+          <h2>Farms on this account</h2>
+        </div>
+        {canSwitch ? (
+          <>
+            <p className="small">
+              This account has more than one farm. Each keeps its own animals, records, workers, cards and plan; nothing is mixed between them.
+            </p>
+            <div className="row">
+              <button className="btn outline" onClick={() => router.push('/farms/')}>
+                <Icon name="switch" /> Open another farm
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="small">One account runs one farm. For a second farm or a collection centre, ask FarmTap. Each farm then has its own plan.</p>
+            <div className="row wrap">
+              <a className="btn outline" href={ask('I want to add another farm to my account.')} target="_blank" rel="noreferrer">
+                <Icon name="whatsapp" /> Ask for another farm
+              </a>
+              <a className="btn ghost" href={`tel:${phone.replace(/\s/g, '')}`}>
+                <Icon name="phone" /> {phone}
+              </a>
+            </div>
+          </>
+        )}
+      </section>
+
+      <section className="card stack">
+        <div className="card-head">
+          <h2>Your data</h2>
+        </div>
+        <p className="small muted">Your farm records belong to you. Download them from each page (CSV), ask for a full copy, or ask us to delete your account.</p>
+        <div className="row wrap">
+          <a className="btn outline" href={ask('please send me a full copy of my farm records.')} target="_blank" rel="noreferrer">
+            <Icon name="download" /> Ask for a copy
+          </a>
+          <a className="btn ghost" style={{ color: 'var(--c-danger)' }} href={ask('please delete my account and my farm records.')} target="_blank" rel="noreferrer">
+            <Icon name="close" /> Delete my account
+          </a>
+        </div>
+        {(config.legal.termsUrl || config.legal.privacyUrl) && (
+          <p className="small">
+            {config.legal.privacyUrl && (
+              <a href={config.legal.privacyUrl} target="_blank" rel="noreferrer">
+                Privacy policy
+              </a>
+            )}
+            {config.legal.termsUrl && config.legal.privacyUrl && ' · '}
+            {config.legal.termsUrl && (
+              <a href={config.legal.termsUrl} target="_blank" rel="noreferrer">
+                Terms of use
+              </a>
+            )}
+          </p>
+        )}
+      </section>
+    </Fit>
   );
 }
