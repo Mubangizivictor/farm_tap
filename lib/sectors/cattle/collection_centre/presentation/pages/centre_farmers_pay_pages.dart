@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
+import 'package:farm_tap/core/people/domain/card_registry.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/formats.dart';
@@ -10,7 +11,9 @@ import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_models.d
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_repository.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_collect_pages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 FarmTapFormat _fmt(BuildContext context) => FarmTapFormat(Localizations.localeOf(context).toLanguageTag());
 
@@ -23,23 +26,35 @@ String _network(AppLocalizations l10n, MobileNetwork n) =>
 // ---------------------------------------------------------------- G06
 
 class CentreFarmersPage extends StatefulWidget {
-  const new({required this.repo, required this.onFarmer, required this.onAdd, super.key});
+  const new({required this.repo, required this.onFarmer, required this.onAdd, super.key, this.onDownload});
 
   final CentreRepository repo;
-  final ValueChanged<CentreFarmer> onFarmer;
-  final VoidCallback onAdd;
+
+  /// Opens G07; the list reloads when it closes (the farmer may be edited).
+  final FutureOr<void> Function(CentreFarmer) onFarmer;
+
+  /// Adds a farmer; the list reloads when the sheet closes.
+  final FutureOr<void> Function() onAdd;
+
+  /// Shares the farmer list as PDF or spreadsheet.
+  final VoidCallback? onDownload;
 
   @override
   State<CentreFarmersPage> createState() => _CentreFarmersPageState();
 }
 
 class _CentreFarmersPageState extends State<CentreFarmersPage> {
-  late final Future<(List<CentreFarmer>, FarmerCounts?)> _load = _fetch();
+  late Future<(List<CentreFarmer>, FarmerCounts?)> _load = _fetch();
   FarmerFilter _filter = FarmerFilter.all;
   String _query = '';
 
   Future<(List<CentreFarmer>, FarmerCounts?)> _fetch() async =>
       ((await widget.repo.farmers()).data ?? const <CentreFarmer>[], (await widget.repo.counts()).data);
+
+  Future<void> _then(FutureOr<void> action) async {
+    await action;
+    if (mounted) setState(() => _load = _fetch());
+  }
 
   List<CentreFarmer> _shown(List<CentreFarmer> all) {
     final q = _query.trim().toLowerCase();
@@ -66,11 +81,14 @@ class _CentreFarmersPageState extends State<CentreFarmersPage> {
         return AdaptiveScaffold(
           title: l10n.farmers,
           subtitle: counts == null ? null : l10n.suppliersCount(counts.total),
-          actions: [BarAction(icon: Symbols.download_rounded, tooltip: l10n.download, onPressed: () {})],
+          actions: [
+            if (widget.onDownload case final download?)
+              BarAction(icon: Symbols.download_rounded, tooltip: l10n.download, onPressed: download),
+          ],
           floatingActionButton: FarmTapFab(
             label: l10n.addFarmer,
             icon: Symbols.person_add_rounded,
-            onPressed: widget.onAdd,
+            onPressed: () => _then(widget.onAdd()),
           ),
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -91,7 +109,9 @@ class _CentreFarmersPageState extends State<CentreFarmersPage> {
                 onSelected: (v) => setState(() => _filter = v),
               ),
               context.space.gapSm,
-              if (snapshot.hasData && shown.isEmpty)
+              if (!snapshot.hasData)
+                const FarmTapPageLoader()
+              else if (shown.isEmpty)
                 Padding(
                   padding: EdgeInsets.all(context.space.xl),
                   child: Text(l10n.noMatches, textAlign: TextAlign.center, style: context.text.bodyMedium),
@@ -99,14 +119,14 @@ class _CentreFarmersPageState extends State<CentreFarmersPage> {
               else
                 RecordCollection<CentreFarmer>(
                   items: shown,
-                  onTap: widget.onFarmer,
+                  onTap: (x) => _then(widget.onFarmer(x)),
                   tileBuilder: (context, x) => RecordTile(
                     leading: FarmerAvatar(farmer: x),
                     title: x.name,
                     subtitle: l10n.cardThisPeriod(x.card ?? '—', f.count(x.periodLitres)),
                     trailingValue: x.todayLitres == null ? '—' : f.litres(x.todayLitres!),
                     trailingSub: l10n.today,
-                    onTap: () => widget.onFarmer(x),
+                    onTap: () => _then(widget.onFarmer(x)),
                   ),
                   columns: [
                     RecordColumn(
@@ -154,23 +174,49 @@ class _CentreFarmersPageState extends State<CentreFarmersPage> {
 }
 
 /// Add a supplier from the G06 FAB: name, Mobile Money phone, village, card.
-Future<CentreFarmer?> showAddFarmerSheet(BuildContext context, CentreRepository repo) =>
-    showAdaptiveSheet<CentreFarmer>(context, builder: (_) => _AddFarmerSheet(repo: repo));
+/// Adds a farmer; [card] fills in a card that was just tapped.
+Future<CentreFarmer?> showAddFarmerSheet(BuildContext context, CentreRepository repo, {String? card}) =>
+    showAdaptiveSheet<CentreFarmer>(
+      context,
+      builder: (_) => _AddFarmerSheet(repo: repo, card: card),
+    );
+
+/// G07 edit: name, phone, village and SMS receipts. The card is changed
+/// from the card screens.
+Future<CentreFarmer?> showEditFarmerSheet(BuildContext context, CentreRepository repo, CentreFarmer farmer) =>
+    showAdaptiveSheet<CentreFarmer>(
+      context,
+      builder: (_) => _AddFarmerSheet(repo: repo, initial: farmer),
+    );
 
 class _AddFarmerSheet extends StatefulWidget {
-  const new({required this.repo});
+  const new({required this.repo, this.card, this.initial});
 
   final CentreRepository repo;
+  final String? card;
+
+  /// Set when editing.
+  final CentreFarmer? initial;
 
   @override
   State<_AddFarmerSheet> createState() => _AddFarmerSheetState();
 }
 
 class _AddFarmerSheetState extends State<_AddFarmerSheet> {
-  final _name = TextEditingController();
-  final _phone = TextEditingController();
-  final _village = TextEditingController();
-  final _card = TextEditingController();
+  late final _name = TextEditingController(text: widget.initial?.name ?? '');
+  late final _phone = TextEditingController(text: _localDigits(widget.initial?.phone));
+  late final _village = TextEditingController(text: widget.initial?.village ?? '');
+  late final _card = TextEditingController(text: widget.card ?? '');
+  late bool _sms = widget.initial?.smsReceipts ?? true;
+
+  /// "+256 772 451 908" back to "772 451 908" for the field.
+  static String _localDigits(String? phone) => phone == null
+      ? ''
+      : phone.startsWith('+256 ')
+      ? phone.substring(5)
+      : phone;
+
+  String? _cardError;
 
   @override
   void dispose() {
@@ -183,13 +229,36 @@ class _AddFarmerSheetState extends State<_AddFarmerSheet> {
   bool get _ready => _name.text.trim().isNotEmpty && _phone.text.replaceAll(' ', '').length >= 9;
 
   Future<void> _save() async {
-    final farmer = (await widget.repo.addFarmer(
-      name: _name.text.trim(),
-      phone: '+256 ${_phone.text.trim()}',
-      village: _village.text.trim(),
-      card: _card.text.trim(),
-    )).data;
-    if (!mounted || farmer == null) return;
+    final initial = widget.initial;
+    final result = initial == null
+        ? await widget.repo.addFarmer(
+            name: _name.text.trim(),
+            phone: '+256 ${_phone.text.trim()}',
+            village: _village.text.trim(),
+            card: _card.text.trim(),
+          )
+        : await widget.repo.updateFarmer(
+            initial.id,
+            name: _name.text.trim(),
+            phone: '+256 ${_phone.text.trim()}',
+            village: _village.text.trim(),
+            smsReceipts: _sms,
+          );
+    final farmer = result.data;
+    if (!mounted) return;
+    if (farmer == null) {
+      // One holder per card (decision 0016): say who has it.
+      final l10n = AppLocalizations.of(context);
+      final m = result.failure?.message ?? '';
+      setState(
+        () => _cardError = m.startsWith(CardIssueError.taken)
+            ? l10n.cardTaken(_card.text.trim(), m.split(':').last)
+            : m == CardIssueError.lost
+            ? l10n.cardLostCannotReuse(_card.text.trim())
+            : l10n.cardNotUsable,
+      );
+      return;
+    }
     FarmTapToast.show(context, message: AppLocalizations.of(context).farmerSaved(farmer.name));
     Navigator.of(context).pop(farmer);
   }
@@ -202,7 +271,7 @@ class _AddFarmerSheetState extends State<_AddFarmerSheet> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SheetTitle(l10n.addFarmer),
+        SheetTitle(widget.initial == null ? l10n.addFarmer : l10n.editFarmer),
         context.space.gapLg,
         FarmTapTextField(
           label: l10n.farmerName,
@@ -230,12 +299,23 @@ class _AddFarmerSheetState extends State<_AddFarmerSheet> {
           textInputAction: TextInputAction.next,
         ),
         context.space.gapLg,
-        FarmTapTextField(
-          label: l10n.cardOptional,
-          icon: Symbols.contactless_rounded,
-          controller: _card,
-          keyboardType: TextInputType.number,
-        ),
+        if (widget.initial == null)
+          FarmTapTextField(
+            label: l10n.cardOptional,
+            icon: Symbols.contactless_rounded,
+            controller: _card,
+            keyboardType: TextInputType.number,
+            error: _cardError,
+            onChanged: (_) => setState(() => _cardError = null),
+          )
+        else
+          SwitchListTile.adaptive(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l10n.sendSmsReceipts),
+            subtitle: Text(l10n.sendSmsReceiptsHint),
+            value: _sms,
+            onChanged: (v) => setState(() => _sms = v),
+          ),
         context.space.gapXl,
         FarmTapButton(label: l10n.saveFarmer, icon: Symbols.check_rounded, onPressed: _ready ? _save : null),
       ],
@@ -246,20 +326,61 @@ class _AddFarmerSheetState extends State<_AddFarmerSheet> {
 // ---------------------------------------------------------------- G07
 
 class CentreFarmerPage extends StatefulWidget {
-  const new({required this.repo, required this.farmerId, super.key});
+  const new({
+    required this.repo,
+    required this.farmerId,
+    super.key,
+    this.canManage = false,
+    this.onIdCard,
+    this.onPhoto,
+    this.onAssignCard,
+    this.onRevokeCard,
+  });
 
   final CentreRepository repo;
   final String farmerId;
+
+  /// Owner, manager or clerk: cards and photo (decision 0016).
+  final bool canManage;
+  final Future<void> Function()? onIdCard;
+  final Future<void> Function(CentreFarmer farmer)? onPhoto;
+  final Future<void> Function(CentreFarmer farmer)? onAssignCard;
+  final Future<void> Function(CentreFarmer farmer)? onRevokeCard;
 
   @override
   State<CentreFarmerPage> createState() => _CentreFarmerPageState();
 }
 
 class _CentreFarmerPageState extends State<CentreFarmerPage> {
-  late final Future<(CentreFarmer?, FarmerStatement?)> _load = _fetch();
+  late Future<(CentreFarmer?, FarmerStatement?)> _load = _fetch();
+  List<IdCardRecord> _cards = const [];
 
-  Future<(CentreFarmer?, FarmerStatement?)> _fetch() async =>
-      ((await widget.repo.farmer(widget.farmerId)).data, (await widget.repo.statement(widget.farmerId)).data);
+  Future<(CentreFarmer?, FarmerStatement?)> _fetch() async {
+    _cards = (await widget.repo.cardHistory(widget.farmerId)).data ?? const [];
+    return ((await widget.repo.farmer(widget.farmerId)).data, (await widget.repo.statement(widget.farmerId)).data);
+  }
+
+  void _reload() => setState(() {
+    _load = _fetch();
+  });
+
+  Future<void> _run(Future<void> Function(CentreFarmer)? action, CentreFarmer f) async {
+    if (action == null) return;
+    await action(f);
+    if (mounted) _reload();
+  }
+
+  Future<void> _call(CentreFarmer farmer) async {
+    final digits = farmer.phone.replaceAll(RegExp('[^0-9+]'), '');
+    final ok = await launchUrl(Uri.parse('tel:$digits'));
+    if (!ok) await Clipboard.setData(ClipboardData(text: farmer.phone));
+    if (!ok && mounted) FarmTapToast.show(context, message: AppLocalizations.of(context).phoneCopied);
+  }
+
+  Future<void> _edit(CentreFarmer farmer) async {
+    final saved = await showEditFarmerSheet(context, widget.repo, farmer);
+    if (saved != null && mounted) setState(() => _load = _fetch());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -272,8 +393,19 @@ class _CentreFarmerPageState extends State<CentreFarmerPage> {
         return AdaptiveScaffold(
           title: l10n.farmerTitle,
           actions: [
-            BarAction(icon: Symbols.call_rounded, tooltip: l10n.call, onPressed: () {}),
-            BarAction(icon: Symbols.edit_rounded, tooltip: l10n.edit, onPressed: () {}),
+            if (farmer != null) ...[
+              BarAction(icon: Symbols.call_rounded, tooltip: l10n.call, onPressed: () => _call(farmer)),
+              BarAction(icon: Symbols.edit_rounded, tooltip: l10n.edit, onPressed: () => _edit(farmer)),
+            ],
+            if (widget.onIdCard != null)
+              BarAction(
+                icon: Symbols.badge_rounded,
+                tooltip: l10n.idCardTitle,
+                onPressed: () async {
+                  await widget.onIdCard!();
+                  if (mounted) _reload();
+                },
+              ),
           ],
           body: farmer == null || st == null
               ? const SizedBox.shrink()
@@ -283,7 +415,10 @@ class _CentreFarmerPageState extends State<CentreFarmerPage> {
                     FarmTapCard(
                       child: Row(
                         children: [
-                          FarmerAvatar(farmer: farmer, size: context.sizes.avatarXl, plain: true),
+                          GestureDetector(
+                            onTap: widget.canManage ? () => _run(widget.onPhoto, farmer) : null,
+                            child: FarmerAvatar(farmer: farmer, size: context.sizes.avatarXl, plain: true),
+                          ),
                           context.space.gapLg,
                           Expanded(
                             child: Column(
@@ -361,6 +496,82 @@ class _CentreFarmerPageState extends State<CentreFarmerPage> {
                         ],
                       ),
                     ),
+                    if (widget.canManage) ...[
+                      context.space.gapLg,
+                      ListCard(
+                        children: [
+                          if (widget.onIdCard != null)
+                            RecordTile(
+                              leading: IconBubble(icon: Symbols.badge_rounded, size: context.sizes.bubbleMd),
+                              title: l10n.idCardTitle,
+                              subtitle: l10n.idCardRowBody,
+                              onTap: () async {
+                                await widget.onIdCard!();
+                                if (mounted) _reload();
+                              },
+                            ),
+                          RecordTile(
+                            leading: IconBubble(
+                              icon: Symbols.photo_camera_rounded,
+                              tone: FarmTapTone.info,
+                              size: context.sizes.bubbleMd,
+                            ),
+                            title: farmer.hasPhoto ? l10n.changePhoto : l10n.addPhoto,
+                            onTap: () => _run(widget.onPhoto, farmer),
+                          ),
+                          RecordTile(
+                            leading: IconBubble(
+                              icon: Symbols.contactless_rounded,
+                              tone: FarmTapTone.gold,
+                              size: context.sizes.bubbleMd,
+                            ),
+                            title: farmer.card == null ? l10n.assignCardRow : l10n.replaceLostCard,
+                            onTap: () => _run(widget.onAssignCard, farmer),
+                          ),
+                          if (farmer.card != null)
+                            RecordTile(
+                              leading: IconBubble(
+                                icon: Symbols.credit_card_off_rounded,
+                                tone: FarmTapTone.danger,
+                                size: context.sizes.bubbleMd,
+                              ),
+                              title: l10n.revokeCardRow,
+                              subtitle: l10n.revokeCardRowBody,
+                              onTap: () => _run(widget.onRevokeCard, farmer),
+                            ),
+                        ],
+                      ),
+                    ],
+                    if (_cards.isNotEmpty) ...[
+                      context.space.gapLg,
+                      ListCard(
+                        title: l10n.cardHistoryTitle,
+                        children: [
+                          for (final c in _cards)
+                            RecordTile(
+                              leading: IconBubble(
+                                icon: Symbols.contactless_rounded,
+                                tone: c.active ? FarmTapTone.success : FarmTapTone.neutral,
+                                size: context.sizes.bubbleMd,
+                              ),
+                              title: l10n.cardNumberBadge(c.number),
+                              badge: StatusBadge(
+                                label: switch (c.status) {
+                                  CardStatus.active => l10n.cardActive,
+                                  CardStatus.returned => l10n.cardReturned,
+                                  CardStatus.lost => l10n.cardLost,
+                                },
+                                tone: switch (c.status) {
+                                  CardStatus.active => FarmTapTone.success,
+                                  CardStatus.returned => FarmTapTone.neutral,
+                                  CardStatus.lost => FarmTapTone.danger,
+                                },
+                              ),
+                              showChevron: false,
+                            ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
         );
@@ -371,13 +582,14 @@ class _CentreFarmerPageState extends State<CentreFarmerPage> {
 
 // ---------------------------------------------------------------- G09
 
-class CentrePaymentsPage extends StatelessWidget {
+class CentrePaymentsPage extends StatefulWidget {
   const new({
     required this.repo,
     required this.onSendSms,
     required this.onPaymentSheet,
     required this.onFarmer,
     super.key,
+    this.onDownload,
   });
 
   final CentreRepository repo;
@@ -385,18 +597,49 @@ class CentrePaymentsPage extends StatelessWidget {
   final VoidCallback onPaymentSheet;
   final ValueChanged<CentreFarmer> onFarmer;
 
+  /// Shares the farmer statements as PDF or spreadsheet.
+  final VoidCallback? onDownload;
+
+  @override
+  State<CentrePaymentsPage> createState() => _CentrePaymentsPageState();
+}
+
+class _CentrePaymentsPageState extends State<CentrePaymentsPage> {
+  late Future<PaymentPeriod?> _load = _fetch();
+
+  Future<PaymentPeriod?> _fetch() => widget.repo.payments().then((r) => r.data);
+
+  /// What the centre pays per litre; every amount owed follows it.
+  Future<void> _editPrice() async {
+    final l10n = AppLocalizations.of(context);
+    final f = _fmt(context);
+    final price = await showAdaptiveSheet<double>(
+      context,
+      builder: (_) => _PriceSheet(current: widget.repo.pricePerLitre),
+    );
+    if (price == null || !mounted) return;
+    await widget.repo.setPricePerLitre(price);
+    if (!mounted) return;
+    FarmTapToast.show(context, message: l10n.priceSaved(f.money(price)));
+    setState(() => _load = _fetch());
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final f = _fmt(context);
     return FutureBuilder<PaymentPeriod?>(
-      future: repo.payments().then((r) => r.data),
+      future: _load,
       builder: (context, snapshot) {
         final p = snapshot.data;
         return AdaptiveScaffold(
           title: l10n.payments,
           subtitle: p == null ? null : l10n.periodLabel(f.period(p.start, p.end)),
-          actions: [BarAction(icon: Symbols.download_rounded, tooltip: l10n.download, onPressed: () {})],
+          actions: [
+            BarAction(icon: Symbols.sell_rounded, tooltip: l10n.pricePerLitre, onPressed: _editPrice),
+            if (widget.onDownload case final download?)
+              BarAction(icon: Symbols.download_rounded, tooltip: l10n.download, onPressed: download),
+          ],
           body: p == null
               ? const SizedBox.shrink()
               : Column(
@@ -415,25 +658,25 @@ class CentrePaymentsPage extends StatelessWidget {
                         label: l10n.sendSmsStatements,
                         icon: Symbols.sms_rounded,
                         kind: ButtonKind.tonal,
-                        onPressed: onSendSms,
+                        onPressed: widget.onSendSms,
                       ),
                       second: FarmTapButton(
                         label: l10n.paymentSheet,
                         icon: Symbols.receipt_long_rounded,
-                        onPressed: onPaymentSheet,
+                        onPressed: widget.onPaymentSheet,
                       ),
                     ),
                     context.space.gapLg,
                     RecordCollection<PaymentLine>(
                       items: p.lines,
-                      onTap: (line) => onFarmer(line.farmer),
+                      onTap: (line) => widget.onFarmer(line.farmer),
                       tileBuilder: (context, line) => RecordTile(
                         leading: FarmerAvatar(farmer: line.farmer, plain: true),
                         title: line.farmer.name,
                         subtitle: l10n.litresAndCard(f.count(line.litres), line.farmer.card ?? '—'),
                         trailingValue: f.compact(line.gross),
                         trailingSub: l10n.ugxUnit,
-                        onTap: () => onFarmer(line.farmer),
+                        onTap: () => widget.onFarmer(line.farmer),
                       ),
                       columns: [
                         RecordColumn(
@@ -482,6 +725,57 @@ class CentrePaymentsPage extends StatelessWidget {
                 ),
         );
       },
+    );
+  }
+}
+
+class _PriceSheet extends StatefulWidget {
+  const new({required this.current});
+
+  final double current;
+
+  @override
+  State<_PriceSheet> createState() => _PriceSheetState();
+}
+
+class _PriceSheetState extends State<_PriceSheet> {
+  late final _price = TextEditingController(text: widget.current.round().toString());
+
+  @override
+  void dispose() {
+    _price.dispose();
+    super.dispose();
+  }
+
+  double? get _value {
+    final v = double.tryParse(_price.text.replaceAll(',', ''));
+    return v == null || v <= 0 ? null : v;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SheetTitle(l10n.pricePerLitre, subtitle: l10n.pricePerLitreHint),
+        context.space.gapLg,
+        FarmTapTextField(
+          label: l10n.pricePerLitre,
+          prefixText: 'UGX ',
+          controller: _price,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          onChanged: (_) => setState(() {}),
+        ),
+        context.space.gapXl,
+        FarmTapButton(
+          label: l10n.save,
+          icon: Symbols.check_rounded,
+          onPressed: _value == null ? null : () => Navigator.of(context).pop(_value),
+        ),
+      ],
     );
   }
 }
@@ -624,24 +918,26 @@ class _PayoutBadge extends StatelessWidget {
 // ---------------------------------------------------------------- G11
 
 class SmsStatementsPage extends StatelessWidget {
-  const new({required this.repo, required this.onSent, super.key});
+  const new({required this.repo, required this.onQueued, super.key});
 
   final CentreRepository repo;
-  final VoidCallback onSent;
 
-  Future<void> _send(BuildContext context, SmsPreview p) async {
+  /// Statements were queued: open the messages waiting to be sent.
+  final VoidCallback onQueued;
+
+  Future<void> _send(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
-    await repo.sendStatements();
+    final count = (await repo.sendStatements()).data ?? 0;
     if (!context.mounted) return;
-    await showCelebration(
+    final go = await showCelebration(
       context,
       animation: FarmTapAnimations.smsSent,
       sound: FarmTapSound.success,
-      title: l10n.smsSent,
-      message: l10n.sendToFarmers(p.messages),
-      primaryLabel: l10n.done,
+      title: l10n.statementsReady,
+      message: l10n.statementsQueued(count),
+      primaryLabel: count == 0 ? l10n.done : l10n.sendNow,
     );
-    onSent();
+    if (count > 0 && go == CelebrationAction.primary) onQueued();
   }
 
   @override
@@ -706,8 +1002,11 @@ class SmsStatementsPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           SummaryRow(label: l10n.messages, value: f.count(p.messages)),
-                          SummaryRow(label: l10n.smsLeftThisMonth, value: l10n.countOfTotal(p.smsLeft, p.smsMonthly)),
-                          SummaryRow(label: l10n.extraSmsNeeded, value: f.count(p.extraNeeded)),
+                          context.space.gapXs,
+                          Text(
+                            l10n.statementsFreeNote,
+                            style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+                          ),
                         ],
                       ),
                     ),
@@ -715,7 +1014,7 @@ class SmsStatementsPage extends StatelessWidget {
                     FarmTapButton(
                       label: l10n.sendToFarmers(p.messages),
                       icon: Symbols.sms_rounded,
-                      onPressed: () => unawaited(_send(context, p)),
+                      onPressed: () => unawaited(_send(context)),
                     ),
                   ],
                 ),

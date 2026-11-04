@@ -1,4 +1,5 @@
 import 'package:farm_tap/core/theme/theme.dart';
+import 'package:farm_tap/core/ui/farmtap_loader.dart';
 import 'package:flutter/material.dart';
 
 enum ButtonKind { filled, tonal, outlined, text, danger, gold, neutral }
@@ -16,7 +17,11 @@ class FarmTapButton extends StatelessWidget {
     this.trailingIcon,
     this.large = false,
     this.expand = true,
+    this.loading = false,
   });
+
+  /// Working (signing in, saving): shows the FarmTap loader and ignores taps.
+  final bool loading;
 
   final String label;
   final VoidCallback? onPressed;
@@ -75,7 +80,9 @@ class FarmTapButton extends StatelessWidget {
     final text = Text(label, maxLines: 1, overflow: TextOverflow.ellipsis);
     final lead = leading ?? (icon == null ? null : Icon(icon, fill: 1));
     final Widget child;
-    if (trailingIcon != null) {
+    if (loading) {
+      child = FarmTapLoader(size: context.sizes.iconLg, semanticLabel: label);
+    } else if (trailingIcon != null) {
       child = Stack(
         alignment: Alignment.center,
         children: [
@@ -95,9 +102,10 @@ class FarmTapButton extends StatelessWidget {
               ],
             );
     }
+    final tap = loading ? null : onPressed;
     final button = kind == ButtonKind.text
-        ? TextButton(onPressed: onPressed, style: style, child: child)
-        : FilledButton(onPressed: onPressed, style: style, child: child);
+        ? TextButton(onPressed: tap, style: style, child: child)
+        : FilledButton(onPressed: tap, style: style, child: child);
     return expand ? SizedBox(width: double.infinity, child: button) : button;
   }
 }
@@ -169,7 +177,8 @@ class TextAction extends StatelessWidget {
                     children: [
                       Icon(icon, fill: 1, size: context.sizes.iconMd, color: style?.color),
                       context.space.gapSm,
-                      Text(label, style: style),
+                      // Long labels wrap instead of overflowing (large text).
+                      Flexible(child: Text(label, style: style, textAlign: TextAlign.center)),
                     ],
                   ),
           ),

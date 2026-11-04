@@ -167,7 +167,9 @@ class WorkerDay extends Equatable {
   final bool morningSession;
   final int feedingGroupsLeft;
   final int treatmentsDue;
-  final DateTime dippingDue;
+
+  /// Next dipping on the health schedule; null when none is planned.
+  final DateTime? dippingDue;
   final List<WorkerTask> tasks;
 
   @override

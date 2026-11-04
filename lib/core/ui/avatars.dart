@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:farm_tap/core/media/photo_store.dart';
 import 'package:farm_tap/core/theme/theme.dart';
+import 'package:farm_tap/core/ui/photo_widgets.dart';
 import 'package:farm_tap/core/ui/tone.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -33,7 +38,7 @@ class CowAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dimension = size ?? context.sizes.avatarMd;
-    final url = photoUrl;
+    final url = photoUrl ?? (animalId == null ? null : PhotoStore.instance.animalPhotos[animalId]);
     final index = avatarIndex;
     final cartoon = isCalf
         ? FarmTapAssets.calfAvatar
@@ -60,7 +65,7 @@ class CowAvatar extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(shape: BoxShape.circle, color: context.colors.surfaceContainer),
           clipBehavior: Clip.antiAlias,
-          child: url == null ? fallback : Image.network(url, fit: BoxFit.cover, errorBuilder: (_, _, _) => fallback),
+          child: url == null || url.isEmpty ? fallback : StoredPhoto(photoKey: url, placeholder: fallback),
         ),
       ),
     );
@@ -79,9 +84,29 @@ class PersonAvatar extends StatelessWidget {
     this.tone = FarmTapTone.primary,
     this.initials,
     this.onTap,
+    this.photo,
   });
 
   final String name;
+
+  /// The person's photo (base64 JPEG from their record); initials when null.
+  final String? photo;
+
+  static final _decoded = <String, Uint8List>{};
+
+  /// Decodes a base64 photo once; null when it is not a picture.
+  static Uint8List? photoBytes(String? photo) {
+    if (photo == null || photo.isEmpty) return null;
+    final hit = _decoded[photo];
+    if (hit != null) return hit;
+    try {
+      final bytes = base64Decode(photo);
+      if (_decoded.length > 64) _decoded.remove(_decoded.keys.first);
+      return _decoded[photo] = bytes;
+    } on FormatException {
+      return null;
+    }
+  }
 
   /// Defaults to `context.sizes.avatarSm` (40).
   final double? size;
@@ -113,6 +138,7 @@ class PersonAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final dimension = size ?? context.sizes.avatarSm;
     final colors = tone.of(context);
+    final bytes = photoBytes(photo);
     final avatar = Container(
       width: dimension,
       height: dimension,
@@ -122,14 +148,17 @@ class PersonAvatar extends StatelessWidget {
         border: ring ? Border.all(color: ringColor ?? context.colors.primary, width: context.sizes.avatarRing) : null,
       ),
       alignment: Alignment.center,
-      child: Text(
-        initials ?? initialsOf(name),
-        style: FarmTapTextStyles.initials(
-          context.text.titleSmall!,
-          dimension,
-          context.sizes.initialsFraction,
-        ).copyWith(color: colors.onContainer),
-      ),
+      clipBehavior: Clip.antiAlias,
+      child: bytes != null
+          ? Image.memory(bytes, width: dimension, height: dimension, fit: BoxFit.cover, gaplessPlayback: true)
+          : Text(
+              initials ?? initialsOf(name),
+              style: FarmTapTextStyles.initials(
+                context.text.titleSmall!,
+                dimension,
+                context.sizes.initialsFraction,
+              ).copyWith(color: colors.onContainer),
+            ),
     );
     if (onTap == null) {
       return Semantics(

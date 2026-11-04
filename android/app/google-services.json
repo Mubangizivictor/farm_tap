@@ -12,7 +12,20 @@
           "package_name": "com.victorbee.farm_tap"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "913049305053-4sd5562ct6er40vdmn6uiaj7id75hnco.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.victorbee.farm_tap",
+            "certificate_hash": "a081b202e46401ad200a2b3becb42aecf1b5e397"
+          }
+        },
+        {
+          "client_id": "913049305053-veepsq3tbhjv5a363c6n8mk8emehqnat.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCoA1u3UHwFqC3MOPkn-1XevAKczOvDOWs"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "913049305053-79f8ncaaff3thn1h2niaqhpa1cdboc2q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "913049305053-73cp00c1a335d91cpo8iksnodcgs6g2l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.victorbee.farmTap"
+              }
+            }
+          ]
         }
       }
     }

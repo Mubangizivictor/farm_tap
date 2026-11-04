@@ -1,35 +1,61 @@
+import 'package:farm_tap/core/auth/domain/password_strength.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
-import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/theme/theme.dart';
-import 'package:farm_tap/core/ui/navigation_scope.dart';
+import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// "G" / "A" letter in a small neutral circle: placeholder for the official
-/// Google / Apple marks (TODO: official branding before release).
-class ProviderBadge extends StatelessWidget {
-  const new(this.letter, {super.key});
+enum SignInProvider { google, apple }
 
-  final String letter;
+/// The provider's own mark on its sign-in button: Google's "G", Apple's logo.
+class ProviderLogo extends StatelessWidget {
+  const new(this.provider, {super.key});
+
+  final SignInProvider provider;
 
   @override
   Widget build(BuildContext context) {
     final size = context.sizes.iconMd;
     // Decorative: the button label already names the provider.
     return ExcludeSemantics(
-      child: Container(
-        width: size,
-        height: size,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: context.colors.surfaceContainerHigh),
-        child: Text(letter, style: context.text.labelSmall),
+      child: switch (provider) {
+        SignInProvider.google => SvgPicture.asset(FarmTapAssets.googleG, width: size, height: size),
+        SignInProvider.apple => Icon(Icons.apple, size: size, color: context.colors.onSurface),
+      },
+    );
+  }
+}
+
+/// "—— or ——" between the provider buttons and email.
+class OrDivider extends StatelessWidget {
+  const new({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final line = Expanded(
+      child: Divider(color: context.colors.outlineVariant, height: context.sizes.borderThin),
+    );
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: context.space.sm),
+      child: Row(
+        children: [
+          line,
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: context.space.md),
+            child: Text(
+              AppLocalizations.of(context).orLabel,
+              style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+            ),
+          ),
+          line,
+        ],
       ),
     );
   }
 }
 
-/// "English · Runyankore   Terms · Privacy" under the sign-in buttons.
+/// "Terms · Privacy" under the sign-in buttons.
 /// Tapping a language switches the app language at once.
 class AuthFooter extends StatelessWidget {
   const new({super.key, this.onTerms, this.onPrivacy});
@@ -55,13 +81,10 @@ class AuthFooter extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        link(l10n.languageEnglish, () => context.read<AppSettingsCubit>().setLanguage('en')),
-        dot,
-        link(l10n.languageRunyankore, () => context.read<AppSettingsCubit>().setLanguage('nyn')),
-        context.space.gapLg,
-        link(l10n.terms, onTerms),
-        dot,
-        link(l10n.privacy, onPrivacy),
+        // Shown once the Terms and Privacy pages exist.
+        if (onTerms != null) link(l10n.terms, onTerms),
+        if (onTerms != null && onPrivacy != null) dot,
+        if (onPrivacy != null) link(l10n.privacy, onPrivacy),
       ],
     );
   }
@@ -121,3 +144,27 @@ class AuthBackButton extends StatelessWidget {
 
 /// Basic email check used for inline validation.
 bool looksLikeEmail(String value) => RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]{2,}$').hasMatch(value.trim());
+
+/// Thin bar + word under the sign-up password: Weak / Fair / Good / Strong.
+class PasswordStrengthBar extends StatelessWidget {
+  const new({required this.strength, super.key});
+
+  final PasswordStrength strength;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final (label, tone) = switch (strength) {
+      PasswordStrength.weak => (l10n.passwordStrengthWeak, FarmTapTone.danger),
+      PasswordStrength.fair => (l10n.passwordStrengthFair, FarmTapTone.warning),
+      PasswordStrength.good => (l10n.passwordStrengthGood, FarmTapTone.info),
+      PasswordStrength.strong => (l10n.passwordStrengthStrong, FarmTapTone.success),
+    };
+    return FarmTapProgress(
+      value: (strength.index + 1) / PasswordStrength.values.length,
+      thin: true,
+      trailingLabel: label,
+      color: tone.of(context).accent,
+    );
+  }
+}

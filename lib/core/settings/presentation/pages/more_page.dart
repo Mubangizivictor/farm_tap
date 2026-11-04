@@ -7,13 +7,28 @@ import 'package:material_symbols_icons/symbols.dart';
 
 enum MoreTarget {
   profile,
+
+  /// The worker's own page (decision 0016 §7).
+  me,
+
+  /// Scan station.
+  scan,
   feeding,
   breeding,
+
+  /// Decision 0024: the farm's contacts, duty roster, feeds store,
+  /// vaccinations and reminders.
+  contacts,
+  roster,
+  feedStore,
+  vaccinations,
+  reminders,
   workers,
   money,
   reports,
   cards,
   subscription,
+  messages,
   settings,
   help,
   lock,
@@ -28,7 +43,15 @@ class MorePage extends StatelessWidget {
     required this.onOpen,
     super.key,
     this.trialDaysLeft,
+    this.visible,
+    this.photo,
   });
+
+  /// What this person may open (decision 0016 §7); null shows everything.
+  final Set<MoreTarget>? visible;
+
+  /// Their photo (base64).
+  final String? photo;
 
   final String name;
 
@@ -41,6 +64,7 @@ class MorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    bool shows(MoreTarget t) => visible?.contains(t) ?? t != MoreTarget.me;
     QuickActionTile tile(MoreTarget t, IconData icon, String label, FarmTapTone tone) =>
         QuickActionTile(icon: icon, label: label, tone: tone, onTap: () => onOpen(t));
     RecordTile row(MoreTarget t, IconData icon, String title, FarmTapTone tone, {String? subtitle}) => RecordTile(
@@ -58,7 +82,7 @@ class MorePage extends StatelessWidget {
             onTap: () => onOpen(MoreTarget.profile),
             child: Row(
               children: [
-                PersonAvatar(name: name, size: context.sizes.avatarLg),
+                PersonAvatar(name: name, photo: photo, size: context.sizes.avatarLg),
                 context.space.gapLg,
                 Expanded(
                   child: Column(
@@ -83,33 +107,55 @@ class MorePage extends StatelessWidget {
             maxColumns: context.isCompact ? 3 : 6,
             spacing: context.space.md,
             children: [
-              tile(MoreTarget.feeding, Symbols.grass_rounded, l10n.feeding, FarmTapTone.gold),
-              tile(MoreTarget.breeding, Symbols.favorite_rounded, l10n.breeding, FarmTapTone.danger),
-              tile(MoreTarget.workers, Symbols.groups_rounded, l10n.workers, FarmTapTone.info),
-              tile(MoreTarget.money, Symbols.account_balance_wallet_rounded, l10n.money, FarmTapTone.primary),
-              tile(MoreTarget.reports, Symbols.bar_chart_rounded, l10n.reports, FarmTapTone.primary),
-              tile(MoreTarget.cards, Symbols.contactless_rounded, l10n.cardsLabel, FarmTapTone.gold),
+              for (final (t, icon, label, tone) in [
+                (MoreTarget.me, Symbols.badge_rounded, l10n.myPageTitle, FarmTapTone.primary),
+                (MoreTarget.feeding, Symbols.grass_rounded, l10n.feeding, FarmTapTone.gold),
+                (MoreTarget.breeding, Symbols.favorite_rounded, l10n.breeding, FarmTapTone.danger),
+                (MoreTarget.vaccinations, Symbols.vaccines_rounded, l10n.opsVaccinations, FarmTapTone.info),
+                (MoreTarget.feedStore, Symbols.inventory_2_rounded, l10n.opsFeedStore, FarmTapTone.gold),
+                (MoreTarget.roster, Symbols.calendar_month_rounded, l10n.opsRoster, FarmTapTone.primary),
+                (MoreTarget.contacts, Symbols.contact_phone_rounded, l10n.opsContacts, FarmTapTone.info),
+                (MoreTarget.workers, Symbols.groups_rounded, l10n.workers, FarmTapTone.info),
+                (MoreTarget.money, Symbols.account_balance_wallet_rounded, l10n.money, FarmTapTone.primary),
+                (MoreTarget.reports, Symbols.bar_chart_rounded, l10n.reports, FarmTapTone.primary),
+                (MoreTarget.cards, Symbols.contactless_rounded, l10n.cardsLabel, FarmTapTone.gold),
+                (MoreTarget.scan, Symbols.qr_code_scanner_rounded, l10n.scanStationTitle, FarmTapTone.info),
+              ])
+                if (shows(t)) tile(t, icon, label, tone),
             ],
           ),
           context.space.gapLg,
           ListCard(
             children: [
-              row(
-                MoreTarget.subscription,
-                Symbols.savings_rounded,
-                l10n.subscriptionLabel,
-                FarmTapTone.gold,
-                subtitle: trialDaysLeft == null ? null : l10n.trialDaysLeftShort(trialDaysLeft!),
-              ),
-              row(MoreTarget.settings, Symbols.settings_rounded, l10n.settings, FarmTapTone.neutral),
+              if (shows(MoreTarget.subscription))
+                row(
+                  MoreTarget.subscription,
+                  Symbols.savings_rounded,
+                  l10n.subscriptionLabel,
+                  FarmTapTone.gold,
+                  subtitle: trialDaysLeft == null ? null : l10n.trialDaysLeftShort(trialDaysLeft!),
+                ),
+              if (shows(MoreTarget.reminders))
+                row(
+                  MoreTarget.reminders,
+                  Symbols.notifications_rounded,
+                  l10n.remindersTitle,
+                  FarmTapTone.primary,
+                  subtitle: l10n.remindersSub,
+                ),
+              if (shows(MoreTarget.messages))
+                row(MoreTarget.messages, Symbols.sms_rounded, l10n.messagesToSend, FarmTapTone.primary),
+              if (shows(MoreTarget.settings))
+                row(MoreTarget.settings, Symbols.settings_rounded, l10n.settings, FarmTapTone.neutral),
               row(MoreTarget.help, Symbols.support_agent_rounded, l10n.helpSupport, FarmTapTone.info),
-              row(
-                MoreTarget.lock,
-                Symbols.lock_rounded,
-                l10n.lockPhone,
-                FarmTapTone.primary,
-                subtitle: l10n.lockPhoneSub,
-              ),
+              if (shows(MoreTarget.lock))
+                row(
+                  MoreTarget.lock,
+                  Symbols.lock_rounded,
+                  l10n.lockPhone,
+                  FarmTapTone.primary,
+                  subtitle: l10n.lockPhoneSub,
+                ),
               row(MoreTarget.signOut, Symbols.logout_rounded, l10n.signOutLabel, FarmTapTone.danger),
             ],
           ),

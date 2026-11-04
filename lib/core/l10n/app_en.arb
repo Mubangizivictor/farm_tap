@@ -116,8 +116,6 @@
   "continueGoogle": "Continue with Google",
   "continueApple": "Continue with Apple",
   "continueEmail": "Continue with email",
-  "languageEnglish": "English",
-  "languageRunyankore": "Runyankore",
   "terms": "Terms",
   "privacy": "Privacy",
   "brandTagline": "Tap the card, record the work.",
@@ -194,10 +192,6 @@
   "discardBody": "What you typed on this screen will be lost.",
   "discardConfirm": "Discard",
   "keepEditing": "Keep editing",
-  "chooseLanguageTitle": "Choose your language",
-  "chooseLanguageSubtitle": "Hitamu orurimi. You can change it later.",
-  "runyankoreSubtitle": "Orurimi rw'Ankole",
-  "englishSubtitle": "Use the app in English",
   "sectorTitle": "What do you do?",
   "sectorSubtitle": "Pick your main work. Dairy is ready now.",
   "sectorDairy": "Dairy (cattle)",
@@ -271,7 +265,7 @@
   "nfcLaterBody": "Tap 'Assign card' on the worker's page when cards arrive.",
   "saveWorker": "Save worker",
   "farmReadyTitle": "Your farm is ready!",
-  "farmReadyBody": "Your 14 free days start today and end on {date}. After that FarmTap is UGX 70,000 a month.",
+  "farmReadyBody": "Your 7 free days start today and end on {date}. After that FarmTap is UGX 70,000 a month.",
   "@farmReadyBody": {
     "placeholders": {
       "date": {
@@ -1291,7 +1285,7 @@
   "tapNextCard": "Tap the next card",
   "readyNextFarmer": "Ready for the next farmer.",
   "lastSaved": "Last saved",
-  "smsQueuedPrintSlip": "SMS receipt queued · Print slip",
+  "smsQueuedPrintSlip": "SMS receipt queued",
   "savedForFarmer": "Saved {litres} L for {name}",
   "@savedForFarmer": {
     "placeholders": {
@@ -2611,5 +2605,1245 @@
         "type": "String"
       }
     }
-  }
+  },
+  "searchList": "Search",
+  "useTyped": "Use “{text}”",
+  "@useTyped": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "nothingFound": "Nothing found. Type the full name to use it.",
+  "locationOff": "Turn on location in your phone settings, or pick the district.",
+  "locationDenied": "Location is not allowed. Pick the district from the list.",
+  "locationNotFound": "Could not find your district. Pick it from the list.",
+  "findingLocation": "Finding your location…",
+  "cowsCountLabel": "How many cows?",
+  "cowsCountHelper": "All cattle on the farm today",
+  "roleSupervisor": "Supervisor",
+  "roleMilker": "Milker",
+  "roleSecretary": "Secretary",
+  "roleAccountant": "Accountant",
+  "roleDriver": "Driver",
+  "roleGuard": "Security guard",
+  "roleCook": "Cook",
+  "roleFamily": "Family member",
+  "roleCoOwner": "Co-owner",
+  "roleFarmManager": "Farm manager",
+  "jobLabel": "Job",
+  "jobHelper": "Pick one or type your own, e.g. “Farmer's daughter”",
+  "accessLabel": "What they can do in FarmTap",
+  "phoneOptional": "Phone number (optional)",
+  "wageOptional": "Monthly pay (optional)",
+  "cardForWorker": "Their card",
+  "cardForWorkerHelp": "Hold their FarmTap card to the back of the phone, or type the number printed on it.",
+  "cardReadNumber": "Card {number}",
+  "@cardReadNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "changeCard": "Change",
+  "noCardYet": "No card yet: give one later from the worker's page.",
+  "yourRoleLabel": "Your role",
+  "ownerAccess": "Full access: I own the farm and pay for FarmTap",
+  "managerAccess": "Manager: I run the farm for the owner",
+  "accessTitle": "What can you do?",
+  "cowsInvalid": "Type the number of cows, e.g. 25",
+  "firstWorkerSaved": "{name} added",
+  "@firstWorkerSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "farmCreateFailed": "Could not create the farm. Check the internet and try again.",
+  "creatingFarm": "Creating your farm…",
+  "appearanceTitle": "Appearance",
+  "themeSystem": "Phone",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeHelp": "Phone follows your phone's light or dark setting.",
+  "soundsLabel": "Sounds",
+  "soundsSub": "Clicks and chimes when you save",
+  "accountTitle": "Account",
+  "farmTitle": "Farm",
+  "helpIntro": "Stuck or have a question? Talk to the FarmTap team. We answer in English.",
+  "helpWhatsapp": "Chat on WhatsApp",
+  "helpWhatsappSub": "Fastest; send a screenshot if something looks wrong",
+  "helpCall": "Call us",
+  "helpSms": "Send an SMS",
+  "helpOpenFailed": "Could not open that on this phone.",
+  "authNoInternet": "No internet. Connect and try again.",
+  "authProviderOff": "This sign-in method is not switched on for FarmTap yet. Use Google or email for now.",
+  "authOtherMethod": "This email already uses another sign-in. Use Google or email.",
+  "authEmailInUse": "An account with this email already exists. Sign in instead.",
+  "authFailedCode": "That did not work ({code}). Try again.",
+  "@authFailedCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmPasswordLabel": "Confirm password",
+  "passwordsDontMatch": "The passwords do not match.",
+  "passwordRuleStrong": "8+ characters with A-Z, a-z and 0-9",
+  "passwordWeak": "Add a capital letter, a small letter and a number.",
+  "passwordStrengthWeak": "Weak",
+  "passwordStrengthFair": "Fair",
+  "passwordStrengthGood": "Good",
+  "passwordStrengthStrong": "Strong",
+  "suggestPassword": "Suggest a strong password",
+  "suggestedPasswordNote": "Suggested: {password}. Save it somewhere safe.",
+  "@suggestedPasswordNote": {
+    "placeholders": {
+      "password": {
+        "type": "String"
+      }
+    }
+  },
+  "copyWhatsappNumber": "Same as WhatsApp",
+  "smsNumberHelp": "Alerts go here. It can be a different line from WhatsApp.",
+  "signInTagline": "Simple records for your business.\nWorks even without network.",
+  "signInCardOffline": "Works offline",
+  "signInCardTap": "Tap cards",
+  "signInCardBackup": "Safe backup",
+  "orLabel": "or",
+  "scanCard": "Scan card",
+  "workerCardTitle": "{name}'s worker card",
+  "@workerCardTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "workerCardOnCollect": "This card is for clocking in and out. Farmers bringing milk need their own farmer card.",
+  "openAttendance": "Clock in or out",
+  "newCardTitle": "New card {number}",
+  "@newCardTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "newCardOnCollect": "No farmer has this card yet. Add the farmer now and the card is theirs.",
+  "addFarmerWithCard": "Add farmer with this card",
+  "newCardOnAttendance": "No worker has this card yet. Give it to a worker, then tap again to clock in.",
+  "giveCardToWorker": "Give it to a worker",
+  "farmerCardOnAttendance": "This is {name}'s farmer card. Worker cards clock in here.",
+  "@farmerCardOnAttendance": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "typeCardNumberLink": "Type the card number",
+  "gettingFarmReady": "Getting {farm} ready…",
+  "@gettingFarmReady": {
+    "placeholders": {
+      "farm": {
+        "type": "String"
+      }
+    }
+  },
+  "gettingFarmReadySub": "Bringing back your animals, workers and records.",
+  "welcomeBackName": "Welcome back, {name}",
+  "@welcomeBackName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeName": "Welcome, {name}",
+  "@welcomeName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeBackPlain": "Welcome back",
+  "openingFarmTitle": "Opening {farm}",
+  "@openingFarmTitle": {
+    "placeholders": {
+      "farm": {
+        "type": "String"
+      }
+    }
+  },
+  "farmPickerOneSub": "Your farm is ready on this phone. Tap it to open.",
+  "farmPickerManySub": "You can open {count} farms. Pick the one to work on.",
+  "@farmPickerManySub": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "openFarmButton": "Open farm",
+  "placeDairyFarm": "Dairy farm",
+  "placeCentre": "Milk collection centre",
+  "placeDairyAndCentre": "Dairy farm and milk centre",
+  "herdCows": "{count, plural, =1{1 cow} other{{count} cows}}",
+  "@herdCows": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "herdBirds": "{count, plural, =1{1 bird} other{{count} birds}}",
+  "@herdBirds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "herdPigs": "{count, plural, =1{1 pig} other{{count} pigs}}",
+  "@herdPigs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "herdAnimals": "{count, plural, =1{1 animal} other{{count} animals}}",
+  "@herdAnimals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "youAreRole": "You: {role}",
+  "@youAreRole": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "freeTrialLabel": "Free trial",
+  "trialDaysLeftOf": "{left} of {total} days left",
+  "@trialDaysLeftOf": {
+    "placeholders": {
+      "left": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "paidUntilDate": "Paid until {date}",
+  "@paidUntilDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "graceDaysToPay": "Payment due · {days, plural, =1{1 day} other{{days} days}} to pay",
+  "@graceDaysToPay": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "readOnlyPickerHint": "Trial ended. You can look at records but not add new ones until you pay.",
+  "signedInAsEmail": "Signed in as {email}",
+  "@signedInAsEmail": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "useAnotherAccount": "Use another account",
+  "noFarmTitle": "Let's set up your farm",
+  "noFarmBody": "It takes about 2 minutes. Your first {days} days are free.",
+  "@noFarmBody": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "setUpMyFarm": "Set up my farm",
+  "joinFarmHint": "Joining someone else's farm? Ask the owner to add your email, then tap Check again.",
+  "checkAgain": "Check again",
+  "placesOfflineTitle": "Can't load your farm",
+  "placesOfflineBody": "This phone needs the internet once to download your farm. After that it works offline.",
+  "farmLimitReachedBody": "This account already has a farm. To run more than one farm, ask us about the multi-farm plan.",
+  "talkToUsWhatsApp": "Talk to us on WhatsApp",
+  "multiFarmWhatsAppMessage": "Hello FarmTap, I want to run more than one farm. Please tell me about the multi-farm plan.",
+  "multiFarmQuestion": "Running more than one farm?",
+  "multiFarmAnswer": "One account runs one farm. Ask us about the multi-farm plan.",
+  "exportPdf": "PDF",
+  "exportPdfSub": "To print, or send on WhatsApp or email",
+  "exportSheet": "Spreadsheet (Excel)",
+  "exportSheetSub": "Opens in Excel or Google Sheets",
+  "nothingToExport": "Nothing to export yet",
+  "exportFailed": "Could not make the file. Try again.",
+  "viewingDay": "Viewing {day}",
+  "@viewingDay": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "backToToday": "Back to today",
+  "noMilkRecordedToday": "No milk recorded today yet. Record milk first, then split it here.",
+  "useMoreThanMilked": "{litres} more than was milked today",
+  "@useMoreThanMilked": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "buyerCentre": "Centre",
+  "buyerShop": "Shop",
+  "buyerNeighbours": "Neighbours",
+  "saleSaved": "Sale saved",
+  "salePaidSaved": "Marked as paid",
+  "saleUnpaidSaved": "Marked as not paid",
+  "paidOn": "Paid {date}",
+  "@paidOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "markPaid": "Mark as paid",
+  "markUnpaid": "Mark as not paid",
+  "colDate": "Date",
+  "noSalesYet": "No sales yet",
+  "noSalesYetBody": "Add each sale of milk, to the centre, a shop or neighbours. Unpaid sales show what buyers owe you.",
+  "enterBuyer": "Enter who bought the milk",
+  "enterLitres": "Enter the litres",
+  "enterPrice": "Enter the price",
+  "notPaidYet": "Not paid yet",
+  "paidNow": "Paid now",
+  "saveSale": "Save sale",
+  "takePhoto": "Take photo",
+  "choosePhoto": "Choose from phone",
+  "removePhoto": "Remove photo",
+  "changePhoto": "Change photo",
+  "photoFailed": "Could not save the photo. Try again.",
+  "cameraPermissionNeeded": "FarmTap needs the camera to scan. Allow it in your phone settings.",
+  "cameraNotAvailable": "The camera is not available. Type the number instead.",
+  "noAnimalWithTag": "No animal with tag {tag} on this farm",
+  "@noAnimalWithTag": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "tagTaken": "Another animal already has tag {tag}",
+  "@tagTaken": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "editAnimal": "Edit animal",
+  "statusNow": "What is she doing now?",
+  "animalSoldSaved": "{name} recorded as sold",
+  "@animalSoldSaved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sellAnimalTitle": "Sell {name}",
+  "@sellAnimalTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sellAnimalBody": "She moves to past animals. The price is added to this month's income.",
+  "salePrice": "Price",
+  "boughtByOptional": "Bought by (optional)",
+  "recordSale": "Record sale",
+  "conditionLabel": "Problem",
+  "givenByLabel": "Given by",
+  "milkSafeFrom": "Milk safe from",
+  "averagePerDayLabel": "Average a day",
+  "cardLabel": "Card",
+  "grossLabel": "Gross (UGX)",
+  "deductionsLabel": "Deductions (UGX)",
+  "netLabel": "To pay (UGX)",
+  "incomeAnimalSale": "Animal sold",
+  "incomeCalfSale": "Calf sold",
+  "incomeManure": "Manure",
+  "incomeHire": "Bull service / hire",
+  "addIncome": "Add income",
+  "incomeSaved": "{amount} income saved",
+  "@incomeSaved": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceLabel": "From",
+  "otherIncomeCaption": "Other {amount}",
+  "@otherIncomeCaption": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteExpense": "Remove this expense",
+  "deleteExpenseBody": "Only remove an expense entered by mistake. It stays in the audit trail.",
+  "expenseDeleted": "Expense removed",
+  "fromFeedPurchase": "Made by a feed purchase. Change it in Feeding.",
+  "previousMonth": "Previous month",
+  "nextMonth": "Next month",
+  "noExpensesYet": "No money recorded this month",
+  "noExpensesYetBody": "Add expenses as you spend, and milk sales as you sell. Profit and cost per litre are worked out for you.",
+  "makingReport": "Making the report…",
+  "saved": "Saved",
+  "notSetYet": "Not set yet",
+  "whatsappNumber": "WhatsApp number",
+  "setWhatsappNumber": "Set the WhatsApp number that gets this report.",
+  "sendNowWhatsapp": "Send today's report on WhatsApp",
+  "addAnimalsFirst": "Add your animals in Herd first, then record treatments here.",
+  "diseaseName": "Name of the disease",
+  "whatYouSee": "What you see (optional)",
+  "boughtMore": "Bought more",
+  "countStock": "Count",
+  "howManyNow": "How many are on the shelf now",
+  "howManyBought": "How many did you buy",
+  "pricePaidOptional": "Price paid (optional)",
+  "enterAmount": "Enter a number",
+  "stockSaved": "Stock saved",
+  "markJobDone": "Is “{job}” done?",
+  "@markJobDone": {
+    "placeholders": {
+      "job": {
+        "type": "String"
+      }
+    }
+  },
+  "markDone": "Yes, it is done",
+  "jobDone": "Marked as done",
+  "noHealthJobs": "No health jobs planned",
+  "noHealthJobsBody": "Add dipping, deworming and vaccinations so nobody forgets them.",
+  "overdue": "Overdue",
+  "feedNapier": "Napier grass",
+  "feedHay": "Hay",
+  "feedCottonCake": "Cotton seed cake",
+  "feedBrewersWaste": "Brewers' waste",
+  "countFeedStock": "Count stock",
+  "countFeedStockSub": "What is in the store now. Do this when you start, and whenever the numbers look wrong.",
+  "addFemalesFirst": "Add your cows and heifers in Herd first, then record heats and services here.",
+  "editFarmer": "Edit farmer",
+  "sendSmsReceipts": "Send SMS receipts",
+  "sendSmsReceiptsHint": "A text after every delivery",
+  "priceSaved": "Price saved: {price} per litre",
+  "@priceSaved": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "pricePerLitreHint": "What the centre pays farmers for each litre. Amounts owed update straight away.",
+  "phoneCopied": "Phone number copied",
+  "absentWord": "Absent",
+  "presentWord": "Present",
+  "broughtToday": "Brought {litres} today",
+  "@broughtToday": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "notDeliveredToday": "No milk today",
+  "cardNotUsable": "Card cannot be used",
+  "chooseFromGallery": "Choose from gallery",
+  "photoSheetTitle": "Photo for the ID card",
+  "photoSheetBody": "Face the camera, in good light.",
+  "photoSaved": "Photo saved",
+  "photoSavedLocal": "Photo saved. The full photo uploads when cloud storage is on.",
+  "photoNotSaved": "Photo not saved. Try again.",
+  "clockInOutShort": "Clock in/out",
+  "lookUpShort": "Look up",
+  "departmentLabel": "Department",
+  "emergencyLabel": "Emergency",
+  "phoneLabel": "Phone",
+  "ninLabel": "NIN",
+  "memberSinceLabel": "Since",
+  "issuedLabel": "Issued",
+  "idNumberLabel": "ID",
+  "downloadCardPdf": "Download PDF",
+  "printCard": "Print card",
+  "printOnA4": "Print on A4 paper",
+  "giveCardToSomeone": "Give this card",
+  "holdQrToCamera": "Hold the card's QR code to the camera",
+  "idCardBack": "Back",
+  "idCardFront": "Front",
+  "idCardFrontLabel": "ID card of {name}, front",
+  "@idCardFrontLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "idCardBackLabel": "ID card of {name}, back",
+  "@idCardBackLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "idCardIfFound": "If found, please return to the farm",
+  "idCardNoCardTitle": "No card yet",
+  "idCardNoCardBody": "Give a card first. Its number and QR code go on the print.",
+  "idCardPrintHelp": "Card printer: print the 2 pages on a blank PVC card. Normal printer: print on A4, cut along the marks and laminate.",
+  "idCardScanMe": "Scan me",
+  "idCardStaff": "Staff",
+  "idCardSupplier": "Milk supplier",
+  "idCardTitle": "ID card",
+  "idCardValidNote": "Valid until revoked. Tap or scan at the farm.",
+  "lastPaidLine": "Last paid {amount} on {date}",
+  "@lastPaidLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "payrollLine": "Wage {wage} · advances {advances} · paid {paid}",
+  "@payrollLine": {
+    "placeholders": {
+      "wage": {
+        "type": "String"
+      },
+      "advances": {
+        "type": "String"
+      },
+      "paid": {
+        "type": "String"
+      }
+    }
+  },
+  "lostCardTitle": "Card {number} was reported lost",
+  "@lostCardTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "lostCardBody": "It belonged to {name} ({date}). Keep the card and tell the manager.",
+  "@lostCardBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "returnedCardTitle": "Card {number} was returned",
+  "@returnedCardTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "returnedCardBody": "It belonged to {name}. Give it to someone new from their page.",
+  "@returnedCardBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "unknownCardBody": "No one has this card yet.",
+  "otherFarmCardTitle": "Card from another farm",
+  "otherFarmCardBody": "This card belongs to another farm and does not work here.",
+  "moneyOwedLabel": "Money owed",
+  "thisPeriodLabel": "This period",
+  "payDayLine": "Pay day {date} · {price} a litre",
+  "@payDayLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "rejectedWord": "rejected",
+  "nextCard": "Next card",
+  "openDetails": "Details",
+  "scanModeAttendance": "Each card clocks in or out",
+  "scanModeLookUp": "Each card shows who it is",
+  "scanQrInstead": "Scan QR with camera",
+  "useNfcInstead": "Tap cards instead",
+  "scanStationTitle": "Scan cards",
+  "scanStationBody": "Tap one card after another. Each person shows for a few seconds.",
+  "scannedTodayTitle": "Scanned ({n})",
+  "@scannedTodayTitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "statusClockedIn": "Clocked in {time}",
+  "@statusClockedIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statusClockedOut": "Clocked out {time}",
+  "@statusClockedOut": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statusLeftAt": "Left at {time}",
+  "@statusLeftAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statusPresentSince": "Present since {time}",
+  "@statusPresentSince": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statusNotInToday": "Not in today",
+  "advanceWord": "Advance",
+  "advancesLabel": "Advances",
+  "alreadyHasCard": "This person already has a card. Replace it instead.",
+  "cardActive": "Working",
+  "cardHistoryTitle": "Card history",
+  "cardLost": "Lost",
+  "cardNotGivenTitle": "Card not given",
+  "cardRegisterTitle": "All cards",
+  "cardReturned": "Given back",
+  "changeMyPin": "Change my PIN",
+  "changeNumber": "Change number",
+  "chooseOwnPinBody": "Pick 4 numbers only you know. Not 1234, not 0000.",
+  "chooseOwnPinTitle": "Choose your own PIN",
+  "confirmPinBody": "Type the same 4 numbers again.",
+  "confirmPinTitle": "Type it again",
+  "departmentOptional": "Department (optional)",
+  "deptAnimalHealth": "Animal health",
+  "deptCollection": "Milk collection",
+  "deptFeeding": "Feeding",
+  "deptField": "Field and pasture",
+  "deptHerd": "Herd",
+  "deptKitchen": "Kitchen",
+  "deptManagement": "Management",
+  "deptMilking": "Milking",
+  "deptOffice": "Office",
+  "deptSecurity": "Security",
+  "deptTransport": "Transport",
+  "detailsTitle": "Details",
+  "emergencyNameOptional": "Next of kin (optional)",
+  "emergencyPhoneOptional": "Next of kin phone (optional)",
+  "idCardRowBody": "See, print or download the ID card",
+  "myAttendanceTitle": "My days",
+  "myPageShort": "Me",
+  "myPageTitle": "My page",
+  "myTasksTitle": "My tasks",
+  "nfcChipWord": "NFC chip",
+  "ninOptional": "National ID number (optional)",
+  "noCardsToPrint": "No one has a card yet. Give cards first.",
+  "noCardsYetBody": "Cards you give to workers and milk suppliers show here.",
+  "noCardsYetTitle": "No cards yet",
+  "noTasksForYou": "No tasks for you today",
+  "openMyCard": "Open my card",
+  "paidInFull": "Paid in full",
+  "paidLabel": "Paid",
+  "paymentsTitle": "Payments",
+  "phoneNumberLabel": "Phone number",
+  "phoneSignInBadge": "Phone sign-in",
+  "pinChangedToast": "Your new PIN is saved",
+  "pinTooEasy": "Too easy to guess. Pick other numbers.",
+  "pinWhatFor": "Your card says who you are. Your PIN proves it is you, so nobody can clock in or record milk with your card. On your own phone it is your password.",
+  "pinsDoNotMatch": "The two PINs are not the same. Try again.",
+  "printAllCards": "Print all cards",
+  "printedCardNoChip": "Printed card, no chip (QR and number only)",
+  "revokeCardRow": "Take back or report lost",
+  "revokeCardRowBody": "The card stops working at once",
+  "revokeLost": "Lost or stolen: never use again",
+  "revokeReturned": "Given back: can go to someone new",
+  "setUpPhoneSignIn": "Set up phone sign-in",
+  "setUpPhoneSignInBody": "They sign in on their own phone with phone number and PIN",
+  "staffLoginNotMade": "Phone sign-in was not set up. Check the internet and try again.",
+  "staffLoginOtherFarm": "This phone number already signs in to another farm.",
+  "staffPhoneInvalid": "Type a Ugandan phone number, like 0701 220 318.",
+  "staffSignInBody": "Type the phone number your farm saved for you.",
+  "staffSignInEntry": "I work on a farm: sign in with phone and PIN",
+  "staffSignInHelpBody": "Ask your farm manager. They add your phone number and give you a PIN to start. The first time, you choose your own PIN.",
+  "staffSignInHelpTitle": "No PIN yet?",
+  "staffSignInOffline": "No internet. Sign-in needs internet the first time.",
+  "staffSignInTitle": "Sign in as a worker",
+  "staffSignInTooMany": "Too many tries. Wait a few minutes and try again.",
+  "staffSignInWrong": "Phone number or PIN is wrong.",
+  "temporaryPinTitle": "Starting PIN",
+  "todayLabel": "Today",
+  "villageOptional": "Village (optional)",
+  "wageLabel": "Wage",
+  "wageWord": "Wage",
+  "cardLostCannotReuse": "Card {card} was reported lost. It can never be given again.",
+  "@cardLostCannotReuse": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "cardRevokedToast": "Card {card} no longer works",
+  "@cardRevokedToast": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "cardsCount": "{count, plural, =1{1 working card} other{{count} working cards}}",
+  "@cardsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "endedOn": "Ended {date}",
+  "@endedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "issuedOn": "Given {date}",
+  "@issuedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "myPayTitle": "My pay for {month}",
+  "@myPayTitle": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "opensSections": "Opens: {sections}",
+  "@opensSections": {
+    "placeholders": {
+      "sections": {
+        "type": "String"
+      }
+    }
+  },
+  "replaceCardBody": "{name}'s card {card} will be marked lost and stop working. Then tap the new card.",
+  "@replaceCardBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "replaceCardTitle": "Replace card {card}?",
+  "@replaceCardTitle": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "resetPinBodyTemp": "Give {name} a starting PIN. They must choose their own the next time they sign in.",
+  "@resetPinBodyTemp": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "resetPinDoneTemp": "{name} must choose a new PIN at next sign-in",
+  "@resetPinDoneTemp": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "revokeCardBody": "What happened to {name}'s card?",
+  "@revokeCardBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "revokeCardTitle": "Card {card}",
+  "@revokeCardTitle": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "staffLoginMade": "{name} can now sign in on their phone with {phone} and the starting PIN",
+  "@staffLoginMade": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "staffSignInPinBody": "Enter the PIN for {phone}",
+  "@staffSignInPinBody": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "temporaryPinBody": "Tell {name} this PIN. They choose their own the first time.",
+  "@temporaryPinBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sendOnWhatsapp": "WhatsApp",
+  "sendBySms": "SMS",
+  "smsAppOpenFailed": "Couldn't open the SMS app on this phone.",
+  "whatsappOpenFailed": "Couldn't open WhatsApp. Is it installed? Try SMS.",
+  "messagesToSend": "Messages to send",
+  "messagesFreeNote": "Messages go out from this phone's WhatsApp or SMS app with the words already typed. Tap Send there. FarmTap charges nothing; SMS uses your own airtime or bundle.",
+  "noMessagesWaiting": "No messages waiting",
+  "noMessagesWaitingSub": "Milk receipts and weekly statements appear here, ready to send.",
+  "messagesWaiting": "{count, plural, =1{1 message waiting} other{{count} messages waiting}}",
+  "@messagesWaiting": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sendNextTo": "Next: {name}",
+  "@sendNextTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sendNextOnWhatsapp": "Send next · WhatsApp",
+  "sendNextBySms": "Send next · SMS",
+  "recentlySent": "Recently sent",
+  "sentFromThisPhone": "Sent from this phone",
+  "msgSentAutomatically": "Sent automatically",
+  "msgKindReceipt": "Receipt",
+  "msgKindStatement": "Statement",
+  "removeMessage": "Don't send",
+  "statementsQueued": "{count, plural, =0{No farmer delivered this week, so there is nothing to send.} =1{1 statement is ready to send.} other{{count} statements are ready to send.}}",
+  "@statementsQueued": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statementsReady": "Statements ready",
+  "sendNow": "Send now",
+  "statementsFreeNote": "Sent one by one from this phone's WhatsApp or SMS. FarmTap charges nothing.",
+  "readyEveryDay": "Ready every day at {time}. Tap a button to send it to {phone}.",
+  "@readyEveryDay": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptWaiting": "Receipt ready to send",
+  "opsContacts": "Contacts",
+  "opsAddContact": "Add contact",
+  "opsEditContact": "Edit contact",
+  "opsContactKind": "Who is this",
+  "opsContactNeeds": "Add a name and a phone number of at least 9 digits.",
+  "opsContactOrg": "Business or clinic (optional)",
+  "opsContactPlace": "Where they are (optional)",
+  "opsShowWorkers": "Workers can see this contact",
+  "opsSearchContacts": "Search contacts",
+  "opsNoContacts": "No contacts yet",
+  "opsNoContactsBody": "Keep your vet, AI technician, feed suppliers and buyers here so anyone on the farm can call them.",
+  "opsWhatsapp": "WhatsApp",
+  "opsKindVet": "Vets",
+  "opsKindAi": "AI technicians",
+  "opsKindFeed": "Feed suppliers",
+  "opsKindAgrovet": "Agrovet shops",
+  "opsKindBuyer": "Buyers",
+  "opsKindTransport": "Transport",
+  "opsKindEmergency": "Emergency",
+  "opsKindOther": "Other",
+  "opsRoster": "Duty roster",
+  "opsAddDuty": "Add duty",
+  "opsEditDuty": "Edit duty",
+  "opsDutyNeeds": "Pick who does it and on which days.",
+  "opsNoDuties": "No duties yet",
+  "opsNoDutiesBody": "Give each job a person and the days they do it. Stand-ins cover when someone is away.",
+  "opsNothingThatDay": "No duties on this day.",
+  "opsTomorrow": "Tomorrow",
+  "opsYou": "You",
+  "opsNobodyOn": "{name} is away and nobody stands in",
+  "@opsNobodyOn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "opsStandsIn": "{who} stands in for {colleague}",
+  "@opsStandsIn": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "colleague": {
+        "type": "String"
+      }
+    }
+  },
+  "opsAway": "Away",
+  "opsAddAway": "Add",
+  "opsNobodyAway": "Nobody is away.",
+  "opsAddWorkersFirst": "Add workers first, then give them duties.",
+  "opsJob": "Job",
+  "opsJobName": "Name of the job",
+  "opsWho": "Who does it",
+  "opsStandIn": "Stand-in when away",
+  "opsNoStandIn": "No stand-in",
+  "opsShift": "When",
+  "opsEveryDay": "Every day",
+  "opsSomeDays": "Some days",
+  "opsWhichDays": "Which days",
+  "opsFrom": "From",
+  "opsTo": "To",
+  "opsReason": "Reason (optional)",
+  "opsDutyMilking": "Milking",
+  "opsDutyFeeding": "Feeding",
+  "opsDutyHealth": "Health checks",
+  "opsDutyCleaning": "Cleaning",
+  "opsDutyGrazing": "Grazing",
+  "opsDutySecurity": "Security",
+  "opsDutyCollection": "Milk collection",
+  "opsDutyManager": "Manager on duty",
+  "opsDutyOther": "Other job",
+  "opsShiftMorning": "Morning",
+  "opsShiftAfternoon": "Afternoon",
+  "opsShiftEvening": "Evening",
+  "opsShiftNight": "Night",
+  "opsShiftAllDay": "All day",
+  "opsFeedStore": "Feeds store",
+  "opsAddFeed": "Add feed",
+  "opsEditFeed": "Edit feed",
+  "opsBuyOrFeed": "Record buying or feeding",
+  "opsInStore": "In the store",
+  "opsNoFeeds": "No feeds yet",
+  "opsNoFeedsBody": "Add the feeds you use. FarmTap works out how long each one lasts.",
+  "opsNoUseYet": "No feeding recorded yet",
+  "opsLow": "Low",
+  "opsLastsDays": "{days, plural, =0{Runs out today} =1{Lasts about 1 day} other{Lasts about {days} days}}",
+  "@opsLastsDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "opsRunningLow": "{count, plural, =1{1 feed running low} other{{count} feeds running low}}",
+  "@opsRunningLow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "opsCountStore": "Count the store",
+  "opsCountStoreSub": "Set what is really left",
+  "opsHowMuchLeft": "How much is left ({unit})",
+  "@opsHowMuchLeft": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "opsFeedName": "Feed name",
+  "opsFeedNameHint": "For example dairy meal",
+  "opsUnit": "Unit",
+  "opsUnitHint": "kg, bags or bales",
+  "opsLowAt": "Warn me when below (optional)",
+  "opsVaccinations": "Vaccinations",
+  "opsRecordVaccination": "Record vaccination",
+  "opsNoVaccinations": "No vaccinations yet",
+  "opsNoVaccinationsBody": "Record each vaccination and FarmTap reminds you when the next dose is due.",
+  "opsNextDoses": "Next doses",
+  "opsGiven": "Given",
+  "opsOverdue": "Overdue",
+  "opsSoon": "Soon",
+  "opsVaccine": "Vaccine",
+  "opsWholeHerd": "Whole herd",
+  "opsWholeHerdNote": "Leave animals empty to record it for the whole herd.",
+  "opsGivenOn": "Given on",
+  "opsNextDue": "Next dose due (optional)",
+  "opsCostUgx": "Cost in UGX (optional)",
+  "opsVet": "Vet (optional)",
+  "opsNoVet": "No vet",
+  "opsRemoveVaccination": "Remove this vaccination?",
+  "opsRemoveVaccinationBody": "Its cost is removed from your spending too.",
+  "opsUgx": "UGX {amount}",
+  "@opsUgx": {
+    "placeholders": {
+      "amount": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "opsAnimals": "{count, plural, =1{1 animal} other{{count} animals}}",
+  "@opsAnimals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "opsNoDate": "No date",
+  "opsClear": "Clear",
+  "opsRemove": "Remove",
+  "opsViewOnly": "Only owners and managers can change this.",
+  "remindersTitle": "Reminders",
+  "remindersSub": "Duties, vaccinations, calving and your plan",
+  "remindersToday": "Today",
+  "remindersNone": "Nothing to remind you of today",
+  "remindersNoneBody": "Duties, vaccinations, calving and plan reminders show here on the day.",
+  "remindersWhat": "Remind about",
+  "remindersDuties": "Duties for each worker",
+  "remindersVaccinations": "Vaccinations due",
+  "remindersCalving": "Calving, pregnancy checks and heat",
+  "remindersPlan": "Free trial and plan ending",
+  "remindersHow": "How",
+  "remindersPush": "Notifications on this phone",
+  "remindersPushSub": "Shown once each day",
+  "remindersWhatsapp": "WhatsApp to workers",
+  "remindersWhatsappSub": "Ready to send from this phone, free",
+  "remindersSms": "SMS to workers",
+  "remindersSmsSub": "Sent from this phone at your normal SMS rate",
+  "remindersHour": "Remind at",
+  "remindersFreeNote": "Messages go from your own phone, so FarmTap charges nothing for them.",
+  "subscriptionTitle": "Plan and payment",
+  "payChoosePlan": "Choose a plan",
+  "payPerMonth": "{amount} a month",
+  "@payPerMonth": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payHow": "How to pay",
+  "payPhone": "Mobile Money number",
+  "payPhoneNeeded": "Enter an MTN or Airtel number, like 0772 123 456.",
+  "payAmount": "Pay {amount}",
+  "@payAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payMobileNote": "A prompt comes to that phone. Enter your Mobile Money PIN to pay.",
+  "payCardNote": "A secure card page opens. Come back here when you have paid.",
+  "payByHand": "Pay, then send us the transaction ID",
+  "payByHandAmount": "Amount: {amount}",
+  "@payByHandAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payAccountName": "Account name",
+  "payCode": "Account or pay code",
+  "payReference": "Transaction ID",
+  "payReferenceHint": "From your payment message",
+  "payReferenceNeeded": "Enter the transaction ID from your payment message.",
+  "paySendDetails": "Send payment details",
+  "payWaiting": "Waiting for your payment",
+  "payWaitingPhone": "Check your phone and enter your Mobile Money PIN. This page updates by itself.",
+  "payWaitingCard": "Finish paying on the card page. This page updates by itself.",
+  "payCheckNow": "Check now",
+  "payDone": "Payment received",
+  "payDoneBody": "Thank you. Your farm is open and your receipt is below.",
+  "payClaimSent": "Payment details sent",
+  "payClaimSentBody": "FarmTap checks your payment and opens your farm, usually within a few hours.",
+  "payFailed": "Payment not finished",
+  "payFailedBody": "Nothing was taken. Try again, or pay another way.",
+  "payTryAgain": "Try again",
+  "payNotStarted": "The payment could not start. Check your internet and try again.",
+  "paySoon": "Paying in the app is coming soon",
+  "paySoonBody": "For now, WhatsApp or call FarmTap on {phone} to pay.",
+  "@paySoonBody": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "payAskOwner": "Only the owner or a manager pays",
+  "payAskOwnerBody": "Ask them to pay for FarmTap. Recording starts again as soon as the payment is confirmed.",
+  "payActive": "Your plan is active",
+  "payPaidUntil": "Paid until {date}",
+  "@payPaidUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "payTrialEnds": "Your free trial ends on {date}",
+  "@payTrialEnds": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "payLockedBody": "Choose a plan and pay to record again. Your records are safe.",
+  "payReceipts": "Receipts and invoices",
+  "payNoReceipts": "Your receipts show here after each payment.",
+  "payReceipt": "Receipt (PDF)",
+  "payInvoice": "Invoice (PDF)",
+  "payRefundNote": "Refund note (PDF)",
+  "payReceiptFailed": "The PDF could not be made. Try again.",
+  "payHelp": "Need help paying?",
+  "payHelpMessage": "Hello FarmTap, I want to pay for {farm}.",
+  "@payHelpMessage": {
+    "placeholders": {
+      "farm": {
+        "type": "String"
+      }
+    }
+  },
+  "lockedTrialTitle": "Your free trial has ended",
+  "lockedPlanTitle": "Your FarmTap plan has ended",
+  "lockedBody": "Nothing can be added or changed on {farm} until it is paid for. Your records are safe and nothing is deleted.",
+  "@lockedBody": {
+    "placeholders": {
+      "farm": {
+        "type": "String"
+      }
+    }
+  },
+  "lockedPay": "Choose a plan and pay",
+  "lockedView": "Look at my records",
+  "lockedOtherFarm": "Open another farm",
+  "readOnlyBannerTitle": "Read only",
+  "readOnlyBannerBody": "Your plan has ended. Pay to record again; anything saved now will not be kept.",
+  "profilePhoto": "Profile photo",
+  "profilePhotoBody": "Shown on your account on this phone and the web.",
+  "profilePhotoRemove": "Remove photo",
+  "legalTitle": "Legal",
+  "privacyPolicy": "Privacy policy",
+  "termsOfUse": "Terms of use",
+  "deleteTitle": "Delete my account",
+  "deleteSub": "Kept 90 days, then erased",
+  "deleteWarnTitle": "This closes your account",
+  "deleteWarnBody": "Read what happens before you go on.",
+  "deleteWhatHappens": "What happens",
+  "deleteWhat1": "You are signed out on every phone and computer, and cannot sign in again.",
+  "deleteWhat2": "Every farm you own closes with it: nobody can open or record on it.",
+  "deleteWhat3": "Your workers and managers lose access to those farms.",
+  "deleteWhat4": "Any time left on your plan is not refunded.",
+  "deleteWhat5": "For 90 days FarmTap keeps everything, so support can bring it back if you change your mind.",
+  "deleteWhat6": "After 90 days your account, farms and records are erased for good.",
+  "deleteInstead": "Only want to stop paying? You do not need to delete anything: the farm turns read-only and your records stay safe.",
+  "deleteContinue": "I still want to delete",
+  "deleteUnderstand": "I understand my farms close and are erased after 90 days",
+  "deleteTypeLabel": "Type DELETE to confirm",
+  "deleteTypeNeeded": "Type the word DELETE.",
+  "deleteReason": "Why are you leaving? (optional)",
+  "deleteNow": "Delete my account",
+  "deleteKeep": "Keep my account",
+  "deleteLastTitle": "Delete your account now?",
+  "deleteLastBody": "You are signed out straight away. Support can restore it within 90 days.",
+  "deleteFailed": "Your account was not deleted. Check your internet and try again.",
+  "closedTitle": "This account is closed",
+  "closedBody": "It can be brought back until {date}. After that it is erased for good.",
+  "@closedBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "closedBodySoon": "It can be brought back for 90 days. After that it is erased for good.",
+  "closedRestore": "Ask FarmTap to bring it back",
+  "closedRestoreMessage": "Hello FarmTap, I closed my account and want it back."
 }

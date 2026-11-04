@@ -1,0 +1,580 @@
+rules_version = '2';
+
+// FarmTap security rules (ROADMAP 7.4, decision 0014).
+// - A farm's data is readable and writable only by its members.
+// - Records keep their base fields; the id, farm and collection in the
+//   document must match its path.
+// - Append-only records (milk, deliveries, money...) can be created and
+//   re-sent unchanged, never edited. Corrections are new records.
+// - Nothing is ever hard-deleted from the app (soft delete with isDeleted).
+// - Money, staff and settings need an owner or manager.
+// - Subscription, review and other panel fields are set only from the
+//   platform control panel (decision 0020), and every such change is logged.
+// Tests: firestore/rules.test.mjs (npm test in firestore/).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // ---- Platform admins (decision 0020) ----
+    function adminPath() {
+      return /databases/$(database)/documents/platformAdmins/$(request.auth.uid);
+    }
+    function isAdmin() {
+      return signedIn() && exists(adminPath()) && get(adminPath()).data.get('active', false) == true;
+    }
+    // The owner has every permission; staff only the ones they were given.
+    function can(p) {
+      return isAdmin() && (get(adminPath()).data.role == 'owner' || p in get(adminPath()).data.get('perms', []));
+    }
+    // Every admin change writes adminAudit/{lastAudit} in the same batch,
+    // by the same person, at the same moment, so nothing goes unlogged.
+    function audited() {
+      let id = request.resource.data.get('lastAudit', '');
+      let path = /databases/$(database)/documents/adminAudit/$(id);
+      return id is string && id != '' && existsAfter(path)
+        && getAfter(path).data.by == request.auth.uid
+        && getAfter(path).data.at == request.time;
+    }
+    // Fields on a farm only the panel may set.
+    function adminFarmKeys() {
+      return ['subscription', 'review', 'status', 'planId', 'features', 'smsCredits',
+        'messaging', 'billing', 'lastAudit', 'suspendedReason', 'closure'];
+    }
+    function platformConfig() {
+      return /databases/$(database)/documents/platform/config;
+    }
+    // Trial length set in the panel (default 14 days, decision 0023).
+    function trialDays() {
+      return exists(platformConfig()) ? get(platformConfig()).data.get('trialDays', 14) : 14;
+    }
+
+    function member(t) {
+      return signedIn() && exists(/databases/$(database)/documents/tenants/$(t)/members/$(request.auth.uid));
+    }
+
+    function role(t) {
+      return get(/databases/$(database)/documents/tenants/$(t)/members/$(request.auth.uid)).data.role;
+    }
+
+    function manages(t) {
+      return member(t) && role(t) in ['owner', 'manager'];
+    }
+
+    // The staff record a worker signed in with phone + PIN is (decision 0016 §5).
+    function myStaffId(t) {
+      return get(/databases/$(database)/documents/tenants/$(t)/members/$(request.auth.uid)).data.get('staffId', null);
+    }
+
+    // A worker's PIN: the managers set a starting one, the worker their own.
+    function pinOk(t, c, id) {
+      return c != 'staffPins' || manages(t) || myStaffId(t) == id;
+    }
+
+    // Roles a manager may give a staff login: only the owner makes managers.
+    function staffRoles(t) {
+      return role(t) == 'owner' ? ['manager', 'clerk', 'worker'] : ['clerk', 'worker'];
+    }
+
+    function tenantDoc(t) {
+      return get(/databases/$(database)/documents/tenants/$(t)).data;
+    }
+
+    // Locked after the free trial or the paid plan ends (decision 0023):
+    // nothing can be added or changed, from any app, until the server
+    // records a payment. No grace and no slack: support extends paid-until
+    // by hand when a farm needs more time. Suspended farms are locked too.
+    function canWrite(t) {
+      let sub = tenantDoc(t).get('subscription', {});
+      return tenantDoc(t).get('status', 'active') != 'suspended'
+        // An owner who deleted their account closes the farm (decision 0024).
+        && tenantDoc(t).get('closure', null) == null
+        && ((sub.get('trialEndsAt', null) != null && request.time < sub.trialEndsAt)
+        || (sub.get('paidUntil', null) != null && request.time < sub.paidUntil));
+    }
+
+    function appendOnly(c) {
+      return c in ['milkRecords', 'milkSales', 'deliveries', 'qualityTests', 'treatments',
+        'vaccinations', 'attendance', 'payments', 'payouts', 'expenses', 'income', 'wages',
+        'feedUsage', 'stockMovements', 'animalEvents', 'breedingEvents', 'auditLog', 'smsOutbox'];
+    }
+
+    // Only an owner or manager may create these.
+    function managerOnly(c) {
+      return c in ['staff', 'nfcCards', 'settings', 'paymentPeriods', 'farmerStatements',
+        'deductions', 'payouts', 'expenses', 'income', 'wages', 'payments', 'tasks',
+        // Decision 0023: who to call, who is on duty, feed types, vaccinations.
+        'contacts', 'duties', 'absences', 'feedTypes', 'vaccinations'];
+    }
+
+    // A subscription payment is only ever submitted from the app; Victorbee
+    // confirms it on the server.
+    function paymentOk(c) {
+      return c != 'payments' || request.resource.data.body.get('status', '') == 'submitted';
+    }
+
+    // An SMS is queued from the app, or sent by the user from this phone's
+    // WhatsApp / SMS app (decision 0015). Only the server writes sending,
+    // sent or failed.
+    function smsOk(c) {
+      return c != 'smsOutbox' || request.resource.data.body.get('status', '') in ['queued', 'sentFromPhone'];
+    }
+
+    // The one change the app may make to a queued SMS: mark it sent from
+    // the phone, with the number and words unchanged.
+    function smsSentFromPhone(c) {
+      let before = resource.data.body;
+      let after = request.resource.data.body;
+      return c == 'smsOutbox' && before.get('status', '') == 'queued'
+        && after.get('status', '') == 'sentFromPhone'
+        && after.get('to', '') == before.get('to', '') && after.get('text', '') == before.get('text', '')
+        && request.resource.data.version == resource.data.version + 1
+        && request.resource.data.isDeleted == resource.data.isDeleted;
+    }
+
+    // Written only by Cloud Functions (admin SDK skips these rules).
+    // subscriptionPayments: in-app payments, kept by functions/ (decision 0023).
+    function serverOnly(c) {
+      return c in ['members', 'messages', 'aiQuestions', 'iotDevices', 'iotReadings', 'subscriptionPayments',
+        // Reminders already delivered (decision 0024), kept by the server.
+        'alertLog'];
+    }
+
+    function softDelete() {
+      let d = request.resource.data;
+      return resource.data.isDeleted == false && d.isDeleted == true
+        && d.version == resource.data.version + 1 && d.body == resource.data.body;
+    }
+
+    function validRecord(t, c, id) {
+      let d = request.resource.data;
+      return d.id == id && d.tenantId == t && d.collection == c
+        && d.version is int && d.version >= 1
+        && d.deviceId is string && d.createdBy is string && d.updatedBy is string
+        && d.isDeleted is bool && d.body is map
+        && d.serverUpdatedAt == request.time;
+    }
+
+    // One account owns one farm (decision 0018). `farmLimit` is set by
+    // Victorbee for a multi-farm plan and never from the app; `ownedFarms`
+    // only goes up, by one, with each farm the account creates.
+    function ownedFarms(d) { return d.get('ownedFarms', 0); }
+    function farmLimit(d) { return d.get('farmLimit', 1); }
+    function linksBefore() { return resource == null ? [] : resource.data.get('farmerLinks', []); }
+    function linksUnchanged() { return request.resource.data.get('farmerLinks', []) == linksBefore(); }
+    // A supplier links their account to a farmer record only with an unused
+    // invite, marked used by them in the same write (supplier-invite page).
+    function linkFromInvite(uid) {
+      let code = request.resource.data.get('inviteCode', '');
+      let path = /databases/$(database)/documents/farmerInvites/$(code);
+      let inv = get(path).data;
+      return code is string && code.size() > 0
+        && inv.used == false
+        && request.resource.data.farmerLinks == linksBefore().concat([{'tenantId': inv.tenantId, 'farmerId': inv.farmerId}])
+        && getAfter(path).data.get('usedBy', '') == uid;
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow read: if can('users') || can('support');
+      // The panel disables an account or raises its farm limit (decision 0020).
+      allow update: if (can('users') || can('farms')) && audited()
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['disabled', 'disabledReason', 'farmLimit', 'lastAudit', 'deletion']);
+      allow create: if signedIn() && request.auth.uid == uid
+        && !('farmLimit' in request.resource.data)
+        && !('disabled' in request.resource.data)
+        && ownedFarms(request.resource.data) <= 1
+        && (linksUnchanged() || linkFromInvite(uid));
+      allow update: if signedIn() && request.auth.uid == uid
+        && (linksUnchanged() || linkFromInvite(uid))
+        // Asking to delete is final for the person; only support restores.
+        && (resource.data.get('deletion', null) == null
+          || request.resource.data.get('deletion', null) == resource.data.get('deletion', null))
+        && (request.resource.data.get('deletion', null) == null
+          || resource.data.get('deletion', null) != null
+          || request.resource.data.deletion.at == request.time)
+        && farmLimit(request.resource.data) == farmLimit(resource.data)
+        && request.resource.data.get('disabled', false) == resource.data.get('disabled', false)
+        // Profile photo: a small copy only (decision 0024); the full one is in file storage.
+        && (request.resource.data.get('photo', null) == null
+          || (request.resource.data.photo.keys().hasOnly(['thumb', 'url', 'updatedAt'])
+            && request.resource.data.photo.thumb is string
+            && request.resource.data.photo.thumb.size() < 200000))
+        && ownedFarms(request.resource.data) >= ownedFarms(resource.data)
+        && ownedFarms(request.resource.data) <= ownedFarms(resource.data) + 1;
+    }
+
+    // This person's phones, for reminders (decision 0024): the token only.
+    match /users/{uid}/devices/{device} {
+      allow read, delete: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['token', 'platform', 'updatedAt', 'app'])
+        && request.resource.data.token is string && request.resource.data.token.size() < 4096;
+    }
+
+    // Phone sign-in for workers (decision 0016 §5): which login version a
+    // phone number has, read before sign-in. Holds no PIN and no name.
+    match /staffLogins/{phone} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if manages(request.resource.data.tenantId) && canWrite(request.resource.data.tenantId)
+        && request.resource.data.keys().hasOnly(['tenantId', 'staffId', 'uid', 'v'])
+        && request.resource.data.v is int;
+      allow update: if manages(resource.data.tenantId) && canWrite(resource.data.tenantId)
+        && request.resource.data.tenantId == resource.data.tenantId
+        && request.resource.data.keys().hasOnly(['tenantId', 'staffId', 'uid', 'v'])
+        && request.resource.data.v > resource.data.v;
+      allow delete: if manages(resource.data.tenantId);
+    }
+
+    match /waitlist/{id} {
+      allow create: if true;
+      allow read: if can('farms');
+    }
+
+    // The farm is created in one batch with the owner's `ownedFarms` going up
+    // by one, and only while the account is under its farm limit.
+    function withinFarmLimit() {
+      let path = /databases/$(database)/documents/users/$(request.auth.uid);
+      let before = exists(path) ? get(path).data : {};
+      let after = getAfter(path).data;
+      return ownedFarms(before) < farmLimit(before)
+        && ownedFarms(after) == ownedFarms(before) + 1;
+    }
+
+    match /tenants/{t} {
+      allow read: if member(t);
+      allow read: if can('farms') || can('finance') || can('support') || can('users');
+      // The panel: review, suspend, plan, flags (farms); subscription and
+      // billing (finance). Never the owner or the farm's own profile.
+      allow update: if audited()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(adminFarmKeys())
+        && (can('farms') || (can('finance')
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['subscription', 'planId', 'billing', 'smsCredits', 'lastAudit']))
+          // Restoring a deleted account (Users access) reopens its farms.
+          || (can('users') && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['closure', 'lastAudit'])
+            && request.resource.data.get('closure', null) == null));
+      // Onboarding: the signer creates the farm as its owner, on trial.
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.subscription.keys().hasOnly(['trialStartedAt', 'trialEndsAt'])
+        && request.resource.data.subscription.trialEndsAt is timestamp
+        && request.resource.data.subscription.trialEndsAt <= request.time + duration.value(trialDays() + 1, 'd')
+        && !request.resource.data.keys().hasAny(['status', 'planId', 'features', 'smsCredits', 'messaging', 'billing', 'lastAudit'])
+        // Every new farm waits for Victorbee's review (admin panel).
+        && request.resource.data.review == {'status': 'pending'}
+        && withinFarmLimit();
+      // Profile edits only, while the farm is not locked; subscription and
+      // review stay server-side.
+      allow update: if manages(t) && canWrite(t)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(adminFarmKeys().concat(['ownerUid', 'owner']));
+
+      // Deleting the owner's account closes the farm at once (decision 0024).
+      // Only the panel can open it again (Restore), within the 90-day hold.
+      allow update: if member(t) && role(t) == 'owner'
+        && resource.data.get('closure', null) == null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['closure'])
+        && request.resource.data.closure.keys().hasOnly(['at', 'by', 'requestId'])
+        && request.resource.data.closure.at == request.time
+        && request.resource.data.closure.by == request.auth.uid;
+
+      match /members/{uid} {
+        allow read: if member(t);
+        allow read: if can('farms') || can('support') || can('users');
+        // The owner's own first membership, right after creating the farm.
+        allow create: if signedIn() && uid == request.auth.uid
+          && getAfter(/databases/$(database)/documents/tenants/$(t)).data.ownerUid == request.auth.uid
+          && request.resource.data.role in ['owner', 'manager'];
+        allow update, delete: if member(t) && role(t) == 'owner' && uid != request.auth.uid && canWrite(t);
+        // A worker's phone sign-in, made by the owner or a manager. It is
+        // tied to a staff record and never makes an owner.
+        allow create, update: if manages(t) && uid != request.auth.uid && canWrite(t)
+          && request.resource.data.staffId is string
+          && request.resource.data.role in staffRoles(t)
+          && (resource == null || resource.data.get('staffId', null) is string);
+        allow delete: if manages(t) && uid != request.auth.uid
+          && resource.data.get('staffId', null) is string
+          && resource.data.role in staffRoles(t);
+      }
+
+      match /{c}/{id} {
+        allow read: if member(t) && c != 'members';
+        // Open a farm read-only from the panel (decision 0020).
+        allow read: if c != 'members' && (can('farms') || can('support') || can('users') || can('finance'));
+        // Support: reset a card PIN to a temporary one, or revoke a card.
+        allow update: if c in ['staffPins', 'nfcCards'] && can('users') && audited()
+          && validRecord(t, c, id)
+          && request.resource.data.createdBy == resource.data.createdBy
+          && request.resource.data.version == resource.data.version + 1;
+        allow create: if member(t) && !serverOnly(c)
+          // A locked farm may still send a manual payment claim, nothing else.
+          && (canWrite(t) || (c == 'payments' && manages(t)))
+          && (!managerOnly(c) || manages(t))
+          && paymentOk(c)
+          && smsOk(c)
+          && pinOk(t, c, id)
+          && validRecord(t, c, id);
+        allow update: if member(t) && !serverOnly(c) && canWrite(t)
+          && (!managerOnly(c) || manages(t))
+          && pinOk(t, c, id)
+          && validRecord(t, c, id)
+          && request.resource.data.createdBy == resource.data.createdBy
+          // Append-only: only the same version again (a retried send), or
+          // the one soft delete (Undo on a delivery), with nothing else changed.
+          && (!appendOnly(c) || request.resource.data.version == resource.data.version || softDelete()
+            || smsSentFromPhone(c));
+        // Workers may mark tasks done/open (status update only). The phone
+        // ticks a task with doneAt; older web tasks used status/completedAt.
+        allow update: if c == 'tasks' && member(t) && canWrite(t)
+          && validRecord(t, c, id)
+          && request.resource.data.createdBy == resource.data.createdBy
+          && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['body', 'updatedAt', 'updatedBy', 'version', 'deviceId', 'serverUpdatedAt'])
+          && request.resource.data.body.diff(resource.data.body).affectedKeys()
+              .hasOnly(['doneAt', 'status', 'completedAt', 'completedBy', 'completedByName']);
+        allow delete: if false;
+      }
+    }
+      // ================= Platform control panel (decision 0020) =================
+
+    // Settings the apps read: versions, maintenance, support, flags, gateways
+    // (no secrets). Readable before sign-in so a phone can show maintenance.
+    match /platform/config {
+      allow get: if true;
+      allow write: if can('settings') && audited();
+    }
+    // Provider settings and masked key info, for admins only.
+    match /platform/integrations {
+      allow read: if isAdmin();
+      allow write: if (can('settings') || can('secrets')) && audited();
+    }
+    // API keys: written by the panel, read only by server code (Admin SDK).
+    match /platformSecrets/{name} {
+      allow read: if false;
+      allow create, update: if can('secrets') && audited()
+        && request.resource.data.keys().hasOnly(['value', 'lastAudit', 'updatedAt'])
+        && request.resource.data.value is string && request.resource.data.value.size() <= 4096;
+      allow delete: if false;
+    }
+    // Landing page words and company details on documents (decision 0024).
+    match /platform/site {
+      allow get: if true;
+      allow write: if can('settings') && audited();
+    }
+    match /platform/company {
+      allow get: if true;
+      allow write: if can('settings') && audited();
+    }
+    // Logo, company stamp and signature (decision 0024): a small copy of the
+    // picture (data URL) for documents and pages, and the stored file's link.
+    match /platformAssets/{name} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow write: if can('settings') && audited() && name in ['logo', 'stamp', 'signature', 'logoDark']
+        && request.resource.data.keys().hasOnly(['dataUrl', 'url', 'path', 'width', 'height', 'updatedAt', 'updatedByName', 'lastAudit'])
+        && (!('dataUrl' in request.resource.data) || request.resource.data.dataUrl.size() < 700000);
+    }
+    // Privacy Policy and Terms of Use: the published version and every
+    // earlier one (kept for ever), and the draft being edited.
+    match /legalDocs/{kind} {
+      allow get: if kind in ['privacy', 'terms'];
+      allow list: if true;
+      allow write: if can('settings') && audited() && kind in ['privacy', 'terms']
+        && request.resource.data.version is int && request.resource.data.body is string
+        && (resource == null || request.resource.data.version == resource.data.version + 1)
+        && existsAfter(/databases/$(database)/documents/legalDocs/$(kind)/versions/$(string(request.resource.data.version)));
+      match /versions/{v} {
+        allow read: if true;
+        allow create: if can('settings') && audited();
+        allow update, delete: if false;
+      }
+    }
+    match /legalDrafts/{kind} {
+      allow read, write: if can('settings');
+    }
+
+    // Asking to delete an account (decision 0024). Signed in: the account
+    // closes at once (id = uid) and is erased after 90 days. Not signed in
+    // (the public page): a request support checks first.
+    match /deletionRequests/{id} {
+      allow read: if signedIn() && resource.data.get('uid', '') == request.auth.uid;
+      allow read: if can('users') || can('support');
+      allow create: if signedIn() && id == request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'closed'
+        && request.resource.data.closedAt == request.time
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'name', 'reason', 'status', 'closedAt', 'farms', 'source', 'confirmed']);
+      allow create: if (!signedIn() || id != request.auth.uid)
+        && request.resource.data.status == 'requested'
+        && request.resource.data.uid == null
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'email', 'phone', 'farmName', 'reason', 'status', 'createdAt', 'source'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 120
+        && request.resource.data.email is string && request.resource.data.email.size() <= 160
+        && request.resource.data.phone is string && request.resource.data.phone.size() <= 40
+        && request.resource.data.farmName is string && request.resource.data.farmName.size() <= 160
+        && request.resource.data.reason is string && request.resource.data.reason.size() <= 1000;
+      // Support: restore within 90 days, reject, or mark checked.
+      allow update: if can('users') && audited()
+        && request.resource.data.status in ['closed', 'restored', 'rejected', 'verified', 'requested']
+        && resource.data.status != 'erased';
+      allow delete: if false;
+    }
+
+    // Receipts, invoices and refund notes (decision 0024). One number
+    // sequence (counters/billing): each new document takes `next` and moves
+    // it on by one in the same write, so numbers never repeat.
+    function billingCounter() {
+      return /databases/$(database)/documents/counters/billing;
+    }
+    function nextBillingSeq() {
+      return exists(billingCounter()) ? get(billingCounter()).data.next : 1;
+    }
+    match /billingDocs/{id} {
+      allow read: if can('finance') || can('support');
+      allow read: if member(resource.data.tenantId);
+      allow create: if can('finance') && audited()
+        && request.resource.data.seq == nextBillingSeq()
+        && getAfter(billingCounter()).data.next == request.resource.data.seq + 1
+        && request.resource.data.tenantId is string
+        && request.resource.data.totalUgx is number;
+      allow update, delete: if false;
+    }
+    match /counters/billing {
+      allow read: if can('finance');
+      allow create, update: if can('finance') && audited()
+        && request.resource.data.next == nextBillingSeq() + 1
+        && getAfter(/databases/$(database)/documents/billingDocs/$(request.resource.data.lastDoc)).data.seq == nextBillingSeq();
+    }
+    // Refunds: recorded, approved, then sent (by the server through the
+    // provider, or by hand and marked done). Never deleted.
+    match /refunds/{id} {
+      allow read: if can('finance');
+      allow create: if can('finance') && audited() && request.resource.data.status == 'requested'
+        && request.resource.data.amountUgx is int && request.resource.data.amountUgx > 0;
+      allow update: if can('finance') && audited()
+        && (
+          (resource.data.status == 'requested' && request.resource.data.status in ['approved', 'rejected'])
+          || (resource.data.status in ['approved', 'failed'] && request.resource.data.status in ['done', 'approved', 'rejected'])
+          || (resource.data.status == 'sent' && request.resource.data.status == 'done')
+        );
+      allow delete: if false;
+    }
+
+    // Plans and SMS packages: the apps show them; prices edited in the panel.
+    match /plans/{id} {
+      allow read: if true;
+      allow write: if can('finance') && audited();
+    }
+    match /smsPackages/{id} {
+      allow read: if true;
+      allow write: if can('finance') && audited();
+    }
+    match /announcements/{id} {
+      allow read: if signedIn();
+      allow write: if can('messages') && audited();
+    }
+    // Index of in-app payments by reference, for provider callbacks. Server only.
+    match /paymentRefs/{id} {
+      allow read, write: if false;
+    }
+    // In-app payments across farms, for the panel's money page.
+    match /{path=**}/subscriptionPayments/{id} {
+      allow read: if can('finance');
+    }
+    // Payments Victorbee received. Never deleted; a mistake is voided.
+    match /platformPayments/{id} {
+      allow read: if can('finance');
+      allow create: if can('finance') && audited()
+        && request.resource.data.amountUgx is int && request.resource.data.amountUgx > 0
+        && request.resource.data.status == 'received';
+      allow update: if can('finance') && audited()
+        && resource.data.status == 'received' && request.resource.data.status == 'void'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'voidReason', 'voidedBy', 'lastAudit']);
+      allow delete: if false;
+    }
+    match /adminNotes/{id} {
+      allow read: if can('support') || can('farms');
+      allow create: if (can('support') || can('farms')) && audited()
+        && request.resource.data.by == request.auth.uid;
+      allow update, delete: if false;
+    }
+    // Payment claims farms send from the app, across all farms (finance).
+    match /{path=**}/payments/{id} {
+      allow read: if can('finance');
+    }
+    // Append-only log of every panel change.
+    match /adminAudit/{id} {
+      allow read: if can('audit');
+      allow create: if isAdmin() && request.resource.data.by == request.auth.uid
+        && request.resource.data.at == request.time
+        && request.resource.data.action is string
+        && request.resource.data.keys().hasOnly(['by', 'byName', 'at', 'action', 'target', 'tenantId', 'details']);
+      allow update, delete: if false;
+    }
+    // Staff of Victorbee. The first owner is made in the Firebase console;
+    // the panel can never make or change an owner, nor change itself.
+    match /platformAdmins/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || can('staff'));
+      allow create, update: if can('staff') && audited() && uid != request.auth.uid
+        && request.resource.data.role != 'owner'
+        && (resource == null || resource.data.role != 'owner')
+        && request.resource.data.keys().hasOnly(['role', 'perms', 'active', 'name', 'email', 'lastAudit', 'invitedBy']);
+      // Accepting an invite: exactly the invited role and permissions.
+      allow create: if signedIn() && uid == request.auth.uid
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/adminInvites/$(request.auth.token.email.lower()))
+        && inviteMatches(get(/databases/$(database)/documents/adminInvites/$(request.auth.token.email.lower())).data)
+        && request.resource.data.keys().hasOnly(['role', 'perms', 'active', 'name', 'email', 'invitedBy']);
+      allow delete: if false;
+    }
+    function inviteMatches(inv) {
+      let d = request.resource.data;
+      return inv.get('active', false) == true && inv.role != 'owner'
+        && d.role == inv.role && d.perms == inv.perms && d.active == true
+        && d.email == request.auth.token.email.lower();
+    }
+    match /adminInvites/{email} {
+      allow read: if can('staff') || (signedIn() && request.auth.token.email.lower() == email);
+      allow write: if can('staff') && audited() && request.resource.data.role != 'owner';
+    }
+
+    // ======================= Supplier / farmer invites =======================
+    // A collection centre manager generates a code; the farmer accepts it via
+    // the web with their Google account, linking their uid to their farmer record.
+
+    match /farmerInvites/{code} {
+      // Public read so the invite page can look up the code without sign-in.
+      allow get: if true;
+      // Managers of the linked tenant write invites.
+      allow create, update: if manages(request.resource.data.tenantId);
+      // The farmer accepts it once, together with linking their account.
+      allow update: if signedIn()
+        && resource.data.used == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'usedBy', 'usedAt'])
+        && request.resource.data.used == true
+        && request.resource.data.usedBy == request.auth.uid
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('inviteCode', '') == code;
+      allow delete: if false;
+    }
+
+    // users/{uid}.farmerLinks is an array, added to only with an invite
+    // (linkFromInvite, above); the farm's delivery reads check it.
+
+    // Suppliers may read their own deliveries across the tenant they're linked to.
+    match /tenants/{t}/deliveries/{id} {
+      allow read: if signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data
+            .get('farmerLinks', [])
+            .hasAny([{'tenantId': t, 'farmerId': resource.data.body.farmerId}]);
+    }
+    match /tenants/{t}/farmers/{id} {
+      allow read: if signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data
+            .get('farmerLinks', [])
+            .hasAny([{'tenantId': t, 'farmerId': id}]);
+    }
+  }
+}

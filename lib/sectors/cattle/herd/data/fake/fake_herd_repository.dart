@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/tenancy/tenant_provider.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
@@ -11,15 +12,23 @@ import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_repository.dart';
 
 /// In-memory herd for the UI phase (useFakeData = true), seeded with the
-/// sample cows from the mockups. The Isar repository (HerdRepositoryImpl)
-/// replaces it in the backend phase without touching the UI.
-class FakeHerdRepository implements HerdRepository {
-  new({required this.clock, required this.tenantProvider, required this.treatments, required this.breeding}) {
+/// sample cows from the mockups. LocalHerdRepository is the real-data one.
+class FakeHerdRepository implements HerdRepository, Restorable {
+  new({
+    required this.clock,
+    required this.tenantProvider,
+    required this.treatments,
+    required this.breeding,
+    this.journal,
+  }) {
     _animals = [for (final s in _seed) _animal(s)];
     _milk = {for (final s in _seed) 'animal-${s.tag}': s.milk};
   }
 
   final Clock clock;
+
+  /// Saves records on the phone for sync (decision 0014); null in tests.
+  final RecordJournal? journal;
   final TenantProvider tenantProvider;
 
   /// Withdrawal and the Treated status come from the treatment records.
@@ -45,6 +54,7 @@ class FakeHerdRepository implements HerdRepository {
   @override
   Future<Result<void>> addAnimal(Animal animal) async {
     _animals = [..._animals, animal];
+    await journal?.add('animals', _animalBody(animal), id: animal.id);
     _controller.add(Result.success(List.unmodifiable(_alive)));
     return const Result.success(null);
   }
@@ -152,11 +162,46 @@ class FakeHerdRepository implements HerdRepository {
   Future<Result<String>> nextTag() async => Result.success('FT-${_nextTag.toString().padLeft(3, '0')}');
 
   @override
+  Future<Result<bool>> updateAnimal(Animal animal) async {
+    final tag = animal.tagNumber.trim().toLowerCase();
+    if (_alive.any((a) => a.id != animal.id && a.tagNumber.toLowerCase() == tag)) return const Result.success(false);
+    _animals = [
+      for (final a in _animals)
+        if (a.id == animal.id) animal else a,
+    ];
+    await journal?.put('animals', animal.id, _animalBody(animal));
+    _controller.add(Result.success(List.unmodifiable(_alive)));
+    return const Result.success(true);
+  }
+
+  @override
+  Future<Result<void>> recordSale(String animalId, {required int price, String? buyer}) async {
+    _animals = [
+      for (final a in _animals)
+        if (a.id == animalId) a.copyWith(status: AnimalStatus.sold, isDeleted: true) else a,
+    ];
+    await journal?.add('animalEvents', {'type': 'sold', 'animalId': animalId, 'price': price, 'buyer': buyer});
+    _controller.add(Result.success(List.unmodifiable(_alive)));
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<List<Animal>>> pastAnimals() async => Result.success([
+    for (final a in _animals)
+      if (a.isDeleted) a,
+  ]);
+
+  @override
   Future<Result<void>> recordDeath(String animalId, {String? cause}) async {
     _animals = [
       for (final a in _animals)
         if (a.id == animalId) _copy(a, deleted: true) else a,
     ];
+    final dead = _animals.where((a) => a.id == animalId).firstOrNull;
+    if (dead != null) {
+      await journal?.put('animals', animalId, {..._animalBody(dead), 'status': 'dead'});
+      await journal?.add('animalEvents', {'type': 'death', 'animalId': animalId, 'cause': cause});
+    }
     _controller.add(Result.success(List.unmodifiable(_alive)));
     return const Result.success(null);
   }
@@ -191,6 +236,59 @@ class FakeHerdRepository implements HerdRepository {
     return Result.success(calf);
   }
 
+  @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    for (final r in await j.load('animals')) {
+      final b = r.body;
+      final dead = b['status'] == 'dead';
+      final i = _animals.indexWhere((a) => a.id == r.id);
+      if (i >= 0) {
+        if (dead) _animals[i] = _copy(_animals[i], deleted: true);
+        continue;
+      }
+      _animals = [
+        ..._animals,
+        Animal(
+          id: r.id,
+          tenantId: r.tenantId,
+          tagNumber: b['tagNumber']! as String,
+          name: b['name'] as String? ?? '',
+          sex: AnimalSex.values.byName(b['sex']! as String),
+          breed: b['breed'] as String? ?? '',
+          dateOfBirth: DateTime.parse(b['dateOfBirth']! as String),
+          status: AnimalStatus.values.byName(dead ? AnimalStatus.active.name : b['status']! as String),
+          govIdTag: b['govIdTag'] as String?,
+          createdAt: r.createdAt,
+          updatedAt: r.updatedAt,
+          createdBy: r.createdBy,
+          updatedBy: r.updatedBy,
+          deviceId: r.deviceId,
+          syncStatus: SyncStatus.synced,
+          isDeleted: dead,
+          dairyStatus: DairyStatus.values.byName(b['dairyStatus']! as String),
+          group: b['group'] as String?,
+          motherTag: b['motherTag'] as String?,
+        ),
+      ];
+    }
+    _controller.add(Result.success(List.unmodifiable(_alive)));
+  }
+
+  static Map<String, Object?> _animalBody(Animal a) => {
+    'tagNumber': a.tagNumber,
+    'name': a.name,
+    'sex': a.sex.name,
+    'breed': a.breed,
+    'dateOfBirth': a.dateOfBirth.toIso8601String(),
+    'status': a.status.name,
+    'govIdTag': a.govIdTag,
+    'dairyStatus': a.dairyStatus.name,
+    'group': a.group,
+    'motherTag': a.motherTag,
+  };
+
   Animal _copy(Animal a, {required bool deleted, DairyStatus? dairyStatus}) => Animal(
     id: a.id,
     tenantId: a.tenantId,
@@ -211,6 +309,7 @@ class FakeHerdRepository implements HerdRepository {
     avatarIndex: a.avatarIndex,
     group: a.group,
     motherTag: a.motherTag,
+    photo: a.photo,
   );
 
   // The timeline is English sample data in the UI phase.

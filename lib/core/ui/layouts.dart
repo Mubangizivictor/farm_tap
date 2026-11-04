@@ -55,22 +55,34 @@ class SplitAuthLayout extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: context.space.sm),
                   child: header,
                 ),
+              // Content and its buttons together, centred on the screen
+              // (scrolls when the keyboard or a long form needs it).
               Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(context.space.xl, context.space.lg, context.space.xl, context.space.xl),
-                  child: child,
+                child: LayoutBuilder(
+                  builder: (context, box) => SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      context.space.xl,
+                      context.space.lg,
+                      context.space.xl,
+                      compactBottomPadding ?? context.space.xl,
+                    ),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: (box.maxHeight - context.space.lg - (compactBottomPadding ?? context.space.xl))
+                            .clamp(0, double.infinity),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          child,
+                          if (bottom != null) ...[context.space.gapXl, bottom!],
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              if (bottom != null)
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    context.space.xl,
-                    0,
-                    context.space.xl,
-                    compactBottomPadding ?? context.space.xl,
-                  ),
-                  child: bottom,
-                ),
             ],
           ),
         ),

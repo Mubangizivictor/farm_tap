@@ -11,6 +11,16 @@ abstract interface class WorkersRepository {
   /// one has this card.
   Future<Result<StaffToday?>> clockByCard(String cardNumber);
 
+  /// Clocks [staffId] in, or out if already in (scan station, decision
+  /// 0016). [method]: card, qr or typed.
+  Future<Result<StaffToday?>> clockStaff(String staffId, {String method});
+
+  /// The worker's clock-ins this month, newest first (My page, activity).
+  Future<Result<List<AttendanceRecord>>> attendanceThisMonth(String staffId);
+
+  /// Advances and wages paid to the worker, newest first.
+  Future<Result<List<StaffPayment>>> paymentsOf(String staffId);
+
   /// K02: milk records this worker saved this month.
   Future<Result<int>> milkRecordsThisMonth(String staffId);
 

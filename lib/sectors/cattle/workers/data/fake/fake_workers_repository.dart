@@ -5,16 +5,20 @@ import 'package:farm_tap/core/money/domain/money_models.dart';
 import 'package:farm_tap/core/money/domain/money_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_models.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
+import 'package:flutter/foundation.dart';
 
 /// UI phase: every worker clocked in on each earlier day this month; today
 /// Tom 6:02, Amos 5:45, Joy 6:10 and Rita 6:30 are in (4 of 6). Advances
 /// this month: Amos 120,000, Peter 80,000, Rita 40,000 (wage expenses).
-class FakeWorkersRepository implements WorkersRepository {
-  new(this.clock, this.directory, this.money, this.milk) {
+/// With [withSamples] false (real data) it starts empty.
+class FakeWorkersRepository implements WorkersRepository, Restorable {
+  new(this.clock, this.directory, this.money, this.milk, {this.journal, this.withSamples = true, this.findByCard}) {
+    if (!withSamples) return;
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
     DateTime at(int h, int m, [int daysAgo = 0]) =>
@@ -94,13 +98,26 @@ class FakeWorkersRepository implements WorkersRepository {
   };
 
   final Clock clock;
+
+  /// False in real-data mode.
+  final bool withSamples;
+
+  /// Saves records on the phone for sync (decision 0014); null in tests.
+  final RecordJournal? journal;
   final StaffDirectory directory;
+
+  /// Resolves an NFC chip id, QR code or typed number to its worker through
+  /// the card register (decision 0016); null matches printed numbers only.
+  final Future<StaffMember?> Function(String scanned)? findByCard;
   final MoneyRepository money;
 
   /// Milk records carry recordedBy (K02 count).
   final MilkRepository milk;
   final List<AttendanceRecord> _attendance = [];
   final List<FarmTask> _tasks = [];
+
+  /// Saved task bodies by id, so an edit keeps fields this phone does not use.
+  final Map<String, Map<String, Object?>> _taskBodies = {};
   final List<StaffPayment> _payments = [];
   var _next = 1;
 
@@ -120,17 +137,55 @@ class FakeWorkersRepository implements WorkersRepository {
 
   @override
   Future<Result<StaffToday?>> clockByCard(String cardNumber) async {
-    final card = cardNumber.padLeft(4, '0');
-    final s = (await _staff()).where((m) => m.cardNumber == card).firstOrNull;
+    final s =
+        await findByCard?.call(cardNumber) ??
+        (await _staff()).where((m) => m.cardNumber != null && m.cardNumber == cardNumber.padLeft(4, '0')).firstOrNull;
+    if (s == null) return const Result.success(null);
+    return await clockStaff(s.id);
+  }
+
+  @override
+  Future<Result<StaffToday?>> clockStaff(String staffId, {String method = 'card'}) async {
+    final s = (await _staff()).where((m) => m.id == staffId).firstOrNull;
     if (s == null) return const Result.success(null);
     final now = clock.now();
     final open = _todayRecord(s.id);
     if (open != null && open.outAt == null) {
       _attendance[_attendance.indexOf(open)] = open.clockOut(now);
+      // Attendance is append-only (decision 0014): clocking out is a new
+      // record pointing at the clock-in.
+      await journal?.add('attendance', {
+        'staffId': s.id,
+        'event': 'out',
+        'inId': open.id,
+        'at': now.toIso8601String(),
+        'method': method,
+      });
     } else {
-      _attendance.add(AttendanceRecord(id: 'att-${_next++}', staffId: s.id, inAt: now));
+      final id = journal?.newId() ?? 'att-${_next++}';
+      _attendance.add(AttendanceRecord(id: id, staffId: s.id, inAt: now));
+      await journal?.add('attendance', {
+        'staffId': s.id,
+        'event': 'in',
+        'at': now.toIso8601String(),
+        'method': method,
+      }, id: id);
     }
     return Result.success(StaffToday(staff: s, record: _todayRecord(s.id)));
+  }
+
+  @override
+  Future<Result<List<AttendanceRecord>>> attendanceThisMonth(String staffId) async {
+    final monthStart = DateTime(_today.year, _today.month);
+    final mine = _attendance.where((a) => a.staffId == staffId && !a.inAt.isBefore(monthStart)).toList()
+      ..sort((a, b) => b.inAt.compareTo(a.inAt));
+    return Result.success(mine);
+  }
+
+  @override
+  Future<Result<List<StaffPayment>>> paymentsOf(String staffId) async {
+    final mine = _payments.where((p) => p.staffId == staffId).toList()..sort((a, b) => b.at.compareTo(a.at));
+    return Result.success(mine);
   }
 
   @override
@@ -150,6 +205,59 @@ class FakeWorkersRepository implements WorkersRepository {
   @override
   Future<Result<List<FarmTask>>> tasks() async => Result.success(List.unmodifiable(_tasks));
 
+  /// Wage expenses come back through the money repository.
+  @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    for (final r in await j.loadWithDeleted('tasks')) {
+      final i = _tasks.indexWhere((x) => x.id == r.id);
+      final t = r.isDeleted ? null : taskFromBody(r.id, r.body, now: clock.now());
+      if (t == null) {
+        // Removed on the web or another phone (or unreadable): not shown.
+        if (i >= 0) _tasks.removeAt(i);
+        _taskBodies.remove(r.id);
+        continue;
+      }
+      _taskBodies[r.id] = r.body;
+      if (i >= 0) {
+        _tasks[i] = t;
+      } else {
+        _tasks.add(t);
+      }
+    }
+    // Clock-ins first, then each clock-out closes its clock-in.
+    final events = await j.load('attendance');
+    for (final r in events) {
+      if (r.body['event'] != 'in' || _attendance.any((a) => a.id == r.id)) continue;
+      final at = DateTime.tryParse(r.body['at'] as String? ?? '');
+      final staffId = r.body['staffId'] as String?;
+      if (at == null || staffId == null) continue;
+      _attendance.add(AttendanceRecord(id: r.id, staffId: staffId, inAt: at));
+    }
+    for (final r in events) {
+      if (r.body['event'] != 'out') continue;
+      final at = DateTime.tryParse(r.body['at'] as String? ?? '');
+      final i = _attendance.indexWhere((a) => a.id == r.body['inId']);
+      if (at == null || i < 0 || _attendance[i].outAt != null) continue;
+      _attendance[i] = _attendance[i].clockOut(at);
+    }
+    _attendance.sort((a, b) => a.inAt.compareTo(b.inAt));
+    for (final r in await j.load('wages')) {
+      if (_payments.any((p) => p.id == r.id)) continue;
+      final b = r.body;
+      _payments.add(
+        StaffPayment(
+          id: r.id,
+          staffId: b['staffId']! as String,
+          kind: PayKind.values.byName(b['kind']! as String),
+          amount: b['amount']! as int,
+          at: DateTime.parse(b['at']! as String),
+        ),
+      );
+    }
+  }
+
   @override
   Future<Result<FarmTask>> addTask({
     required String title,
@@ -157,17 +265,59 @@ class FakeWorkersRepository implements WorkersRepository {
     required DateTime due,
     required String when,
   }) async {
-    final t = FarmTask(id: 'task-${_next++}', title: title, staffId: staffId, due: due, when: when);
+    final t = FarmTask(id: journal?.newId() ?? 'task-${_next++}', title: title, staffId: staffId, due: due, when: when);
     _tasks.add(t);
+    await journal?.add('tasks', _taskBody(t), id: t.id);
     return Result.success(t);
   }
 
   @override
   Future<Result<void>> setTaskDone(String taskId, {required bool done}) async {
     final i = _tasks.indexWhere((t) => t.id == taskId);
-    if (i >= 0) _tasks[i] = _tasks[i].withDone(done ? clock.now() : null);
+    if (i >= 0) {
+      _tasks[i] = _tasks[i].withDone(done ? clock.now() : null);
+      // Keep what the web app added (a note, how urgent) when ticking.
+      final body = {...?_taskBodies[taskId], ..._taskBody(_tasks[i])};
+      _taskBodies[taskId] = body;
+      await journal?.put('tasks', taskId, body);
+    }
     return const Result.success(null);
   }
+
+  /// A task from its saved body. Reads the phone's shape and the older web
+  /// shape (assignedTo, dueDate, status); null when it has no title or no
+  /// worker, so one odd record never stops the farm from opening.
+  @visibleForTesting
+  static FarmTask? taskFromBody(String id, Map<String, Object?> b, {required DateTime now}) {
+    String? text(Object? v) => v is String && v.trim().isNotEmpty ? v : null;
+    final title = text(b['title']);
+    final staffId = text(b['staffId']) ?? text(b['assignedTo']);
+    if (title == null || staffId == null) return null;
+    final dueRaw = DateTime.tryParse(text(b['due']) ?? text(b['dueDate']) ?? '');
+    // A due date with no time means the end of that working day.
+    final due = dueRaw == null
+        ? null
+        : (dueRaw.hour == 0 && dueRaw.minute == 0 ? DateTime(dueRaw.year, dueRaw.month, dueRaw.day, 18) : dueRaw);
+    final doneAt =
+        DateTime.tryParse(text(b['doneAt']) ?? text(b['completedAt']) ?? '') ??
+        (b['status'] == 'done' && due != null ? due : null);
+    return FarmTask(
+      id: id,
+      title: title,
+      staffId: staffId,
+      due: due ?? now,
+      when: text(b['when']) ?? '',
+      doneAt: doneAt,
+    );
+  }
+
+  static Map<String, Object?> _taskBody(FarmTask t) => {
+    'title': t.title,
+    'staffId': t.staffId,
+    'due': t.due.toIso8601String(),
+    'when': t.when,
+    'doneAt': t.doneAt?.toIso8601String(),
+  };
 
   @override
   Future<Result<WagesSummary>> wages() async {
@@ -179,7 +329,7 @@ class FakeWorkersRepository implements WorkersRepository {
         month: month,
         lines: [
           for (final s in await _staff())
-            if (monthlyWage[s.id] case final wage?)
+            if (s.monthlyWage ?? monthlyWage[s.id] case final wage?)
               WageLine(staff: s, wage: wage, advances: sum(s.id, PayKind.advance), paid: sum(s.id, PayKind.wage)),
         ],
       ),
@@ -188,7 +338,19 @@ class FakeWorkersRepository implements WorkersRepository {
 
   @override
   Future<Result<StaffPayment>> pay(String staffId, {required PayKind kind, required int amount}) async {
-    final p = StaffPayment(id: 'pay-${_next++}', staffId: staffId, kind: kind, amount: amount, at: clock.now());
+    final p = StaffPayment(
+      id: journal?.newId() ?? 'pay-${_next++}',
+      staffId: staffId,
+      kind: kind,
+      amount: amount,
+      at: clock.now(),
+    );
+    await journal?.add('wages', {
+      'staffId': staffId,
+      'kind': kind.name,
+      'amount': amount,
+      'at': p.at.toIso8601String(),
+    }, id: p.id);
     await _record(p);
     return Result.success(p);
   }

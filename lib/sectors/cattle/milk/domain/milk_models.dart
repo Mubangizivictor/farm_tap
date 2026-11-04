@@ -152,9 +152,16 @@ class MilkSale extends Equatable {
     required this.paid,
     this.kind = BuyerKind.centre,
     this.at,
+    this.id = '',
+    this.paidAt,
   });
 
+  /// The sale's record id (empty for samples made in code).
+  final String id;
   final String buyer;
+
+  /// When the buyer paid (null while unpaid).
+  final DateTime? paidAt;
 
   /// When it was sold (the sales ledger; L01 income).
   final DateTime? at;
@@ -165,8 +172,19 @@ class MilkSale extends Equatable {
 
   int get amount => (litres * pricePerLitre).round();
 
+  MilkSale copyWith({bool? paid, DateTime? paidAt}) => MilkSale(
+    id: id,
+    buyer: buyer,
+    litres: litres,
+    pricePerLitre: pricePerLitre,
+    paid: paid ?? this.paid,
+    kind: kind,
+    at: at,
+    paidAt: paid == false ? null : paidAt ?? this.paidAt,
+  );
+
   @override
-  List<Object?> get props => [buyer, litres, pricePerLitre, paid, kind, at];
+  List<Object?> get props => [id, buyer, litres, pricePerLitre, paid, kind, at, paidAt];
 }
 
 enum BuyerKind { centre, shop, neighbours }
@@ -179,7 +197,7 @@ class MilkSalesSummary extends Equatable {
   final int owed;
   final int buyersOwing;
 
-  /// Latest sale per buyer.
+  /// The last 30 days of sales, newest first, plus any older still unpaid.
   final List<MilkSale> sales;
 
   @override

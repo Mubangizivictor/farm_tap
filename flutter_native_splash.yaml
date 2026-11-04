@@ -1,21 +1,20 @@
+# The wordmark is not on the native splash: A01 brings it in, animated,
+# right under the logo.
 # Run: dart run flutter_native_splash:create --path=flutter_native_splash.yaml
 flutter_native_splash:
   color: "#F7F5EF"
   image: assets/splash/splash_logo_light.png
-  branding: assets/splash/splash_branding_light.png
   color_dark: "#0F1714"
   image_dark: assets/splash/splash_logo_dark.png
-  branding_dark: assets/splash/splash_branding_dark.png
 
   android_12:
     color: "#F7F5EF"
     image: assets/splash/splash_logo_android12_light.png
-    branding: assets/splash/splash_branding_light.png
     color_dark: "#0F1714"
     image_dark: assets/splash/splash_logo_android12_dark.png
-    branding_dark: assets/splash/splash_branding_dark.png
 
   android: true
   ios: true
   web: false
   fullscreen: false
+

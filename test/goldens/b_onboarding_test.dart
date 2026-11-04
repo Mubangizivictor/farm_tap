@@ -23,7 +23,7 @@ const _sample = FarmSetup(
   farmName: 'Rwemera Dairy Farm',
   district: 'Mbarara',
   village: 'Rwemera, Bubaare',
-  herdSize: HerdSize.upTo100,
+  cows: 48,
   whatsapp: '772 451 908',
 );
 
@@ -31,8 +31,6 @@ OnboardingCubit _cubit([FarmSetup setup = _sample]) => OnboardingCubit()..update
 
 void main() {
   final repo = FakeOnboardingRepository(FixedClock());
-
-  screenGoldens('B01_onboard_language', (_) => OnboardLanguagePage(cubit: _cubit(), onContinue: () {}));
 
   screenGoldens(
     'B02_onboard_sector',
@@ -68,7 +66,7 @@ void main() {
 
   screenGoldens(
     'B06_onboard_farm_details',
-    (_) => OnboardFarmDetailsPage(cubit: _cubit(), districts: repo.districts, onContinue: () {}),
+    (_) => OnboardFarmDetailsPage(cubit: _cubit(), onContinue: () {}),
     act: (tester, _) async {
       await tester.tap(find.text('Rwemera, Bubaare'));
       await tester.pump();

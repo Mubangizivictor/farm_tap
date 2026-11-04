@@ -5,8 +5,8 @@ import 'package:farm_tap/core/ui/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// Total onboarding steps shown in "Step x of 8".
-const onboardingSteps = 8;
+/// Total onboarding steps shown in "Step x of 6".
+const onboardingSteps = 6;
 
 /// One onboarding step (B02, B05-B09): step header with back (and optional
 /// Skip), title + subtitle, content, and the action pinned at the bottom on

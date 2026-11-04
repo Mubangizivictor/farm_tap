@@ -31,6 +31,9 @@ class FakeAuthRepository implements AuthRepository {
     return Result.success(user);
   }
 
+  /// A worker signed in with phone + PIN (FakeStaffLoginRepository).
+  void signInAs(AccountUser user) => _set(user);
+
   @override
   Future<Result<AccountUser>> signInWithGoogle() async => _set(sampleOwner);
 

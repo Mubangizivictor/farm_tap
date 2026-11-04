@@ -1,4 +1,5 @@
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 import 'package:farm_tap/sectors/cattle/milk/domain/milk_models.dart';
@@ -6,8 +7,8 @@ import 'package:farm_tap/sectors/cattle/milk/domain/milk_repository.dart';
 
 /// UI phase: the F01-F10 sample numbers. Recording a cow marks her done.
 /// Withdrawal ("not for sale") comes from the shared treatment records.
-class FakeMilkRepository implements MilkRepository {
-  new(this.clock, this.treatments) {
+class FakeMilkRepository implements MilkRepository, Restorable {
+  new(this.clock, this.treatments, {this.journal}) {
     final today = DateTime(clock.now().year, clock.now().month, clock.now().day);
     _cows = [
       MilkCow(
@@ -84,6 +85,10 @@ class FakeMilkRepository implements MilkRepository {
 
   final Clock clock;
   final TreatmentRepository treatments;
+
+  /// Saves records on the phone for sync (decision 0014); null in tests.
+  final RecordJournal? journal;
+
   late List<MilkCow> _cows;
   final List<MilkRecord> _records = [];
   var _nextRecord = 1;
@@ -122,9 +127,25 @@ class FakeMilkRepository implements MilkRepository {
       // Sold after the evening milking (F09, L01 income).
       final at = day.add(const Duration(hours: 18));
       _sales.addAll([
-        MilkSale(buyer: _centre, litres: 220, pricePerLitre: 1100, paid: true, at: at),
-        MilkSale(buyer: _shop, litres: 40, pricePerLitre: 1400, paid: d > 3, kind: BuyerKind.shop, at: at),
-        MilkSale(buyer: _neighbours, litres: 12, pricePerLitre: 1500, paid: true, kind: BuyerKind.neighbours, at: at),
+        MilkSale(id: 'sale-c-$d', buyer: _centre, litres: 220, pricePerLitre: 1100, paid: true, at: at),
+        MilkSale(
+          id: 'sale-s-$d',
+          buyer: _shop,
+          litres: 40,
+          pricePerLitre: 1400,
+          paid: d > 3,
+          kind: BuyerKind.shop,
+          at: at,
+        ),
+        MilkSale(
+          id: 'sale-n-$d',
+          buyer: _neighbours,
+          litres: 12,
+          pricePerLitre: 1500,
+          paid: true,
+          kind: BuyerKind.neighbours,
+          at: at,
+        ),
       ]);
     }
     for (var i = 0; i < _otherRecorded; i++) {
@@ -164,7 +185,39 @@ class FakeMilkRepository implements MilkRepository {
   Future<List<MilkCow>> _cowsNow() async => [for (final c in _cows) await _withTreatment(c)];
 
   @override
-  Future<Result<MilkSessionSummary>> session(MilkSession session) async {
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    final known = {for (final r in _records) r.id};
+    final today = clock.today();
+    for (final r in await j.load('milkRecords')) {
+      if (known.contains(r.id)) continue;
+      final b = r.body;
+      final cowId = b['animalId'] as String?;
+      final litres = (b['litres']! as num).toDouble();
+      final session = MilkSession.values.byName(b['session']! as String);
+      _records.add(
+        MilkRecord(
+          id: r.id,
+          cowId: cowId,
+          session: session,
+          litres: litres,
+          at: r.createdAt,
+          recordedBy: b['recordedBy'] as String? ?? r.createdBy,
+          notForSale: b['notForSale'] as bool? ?? false,
+        ),
+      );
+      if (cowId != null && session == MilkSession.morning && !r.createdAt.isBefore(today)) {
+        _cows = [
+          for (final c in _cows)
+            if (c.id == cowId) c.copyWith(recordedLitres: litres, recordedAt: r.createdAt) else c,
+        ];
+      }
+    }
+  }
+
+  @override
+  Future<Result<MilkSessionSummary>> session(MilkSession session, {DateTime? day}) async {
     final cows = await _cowsNow();
     final mine = cows.fold<double>(0, (s, c) => s + (c.recordedLitres ?? 0));
     final morning = session == MilkSession.morning;
@@ -193,9 +246,10 @@ class FakeMilkRepository implements MilkRepository {
     required bool notForSale,
     required String recordedBy,
   }) async {
+    final id = journal?.newId() ?? 'milk-${_nextRecord++}';
     _records.add(
       MilkRecord(
-        id: 'milk-${_nextRecord++}',
+        id: id,
         cowId: cowId,
         session: session,
         litres: litres,
@@ -204,6 +258,13 @@ class FakeMilkRepository implements MilkRepository {
         notForSale: notForSale,
       ),
     );
+    await journal?.add('milkRecords', {
+      'animalId': cowId,
+      'session': session.name,
+      'litres': litres,
+      'notForSale': notForSale,
+      'recordedBy': recordedBy,
+    }, id: id);
     _cows = [
       for (final c in _cows)
         if (c.id == cowId) c.copyWith(recordedLitres: litres, recordedAt: clock.now()) else c,
@@ -213,15 +274,14 @@ class FakeMilkRepository implements MilkRepository {
 
   @override
   Future<Result<void>> recordTotal(MilkSession session, double litres, {required String recordedBy}) async {
-    _records.add(
-      MilkRecord(
-        id: 'milk-${_nextRecord++}',
-        session: session,
-        litres: litres,
-        at: clock.now(),
-        recordedBy: recordedBy,
-      ),
-    );
+    final id = journal?.newId() ?? 'milk-${_nextRecord++}';
+    _records.add(MilkRecord(id: id, session: session, litres: litres, at: clock.now(), recordedBy: recordedBy));
+    await journal?.add('milkRecords', {
+      'animalId': null,
+      'session': session.name,
+      'litres': litres,
+      'recordedBy': recordedBy,
+    }, id: id);
     return const Result.success(null);
   }
 
@@ -249,7 +309,15 @@ class FakeMilkRepository implements MilkRepository {
   }
 
   @override
-  Future<Result<void>> saveUse(List<MilkUseLine> lines) async => const Result.success(null);
+  Future<Result<void>> saveUse(List<MilkUseLine> lines) async {
+    await journal?.add('milkUse', {
+      'day': clock.today().toIso8601String(),
+      'lines': [
+        for (final l in lines) {'kind': l.kind.name, 'litres': l.litres, 'detail': l.detail},
+      ],
+    });
+    return const Result.success(null);
+  }
 
   @override
   Future<Result<MilkSalesSummary>> sales() async {
@@ -261,8 +329,65 @@ class FakeMilkRepository implements MilkRepository {
         soldThisWeek: _sales.where((x) => !x.at!.isBefore(weekStart)).fold(0, (t, x) => t + x.litres),
         owed: unpaid.fold(0, (t, x) => t + x.amount),
         buyersOwing: unpaid.map((x) => x.buyer).toSet().length,
-        sales: latest.values.toList(),
+        sales: latest.values.toList().reversed.toList(),
       ),
+    );
+  }
+
+  @override
+  Future<Result<MilkSale>> addSale({
+    required String buyer,
+    required BuyerKind kind,
+    required double litres,
+    required int pricePerLitre,
+    required bool paid,
+  }) async {
+    final now = clock.now();
+    final sale = MilkSale(
+      id: journal?.newId() ?? 'sale-${_nextRecord++}',
+      buyer: buyer.trim(),
+      litres: litres,
+      pricePerLitre: pricePerLitre,
+      paid: paid,
+      kind: kind,
+      at: now,
+      paidAt: paid ? now : null,
+    );
+    _sales.add(sale);
+    await journal?.add('milkSales', {
+      'buyer': sale.buyer,
+      'kind': kind.name,
+      'litres': litres,
+      'pricePerLitre': pricePerLitre,
+      'paid': paid,
+    }, id: sale.id);
+    return Result.success(sale);
+  }
+
+  @override
+  Future<Result<void>> setSalePaid(String saleId, {required bool paid}) async {
+    final i = _sales.indexWhere((x) => x.id == saleId);
+    if (i >= 0) _sales[i] = _sales[i].copyWith(paid: paid, paidAt: clock.now());
+    await journal?.put('milkSalePayments', 'pay-$saleId', {'saleId': saleId, 'paid': paid});
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<List<MilkSale>>> recentBuyers() async {
+    final latest = <String, MilkSale>{};
+    for (final x in _sales.reversed) {
+      latest.putIfAbsent(x.buyer.toLowerCase(), () => x);
+    }
+    return Result.success(latest.values.toList());
+  }
+
+  @override
+  Future<Result<double>> litresOn([DateTime? day]) async {
+    final d = day ?? clock.now();
+    final start = DateTime(d.year, d.month, d.day);
+    final end = start.add(const Duration(days: 1));
+    return Result.success(
+      _records.where((r) => !r.at.isBefore(start) && r.at.isBefore(end)).fold(0, (t, r) => t + r.litres),
     );
   }
 

@@ -4,13 +4,16 @@
 import 'dart:async';
 
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
+import 'package:farm_tap/core/nfc/card_tap_listener.dart';
+import 'package:farm_tap/core/sms/phone_messenger.dart';
+import 'package:farm_tap/core/sms/presentation/send_from_phone.dart';
+import 'package:farm_tap/core/sms/sms_outbox.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_models.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_repository.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -39,6 +42,7 @@ class FarmerAvatar extends StatelessWidget {
     final i = int.tryParse(farmer.card ?? '') ?? farmer.name.length;
     return PersonAvatar(
       name: farmer.name,
+      photo: farmer.photo,
       size: size ?? context.sizes.avatarMd,
       ring: ring,
       tone: plain ? FarmTapTone.primary : tones[i % tones.length],
@@ -109,7 +113,7 @@ class _CentreHomePageState extends State<CentreHomePage> {
         future: _load,
         builder: (context, snapshot) {
           final (day, farmers) = snapshot.data ?? (null, const <CentreFarmer>[]);
-          if (day == null) return const SizedBox.shrink();
+          if (day == null) return const FarmTapPageLoader();
           final session = centreSessionName(l10n, day.session);
           final byId = {for (final x in farmers) x.id: x};
           final tiles = [
@@ -339,12 +343,30 @@ class ReceiveMilkPage extends StatefulWidget {
     required this.onFarmer,
     super.key,
     this.savedDeliveryId,
-    this.showSimulate = kDebugMode,
+    this.showSimulate = false,
     this.now,
     this.showToast = true,
+    this.workerByCard,
+    this.onAddFarmer,
+    this.onWorkerCard,
+    this.outbox,
+    this.messenger = const PhoneMessenger(),
   });
 
   final CentreRepository repo;
+
+  /// Where the farmer's SMS receipt waits; null in the demo (decision 0015).
+  final SmsOutbox? outbox;
+  final PhoneMessenger messenger;
+
+  /// The worker whose card this is, if any (a worker card tapped here).
+  final Future<String?> Function(String card)? workerByCard;
+
+  /// A new card: add a farmer with it; returns the farmer once saved.
+  final Future<CentreFarmer?> Function(String card)? onAddFarmer;
+
+  /// A worker card was tapped and they want to clock in or out.
+  final VoidCallback? onWorkerCard;
 
   /// A card was read (or the farmer was found by number / name).
   final ValueChanged<CentreFarmer> onFarmer;
@@ -361,6 +383,21 @@ class ReceiveMilkPage extends StatefulWidget {
 
 class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
   Delivery? _saved;
+
+  /// The farmer of [_saved] gets an SMS receipt.
+  bool _savedSms = false;
+
+  /// The receipt of [_saved] went out from this phone.
+  bool _receiptSent = false;
+
+  Future<bool> _sendReceipt(Delivery saved, MessageRoute route) async {
+    final outbox = widget.outbox;
+    final message = await outbox?.find(SmsOutbox.receiptId(saved.id));
+    if (outbox == null || message == null) return false;
+    final ok = await outbox.sendFromPhone(message, route, messenger: widget.messenger);
+    if (ok && mounted) setState(() => _receiptSent = true);
+    return ok;
+  }
 
   @override
   void initState() {
@@ -384,7 +421,13 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
     final day = (await widget.repo.today()).data;
     final saved = day?.latest.where((d) => d.id == widget.savedDeliveryId).firstOrNull;
     if (!mounted || saved == null) return;
-    setState(() => _saved = saved);
+    final farmer = (await widget.repo.farmer(saved.farmerId)).data;
+    if (!mounted) return;
+    setState(() {
+      _saved = saved;
+      _receiptSent = false;
+      _savedSms = (farmer?.smsReceipts ?? false) && (farmer?.phone.isNotEmpty ?? false);
+    });
     if (!widget.showToast) return;
     final l10n = AppLocalizations.of(context);
     final f = _fmt(context);
@@ -406,16 +449,46 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
   Future<void> _byCard(String card) async {
     final farmer = (await widget.repo.farmerByCard(card)).data;
     if (!mounted) return;
-    if (farmer == null) {
-      FarmTapToast.show(
-        context,
-        message: AppLocalizations.of(context).farmerCardNotFound,
-        icon: Symbols.error_rounded,
-        tone: FarmTapTone.danger,
-      );
+    if (farmer != null) {
+      widget.onFarmer(farmer);
       return;
     }
-    widget.onFarmer(farmer);
+    await _unknownCard(card);
+  }
+
+  /// A card no farmer has: say whose it is, or offer to give it to a new
+  /// farmer. A dialog (not a toast) so it is still there after the phone's
+  /// scan sheet closes.
+  Future<void> _unknownCard(String card) async {
+    final l10n = AppLocalizations.of(context);
+    final worker = await widget.workerByCard?.call(card);
+    if (!mounted) return;
+    if (worker != null) {
+      final go = await showFarmTapDialog(
+        context,
+        icon: Symbols.badge_rounded,
+        tone: FarmTapTone.info,
+        title: l10n.workerCardTitle(worker),
+        message: l10n.workerCardOnCollect,
+        primaryLabel: l10n.openAttendance,
+        secondaryLabel: l10n.cancel,
+      );
+      if (go) widget.onWorkerCard?.call();
+      return;
+    }
+    final add = widget.onAddFarmer;
+    final ok = await showFarmTapDialog(
+      context,
+      icon: Symbols.contactless_rounded,
+      tone: FarmTapTone.gold,
+      title: l10n.newCardTitle(card),
+      message: add == null ? l10n.farmerCardNotFound : l10n.newCardOnCollect,
+      primaryLabel: add == null ? l10n.close : l10n.addFarmerWithCard,
+      secondaryLabel: add == null ? null : l10n.cancel,
+    );
+    if (!ok || add == null || !mounted) return;
+    final farmer = await add(card);
+    if (farmer != null && mounted) widget.onFarmer(farmer);
   }
 
   Future<void> _enterNumber() async {
@@ -445,6 +518,7 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              CardTapListener(onCard: _byCard, prompt: l10n.tapFarmersCard, child: const SizedBox.shrink()),
               context.space.gapXxxl,
               Center(
                 child: FarmTapAnimationView(
@@ -479,15 +553,34 @@ class _ReceiveMilkPageState extends State<ReceiveMilkPage> {
                           Text(f.litres(saved.litres), style: context.text.titleSmall),
                         ],
                       ),
-                      context.space.gapMd,
-                      Text(
-                        l10n.smsQueuedPrintSlip,
-                        style: context.text.bodyMedium?.copyWith(color: context.colors.primary),
-                      ),
+                      if (_savedSms) ...[
+                        context.space.gapMd,
+                        Text(
+                          widget.outbox == null
+                              ? l10n.smsQueuedPrintSlip
+                              : _receiptSent
+                              ? l10n.sentFromThisPhone
+                              : l10n.receiptWaiting,
+                          style: context.text.bodyMedium?.copyWith(color: context.colors.primary),
+                        ),
+                        if (widget.outbox != null && !_receiptSent) ...[
+                          context.space.gapMd,
+                          SendFromPhoneButtons(
+                            key: ValueKey(saved.id),
+                            forceRow: true,
+                            onSend: (route) => _sendReceipt(saved, route),
+                          ),
+                        ],
+                      ],
                     ],
                   ),
-                )
-              else ...[
+                ),
+              if (saved != null && ScanCardButton.needed) ...[
+                context.space.gapLg,
+                ScanCardButton(label: l10n.scanCard),
+              ],
+              if (saved == null) ...[
+                if (ScanCardButton.needed) ...[ScanCardButton(label: l10n.scanCard), context.space.gapMd],
                 FarmTapButton(
                   label: l10n.enterCardNumber,
                   icon: Symbols.dialpad_rounded,

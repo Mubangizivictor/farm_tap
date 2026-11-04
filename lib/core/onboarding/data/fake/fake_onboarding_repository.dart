@@ -12,21 +12,9 @@ class FakeOnboardingRepository implements OnboardingRepository {
   final Clock clock;
 
   @override
-  List<String> get districts => const [
-    'Mbarara',
-    'Bushenyi',
-    'Isingiro',
-    'Ibanda',
-    'Kiruhura',
-    'Ntungamo',
-    'Sheema',
-    'Rwampara',
-  ];
-
-  @override
   DateTime trialEndsOn() {
     final now = clock.now();
-    return DateTime(now.year, now.month, now.day + 14);
+    return DateTime(now.year, now.month, now.day + freeTrialDays);
   }
 
   @override
@@ -37,8 +25,12 @@ class FakeOnboardingRepository implements OnboardingRepository {
       place: setup.district ?? '',
       kind: setup.dairyType == DairyType.centre ? PlaceKind.collectionCentre : PlaceKind.dairyFarm,
       role: setup.role == SetupRole.owner ? PlaceRole.owner : PlaceRole.manager,
-      // A new farm's own trial: today + 14 days (never another farm's date).
+      // A new farm's own trial: today + freeTrialDays (never another farm's date).
       subscription: Subscription(trialStartedAt: clock.today(), trialEndsAt: trialEndsOn()),
+      sector: setup.sector,
+      village: setup.village.trim().isEmpty ? null : setup.village.trim(),
+      herdSize: setup.cows,
+      withCentre: setup.dairyType == DairyType.both,
     ),
   );
 

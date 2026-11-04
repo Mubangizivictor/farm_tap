@@ -22,7 +22,6 @@ const _routes = <(String, String, bool, bool)>[
   (AppRoutes.emailSignIn, AppRoutes.signIn, false, false),
   (AppRoutes.signUp, AppRoutes.emailSignIn, false, false),
   (AppRoutes.forgotPassword, AppRoutes.emailSignIn, false, false),
-  (AppRoutes.setupSector, AppRoutes.setupLanguage, true, false),
   (AppRoutes.setupWaitlistDone, AppRoutes.setupSector, true, false),
   (AppRoutes.setupDairyType, AppRoutes.setupSector, true, false),
   (AppRoutes.setupFarm, AppRoutes.setupDairyType, true, false),
@@ -209,8 +208,8 @@ void main() {
       ('Workers', '/workers', '6 people'),
       ('Money', '/money', 'Cost per litre'),
       ('Reports', '/reports', 'Monthly farm report'),
-      ('Settings', '/settings', 'Coming soon'),
-      ('Help & support', '/settings/help', 'Coming soon'),
+      ('Settings', '/settings', 'Account'),
+      ('Help & support', '/settings/help', 'Chat on WhatsApp'),
     ]) {
       testWidgets(label, (tester) async {
         final h = await _Harness.pump(tester, start: AppRoutes.more, signedIn: true, farm: true);
@@ -272,8 +271,13 @@ void main() {
       await _settle(tester);
       expect(find.text('Reset PIN'), allowed ? findsOneWidget : findsNothing);
       expect(find.byTooltip('Edit worker'), allowed ? findsOneWidget : findsNothing);
+      if (!allowed) {
+        // Workers is not one of their sections (decision 0016 §7): home instead.
+        expect(h.location, AppRoutes.home);
+        return;
+      }
       await _tapBack(tester);
-      expect(find.text('Add worker'), allowed ? findsOneWidget : findsNothing);
+      expect(find.text('Add worker'), findsOneWidget);
     }
 
     testWidgets('manager (Tom) sees Add / Edit / Reset PIN', (tester) => check(tester, staffIndex: 0, allowed: true));

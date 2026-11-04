@@ -2,6 +2,7 @@ import 'package:farm_tap/app/router/app_dependencies.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/auth/data/fake/fake_auth_repository.dart';
 import 'package:farm_tap/core/money/data/fake/fake_money_repository.dart';
+import 'package:farm_tap/core/nfc/card_reader.dart';
 import 'package:farm_tap/core/onboarding/data/fake/fake_onboarding_repository.dart';
 import 'package:farm_tap/core/people/data/fake/fake_staff_access_repository.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
@@ -19,6 +20,7 @@ import 'package:farm_tap/sectors/cattle/milk/data/fake/fake_milk_repository.dart
 import 'package:farm_tap/sectors/cattle/money/data/fake/fake_farm_money_repository.dart';
 import 'package:farm_tap/sectors/cattle/owner_reports/data/fake/fake_daily_report_repository.dart';
 import 'package:farm_tap/sectors/cattle/workers/data/fake/fake_workers_repository.dart';
+import 'package:flutter/foundation.dart';
 
 /// The mockups' "today": Saturday 7 Nov 2026, 6:52 am.
 class FixedClock extends Clock {
@@ -110,3 +112,19 @@ FakeHerdRepository fakeHerd(Clock clock, TenantProvider tenants, FakeTreatmentRe
       treatments: treatments,
       breeding: FakeBreedingRepository(clock, FakeMoneyRepository(clock)),
     );
+
+/// Stands in for the NFC reader: [tap] acts like a card held to the phone.
+class TestCardReader implements CardReader {
+  ValueChanged<String>? _onCard;
+
+  @override
+  Future<bool> available() async => true;
+
+  @override
+  Future<void> start(ValueChanged<String> onCard, {String? prompt}) async => _onCard = onCard;
+
+  @override
+  Future<void> stop() async => _onCard = null;
+
+  void tap(String card) => _onCard?.call(card);
+}
