@@ -15,9 +15,11 @@ const FIREBASE_CONFIG: FirebaseOptions = {
   messagingSenderId: '913049305053',
   projectId: 'farm-tap-1dd15',
   storageBucket: 'farm-tap-1dd15.firebasestorage.app',
-  // Custom domain as authDomain so the Google sign-in popup shows farmtap.victorbee.com,
-  // not firebaseapp.com. Requires this domain in Firebase Auth → Authorized domains.
-  authDomain: 'farmtap.victorbee.com',
+  // firebaseapp.com works for signInWithPopup without any extra GCP setup.
+  // To show farmtap.victorbee.com here instead, first add
+  // https://farmtap.victorbee.com/__/auth/handler to Authorized redirect URIs
+  // in Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Web client.
+  authDomain: 'farm-tap-1dd15.firebaseapp.com',
 };
 
 /** Local testing against `firebase emulators:start` (auth 9099, firestore 8080). */
