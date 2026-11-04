@@ -1,6 +1,6 @@
 'use client';
 
-import { getRedirectResult, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Loading } from '@/components/Loading';
@@ -16,25 +16,6 @@ export default function AdminSignIn() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-
-  // Handle the page-redirect return from Google.
-  useEffect(() => {
-    if (!firebaseConfigured) return;
-    getRedirectResult(firebase().auth)
-      .then((result) => {
-        if (!result) return;
-        if (!ALLOWED.includes(result.user.email ?? '')) {
-          void signOut();
-          setError('That Google account is not authorised. Only Victorbee staff can sign in here.');
-        }
-      })
-      .catch((e) => {
-        const code = (e as { code: string }).code ?? '';
-        if (code && code !== 'auth/popup-closed-by-user') {
-          setError('Sign-in failed. Try again or contact the system owner.');
-        }
-      });
-  }, [signOut]);
 
   // Once signed in, check the allowlist then go to the panel.
   useEffect(() => {
@@ -56,13 +37,21 @@ export default function AdminSignIn() {
     try {
       const g = new GoogleAuthProvider();
       g.setCustomParameters({ prompt: 'select_account' });
-      await signInWithRedirect(firebase().auth, g);
+      const result = await signInWithPopup(firebase().auth, g);
+      if (!ALLOWED.includes(result.user.email ?? '')) {
+        void signOut();
+        setError('That Google account is not authorised. Only Victorbee staff can sign in here.');
+        setBusy(false);
+      }
+      // Successful sign-in: the user useEffect handles navigation to /admin/
     } catch (e) {
       const code = (e as { code?: string }).code ?? '';
-      if (code === 'auth/unauthorized-domain') {
-        setError('This domain is not authorised in Firebase. Add farm-tap-1dd15.web.app to Firebase → Authentication → Settings → Authorized domains.');
-      } else {
-        setError(`Could not start sign-in (${code || 'unknown error'}). Try again.`);
+      if (code !== 'auth/popup-closed-by-user' && code !== 'auth/cancelled-popup-request') {
+        if (code === 'auth/unauthorized-domain') {
+          setError('This domain is not authorised in Firebase. Add it under Firebase → Authentication → Settings → Authorized domains.');
+        } else {
+          setError(`Sign-in failed (${code || 'unknown error'}). Try again.`);
+        }
       }
       setBusy(false);
     }
