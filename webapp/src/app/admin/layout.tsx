@@ -89,7 +89,7 @@ function NotStaff() {
           <button className="btn ghost sm" onClick={() => router.push('/')}>
             Back to my farm
           </button>
-          <button className="btn ghost sm" onClick={() => void signOut().then(() => router.replace('/admin/sign-in/'))}>
+          <button className="btn ghost sm" onClick={() => void signOut().then(() => router.replace('/admin-sign-in/'))}>
             <Icon name="logout" /> Sign out
           </button>
         </div>
@@ -155,7 +155,7 @@ function Shell({ children }: { children: ReactNode }) {
           <Link href="/" className="btn sm outline hide-sm" title="Open my farm">
             My farm
           </Link>
-          <button className="icon-btn" aria-label="Sign out" title="Sign out" onClick={() => void signOut().then(() => router.replace('/admin/sign-in/'))}>
+          <button className="icon-btn" aria-label="Sign out" title="Sign out" onClick={() => void signOut().then(() => router.replace('/admin-sign-in/'))}>
             <span className="avatar">{initials(me.name || user?.email || '')}</span>
           </button>
         </header>
@@ -201,7 +201,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   useEffect(() => {
     if (user === null) {
-      router.replace('/admin/sign-in/');
+      router.replace('/admin-sign-in/');
     }
   }, [user, router]);
   if (!user) return <Loading />;
