@@ -31,10 +31,15 @@ function navFor(f: Farm, cfg: PlatformConfig): NavItem[] {
     ...(hasHerd(f) && feat('milk') ? [{ href: '/milk/', label: 'Milk', icon: 'drop' as const }] : []),
     ...(hasHerd(f) && feat('herd') ? [{ href: '/herd/', label: 'Herd', icon: 'tag' as const }] : []),
     ...(hasHerd(f) && feat('health') ? [{ href: '/health/', label: 'Health', icon: 'health' as const }] : []),
-    ...(isCentre(f) ? [{ href: '/farmers/', label: 'Suppliers', icon: 'truck' as const }] : []),
-    { href: '/workers/', label: 'Workers', icon: 'workers' as const },
+    ...(hasHerd(f) && feat('breeding') ? [{ href: '/breeding/', label: 'Breeding', icon: 'cow' as const }] : []),
+    ...(hasHerd(f) && feat('feeding') ? [{ href: '/feeds/', label: 'Feeds', icon: 'feed' as const }] : []),
+    ...(isCentre(f) ? [{ href: '/farmers/', label: 'Milk suppliers', icon: 'truck' as const }] : []),
+    ...(feat('workers') ? [{ href: '/workers/', label: 'Workers', icon: 'workers' as const }] : []),
+    { href: '/roster/', label: 'Duty roster', icon: 'calendar' as const },
     { href: '/tasks/', label: 'Tasks', icon: 'check' as const },
+    { href: '/contacts/', label: 'Contacts', icon: 'phone' as const },
     ...(manages(f) && feat('money') ? [{ href: '/money/', label: 'Money', icon: 'money' as const }] : []),
+    ...(manages(f) && feat('money') ? [{ href: '/reports/', label: 'Reports', icon: 'chart' as const }] : []),
     { href: '/settings/', label: 'Settings', icon: 'settings' as const },
   ];
 }
@@ -57,8 +62,8 @@ function ThemeSwitch() {
   );
 }
 
-function UserMenu({ isAdmin }: { isAdmin: boolean }) {
-  const { user, farms, signOut } = useSession();
+function UserMenu() {
+  const { user, canSwitch, signOut } = useSession();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const name = user?.displayName || user?.email || '';
@@ -76,15 +81,10 @@ function UserMenu({ isAdmin }: { isAdmin: boolean }) {
           <div style={{ padding: 'var(--s-xs) var(--s-lg) var(--s-md)' }}>
             <ThemeSwitch />
           </div>
-          {farms && farms.length > 1 && (
-            <button role="menuitem" onClick={() => router.push('/farms/')}>
-              <Icon name="switch" /> Switch place
+          {canSwitch && (
+            <button role="menuitem" onClick={() => router.push('/farms/')} title="Open another farm you own. Each farm keeps its own records, workers and plan.">
+              <Icon name="switch" /> Switch farm
             </button>
-          )}
-          {isAdmin && (
-            <Link role="menuitem" href="/admin/">
-              <Icon name="shield" /> Control panel
-            </Link>
           )}
           <a role="menuitem" href={supportWhatsAppLink()} target="_blank" rel="noreferrer">
             <Icon name="whatsapp" /> Help on WhatsApp
@@ -178,26 +178,78 @@ function Banners({ farm }: { farm: Farm }) {
         </div>
       )}
       {plan.kind === 'readOnly' && (
-        <div className="banner warn" role="status">
+        <div className="banner bad" role="status">
           <Icon name="lock" />
           <span className="grow">
-            {farm.subscription.paidUntil ? 'Your subscription has ended' : 'Your free trial has ended'}
-            {plan.since ? ` (${date(plan.since)})` : ''}. You can still see everything, but new records are off.{' '}
-            <a href={supportWhatsAppLink(`Hello FarmTap, I want to pay for ${farm.name}.`)} target="_blank" rel="noreferrer">
-              Pay to continue
-            </a>
+            {farm.subscription.paidUntil ? 'Your plan has ended' : 'Your free trial has ended'}
+            {plan.since ? ` (${date(plan.since)})` : ''}. Recording, cards and changes are off until you pay. You are viewing your records only.
           </span>
+          <Link className="btn sm" href="/settings/#plan">
+            See plans
+          </Link>
         </div>
       )}
-      {plan.kind === 'grace' && (
+      {plan.kind === 'paid' && plan.daysLeft <= 5 && (
         <div className="banner warn" role="status">
           <Icon name="alert" />
           <span className="grow">
-            Payment is due. Recording stops in {plan.daysLeft} day{plan.daysLeft === 1 ? '' : 's'}.
+            Your plan ends in {plan.daysLeft} day{plan.daysLeft === 1 ? '' : 's'}. Pay before then so recording does not stop.
           </span>
+          <Link className="btn sm outline" href="/settings/#plan">
+            Pay now
+          </Link>
+        </div>
+      )}
+      {plan.kind === 'trial' && plan.daysLeft <= 3 && (
+        <div className="banner warn" role="status">
+          <Icon name="clock" />
+          <span className="grow">
+            {plan.daysLeft <= 0 ? 'Your free trial ends today.' : `Your free trial ends in ${plan.daysLeft} day${plan.daysLeft === 1 ? '' : 's'}.`} After that, nothing can be recorded until you pay.
+          </span>
+          <Link className="btn sm outline" href="/settings/#plan">
+            See plans
+          </Link>
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * Shown on every page once the trial or plan has ended (decision 0023).
+ * The server refuses every write by then; this tells people why and how to
+ * pay. Owners and managers can still open their records to look at them.
+ */
+function LockScreen({ farm, onView }: { farm: Farm; onView: () => void }) {
+  const plan = planState(farm.subscription, new Date());
+  const boss = manages(farm);
+  const since = plan.kind === 'readOnly' ? plan.since : null;
+  return (
+    <div className="lock-screen stack">
+      <div className="lock-icon" aria-hidden>
+        <Icon name="lock" />
+      </div>
+      <h1>{farm.subscription.paidUntil ? 'Your FarmTap plan has ended' : 'Your free trial has ended'}</h1>
+      <p className="muted">
+        {since ? `Since ${date(since)}, ` : ''}nothing can be added or changed on {farm.name}: no milk, animals, cards, scans, payments or workers. Your records are safe and
+        nothing is deleted.
+      </p>
+      {boss ? (
+        <div className="row wrap center">
+          <Link className="btn lg" href="/settings/#plan">
+            <Icon name="money" /> Choose a plan and pay
+          </Link>
+          <button className="btn outline" onClick={onView}>
+            <Icon name="eye" /> Look at my records
+          </button>
+        </div>
+      ) : (
+        <p>Ask the farm owner to pay for FarmTap. Recording starts again as soon as the payment is confirmed.</p>
+      )}
+      <p className="small muted">
+        Need help paying? <a href={supportWhatsAppLink(`Hello FarmTap, I want to pay for ${farm.name}.`)} target="_blank" rel="noreferrer">WhatsApp FarmTap support</a>
+      </p>
+    </div>
   );
 }
 
@@ -210,6 +262,7 @@ function FarmShell({ children }: { children: ReactNode }) {
   const isAdmin = useIsPlatformAdmin();
   const seenRef = useRef(false);
   const side = useSidebar();
+  const [viewing, setViewing] = useState(false);
 
   useEffect(() => {
     if (user === null) router.replace('/sign-in/');
@@ -240,7 +293,9 @@ function FarmShell({ children }: { children: ReactNode }) {
   }
 
   const nav = navFor(farm, config);
-  const plan = planText(planState(farm.subscription, new Date()));
+  const state = planState(farm.subscription, new Date());
+  const plan = planText(state);
+  const locked = state.kind === 'readOnly' && !path.startsWith('/settings') && !(viewing && manages(farm));
   const current = (href: string) => (path === href || path === href.slice(0, -1) ? 'page' : undefined);
   const phoneMain = nav.slice(0, 4);
   const phoneMore = nav.slice(4);
@@ -258,12 +313,6 @@ function FarmShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
         <div className="grow" />
-        {isAdmin && (
-          <Link href="/admin/" className="nav" style={{ padding: 'var(--s-xs) var(--s-sm)', fontSize: 'var(--t-sm)' }} title="Control panel">
-            <Icon name="shield" />
-            <span>Control panel</span>
-          </Link>
-        )}
         <div className="side-foot card flat small">
           <strong>{farm.name}</strong>
           <div className="muted">{farmKind(farm)}</div>
@@ -283,14 +332,15 @@ function FarmShell({ children }: { children: ReactNode }) {
           <span className={`sync-dot hide-sm ${online ? '' : 'off'}`} title={online ? 'Changes from the farm phones show here as they sync' : 'No internet'}>
             {online ? 'Live' : 'Offline'}
           </span>
-          <Link href="/settings/#plan" className={`chip ${plan.tone} hide-sm`} style={{ textDecoration: 'none' }}>
-            {plan.text}
+          <Link href="/settings/#plan" className={`chip plan-chip ${plan.tone}`} title="See plans and pay">
+            <Icon name={state.kind === 'readOnly' ? 'lock' : 'clock'} />
+            <span>{plan.text}</span>
           </Link>
-          <UserMenu isAdmin={isAdmin} />
+          <UserMenu />
         </header>
         <div className="content">
           <Banners farm={farm} />
-          {children}
+          {locked ? <LockScreen farm={farm} onView={() => setViewing(true)} /> : children}
         </div>
       </div>
 

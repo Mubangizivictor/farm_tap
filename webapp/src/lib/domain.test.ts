@@ -35,12 +35,13 @@ test('daily litres skip deleted records and bucket by day', () => {
   assert.deepEqual(days.map((d) => d.litres), [0, 7, 15]);
 });
 
-test('trial, paid, grace and read-only match the rules', () => {
+test('trial, paid and read-only match the rules (no grace, decision 0023)', () => {
   const now = new Date(2026, 10, 3);
   assert.equal(planState({ trialStartedAt: null, trialEndsAt: new Date(2026, 10, 8), paidUntil: null }, now).kind, 'trial');
   assert.equal(planState({ trialStartedAt: null, trialEndsAt: new Date(2026, 10, 1), paidUntil: null }, now).kind, 'readOnly');
   assert.equal(planState({ trialStartedAt: null, trialEndsAt: null, paidUntil: new Date(2026, 10, 30) }, now).kind, 'paid');
-  assert.equal(planState({ trialStartedAt: null, trialEndsAt: null, paidUntil: new Date(2026, 9, 30) }, now).kind, 'grace');
+  assert.equal(planState({ trialStartedAt: null, trialEndsAt: null, paidUntil: new Date(2026, 9, 30) }, now).kind, 'readOnly');
+  assert.equal(canWrite({ trialStartedAt: null, trialEndsAt: null, paidUntil: new Date(2026, 9, 30) }, now), false);
   assert.equal(canWrite({ trialStartedAt: null, trialEndsAt: null, paidUntil: new Date(2026, 9, 1) }, now), false);
 });
 

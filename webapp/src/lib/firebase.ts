@@ -3,6 +3,10 @@
 import { getApp, getApps, initializeApp, type FirebaseOptions } from 'firebase/app';
 import { browserLocalPersistence, connectAuthEmulator, getAuth, setPersistence, type Auth } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore, type Firestore } from 'firebase/firestore';
+import { connectFunctionsEmulator, getFunctions, type Functions } from 'firebase/functions';
+
+/** Where FarmTap's server code runs (functions/, decision 0023). */
+export const FUNCTIONS_REGION = 'europe-west1';
 
 // Same Firebase project as the phone app (farm-tap-1dd15). Online only
 // (decision 0017): Firestore keeps its default memory cache, nothing is
@@ -32,6 +36,17 @@ export const firebaseConfigured = true;
 
 let auth: Auth | undefined;
 let db: Firestore | undefined;
+let fns: Functions | undefined;
+
+/** FarmTap's server code (payments). */
+export function functions(): Functions {
+  if (!fns) {
+    firebase();
+    fns = getFunctions(getApp(), FUNCTIONS_REGION);
+    if (emulators) connectFunctionsEmulator(fns, '127.0.0.1', 5001);
+  }
+  return fns;
+}
 
 export function firebase(): { auth: Auth; db: Firestore } {
   if (!auth || !db) {

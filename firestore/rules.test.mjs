@@ -147,18 +147,18 @@ describe('roles and money', () => {
     await assertSucceeds(getDoc(doc(as('owner'), `tenants/${T}`)));
   });
 
-  test('a phone offline when the trial ended can still send for 2 days', async () => {
+  test('the moment the trial ends, nothing can be written (decision 0023)', async () => {
     await env.withSecurityRulesDisabled((ctx) =>
-      updateDoc(doc(ctx.firestore(), `tenants/${T}`), { 'subscription.trialEndsAt': days(-1) }));
-    await assertSucceeds(setDoc(doc(as('owner'), `tenants/${T}/milkRecords/m9`), rec('milkRecords', 'm9')));
+      updateDoc(doc(ctx.firestore(), `tenants/${T}`), { 'subscription.trialEndsAt': Timestamp.fromMillis(Date.now() - 60000) }));
+    await assertFails(setDoc(doc(as('owner'), `tenants/${T}/milkRecords/m9`), rec('milkRecords', 'm9')));
   });
 
-  test('paid farms write; overdue past grace do not', async () => {
+  test('paid farms write until paid-until, with no grace after', async () => {
     await env.withSecurityRulesDisabled((ctx) =>
-      updateDoc(doc(ctx.firestore(), `tenants/${T}`), { 'subscription.trialEndsAt': days(-60), 'subscription.paidUntil': days(-3) }));
+      updateDoc(doc(ctx.firestore(), `tenants/${T}`), { 'subscription.trialEndsAt': days(-60), 'subscription.paidUntil': days(3) }));
     await assertSucceeds(setDoc(doc(as('owner'), `tenants/${T}/milkRecords/m1`), rec('milkRecords', 'm1')));
     await env.withSecurityRulesDisabled((ctx) =>
-      updateDoc(doc(ctx.firestore(), `tenants/${T}`), { 'subscription.paidUntil': days(-20) }));
+      updateDoc(doc(ctx.firestore(), `tenants/${T}`), { 'subscription.paidUntil': Timestamp.fromMillis(Date.now() - 60000) }));
     await assertFails(setDoc(doc(as('owner'), `tenants/${T}/milkRecords/m2`), rec('milkRecords', 'm2')));
   });
 });
@@ -197,8 +197,8 @@ describe('onboarding', () => {
   test('cannot create a farm already paid, or for someone else', async () => {
     const db = as('newbie');
     await assertFails(createFarm(db, 'newbie', 'f2', { subscription: { trialEndsAt: days(14), paidUntil: days(365) } }));
-    await assertFails(createFarm(db, 'newbie', 'f3', { subscription: { trialEndsAt: days(14) } }));
-    // A 7-day trial: 14 days is too long.
+    // A 14-day trial (the default): 16 days is too long.
+    await assertFails(createFarm(db, 'newbie', 'f3', { subscription: { trialEndsAt: days(16) } }));
     await assertFails(createFarm(db, 'newbie', 'f4', { ownerUid: 'someone' }));
   });
 });
@@ -448,3 +448,102 @@ describe('supplier portal invites', () => {
   });
 });
 
+
+describe('locked after the trial or plan ends (decision 0023)', () => {
+  const lock = () =>
+    env.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, `tenants/${T}/tasks/t1`), rec('tasks', 't1', { body: { title: 'Dip', staffId: 's1', due: '2026-11-07', when: '', doneAt: null } }));
+      await setDoc(doc(db, `tenants/${T}/milkRecords/old`), rec('milkRecords', 'old'));
+      await updateDoc(doc(db, `tenants/${T}`), { 'subscription.trialEndsAt': days(-1) });
+    });
+
+  test('members can still read their records', async () => {
+    await lock();
+    await assertSucceeds(getDoc(doc(as('worker'), `tenants/${T}/milkRecords/old`)));
+    await assertSucceeds(getDoc(doc(as('owner'), `tenants/${T}`)));
+  });
+
+  test('no adding, editing, removing, cards, tasks or farm changes', async () => {
+    await lock();
+    const owner = as('owner');
+    await assertFails(setDoc(doc(owner, `tenants/${T}/animals/a1`), rec('animals', 'a1', { body: { tagNumber: 'FT-001' } })));
+    await assertFails(setDoc(doc(owner, `tenants/${T}/nfcCards/0042`), rec('nfcCards', '0042', { body: { personId: 's1', status: 'active' } })));
+    await assertFails(updateDoc(doc(owner, `tenants/${T}/milkRecords/old`), { isDeleted: true, version: 2, serverUpdatedAt: serverTimestamp() }));
+    await assertFails(updateDoc(doc(as('worker'), `tenants/${T}/tasks/t1`), {
+      body: { title: 'Dip', staffId: 's1', due: '2026-11-07', when: '', doneAt: '2026-11-07T08:00:00.000' }, version: 2, serverUpdatedAt: serverTimestamp(),
+    }));
+    await assertFails(updateDoc(doc(owner, `tenants/${T}`), { name: 'Renamed' }));
+    await assertFails(setDoc(doc(owner, 'staffLogins/256772000000'), { tenantId: T, staffId: 's1', uid: 'x', v: 1 }));
+    await assertFails(setDoc(doc(owner, `tenants/${T}/members/newworker`), { role: 'worker', staffId: 's1' }));
+  });
+
+  test('the owner can still send a payment claim, and only that', async () => {
+    await lock();
+    await assertSucceeds(setDoc(doc(as('owner'), `tenants/${T}/payments/p1`), rec('payments', 'p1', { body: { status: 'submitted', amount: 70000, method: 'mtn', reference: 'X1' } })));
+    await assertFails(setDoc(doc(as('owner'), `tenants/${T}/payments/p2`), rec('payments', 'p2', { body: { status: 'confirmed', amount: 70000 } })));
+    await assertFails(setDoc(doc(as('worker'), `tenants/${T}/payments/p3`), rec('payments', 'p3', { body: { status: 'submitted', amount: 70000 } })));
+  });
+
+  test('a suspended farm is locked even on trial', async () => {
+    await env.withSecurityRulesDisabled((ctx) => updateDoc(doc(ctx.firestore(), `tenants/${T}`), { status: 'suspended' }));
+    await assertFails(setDoc(doc(as('owner'), `tenants/${T}/milkRecords/m1`), rec('milkRecords', 'm1')));
+  });
+
+  test('nobody in the farm can start their own plan', async () => {
+    const owner = as('owner');
+    await assertFails(updateDoc(doc(owner, `tenants/${T}`), { 'subscription.paidUntil': days(365) }));
+    await assertFails(setDoc(doc(owner, `tenants/${T}/subscriptionPayments/x`), rec('subscriptionPayments', 'x', { body: { status: 'paid' } })));
+    await assertFails(setDoc(doc(owner, 'paymentRefs/x'), { tenantId: T }));
+    await assertFails(getDoc(doc(owner, 'paymentRefs/x')));
+  });
+
+  test('in-app payments: the farm reads them, nobody writes them', async () => {
+    await env.withSecurityRulesDisabled((ctx) =>
+      setDoc(doc(ctx.firestore(), `tenants/${T}/subscriptionPayments/sp1`), { status: 'pending', amountUgx: 70000, method: 'mtn' }));
+    await assertSucceeds(getDoc(doc(as('owner'), `tenants/${T}/subscriptionPayments/sp1`)));
+    await assertFails(updateDoc(doc(as('owner'), `tenants/${T}/subscriptionPayments/sp1`), { status: 'paid' }));
+    await assertFails(getDoc(doc(as('stranger'), `tenants/${T}/subscriptionPayments/sp1`)));
+  });
+});
+
+describe('linked spending (decision 0023)', () => {
+  const buy = (db, id, eid) => {
+    const b = writeBatch(db);
+    b.set(doc(db, `tenants/${T}/stockMovements/${id}`), rec('stockMovements', id, { body: { kind: 'purchase', feed: 'dairyMeal', amount: 10, pricePerUnit: 60000, at: '2026-11-07T08:00:00.000' } }));
+    b.set(doc(db, `tenants/${T}/expenses/${eid}`), rec('expenses', eid, { body: { category: 'feed', amount: 600000, at: '2026-11-07T08:00:00.000', sourceId: id, sourceType: 'feedPurchase' } }));
+    return b.commit();
+  };
+
+  test('a feed purchase and its expense are saved together; a worker cannot', async () => {
+    await assertSucceeds(buy(as('owner'), 'buy1', 'e1'));
+    await assertFails(buy(as('worker'), 'buy2', 'e2'));
+  });
+
+  test('an edit removes the old pair and saves a new pair in one write', async () => {
+    const db = as('owner');
+    await buy(db, 'buy1', 'e1');
+    const b = writeBatch(db);
+    for (const [c, id] of [['stockMovements', 'buy1'], ['expenses', 'e1']]) {
+      b.update(doc(db, `tenants/${T}/${c}/${id}`), { isDeleted: true, version: 2, updatedBy: 'owner', serverUpdatedAt: serverTimestamp() });
+    }
+    b.set(doc(db, `tenants/${T}/stockMovements/buy1b`), rec('stockMovements', 'buy1b', { body: { kind: 'purchase', feed: 'dairyMeal', amount: 12, pricePerUnit: 60000, at: '2026-11-07T08:00:00.000' } }));
+    b.set(doc(db, `tenants/${T}/expenses/e1b`), rec('expenses', 'e1b', { body: { category: 'feed', amount: 720000, at: '2026-11-07T08:00:00.000', sourceId: 'buy1b' } }));
+    await assertSucceeds(b.commit());
+  });
+
+  test('an expense amount cannot be changed in place', async () => {
+    const db = as('owner');
+    await buy(db, 'buy1', 'e1');
+    await assertFails(updateDoc(doc(db, `tenants/${T}/expenses/e1`), { body: { category: 'feed', amount: 1, at: '2026-11-07T08:00:00.000' }, version: 2, serverUpdatedAt: serverTimestamp() }));
+  });
+
+  test('contacts and the duty roster: any member reads; managers write', async () => {
+    await assertSucceeds(setDoc(doc(as('owner'), `tenants/${T}/contacts/c1`), rec('contacts', 'c1', { body: { name: 'Dr Okello', kind: 'vet', phone: '0772000000' } })));
+    await assertSucceeds(getDoc(doc(as('worker'), `tenants/${T}/contacts/c1`)));
+    await assertSucceeds(setDoc(doc(as('owner'), `tenants/${T}/duties/d1`), rec('duties', 'd1', { body: { activity: 'milking', staffId: 's1', days: [], shift: 'morning' } })));
+    await assertSucceeds(getDoc(doc(as('worker'), `tenants/${T}/duties/d1`)));
+    await assertFails(setDoc(doc(as('worker'), `tenants/${T}/duties/d2`), rec('duties', 'd2', { body: { activity: 'milking', staffId: 'me', days: [], shift: 'morning' } })));
+    await assertFails(setDoc(doc(as('worker'), `tenants/${T}/contacts/c2`), rec('contacts', 'c2', { body: { name: 'x', kind: 'vet', phone: '1' } })));
+  });
+});

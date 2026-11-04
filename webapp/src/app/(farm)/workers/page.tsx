@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
 import {
+  ConfirmDialog,
   Dialog,
   Empty,
   ExportButtons,
@@ -38,6 +39,14 @@ import { count, date, initials, shortDate, time, ugx, words } from '@/lib/format
 import { firebase } from '@/lib/firebase';
 import { hashPin, pinProblem } from '@/lib/pin';
 import { useFarm, useSession } from '@/lib/session';
+import { expensesOf, removeWithExpenses, saveWithExpense } from '@/lib/linked';
+import { monthlyCost, payMethodName, payMethods, payTerms, payTypeUnit, payTypes, type ExpenseBody, type PayMethod, type PayType } from '@/lib/domain';
+
+/** "UGX 15,000 a day · MTN MoMo" */
+const payText = (b: StaffBody) => {
+  const t = payTerms(b);
+  return t.rate ? `${ugx(t.rate)} ${payTypeUnit[t.type].per}` : '';
+};
 import { useOpenFromUrl } from '@/lib/useOpen';
 
 const inTime = (a: FarmRecord<AttendanceBody>) => parseDate(a.body.inAt ?? a.body.at) ?? recordDate(a);
@@ -54,7 +63,10 @@ function WorkerForm({ s, cards = [], onClose }: { s?: FarmRecord<StaffBody>; car
     role: b?.role ?? 'worker',
     title: b?.title ?? '',
     phone: b?.phone ?? '',
-    monthlyWage: b?.monthlyWage != null ? String(b.monthlyWage) : '',
+    payType: payTerms(b ?? ({} as StaffBody)).type as string,
+    payRate: b ? (payTerms(b).rate ? String(payTerms(b).rate) : '') : '',
+    payMethod: payTerms(b ?? ({} as StaffBody)).method as string,
+    payAccount: b?.payAccount ?? '',
     department: b?.department ?? '',
     village: b?.village ?? '',
     nationalId: b?.nationalId ?? '',
@@ -71,8 +83,9 @@ function WorkerForm({ s, cards = [], onClose }: { s?: FarmRecord<StaffBody>; car
     if (!f.name.trim()) return setError('Type the worker’s name.');
     if (!phoneOk(f.phone)) return setError('The phone number does not look right. Example: 0772 123 456.');
     if (!phoneOk(f.emergencyPhone)) return setError('The emergency phone number does not look right.');
-    const wage = f.monthlyWage.trim() ? Number(f.monthlyWage) : null;
-    if (wage != null && (!Number.isInteger(wage) || wage < 0)) return setError('Type the monthly wage in whole shillings, e.g. 250000.');
+    const rate = f.payRate.trim() ? Number(f.payRate) : null;
+    if (rate != null && (!Number.isInteger(rate) || rate < 0)) return setError('Type the pay in whole shillings, e.g. 250000.');
+    if ((f.payMethod === 'mtn' || f.payMethod === 'airtel') && f.payAccount.trim() && !phoneOk(f.payAccount)) return setError('The Mobile Money number does not look right.');
     if (!s) {
       const p = pinProblem(f.pin);
       if (p) return setError(`Starting PIN: ${p}`);
@@ -82,7 +95,12 @@ function WorkerForm({ s, cards = [], onClose }: { s?: FarmRecord<StaffBody>; car
       role: f.role,
       title: f.title.trim() || null,
       phone: f.phone.trim() || null,
-      monthlyWage: wage,
+      // The phone reads monthlyWage; it stays the monthly pay (null for other pay types).
+      monthlyWage: f.payType === 'monthly' ? rate : null,
+      payType: f.payType,
+      payRate: rate,
+      payMethod: f.payMethod,
+      payAccount: f.payAccount.trim() || null,
       department: f.department.trim() || null,
       village: f.village.trim() || null,
       nationalId: f.nationalId.trim() || null,
@@ -152,9 +170,32 @@ function WorkerForm({ s, cards = [], onClose }: { s?: FarmRecord<StaffBody>; car
         <Field label="Phone (optional)">
           <input className="input" type="tel" value={f.phone} onChange={set('phone')} placeholder="0772 123 456" />
         </Field>
-        <Field label="Monthly wage, UGX (optional)">
-          <input className="input" type="number" min={0} step={1000} inputMode="numeric" value={f.monthlyWage} onChange={set('monthlyWage')} />
+        <Field label="Paid">
+          <select className="input" value={f.payType} onChange={set('payType')}>
+            {payTypes.map((t) => (
+              <option key={t} value={t}>
+                {t === 'contract' ? 'By contract (fixed amount)' : `By the ${payTypeUnit[t].unit}`}
+              </option>
+            ))}
+          </select>
         </Field>
+        <Field label={f.payType === 'contract' ? 'Contract amount, UGX (optional)' : `Pay ${payTypeUnit[f.payType as PayType].per}, UGX (optional)`}>
+          <input className="input" type="number" min={0} step={500} inputMode="numeric" value={f.payRate} onChange={set('payRate')} />
+        </Field>
+        <Field label="Pay them by">
+          <select className="input" value={f.payMethod} onChange={set('payMethod')}>
+            {payMethods.map((m) => (
+              <option key={m} value={m}>
+                {payMethodName[m]}
+              </option>
+            ))}
+          </select>
+        </Field>
+        {f.payMethod !== 'cash' && (
+          <Field label={f.payMethod === 'bank' ? 'Bank and account number' : 'Mobile Money number'}>
+            <input className="input" value={f.payAccount} onChange={set('payAccount')} placeholder={f.payMethod === 'bank' ? 'e.g. Stanbic 9030012345678' : '0772 123 456'} />
+          </Field>
+        )}
         <Field label="Department (optional)">
           <input className="input" value={f.department} onChange={set('department')} placeholder="e.g. Milking" />
         </Field>
@@ -193,23 +234,39 @@ function PayForm({ s, onClose }: { s: FarmRecord<StaffBody>; onClose: () => void
   const farm = useFarm();
   const { user, canSave, online } = useSession();
   const toast = useToast();
+  const terms = payTerms(s.body);
+  const perUnit = terms.type !== 'contract' && terms.type !== 'monthly' && terms.type !== 'yearly';
   const [kind, setKind] = useState<'wage' | 'advance'>('wage');
-  const [amount, setAmount] = useState('');
+  const [units, setUnits] = useState(perUnit ? '' : '1');
+  const [amount, setAmount] = useState(!perUnit && terms.rate ? String(terms.rate) : '');
+  const [method, setMethod] = useState<PayMethod>(terms.method);
+  const [reference, setReference] = useState('');
   const { busy, error, setError, run } = useSave();
+  const unitWord = payTypeUnit[terms.type];
 
   async function save() {
     if (!user) return;
     const n = Number(amount);
     if (!Number.isInteger(n) || n <= 0) return setError('Type the amount in whole shillings, more than 0.');
+    const u = Number(units) || null;
     const { db } = firebase();
     const at = localIso(new Date());
-    // Like the phone's pay(): a wages record plus a wage expense in Money.
-    const ok = await run(async () => {
-      const id = await addRecord(db, farm.id, 'wages', user.uid, { staffId: s.id, kind, amount: n, at });
-      await addRecord(db, farm.id, 'expenses', user.uid, { category: 'wages', amount: n, at, note: `${s.body.name} · ${kind}`, sourceId: id, photo: null });
-    });
+    // Like the phone's pay(): a wages record plus a wage expense in Money, saved together.
+    const ok = await run(() =>
+      saveWithExpense(
+        db,
+        farm.id,
+        user.uid,
+        {
+          collection: 'wages',
+          body: { staffId: s.id, kind, amount: n, at, payMethod: method, units: kind === 'wage' ? u : null, payType: terms.type, reference: reference.trim() || null, note: null },
+        },
+        'wage',
+        { category: 'wages', amount: n, at, note: `${s.body.name} · ${kind === 'wage' ? (u && perUnit ? `${u} ${u === 1 ? unitWord.unit : unitWord.units}` : 'wage') : 'advance'}`, payMethod: method },
+      ),
+    );
     if (ok) {
-      toast(`${ugx(n)} ${kind === 'wage' ? 'wage' : 'advance'} paid to ${s.body.name}`);
+      toast(`${ugx(n)} ${kind === 'wage' ? 'pay' : 'advance'} to ${s.body.name}, saved in Money`);
       onClose();
     }
   }
@@ -217,7 +274,7 @@ function PayForm({ s, onClose }: { s: FarmRecord<StaffBody>; onClose: () => void
   return (
     <FormDialog
       title={`Pay ${s.body.name}`}
-      subtitle="Saved as a wage expense in Money too."
+      subtitle={terms.rate ? `${ugx(terms.rate)} ${unitWord.per}. Saved as worker pay in Money too.` : 'Saved as worker pay in Money too.'}
       onClose={onClose}
       onSubmit={save}
       busy={busy}
@@ -226,10 +283,43 @@ function PayForm({ s, onClose }: { s: FarmRecord<StaffBody>; onClose: () => void
       online={online}
       submit={Number(amount) > 0 ? `Pay ${ugx(Number(amount))}` : 'Pay'}
     >
-      <Seg label="Kind" value={kind} onChange={setKind} items={[['wage', 'Wage'], ['advance', 'Advance']]} />
-      <Field label="Amount (UGX)">
-        <input className="input" type="number" min={1} step={1} inputMode="numeric" required value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus />
-      </Field>
+      <Seg label="Kind" value={kind} onChange={setKind} items={[['wage', 'Pay'], ['advance', 'Advance']]} />
+      <Fit kind="fields" cols={[1, 2, 2, 2]}>
+        {kind === 'wage' && perUnit && (
+          <Field label={`How many ${unitWord.units}`}>
+            <input
+              className="input"
+              type="number"
+              min={0.5}
+              step={0.5}
+              inputMode="decimal"
+              value={units}
+              onChange={(e) => {
+                setUnits(e.target.value);
+                if (terms.rate && Number(e.target.value) > 0) setAmount(String(Math.round(terms.rate * Number(e.target.value))));
+              }}
+              autoFocus
+            />
+          </Field>
+        )}
+        <Field label="Amount (UGX)">
+          <input className="input" type="number" min={1} step={1} inputMode="numeric" required value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus={!perUnit} />
+        </Field>
+        <Field label="Paid by">
+          <select className="input" value={method} onChange={(e) => setMethod(e.target.value as PayMethod)}>
+            {payMethods.map((m) => (
+              <option key={m} value={m}>
+                {payMethodName[m]}
+              </option>
+            ))}
+          </select>
+        </Field>
+        {method !== 'cash' && (
+          <Field label="Transaction ID (optional)" hint={terms.account ? `Their account: ${terms.account}` : undefined}>
+            <input className="input" value={reference} onChange={(e) => setReference(e.target.value)} />
+          </Field>
+        )}
+      </Fit>
     </FormDialog>
   );
 }
@@ -331,6 +421,7 @@ function Profile({
   onPin,
   onCard,
   onClose,
+  onUndo,
 }: {
   s: FarmRecord<StaffBody>;
   card: string | null;
@@ -342,6 +433,7 @@ function Profile({
   onPin: () => void;
   onCard: () => void;
   onClose: () => void;
+  onUndo?: (w: FarmRecord<WageBody>) => void;
 }) {
   const { canSave } = useSession();
   const ins = attendance.filter((a) => isClockIn(a) && a.body.staffId === s.id).sort((a, b) => inTime(b).getTime() - inTime(a).getTime());
@@ -349,7 +441,7 @@ function Profile({
   const days = new Set(ins.map((a) => dayKey(inTime(a))));
   const paid = wages.filter((w) => w.body.staffId === s.id).sort((a, b) => recordDate(b, 'at').getTime() - recordDate(a, 'at').getTime());
   const paidTotal = paid.reduce((t, w) => t + (Number(w.body.amount) || 0), 0);
-  const wage = Number(s.body.monthlyWage) || 0;
+  const wage = monthlyCost(payTerms(s.body));
   return (
     <Dialog title={s.body.name} subtitle={s.body.title || words(s.body.role)} onClose={onClose} size="lg">
       <div className="row wrap">
@@ -392,13 +484,17 @@ function Profile({
           <div className="card flat stat">
             <span className="label">Paid this month</span>
             <span className="value money">{ugx(paidTotal)}</span>
-            <span className="hint">{wage ? (paidTotal >= wage ? 'Fully paid' : `${ugx(wage - paidTotal)} still to pay`) : 'No monthly wage set'}</span>
+            <span className="hint">{wage ? (paidTotal >= wage ? 'Fully paid' : `About ${ugx(wage - paidTotal)} still to pay`) : 'No pay set'}</span>
           </div>
         )}
         {boss && (
           <div className="card flat stat">
-            <span className="label">Monthly wage</span>
-            <span className="value money">{wage ? ugx(wage) : '–'}</span>
+            <span className="label">Pay</span>
+            <span className="value money">{payText(s.body) || '–'}</span>
+            <span className="hint">
+              {payMethodName[payTerms(s.body).method]}
+              {s.body.payAccount ? ` · ${s.body.payAccount}` : ''}
+            </span>
           </div>
         )}
       </Fit>
@@ -434,9 +530,16 @@ function Profile({
                 {paid.map((w) => (
                   <div key={w.id} className="list-row small">
                     <span className="grow">
-                      {shortDate(recordDate(w, 'at'))} · {words(w.body.kind)}
+                      {shortDate(recordDate(w, 'at'))} · {w.body.kind === 'advance' ? 'Advance' : 'Pay'}
+                      {w.body.units ? ` · ${w.body.units} ${w.body.payType ? payTypeUnit[w.body.payType as PayType]?.units ?? '' : ''}` : ''}
+                      {w.body.payMethod ? ` · ${payMethodName[w.body.payMethod as PayMethod] ?? w.body.payMethod}` : ''}
                     </span>
                     <span className="num">{ugx(w.body.amount)}</span>
+                    {canSave && onUndo && (
+                      <button className="icon-btn" aria-label="Remove this payment" title="Remove a mistake (removes it from Money too)" onClick={() => onUndo(w)}>
+                        <Icon name="close" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -460,6 +563,11 @@ export default function Workers() {
   const staff = useRecords<StaffBody>(farm.id, 'staff');
   const attendance = useRecords<AttendanceBody>(farm.id, 'attendance', localIso(monthFrom));
   const wages = useRecords<WageBody>(boss ? farm.id : null, 'wages', localIso(monthFrom));
+  const expenses = useRecords<ExpenseBody>(boss ? farm.id : null, 'expenses', localIso(monthFrom));
+  const [undo, setUndo] = useState<FarmRecord<WageBody> | null>(null);
+  const undoSave = useSave();
+  const toast = useToast();
+  const { user } = useSession();
   const cards = useRecords<NfcCardBody>(farm.id, 'nfcCards');
   const farmers = useRecords<FarmerBody>(farm.id, 'farmers');
   const [q, setQ] = useState('');
@@ -475,7 +583,7 @@ export default function Workers() {
   const todayIn = (id: string) => ins.find((a) => a.body.staffId === id && sameDay(inTime(a), now));
   const daysIn = (id: string) => new Set(ins.filter((a) => a.body.staffId === id).map((a) => dayKey(inTime(a)))).size;
   const paidTo = (id: string) => wages.data.filter((w) => w.body.staffId === id).reduce((t, w) => t + (Number(w.body.amount) || 0), 0);
-  const payroll = active.reduce((t, s) => t + (Number(s.body.monthlyWage) || 0), 0);
+  const payroll = active.reduce((t, s) => t + (monthlyCost(payTerms(s.body))), 0);
   const paidAll = active.reduce((t, s) => t + paidTo(s.id), 0);
   const presentToday = active.filter((s) => todayIn(s.id)).length;
   const taken = takenNumbers(cards.data, [...staff.data.map((s) => s.body.cardNumber), ...farmers.data.map((f) => f.body.card)]);
@@ -483,9 +591,9 @@ export default function Workers() {
   const csv = () =>
     downloadCsv(
       `${farm.name}-workers-${dayKey(now)}`,
-      ['Name', 'Role', 'Phone', 'Card', 'Since', 'In today', 'Days in this month', ...(boss ? ['Monthly wage', 'Paid this month', 'Still to pay'] : [])],
+      ['Name', 'Role', 'Phone', 'Card', 'Since', 'In today', 'Days in this month', ...(boss ? ['Pay', 'Pay type', 'Paid by', 'About a month', 'Paid this month', 'Still to pay'] : [])],
       shown.map((s) => {
-        const wage = Number(s.body.monthlyWage) || 0;
+        const wage = monthlyCost(payTerms(s.body));
         const t = todayIn(s.id);
         return [
           s.body.name,
@@ -495,7 +603,7 @@ export default function Workers() {
           s.body.since ? dayKey(parseDate(s.body.since) ?? now) : '',
           t ? time(inTime(t)) : 'No',
           daysIn(s.id),
-          ...(boss ? [wage, paidTo(s.id), Math.max(0, wage - paidTo(s.id))] : []),
+          ...(boss ? [payTerms(s.body).rate, payTerms(s.body).type, payMethodName[payTerms(s.body).method], wage, paidTo(s.id), Math.max(0, wage - paidTo(s.id))] : []),
         ];
       }),
     );
@@ -530,7 +638,7 @@ export default function Workers() {
             icon="money"
             label="Payroll this month"
             value={ugx(payroll)}
-            hint={payroll ? `${ugx(paidAll)} paid · ${ugx(Math.max(0, payroll - paidAll))} to pay` : 'Set a monthly wage on each worker'}
+            hint={payroll ? `${ugx(paidAll)} paid · about ${ugx(Math.max(0, payroll - paidAll))} to pay` : 'Set each worker’s pay (by the day, month, hour...)'}
             tone="warn"
           />
         )}
@@ -546,14 +654,14 @@ export default function Workers() {
               <th>Card</th>
               <th>Today</th>
               <th className="r">Days this month</th>
-              {boss && <th className="r">Wage</th>}
+              {boss && <th className="r">Pay</th>}
               {boss && <th>Pay status</th>}
             </tr>
           </thead>
           <tbody>
             {shown.map((s) => {
               const t = todayIn(s.id);
-              const wage = Number(s.body.monthlyWage) || 0;
+              const wage = monthlyCost(payTerms(s.body));
               const paid = paidTo(s.id);
               const card = cardOf(s);
               return (
@@ -572,14 +680,14 @@ export default function Workers() {
                     {daysIn(s.id)}
                   </td>
                   {boss && (
-                    <td data-label="Wage" className="r">
-                      {wage ? ugx(wage) : '–'}
+                    <td data-label="Pay" className="r">
+                      {payText(s.body) || '–'}
                     </td>
                   )}
                   {boss && (
                     <td data-label="Pay status">
                       {!wage ? (
-                        <span className="chip">No wage set</span>
+                        <span className="chip">{payTerms(s.body).type === 'contract' ? 'Contract' : 'No pay set'}</span>
                       ) : paid >= wage ? (
                         <span className="chip ok">Paid</span>
                       ) : paid > 0 ? (
@@ -630,7 +738,27 @@ export default function Workers() {
           onPin={() => setModal('pin')}
           onCard={() => setModal('card')}
           onClose={() => setOpenId(null)}
+          onUndo={setUndo}
         />
+      )}
+      {undo && (
+        <ConfirmDialog
+          title="Remove this payment?"
+          confirm="Remove"
+          danger
+          busy={undoSave.busy}
+          error={undoSave.error}
+          onClose={() => setUndo(null)}
+          onConfirm={async () => {
+            if (!user) return;
+            if (await undoSave.run(() => removeWithExpenses(firebase().db, farm.id, user.uid, undo, expensesOf(undo.id, expenses.data)))) {
+              toast('Payment removed, and from Money too');
+              setUndo(null);
+            }
+          }}
+        >
+          {ugx(undo.body.amount)} on {shortDate(recordDate(undo, 'at'))}. Use this only for a mistake. Its expense in Money is removed with it.
+        </ConfirmDialog>
       )}
     </>
   );

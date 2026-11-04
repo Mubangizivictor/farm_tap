@@ -11,6 +11,15 @@ import { firebase } from '@/lib/firebase';
 import { date } from '@/lib/format';
 import { defaultConfig, maskSecret, secretList, secretNameOk, type Gateway, type PlatformConfig } from '@/lib/platform';
 
+/** Keys each in-app gateway needs (names in platformSecrets, read only by functions/). */
+const gatewayKeys: Record<string, string[]> = {
+  mtn: ['mtn_subscription_key', 'mtn_api_user', 'mtn_api_key'],
+  airtel: ['airtel_client_id', 'airtel_client_secret'],
+  card: ['flutterwave_secret_key', 'flutterwave_webhook_hash'],
+};
+const DEFAULT_WEBHOOK_BASE = 'https://europe-west1-farm-tap-1dd15.cloudfunctions.net/paymentWebhook';
+const webhookUrl = (base: string, provider: string) => `${(base || DEFAULT_WEBHOOK_BASE).replace(/\/+$/, '')}/${provider}`;
+
 const sections = [
   ['sms-provider', 'SMS'],
   ['payments', 'Payments'],
@@ -186,38 +195,68 @@ export default function IntegrationsPage() {
         hint={
           i && (
             <select className="input" style={{ width: 'auto' }} value={i.payments.mode} onChange={(e) => setI({ ...i, payments: { ...i.payments, mode: e.target.value as 'sandbox' | 'live' } })} aria-label="Mode">
-              <option value="sandbox">Test mode (sandbox)</option>
+              <option value="sandbox">Test mode (sandbox, no real money)</option>
               <option value="live">Live money</option>
             </select>
           )
         }
       >
         <Fit cols={[1, 2, 2, 3]}>
-          {c.payments.gateways.map((g, idx) => (
-            <section key={g.id} className="card stack">
-              <Toggle label={g.name} hint={g.enabled ? 'Shown in the apps' : 'Hidden'} checked={g.enabled} disabled={!can('settings')} onChange={(enabled) => gw(idx, { enabled })} />
-              {g.enabled && (
-                <>
-                  <label className="field">
-                    <span>Name shown</span>
-                    <input className="input" value={g.name} onChange={(e) => gw(idx, { name: e.target.value })} />
-                  </label>
-                  <label className="field">
-                    <span>{g.id === 'bank' ? 'Account number' : g.id === 'card' ? 'Payment page link' : 'Pay code or number'}</span>
-                    <input className="input" value={g.payCode} onChange={(e) => gw(idx, { payCode: e.target.value })} />
-                  </label>
-                  <label className="field">
-                    <span>Account name</span>
-                    <input className="input" value={g.accountName} onChange={(e) => gw(idx, { accountName: e.target.value })} />
-                  </label>
-                  <label className="field">
-                    <span>How to pay (simple steps)</span>
-                    <input className="input" value={g.instructions} onChange={(e) => gw(idx, { instructions: e.target.value })} />
-                  </label>
-                </>
-              )}
-            </section>
-          ))}
+          {c.payments.gateways.map((g, idx) => {
+            const needs = gatewayKeys[g.id] ?? [];
+            const missing = needs.filter((k) => !secrets[k]?.last4);
+            return (
+              <section key={g.id} className="card stack">
+                <div className="card-head">
+                  <h2>{g.name}</h2>
+                  <span className={`chip ${g.hidden ? '' : g.enabled ? 'ok' : 'warn'}`}>{g.hidden ? 'Hidden' : g.enabled ? 'Live for farms' : 'Coming soon'}</span>
+                </div>
+                <Toggle
+                  label="Farms can pay this way"
+                  hint={g.enabled ? 'On: farms can choose it' : 'Muted: farms see it as Coming soon'}
+                  checked={g.enabled}
+                  disabled={!can('settings')}
+                  onChange={(enabled) => gw(idx, { enabled })}
+                />
+                <Toggle label="Hide it completely" hint="Not even Coming soon" checked={g.hidden} disabled={!can('settings')} onChange={(hidden) => gw(idx, { hidden })} />
+                {needs.length > 0 && (
+                  <Toggle
+                    label="Pay inside the app"
+                    hint={g.api ? 'The server asks the network and starts the plan by itself' : 'By hand: farms follow the steps and send the transaction ID'}
+                    checked={g.api}
+                    disabled={!can('settings')}
+                    onChange={(api) => gw(idx, { api })}
+                  />
+                )}
+                {g.api && needs.length > 0 && missing.length > 0 && (
+                  <div className="banner warn small">
+                    <Icon name="key" />
+                    <span className="grow">Paste its keys below before switching it on ({missing.length} missing). Until then farms get an error.</span>
+                  </div>
+                )}
+                <label className="field">
+                  <span>Name shown</span>
+                  <input className="input" value={g.name} onChange={(e) => gw(idx, { name: e.target.value })} />
+                </label>
+                {!g.api && (
+                  <>
+                    <label className="field">
+                      <span>{g.id === 'bank' ? 'Account number' : g.id === 'card' ? 'Payment page link' : 'Pay code or number'}</span>
+                      <input className="input" value={g.payCode} onChange={(e) => gw(idx, { payCode: e.target.value })} />
+                    </label>
+                    <label className="field">
+                      <span>Account name</span>
+                      <input className="input" value={g.accountName} onChange={(e) => gw(idx, { accountName: e.target.value })} />
+                    </label>
+                    <label className="field">
+                      <span>How to pay (simple steps)</span>
+                      <input className="input" value={g.instructions} onChange={(e) => gw(idx, { instructions: e.target.value })} />
+                    </label>
+                  </>
+                )}
+              </section>
+            );
+          })}
         </Fit>
         <section className="card">
           <Fit cols={[1, 2, 2, 2]}>
@@ -227,11 +266,26 @@ export default function IntegrationsPage() {
             </label>
             {i && (
               <label className="field">
-                <span>Payment callback URL (from your server code, when you add the APIs)</span>
-                <input className="input" type="url" value={i.payments.callbackUrl} onChange={(e) => setI({ ...i, payments: { ...i.payments, callbackUrl: e.target.value.trim() } })} />
+                <span>MTN target environment (from MTN: sandbox, or mtnuganda when live)</span>
+                <input className="input mono" value={i.payments.mtnEnvironment} onChange={(e) => setI({ ...i, payments: { ...i.payments, mtnEnvironment: e.target.value.trim() } })} />
               </label>
             )}
           </Fit>
+          {i && (
+            <div className="stack small" style={{ marginTop: 'var(--s-md)' }}>
+              <strong>Callback addresses to give the providers</strong>
+              <span className="muted">Paste these in the MTN, Airtel and Flutterwave portals. FarmTap always re-checks a payment with the provider before starting a plan.</span>
+              {(['mtn', 'airtel', 'flutterwave'] as const).map((p) => (
+                <code key={p} className="mono" style={{ wordBreak: 'break-all' }}>
+                  {webhookUrl(i.payments.callbackUrl, p)}
+                </code>
+              ))}
+              <label className="field">
+                <span>Server address (leave empty unless you moved the server code)</span>
+                <input className="input mono" type="url" value={i.payments.callbackUrl} placeholder={DEFAULT_WEBHOOK_BASE} onChange={(e) => setI({ ...i, payments: { ...i.payments, callbackUrl: e.target.value.trim() } })} />
+              </label>
+            </div>
+          )}
         </section>
       </Anchor>
 

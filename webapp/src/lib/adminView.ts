@@ -3,8 +3,13 @@ import type { AdminFarm } from './admin.ts';
 import { planState } from './domain.ts';
 import { starterPlan, type Plan } from './platform.ts';
 
-export function farmPlan(f: AdminFarm, now: Date) {
-  return planState({ trialStartedAt: f.trialStartedAt, trialEndsAt: f.trialEndsAt, paidUntil: f.paidUntil }, now);
+/** Admin view of a farm's plan: a paid farm with 7 days or less left shows as 'grace' (due soon). */
+export type AdminPlan = ReturnType<typeof planState> | { kind: 'grace'; until: Date; daysLeft: number };
+
+export function farmPlan(f: AdminFarm, now: Date): AdminPlan {
+  const p = planState({ trialStartedAt: f.trialStartedAt, trialEndsAt: f.trialEndsAt, paidUntil: f.paidUntil }, now);
+  if (p.kind === 'paid' && p.daysLeft <= 7) return { kind: 'grace', until: p.until, daysLeft: p.daysLeft };
+  return p;
 }
 
 export function farmStatus(f: AdminFarm, now: Date): { text: string; tone: 'ok' | 'warn' | 'bad' | 'brand' } {
@@ -15,7 +20,7 @@ export function farmStatus(f: AdminFarm, now: Date): { text: string; tone: 'ok' 
     case 'paid':
       return { text: 'Paid', tone: 'ok' };
     case 'grace':
-      return { text: 'Overdue', tone: 'warn' };
+      return { text: `Due in ${p.daysLeft}d`, tone: 'warn' };
     case 'trial':
       return { text: `Trial, ${p.daysLeft}d left`, tone: p.daysLeft <= 2 ? 'warn' : 'brand' };
     case 'readOnly':

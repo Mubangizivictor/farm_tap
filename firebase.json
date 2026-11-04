@@ -38,6 +38,9 @@
     "singleProjectMode": true,
     "auth": {
       "port": 9099
+    },
+    "functions": {
+      "port": 5001
     }
   },
   "hosting": {
@@ -63,5 +66,23 @@
   },
   "storage": {
     "rules": "storage.rules"
-  }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "payments",
+      "runtime": "nodejs22",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "*.log",
+        "src",
+        "lib/*.test.js",
+        "lib/*.test.js.map"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ]
 }

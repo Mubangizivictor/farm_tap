@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
+import { PlansSection } from '@/components/plans';
 import { Field, PageHead, Seg, Tabs, useSave, useToast } from '@/components/ui';
 import { saveError, upsertRecord, useRecords } from '@/lib/data';
 import { ugandaDistricts } from '@/lib/districts';
@@ -108,56 +109,6 @@ function FarmProfile() {
   );
 }
 
-function SubscriptionSection() {
-  const farm = useFarm();
-  const { config } = usePlatform();
-  const now = new Date();
-  const plan = planState(farm.subscription, now);
-  const pt = planText(plan);
-
-  const enabledGateways = config.payments.gateways.filter((g) => g.enabled);
-
-  return (
-    <section className="card stack">
-      <div className="card-head">
-        <h2>Subscription and payment</h2>
-        <span className={`chip ${pt.tone}`}>{pt.text}</span>
-      </div>
-      {farm.subscription.trialStartedAt && <p className="small muted">Free trial started {date(farm.subscription.trialStartedAt)}.</p>}
-      <p className="small">
-        {plan.kind === 'readOnly'
-          ? 'Your records are safe and you can see everything. Pay to record again.'
-          : 'When the trial or subscription ends, FarmTap becomes read-only until you pay. Nothing is deleted.'}
-      </p>
-
-      {enabledGateways.length > 0 && (
-        <>
-          <h3>How to pay</h3>
-          <div className="list">
-            {enabledGateways.map((g) => (
-              <div key={g.id} className="list-row wrap">
-                <div className="stack grow" style={{ gap: 'var(--s-xxs)' }}>
-                  <strong>{g.name}</strong>
-                  {g.payCode && <span className="mono small">{g.payCode}</span>}
-                  {g.accountName && <span className="small muted">{g.accountName}</span>}
-                  {g.instructions && <span className="small">{g.instructions}</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-          {config.payments.manualNote && <p className="small muted">{config.payments.manualNote}</p>}
-        </>
-      )}
-
-      <div className="row wrap">
-        <a className="btn" href={supportWhatsAppLink(`Hello FarmTap, I want to pay for ${farm.name}.`)} target="_blank" rel="noreferrer">
-          <Icon name="whatsapp" /> Pay on WhatsApp
-        </a>
-      </div>
-    </section>
-  );
-}
-
 function HelpSection() {
   const { config } = usePlatform();
   const phone = config.support.phone || '+256793128137';
@@ -249,7 +200,8 @@ const TABS: readonly (readonly [Tab, string])[] = [
 
 export default function Settings() {
   const farm = useFarm();
-  const { user, farms, signOut } = useSession();
+  const { user, canSwitch, signOut } = useSession();
+  const { config } = usePlatform();
   const router = useRouter();
   const [theme, setTheme] = useTheme();
   const [tab, setTabState] = useState<Tab>('farm');
@@ -281,7 +233,7 @@ export default function Settings() {
         </>
       )}
 
-      {tab === 'plan' && <SubscriptionSection />}
+      {tab === 'plan' && <PlansSection farm={farm} />}
 
       {tab === 'account' && (
         <Fit kind="cards" cols={[1, 2, 2, 2]}>
@@ -301,15 +253,42 @@ export default function Settings() {
             </div>
             <p className="small muted">This browser stays signed in until you sign out. Sign out on shared computers.</p>
             <div className="row wrap">
-              {farms && farms.length > 1 && (
+              {canSwitch && (
                 <button className="btn outline" onClick={() => router.push('/farms/')}>
-                  <Icon name="switch" /> Switch place
+                  <Icon name="switch" /> Switch farm
                 </button>
               )}
               <button className="btn outline" onClick={() => void signOut().then(() => router.replace('/sign-in/'))}>
                 <Icon name="logout" /> Sign out
               </button>
             </div>
+          </section>
+
+          <section className="card stack">
+            <div className="card-head">
+              <h2>Farms on this account</h2>
+            </div>
+            {canSwitch ? (
+              <p className="small">
+                This account has more than one farm. <strong>Switch farm</strong> closes {farm.name} and opens another one. Each farm keeps its own animals,
+                records, workers, cards and plan; nothing is shared or mixed between them.
+              </p>
+            ) : (
+              <p className="small">
+                One account runs one farm. To add a second farm or a collection centre, contact FarmTap: we raise your farm limit, and each farm then has its
+                own plan.
+              </p>
+            )}
+            {!canSwitch && (
+              <div className="row wrap">
+                <a className="btn outline" href={supportWhatsAppLink(`Hello FarmTap, I want to add another farm to my account (${user?.email ?? ''}).`)} target="_blank" rel="noreferrer">
+                  <Icon name="whatsapp" /> Ask for another farm
+                </a>
+                <a className="btn ghost" href={`tel:${(config.support.phone || '+256793128137').replace(/\s/g, '')}`}>
+                  <Icon name="phone" /> {config.support.phone || '+256 793 128 137'}
+                </a>
+              </div>
+            )}
           </section>
 
           <section className="card stack">

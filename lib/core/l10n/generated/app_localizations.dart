@@ -631,7 +631,7 @@ abstract class AppLocalizations {
   /// No description provided for @signUpSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'You\'ll set up your farm next. 7 days free.'**
+  /// **'You\'ll set up your farm next. 14 days free.'**
   String get signUpSubtitle;
 
   /// No description provided for @fullNameLabel.

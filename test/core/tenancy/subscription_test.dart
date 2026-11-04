@@ -18,12 +18,12 @@ import '../../helpers/fake_deps.dart';
 void main() {
   final trial = Subscription(trialStartedAt: DateTime(2026, 11, 2), trialEndsAt: DateTime(2026, 11, 16));
 
-  test('a new farm (B10) gets its own trial: today + 7 days', () async {
+  test('a new farm (B10) gets its own trial: today + 14 days', () async {
     final clock = FakeClock(DateTime(2026, 11, 7, 8, 41));
     final repo = FakeOnboardingRepository(clock);
     final farm = (await repo.createFarm(const FarmSetup(farmName: 'New Farm'))).data!;
-    expect(farm.subscription.trialEndsAt, DateTime(2026, 11, 14));
-    expect(farm.subscription.trialDaysLeft(clock.today()), 7);
+    expect(farm.subscription.trialEndsAt, DateTime(2026, 11, 21));
+    expect(farm.subscription.trialDaysLeft(clock.today()), 14);
   });
 
   group('Subscription', () {
@@ -41,13 +41,11 @@ void main() {
       expect(trial.trialBanner(DateTime(2026, 11, 17)), isNull);
     });
 
-    test('overdue payment: 7 days grace, then read-only', () {
+    test('plan ends -> locked the same day, no grace (decision 0023)', () {
       final paid = Subscription(trialEndsAt: DateTime(2026, 11, 21), paidUntil: DateTime(2026, 12, 21));
       expect(paid.state(DateTime(2026, 12, 20)), SubscriptionState.active);
-      expect(paid.state(DateTime(2026, 12, 21)), SubscriptionState.grace);
-      expect(paid.graceDaysLeft(DateTime(2026, 12, 21)), 7);
-      expect(paid.state(DateTime(2026, 12, 27)), SubscriptionState.grace);
-      expect(paid.state(DateTime(2026, 12, 28)), SubscriptionState.readOnly);
+      expect(paid.state(DateTime(2026, 12, 21)), SubscriptionState.readOnly);
+      expect(paid.graceDaysLeft(DateTime(2026, 12, 21)), 0);
     });
   });
 

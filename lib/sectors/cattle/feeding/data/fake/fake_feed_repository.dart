@@ -220,13 +220,16 @@ class FakeFeedRepository implements FeedRepository, Restorable {
         continue;
       }
       if (b['kind'] != 'purchase' || b['feed'] == null || _purchases.any((p) => p.id == r.id)) continue;
+      // Feeds the farm added on the web (feedTypes) are not on this phone yet.
+      final kind = FeedKind.values.asNameMap()[b['feed']];
+      if (kind == null) continue;
       _purchases = [
         ..._purchases,
         FeedPurchase(
           id: r.id,
-          feed: FeedKind.values.byName(b['feed']! as String),
+          feed: kind,
           amount: (b['amount']! as num).toDouble(),
-          pricePerUnit: b['pricePerUnit']! as int,
+          pricePerUnit: (b['pricePerUnit']! as num).round(),
           at: DateTime.parse(b['at']! as String),
           supplier: b['supplier'] as String?,
         ),

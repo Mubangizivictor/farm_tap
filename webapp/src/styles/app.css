@@ -557,3 +557,93 @@ textarea.input { min-height: calc(var(--z-input) * 2); resize: vertical; }
 .shell.supplier .main { padding-bottom: var(--s-xl); }
 .shell.supplier .content { max-width: var(--z-content); width: 100%; margin: 0 auto; }
 .full-screen .box .icon { width: var(--z-loader); height: var(--z-loader); color: var(--c-primary); }
+
+/* ================= Decision 0023: plans, lock, contacts, feeds, roster ================= */
+.btn.lg { min-height: var(--z-touch); padding: var(--s-md) var(--s-xl); font-size: var(--fs-title-sm); }
+.link-btn { background: none; border: 0; padding: 0; color: var(--c-primary); cursor: pointer; text-align: left; font: inherit; }
+.check-row { display: flex; align-items: center; gap: var(--s-md); cursor: pointer; }
+.check-row input { width: var(--z-icon); height: var(--z-icon); accent-color: var(--c-primary); }
+.bad-text { color: var(--c-danger); }
+.center { justify-content: center; }
+.input.sm { min-height: var(--z-avatar); padding: var(--s-xxs) var(--s-sm); font-size: var(--fs-label); width: auto; }
+.list-row.dim { opacity: 0.55; }
+.avatar.bad, .icon-chip.bad { background: var(--c-danger-container); color: var(--c-on-danger-container); }
+.icon-chip { width: var(--z-avatar); height: var(--z-avatar); border-radius: var(--r-sm); display: grid; place-items: center; background: var(--c-primary-container); color: var(--c-on-primary-container); flex: none; }
+.big-num { font-size: var(--fs-metric); font-weight: var(--fw-bold); line-height: var(--lh-tight); }
+.big-num small { font-size: var(--fs-body); font-weight: var(--fw-medium); color: var(--c-on-surface-variant); }
+
+/* Trial chip: on every screen size, opens the plans. */
+.plan-chip { text-decoration: none; cursor: pointer; }
+.plan-chip:hover { text-decoration: none; filter: brightness(0.97); }
+.plan-chip .icon { width: var(--z-icon-sm); height: var(--z-icon-sm); }
+@media (max-width: 599px) { .plan-chip span { max-width: 18ch; overflow: hidden; text-overflow: ellipsis; } }
+
+/* Lock screen after the trial or plan ends. */
+.lock-screen { max-width: var(--z-lock); margin: var(--s-xxl) auto; text-align: center; align-items: center; gap: var(--s-lg); padding: var(--s-xl); }
+.lock-icon { width: var(--z-lock-icon); height: var(--z-lock-icon); border-radius: var(--r-pill); display: grid; place-items: center; background: var(--c-danger-container); color: var(--c-on-danger-container); }
+.lock-icon .icon { width: var(--z-avatar); height: var(--z-avatar); }
+.lock-screen h1 { font-size: var(--fs-headline); }
+
+/* Plans. */
+.plan-status.bad { border-color: var(--c-danger); }
+.plan-status-text { font-size: var(--fs-title-lg); }
+.plan-grid { display: grid; gap: var(--s-lg); grid-template-columns: repeat(auto-fit, minmax(var(--z-plan-min), 1fr)); }
+.plan-card { position: relative; display: flex; flex-direction: column; gap: var(--s-md); padding: var(--s-xl); border-radius: var(--r-card); background: var(--c-card); border: var(--z-border) solid var(--c-outline-variant); }
+.plan-card.featured { border: var(--z-focus) solid var(--c-primary); box-shadow: 0 var(--z-shadow-y) var(--z-shadow-blur) var(--c-shadow); }
+.plan-card.current { background: var(--c-primary-container); }
+.plan-card h3 { font-size: var(--fs-title-lg); }
+.plan-badge { position: absolute; top: calc(var(--z-plan-ribbon) / -2); right: var(--s-xl); height: var(--z-plan-ribbon); display: inline-flex; align-items: center; padding: 0 var(--s-md); border-radius: var(--r-pill); background: var(--c-secondary); color: var(--c-on-primary); font-size: var(--fs-label-sm); font-weight: var(--fw-bold); }
+.plan-price { display: flex; align-items: baseline; gap: var(--s-xs); flex-wrap: wrap; }
+.plan-price .amount { font-size: var(--fs-display); font-weight: var(--fw-extrabold); color: var(--c-primary); line-height: var(--lh-tight); }
+.plan-price .per { color: var(--c-on-surface-variant); }
+.plan-points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-sm); flex: 1; }
+.plan-points li { display: flex; gap: var(--s-sm); align-items: flex-start; font-size: var(--fs-body); }
+.plan-points .icon { color: var(--c-success); width: var(--z-icon-sm); height: var(--z-icon-sm); flex: none; margin-top: var(--s-xxs); }
+.pay-methods { display: grid; gap: var(--s-sm); grid-template-columns: repeat(auto-fit, minmax(var(--z-col-min), 1fr)); }
+.pay-method { display: flex; align-items: center; gap: var(--s-md); padding: var(--s-md); border-radius: var(--r-md); background: var(--c-container-low); }
+.pay-method.soon { opacity: 0.7; }
+.pay-logo { width: var(--z-pay-logo); height: var(--z-avatar); border-radius: var(--r-sm); display: grid; place-items: center; font-size: var(--fs-label-sm); font-weight: var(--fw-extrabold); background: var(--c-container-high); color: var(--c-on-surface); flex: none; }
+.pay-logo.mtn { background: var(--p-mtn); color: var(--p-on-mtn); }
+.pay-logo.airtel { background: var(--p-airtel); color: var(--p-on-airtel); }
+.pay-logo.card { background: var(--p-card); color: var(--p-on-card); }
+.pay-choice { display: grid; gap: var(--s-sm); grid-template-columns: repeat(auto-fit, minmax(var(--z-stat-min), 1fr)); }
+.pay-option { display: flex; align-items: center; gap: var(--s-md); padding: var(--s-md); border-radius: var(--r-md); border: var(--z-focus) solid var(--c-outline-variant); background: var(--c-card); color: var(--c-on-surface); cursor: pointer; text-align: left; font: inherit; }
+.pay-option.on { border-color: var(--c-primary); background: var(--c-primary-container); }
+.pay-option:disabled { cursor: not-allowed; opacity: 0.55; }
+.pay-option small { margin-left: auto; color: var(--c-on-surface-variant); }
+.pay-wait { align-items: center; text-align: center; }
+.pay-phone { width: var(--z-lock-icon); height: var(--z-lock-icon); border-radius: var(--r-pill); display: grid; place-items: center; background: var(--c-primary-container); color: var(--c-on-primary-container); }
+
+/* Contacts and call buttons. */
+.contact-grid, .duty-grid, .feed-grid { display: grid; gap: var(--s-lg); grid-template-columns: repeat(auto-fill, minmax(var(--z-col-min), 1fr)); }
+.feed-grid { grid-template-columns: repeat(auto-fill, minmax(var(--z-tile-min), 1fr)); }
+.call-btns { gap: var(--s-xs); flex-wrap: nowrap; }
+.card.emergency { border-left: var(--s-xs) solid var(--c-danger); }
+.card.in-charge { border-left: var(--s-xs) solid var(--c-primary); }
+.key-contact { align-items: center; }
+.feed-tile.low { background: var(--c-warning-container); color: var(--c-on-warning-container); }
+
+/* Duty roster. */
+.duty-card.covering { border-color: var(--c-warning); }
+.duty-card.gap { border-color: var(--c-danger); background: var(--c-danger-container); }
+.duty-card.mine { border: var(--z-focus) solid var(--c-primary); }
+.call-line { padding-top: var(--s-sm); border-top: var(--z-border) solid var(--c-outline-variant); }
+.roster-week td.covering { background: var(--c-warning-container); }
+.roster-week td.gap { background: var(--c-danger-container); }
+.roster-week th, .roster-week td { white-space: nowrap; }
+
+/* Pick lists (cows milked, animals vaccinated). */
+.pick-grid { display: grid; gap: var(--s-xs); grid-template-columns: repeat(auto-fill, minmax(var(--z-stat-min), 1fr)); max-height: calc(var(--z-chart) * 2); overflow: auto; }
+.pick { display: flex; align-items: center; gap: var(--s-sm); padding: var(--s-sm) var(--s-md); border-radius: var(--r-sm); background: var(--c-container-low); cursor: pointer; font-size: var(--fs-body-sm); }
+.pick.on { background: var(--c-primary-container); color: var(--c-on-primary-container); }
+
+/* Home: on duty today and reminders. */
+.today-farm .key-calls { padding-top: var(--s-sm); }
+.reminder { display: flex; align-items: center; gap: var(--s-sm); padding: var(--s-sm) var(--s-md); border-radius: var(--r-sm); font-size: var(--fs-body-sm); text-decoration: none; color: inherit; background: var(--c-tertiary-container); }
+.reminder.warn { background: var(--c-warning-container); color: var(--c-on-warning-container); }
+.reminder.bad { background: var(--c-danger-container); color: var(--c-on-danger-container); }
+.reminder .icon { width: var(--z-icon-sm); height: var(--z-icon-sm); }
+
+/* Monthly report. */
+.report-hero { align-items: flex-start; gap: var(--s-xs); border-left: var(--s-xs) solid var(--c-success); }
+.report-hero.bad { border-left-color: var(--c-danger); }
