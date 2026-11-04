@@ -73,7 +73,7 @@ export default function Money() {
       <Fit kind="stats" cols={[2, 4, 4, 4]}>
         <Stat icon="money" label="MRR" value={ugx(mrr)} hint={`${paying.length} paying farms`} tone="gold" />
         <Stat icon="receipt" label="This month" value={ugx(sum(monthStart))} hint={`Last month ${ugx(sum(lastMonthStart, monthStart))}`} tone="gold" />
-        <Stat icon="alert" label="Overdue" value={String(overdue.length)} hint="In the 7 days of grace" tone={overdue.length ? 'warn' : undefined} />
+        <Stat icon="alert" label="Due soon" value={String(overdue.length)} hint="Paid time ends within 7 days" tone={overdue.length ? 'warn' : undefined} />
         <Stat icon="chart" label="All time" value={ugx(sum(new Date(0)))} hint={`${ok.length} payments`} />
       </Fit>
 

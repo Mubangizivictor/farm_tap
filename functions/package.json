@@ -1,0 +1,23 @@
+{
+  "name": "farmtap-functions",
+  "private": true,
+  "description": "FarmTap server code (decision 0023): subscription payments with MTN MoMo, Airtel Money and card (Flutterwave). Keys come from platformSecrets, never the apps.",
+  "main": "lib/index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc && node --test lib/*.test.js",
+    "serve": "npm run build && firebase emulators:start --only functions"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.5.0",
+    "firebase-functions": "^7.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "5.9.3"
+  }
+}

@@ -93,7 +93,7 @@ export default function Setup() {
   // If the selected sector is not in the open list, reset it
   const activeSector = openSectors.includes(sector) ? sector : (openSectors[0] ?? 'dairy');
 
-  const trialDays = cfg.trialDays ?? 7;
+  const trialDays = cfg.trialDays ?? 14;
 
   async function submit(ev: FormEvent) {
     ev.preventDefault();

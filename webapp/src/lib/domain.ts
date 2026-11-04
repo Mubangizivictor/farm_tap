@@ -87,24 +87,21 @@ export const manages = (f: Farm) => f.role === 'owner' || f.role === 'manager';
 export type PlanState =
   | { kind: 'trial'; daysLeft: number; endsAt: Date }
   | { kind: 'paid'; until: Date; daysLeft: number }
-  | { kind: 'grace'; until: Date; daysLeft: number }
   | { kind: 'readOnly'; since: Date | null };
 
 /**
- * Same rule as the phone and firestore.rules (binding rule 3): writes while
- * the trial runs, or until paid-until + 7 days' grace; read-only after.
+ * Same rule as the phone and firestore.rules (decision 0023): the farm can
+ * record while the free trial runs or until the paid-until date, and not a
+ * minute after. There is no grace: support extends paid-until by hand when
+ * a farm needs more time.
  */
 export function planState(s: Subscription, now: Date): PlanState {
-  if (s.paidUntil) {
-    const left = daysBetween(now, s.paidUntil);
-    if (now < s.paidUntil) return { kind: 'paid', until: s.paidUntil, daysLeft: left };
-    const graceEnd = addDays(s.paidUntil, 7);
-    if (now < graceEnd) return { kind: 'grace', until: graceEnd, daysLeft: daysBetween(now, graceEnd) };
-  }
+  if (s.paidUntil && now < s.paidUntil) return { kind: 'paid', until: s.paidUntil, daysLeft: daysBetween(now, s.paidUntil) };
   if (s.trialEndsAt && now < s.trialEndsAt) {
     return { kind: 'trial', daysLeft: Math.max(0, daysBetween(now, s.trialEndsAt)), endsAt: s.trialEndsAt };
   }
-  const since = s.paidUntil ? addDays(s.paidUntil, 7) : s.trialEndsAt;
+  const ends = [s.paidUntil, s.trialEndsAt].filter((d): d is Date => d != null);
+  const since = ends.length ? new Date(Math.max(...ends.map((d) => d.getTime()))) : null;
   return { kind: 'readOnly', since };
 }
 
@@ -137,6 +134,10 @@ export interface MilkBody {
   litres: number;
   notForSale?: boolean;
   recordedBy?: string;
+  /** Herd total only: how many cows were milked (not every cow is milked every day). */
+  cowsMilked?: number | null;
+  /** Herd total only: which cows were milked, when the recorder named them. */
+  cowIds?: string[] | null;
 }
 
 export interface TreatmentBody {
@@ -155,6 +156,10 @@ export interface TreatmentBody {
   avatarIndex?: number;
   note?: string | null;
   photo?: string | null;
+  /** What the treatment cost (drugs + vet), UGX. Goes to Money as a vet expense. */
+  cost?: number | null;
+  /** The vet or doctor (contacts id) who treated. */
+  vetId?: string | null;
 }
 
 export interface ExpenseBody {
@@ -162,8 +167,318 @@ export interface ExpenseBody {
   amount: number;
   at: string;
   note?: string | null;
+  /** The record that made this expense (feed purchase, wage, treatment...). */
   sourceId?: string | null;
+  /** Which kind of record [sourceId] is, so Money can link back to it. */
+  sourceType?: SpendSource | null;
+  /** The supplier or vet paid (contacts id), for "spent per supplier". */
+  supplierId?: string | null;
+  /** How it was paid: cash, MTN, Airtel, bank. */
+  payMethod?: PayMethod | null;
+  photo?: string | null;
 }
+
+/** Where an automatic expense comes from (decision 0023). */
+export type SpendSource = 'feedPurchase' | 'wage' | 'treatment' | 'supplierPayment' | 'drugPurchase' | 'service' | 'vaccination';
+
+export const sourcePage: Record<SpendSource, { label: string; href: string }> = {
+  feedPurchase: { label: 'Feed purchase', href: '/feeds/' },
+  wage: { label: 'Worker pay', href: '/workers/' },
+  treatment: { label: 'Treatment', href: '/health/' },
+  vaccination: { label: 'Vaccination', href: '/health/' },
+  supplierPayment: { label: 'Supplier payment', href: '/contacts/' },
+  drugPurchase: { label: 'Drug purchase', href: '/health/' },
+  service: { label: 'Breeding service', href: '/breeding/' },
+};
+
+/** Phone wages and feed purchases have a sourceId but no sourceType yet. */
+export function sourceOf(e: ExpenseBody): SpendSource | null {
+  if (e.sourceType) return e.sourceType;
+  if (!e.sourceId) return null;
+  if (e.category === 'wages') return 'wage';
+  if (e.category === 'feed') return 'feedPurchase';
+  if (e.category === 'breeding') return 'service';
+  if (e.category === 'vet') return 'drugPurchase';
+  return null;
+}
+
+// ---------------------------------------------------------------- Pay
+
+export const payMethods = ['cash', 'mtn', 'airtel', 'bank'] as const;
+export type PayMethod = (typeof payMethods)[number];
+export const payMethodName: Record<PayMethod, string> = { cash: 'Cash', mtn: 'MTN MoMo', airtel: 'Airtel Money', bank: 'Bank' };
+
+/** How a worker is paid (decision 0023). The phone keeps monthlyWage for monthly pay. */
+export const payTypes = ['monthly', 'daily', 'hourly', 'weekly', 'yearly', 'contract'] as const;
+export type PayType = (typeof payTypes)[number];
+export const payTypeUnit: Record<PayType, { per: string; unit: string; units: string }> = {
+  monthly: { per: 'a month', unit: 'month', units: 'months' },
+  weekly: { per: 'a week', unit: 'week', units: 'weeks' },
+  daily: { per: 'a day', unit: 'day', units: 'days' },
+  hourly: { per: 'an hour', unit: 'hour', units: 'hours' },
+  yearly: { per: 'a year', unit: 'year', units: 'years' },
+  contract: { per: 'for the contract', unit: 'contract', units: 'contracts' },
+};
+
+/** A worker's pay terms, reading older records that only had monthlyWage. */
+export function payTerms(b: StaffBody): { type: PayType; rate: number; method: PayMethod; account: string } {
+  const type = (payTypes as readonly string[]).includes(b.payType ?? '') ? (b.payType as PayType) : 'monthly';
+  const rate = Number(b.payRate ?? (type === 'monthly' ? b.monthlyWage : 0)) || 0;
+  const method = (payMethods as readonly string[]).includes(b.payMethod ?? '') ? (b.payMethod as PayMethod) : 'cash';
+  return { type, rate, method, account: b.payAccount ?? '' };
+}
+
+/** What a worker's pay comes to for a month, for the payroll estimate. */
+export function monthlyCost(t: { type: PayType; rate: number }, workDays = 26, hoursPerDay = 8): number {
+  switch (t.type) {
+    case 'monthly':
+      return t.rate;
+    case 'weekly':
+      return Math.round((t.rate * 52) / 12);
+    case 'daily':
+      return t.rate * workDays;
+    case 'hourly':
+      return t.rate * workDays * hoursPerDay;
+    case 'yearly':
+      return Math.round(t.rate / 12);
+    case 'contract':
+      return 0;
+  }
+}
+
+// ---------------------------------------------------------------- Contacts
+
+/** People and businesses the farm deals with: vets, suppliers, buyers... */
+export const contactKinds = ['vet', 'feedSupplier', 'drugSupplier', 'aiTechnician', 'milkBuyer', 'transport', 'mechanic', 'extension', 'other'] as const;
+export type ContactKind = (typeof contactKinds)[number];
+export const contactKindName: Record<ContactKind, string> = {
+  vet: 'Vet or animal doctor',
+  feedSupplier: 'Feed supplier',
+  drugSupplier: 'Drugs and agro-vet shop',
+  aiTechnician: 'AI technician',
+  milkBuyer: 'Milk buyer',
+  transport: 'Transport',
+  mechanic: 'Mechanic or repairs',
+  extension: 'Extension officer',
+  other: 'Other',
+};
+export const isSupplier = (k: string) => ['feedSupplier', 'drugSupplier', 'aiTechnician', 'vet', 'transport', 'mechanic', 'other'].includes(k);
+
+export interface ContactBody {
+  name: string;
+  kind: ContactKind | string;
+  phone: string;
+  phone2?: string | null;
+  /** Clinic, shop or company. */
+  org?: string | null;
+  place?: string | null;
+  note?: string | null;
+  /** Workers see this contact (on duty boards and their phone). */
+  showWorkers?: boolean;
+}
+
+export const telLink = (p: string) => `tel:${p.replace(/[^\d+]/g, '')}`;
+export const waLink = (p: string) => {
+  let d = p.replace(/\D/g, '');
+  if (d.startsWith('0')) d = `256${d.slice(1)}`;
+  return `https://wa.me/${d}`;
+};
+
+// ---------------------------------------------------------------- Duty roster
+
+/** Farm jobs someone is on duty for. 'manager' = who is in charge. */
+export const dutyActivities = ['milking', 'feeding', 'health', 'cleaning', 'grazing', 'security', 'collection', 'manager'] as const;
+export const dutyName: Record<string, string> = {
+  milking: 'Milking',
+  feeding: 'Feeding',
+  health: 'Animal health',
+  cleaning: 'Cleaning the shed',
+  grazing: 'Grazing and water',
+  security: 'Night watch',
+  collection: 'Taking milk to the centre',
+  manager: 'In charge of the farm',
+};
+export const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+
+export interface DutyBody {
+  activity: string;
+  /** Free text when the activity is not in the list. */
+  label?: string | null;
+  staffId: string;
+  /** Who covers when [staffId] is away. */
+  standInId?: string | null;
+  /** 0 = Sunday ... 6 = Saturday. Empty = every day. */
+  days: number[];
+  shift: 'morning' | 'afternoon' | 'evening' | 'night' | 'allDay';
+  note?: string | null;
+  /** Contact to call for this job (the vet for health, the supplier for feeding). */
+  contactId?: string | null;
+}
+
+export const shiftName: Record<DutyBody['shift'], string> = {
+  morning: 'Morning',
+  afternoon: 'Afternoon',
+  evening: 'Evening',
+  night: 'Night',
+  allDay: 'All day',
+};
+
+export const dutyLabel = (d: DutyBody) => (d.activity === 'other' ? d.label?.trim() || 'Other' : dutyName[d.activity] ?? words2(d.activity));
+const words2 = (k: string) => k.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+
+export const onDay = (d: DutyBody, day: Date) => !d.days?.length || d.days.includes(day.getDay());
+
+/**
+ * Who does a duty on [day]: the person on it, or their stand-in when the
+ * person is away (on leave, or has not clocked in by the time it matters).
+ */
+export function whoIsOn(d: DutyBody, away: Set<string>): { staffId: string | null; covering: boolean } {
+  if (!away.has(d.staffId)) return { staffId: d.staffId, covering: false };
+  if (d.standInId && !away.has(d.standInId)) return { staffId: d.standInId, covering: true };
+  return { staffId: null, covering: false };
+}
+
+// ---------------------------------------------------------------- Feeds
+
+/** The phone's feeds (feeding_models.dart FeedKind) and their units. */
+export const phoneFeeds = ['dairyMeal', 'maizeBran', 'mineralLick', 'silage', 'napierGrass', 'hay', 'cottonSeedCake', 'brewersWaste'] as const;
+export const feedName: Record<string, string> = {
+  dairyMeal: 'Dairy meal',
+  maizeBran: 'Maize bran',
+  mineralLick: 'Mineral lick',
+  silage: 'Silage',
+  napierGrass: 'Napier grass',
+  hay: 'Hay',
+  cottonSeedCake: 'Cotton seed cake',
+  brewersWaste: "Brewers' waste",
+};
+export const feedUnit = (feed: string, custom?: { unit?: string }) =>
+  custom?.unit || (feed === 'mineralLick' ? 'blocks' : ['silage', 'napierGrass', 'brewersWaste'].includes(feed) ? 'kg' : 'bags');
+export const feedGroups = ['milkingCows', 'dryCows', 'heifers', 'calves'] as const;
+
+/** A feed the farm added itself (feedTypes). Its id is used as the feed key. */
+export interface FeedTypeBody {
+  name: string;
+  unit: string;
+  /** Warn when stock falls to this or below. */
+  lowAt?: number | null;
+}
+
+/** stockMovements as the phone writes them: a purchase or a hand count. */
+export interface StockMoveBody {
+  kind: 'purchase' | 'count' | string;
+  feed?: string;
+  amount: number;
+  pricePerUnit?: number;
+  supplier?: string | null;
+  supplierId?: string | null;
+  payMethod?: PayMethod | null;
+  at: string;
+}
+
+export interface FeedUseBody {
+  feed: string;
+  group: string;
+  amount: number;
+  at: string;
+  /** Staff id of who fed. */
+  fedBy?: string | null;
+}
+
+/** Stock of one feed: the last count, plus purchases after it, minus feedings after it. */
+export function feedStock(feed: string, moves: FarmRecord<StockMoveBody>[], uses: FarmRecord<FeedUseBody>[], now: Date) {
+  const mine = alive(moves).filter((m) => m.body.feed === feed);
+  const counts = mine.filter((m) => m.body.kind === 'count').sort((a, b) => recordDate(b, 'at').getTime() - recordDate(a, 'at').getTime());
+  const last = counts[0];
+  const from = last ? recordDate(last, 'at') : new Date(0);
+  let left = last ? Number(last.body.amount) || 0 : 0;
+  for (const m of mine) if (m.body.kind === 'purchase' && recordDate(m, 'at') > from) left += Number(m.body.amount) || 0;
+  const fed = alive(uses).filter((u) => u.body.feed === feed);
+  for (const u of fed) if (recordDate(u, 'at') > from) left -= Number(u.body.amount) || 0;
+  const weekAgo = addDays(now, -7);
+  const perDay = fed.filter((u) => recordDate(u, 'at') >= weekAgo).reduce((t, u) => t + (Number(u.body.amount) || 0), 0) / 7;
+  return { left: Math.round(left * 100) / 100, perDay: Math.round(perDay * 100) / 100, daysLeft: perDay > 0 ? Math.floor(Math.max(0, left) / perDay) : null };
+}
+
+// ---------------------------------------------------------------- Breeding
+
+/**
+ * breedingEvents exactly as the phone writes them (fake_breeding_repository):
+ * a service or heat (type 'ai' | 'service', kind 'heat' | 'natural' | 'ai'),
+ * a pregnancy check (type 'pregnancyCheck', serviceId, pregnant) or a
+ * calving (type 'calving'). cost is whole UGX (the phone reads it as int).
+ */
+export interface BreedingBody {
+  type: 'ai' | 'service' | 'pregnancyCheck' | 'calving';
+  kind?: 'heat' | 'natural' | 'ai';
+  animalId?: string;
+  at: string;
+  straw?: string | null;
+  bull?: string | null;
+  technician?: string | null;
+  cost?: number | null;
+  serviceId?: string;
+  pregnant?: boolean;
+  by?: string | null;
+}
+
+/** Cattle carry a calf about 283 days; heat comes back about every 21 days. */
+export const GESTATION_DAYS = 283;
+export const HEAT_CYCLE_DAYS = 21;
+
+const isService = (b: BreedingBody) => (b.type === 'ai' || b.type === 'service') && b.kind !== 'heat';
+const isHeat = (b: BreedingBody) => b.type === 'service' && b.kind === 'heat';
+
+/** An animal's breeding state from its events: served, in calf, due, next heat. */
+export function breedingView(animalId: string, events: FarmRecord<BreedingBody>[], now: Date) {
+  const all = alive(events).sort((a, b) => recordDate(b, 'at').getTime() - recordDate(a, 'at').getTime());
+  const mine = all.filter((e) => e.body.animalId === animalId);
+  const served = mine.find((e) => isService(e.body));
+  const calved = mine.find((e) => e.body.type === 'calving');
+  const heat = mine.find((e) => isHeat(e.body));
+  const servedAt = served ? recordDate(served, 'at') : null;
+  const open = served && servedAt && (!calved || recordDate(calved, 'at') < servedAt) ? served : null;
+  const check = open ? all.find((e) => e.body.type === 'pregnancyCheck' && e.body.serviceId === open.id) : undefined;
+  const result = check ? check.body.pregnant === true : null;
+  const pregnant = open != null && result !== false;
+  const due = pregnant && servedAt ? addDays(servedAt, GESTATION_DAYS) : null;
+  const lastSign = [heat ? recordDate(heat, 'at') : null, result === false && servedAt ? servedAt : null, calved ? recordDate(calved, 'at') : null]
+    .filter((d): d is Date => d != null)
+    .sort((a, b) => b.getTime() - a.getTime())[0];
+  let nextHeat: Date | null = null;
+  if (!pregnant && lastSign) {
+    nextHeat = addDays(lastSign, HEAT_CYCLE_DAYS);
+    while (nextHeat < startOfDay(now)) nextHeat = addDays(nextHeat, HEAT_CYCLE_DAYS);
+  }
+  return {
+    service: open,
+    servedAt: open ? servedAt : null,
+    confirmed: result === true,
+    pregnant,
+    due,
+    checkDue: open && result == null && servedAt ? addDays(servedAt, 60) : null,
+    lastHeat: heat ? recordDate(heat, 'at') : null,
+    nextHeat,
+    calvedAt: calved ? recordDate(calved, 'at') : null,
+  };
+}
+
+// ---------------------------------------------------------------- Vaccination
+
+/** vaccinations (append-only): one dose given, with when the next is due. */
+export interface VaccinationBody {
+  vaccine: string;
+  /** Whole herd when empty. */
+  animalIds: string[];
+  given: string;
+  nextDue?: string | null;
+  cost?: number | null;
+  vetId?: string | null;
+  note?: string | null;
+}
+
+export const commonVaccines = ['Foot and mouth (FMD)', 'Lumpy skin', 'Anthrax', 'Blackquarter', 'Brucellosis (S19)', 'East Coast Fever (ITM)', 'Rabies'] as const;
+
 
 export interface StaffBody {
   name: string;
@@ -182,6 +497,12 @@ export interface StaffBody {
   emergencyPhone?: string | null;
   login?: string;
   pinHash?: string;
+  /** Decision 0023: how the worker is paid. Older records only had monthlyWage. */
+  payType?: string | null;
+  payRate?: number | null;
+  payMethod?: string | null;
+  /** MoMo number or bank account for paying them. */
+  payAccount?: string | null;
 }
 
 export interface FarmerBody {
@@ -224,6 +545,13 @@ export interface WageBody {
   kind: string;
   amount: number;
   at: string;
+  payMethod?: PayMethod | null;
+  /** Hours, days or months paid for (hourly and daily pay). */
+  units?: number | null;
+  /** Pay type at the time, e.g. 'daily'. */
+  payType?: string | null;
+  reference?: string | null;
+  note?: string | null;
 }
 
 /**
@@ -388,7 +716,21 @@ export function tagTaken(animals: FarmRecord<AnimalBody>[], tag: string, exceptI
   return animals.some((a) => a.id !== exceptId && isActiveAnimal(a) && (a.body.tagNumber ?? '').toLowerCase() === t);
 }
 
+/** The phone's ExpenseCategory names. Keep to these: an older phone cannot read others. */
 export const expenseCategories = ['feed', 'vet', 'breeding', 'wages', 'transport', 'fuel', 'equipment', 'other'] as const;
+export const categoryName: Record<string, string> = {
+  feed: 'Feed',
+  vet: 'Health and vet',
+  breeding: 'Breeding',
+  wages: 'Worker pay',
+  transport: 'Transport',
+  fuel: 'Fuel',
+  equipment: 'Equipment and repairs',
+  other: 'Other',
+};
+/** The expense category a supplier's bills usually go under. */
+export const categoryForContact = (k: string) =>
+  k === 'feedSupplier' ? 'feed' : k === 'vet' || k === 'drugSupplier' ? 'vet' : k === 'aiTechnician' ? 'breeding' : k === 'transport' ? 'transport' : k === 'mechanic' ? 'equipment' : 'other';
 export const dairyStatuses = ['milking', 'dry', 'pregnant', 'heifer', 'calf', 'bull'] as const;
 
 export const animalLabel = (a: FarmRecord<AnimalBody>) => a.body.name?.trim() || a.body.tagNumber || 'No tag';

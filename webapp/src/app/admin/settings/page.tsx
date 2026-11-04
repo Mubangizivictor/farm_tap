@@ -23,11 +23,12 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
   );
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
     <label className="field">
       <span>{label}</span>
       {children}
+      {hint && <small className="muted">{hint}</small>}
     </label>
   );
 }
@@ -143,8 +144,8 @@ export default function Settings() {
         <Fit cols={[1, 1, 2, 2]}>
           <Section title="Sign-up and trial">
             <Toggle label="New farms can sign up" checked={c.signup.open} disabled={disabled} onChange={(open) => set('signup', { ...c.signup, open })} />
-            <Field label="Free trial (days)">
-              <input className="input" type="number" min={1} max={60} value={c.trialDays} onChange={(e) => set('trialDays', Math.max(1, Math.min(60, Math.round(Number(e.target.value) || 7))))} />
+            <Field label="Free trial (days)" hint="For new farms. After it, the farm is locked until it pays. To give one farm more days, open it under Farms.">
+              <input className="input" type="number" min={1} max={60} value={c.trialDays} onChange={(e) => set('trialDays', Math.max(1, Math.min(60, Math.round(Number(e.target.value) || 14))))} />
             </Field>
             <div className="stack" style={{ gap: 'var(--s-xs)' }}>
               <span className="small muted">Sectors open for sign-up (the others join the waiting list)</span>

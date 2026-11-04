@@ -9,7 +9,7 @@ import { adminChange, loadConfig, loadPlans, loadSmsPackages, setOp } from '@/li
 import { useAdmin } from '@/lib/adminSession';
 import { firebase } from '@/lib/firebase';
 import { ugx } from '@/lib/format';
-import { featureList, featureOn, monthlyValue, starterPlan, type FeatureKey, type Plan, type SmsPackage } from '@/lib/platform';
+import { featureList, featureOn, monthlyValue, samplePlans, starterPlan, type FeatureKey, type Plan, type SmsPackage } from '@/lib/platform';
 
 const period = (m: number) => (m === 1 ? 'month' : m === 12 ? 'year' : `${m} months`);
 const toInt = (s: string) => Math.max(0, Math.round(Number(s.replace(/[^\d.]/g, '')) || 0));
@@ -29,7 +29,7 @@ function PlanEditor({ plan, onClose, onSaved }: { plan: Plan | null; onClose: ()
     setErr('');
     const { db } = firebase();
     const ref = plan?.id ? doc(db, 'plans', plan.id) : doc(collection(db, 'plans'));
-    const { id: _id, ...data } = { ...p, name: p.name.trim(), description: p.description.trim() };
+    const { id: _id, ...data } = { ...p, name: p.name.trim(), description: p.description.trim(), badge: p.badge.trim(), highlights: p.highlights.map((h) => h.trim()).filter(Boolean) };
     try {
       await adminChange(actor, { action: plan?.id ? 'plan.edit' : 'plan.create', target: `plans/${ref.id}`, details: { name: data.name, priceUgx: data.priceUgx, months: data.months } }, [setOp(ref, data, false)]);
       onSaved();
@@ -84,6 +84,21 @@ function PlanEditor({ plan, onClose, onSaved }: { plan: Plan | null; onClose: ()
           <span>Short description</span>
           <input className="input" value={p.description} onChange={(e) => set('description', e.target.value)} placeholder="What the farmer gets" />
         </label>
+        <label className="field">
+          <span>Ribbon on the card (optional)</span>
+          <input className="input" value={p.badge} onChange={(e) => set('badge', e.target.value)} placeholder="e.g. Most popular, Best value" maxLength={24} />
+        </label>
+        <label className="field">
+          <span>Points on the card, one per line</span>
+          <textarea
+            className="input"
+            rows={5}
+            value={p.highlights.join('\n')}
+            onChange={(e) => set('highlights', e.target.value.split('\n').slice(0, 12))}
+            placeholder={'Milk, herd, health and breeding\nWorkers and duty roster\nWhatsApp support'}
+          />
+        </label>
+        <Toggle label="Sample price, not confirmed yet" hint="Shows a Sample tag here so you remember to set the real price" checked={p.sample} onChange={(v) => set('sample', v)} />
         <Toggle label="Offered to farmers" hint="Hidden plans stay on the farms already using them" checked={p.active} onChange={(v) => set('active', v)} />
         <h3>Features on this plan</h3>
         <div className="list">
@@ -163,6 +178,31 @@ function PackageEditor({ pkg, onClose, onSaved }: { pkg: SmsPackage | null; onCl
   );
 }
 
+function LoadSamples({ onDone }: { onDone: () => void }) {
+  const { actor } = useAdmin();
+  const act = useAction();
+  return (
+    <button
+      className="btn sm"
+      disabled={act.busy}
+      onClick={() => {
+        const { db } = firebase();
+        void act
+          .run(() =>
+            adminChange(
+              actor,
+              { action: 'plan.samples', target: 'plans', details: { ids: samplePlans.map((p) => p.id) } },
+              samplePlans.map(({ id, ...data }) => setOp(doc(db, 'plans', id), data, false)),
+            ),
+          )
+          .then((ok) => ok && onDone());
+      }}
+    >
+      Load sample plans
+    </button>
+  );
+}
+
 export default function Plans() {
   const plans = useLoad(loadPlans);
   const pkgs = useLoad(loadSmsPackages);
@@ -179,8 +219,9 @@ export default function Plans() {
 
       {plans.data && plans.data.length === 0 && (
         <div className="banner info">
-          <span className="grow">No plans yet. Farms use the standard UGX 70,000 a month until you add one.</span>
-          <button className="btn sm" onClick={() => setEdit({ ...starterPlan, id: '' })}>
+          <span className="grow">No plans yet. Farms see one Standard plan at UGX 70,000 a month until you add yours. Load the samples and change names and prices.</span>
+          <LoadSamples onDone={plans.reload} />
+          <button className="btn sm outline" onClick={() => setEdit({ ...starterPlan, id: '' })}>
             Start with Standard
           </button>
         </div>
@@ -192,6 +233,7 @@ export default function Plans() {
           <section key={p.id} className="card stack" style={p.active ? undefined : { opacity: 0.6 }}>
             <div className="card-head">
               <h2>{p.name}</h2>
+              {p.sample && <span className="chip warn">Sample price</span>}
               <span className={`chip ${p.active ? 'ok' : ''}`}>{p.active ? 'Offered' : 'Hidden'}</span>
             </div>
             <div className="stat">

@@ -53,7 +53,16 @@ export function featureOn(key: FeatureKey, defaults: FeatureMap, plan?: FeatureM
 export interface Gateway {
   id: string;
   name: string;
+  /** On: farms can pay this way. Off: farms see it as "Coming soon" (muted). */
   enabled: boolean;
+  /** Hidden from farms altogether (not even "Coming soon"). */
+  hidden: boolean;
+  /**
+   * Paid through FarmTap's server with the provider's API (MTN, Airtel,
+   * card): the farm pays in the app and the plan starts by itself. Off: the
+   * farm pays by hand with the instructions and support confirms it.
+   */
+  api: boolean;
   /** Merchant or pay code shown to farmers (e.g. MoMo Pay code). Not secret. */
   payCode: string;
   /** Account name the farmer should see when paying. */
@@ -68,6 +77,7 @@ export interface AppVersion {
 }
 
 export interface PlatformConfig {
+  /** Free trial length for new farms (decision 0023: default 14). */
   trialDays: number;
   maintenance: { on: boolean; message: string };
   app: { android: AppVersion; ios: AppVersion; updateMessage: string };
@@ -83,10 +93,10 @@ export interface PlatformConfig {
 }
 
 export const defaultGateways: Gateway[] = [
-  { id: 'mtn', name: 'MTN Mobile Money', enabled: true, payCode: '', accountName: 'Victorbee Technologies', instructions: 'Dial *165*3#, choose MoMoPay, enter the pay code and the amount.' },
-  { id: 'airtel', name: 'Airtel Money', enabled: true, payCode: '', accountName: 'Victorbee Technologies', instructions: 'Dial *185*9#, choose Pay Bill, enter the business number and the amount.' },
-  { id: 'card', name: 'Visa or Mastercard', enabled: false, payCode: '', accountName: 'Victorbee Technologies', instructions: 'Pay by card through the secure payment page.' },
-  { id: 'bank', name: 'Bank transfer', enabled: false, payCode: '', accountName: 'Victorbee Technologies', instructions: 'Send to the account number and use the farm name as the reference.' },
+  { id: 'mtn', name: 'MTN Mobile Money', enabled: false, hidden: false, api: true, payCode: '', accountName: 'Victorbee Technologies', instructions: 'Dial *165*3#, choose MoMoPay, enter the pay code and the amount.' },
+  { id: 'airtel', name: 'Airtel Money', enabled: false, hidden: false, api: true, payCode: '', accountName: 'Victorbee Technologies', instructions: 'Dial *185*9#, choose Pay Bill, enter the business number and the amount.' },
+  { id: 'card', name: 'Visa or Mastercard', enabled: false, hidden: false, api: true, payCode: '', accountName: 'Victorbee Technologies', instructions: 'Pay by card through the secure payment page.' },
+  { id: 'bank', name: 'Bank transfer', enabled: false, hidden: true, api: false, payCode: '', accountName: 'Victorbee Technologies', instructions: 'Send to the account number and use the farm name as the reference.' },
 ];
 
 /** This web build (yyyymmddhhmm, set in next.config.ts); 0 in development. */
@@ -94,8 +104,11 @@ export const WEB_BUILD = Number(process.env.NEXT_PUBLIC_WEB_BUILD ?? 0);
 
 export const SUPPORT_PHONE = '+256 793 128 137';
 
+/** Default free trial (Victor, 4 Nov 2026). The panel can change it. */
+export const DEFAULT_TRIAL_DAYS = 14;
+
 export const defaultConfig: PlatformConfig = {
-  trialDays: 7,
+  trialDays: DEFAULT_TRIAL_DAYS,
   maintenance: { on: false, message: 'FarmTap is being updated. Please try again in a few minutes.' },
   app: {
     android: { minVersion: '0.0.0', latestVersion: '0.0.0', storeUrl: '' },
@@ -168,6 +181,8 @@ export function configFromDoc(data: unknown): PlatformConfig {
             id: str(g.id, `gw${i}`),
             name: str(g.name, 'Payment'),
             enabled: bool(g.enabled, false),
+            hidden: bool(g.hidden, false),
+            api: bool(g.api, ['mtn', 'airtel', 'card'].includes(str(g.id, ''))),
             payCode: str(g.payCode, ''),
             accountName: str(g.accountName, ''),
             instructions: str(g.instructions, ''),
@@ -207,6 +222,12 @@ export interface Plan {
   farmLimit: number;
   active: boolean;
   sort: number;
+  /** Lines on the plan card, e.g. "Unlimited cows". */
+  highlights: string[];
+  /** Ribbon on the card, e.g. "Most popular" (empty = none). */
+  badge: string;
+  /** A sample price Victor has not confirmed: farms see it, the panel flags it. */
+  sample: boolean;
 }
 
 export function planFromDoc(id: string, data: unknown): Plan {
@@ -223,7 +244,23 @@ export function planFromDoc(id: string, data: unknown): Plan {
     farmLimit: Math.max(1, Math.round(numv(d.farmLimit, 1))),
     active: bool(d.active, true),
     sort: numv(d.sort, 0),
+    highlights: Array.isArray(d.highlights) ? d.highlights.filter((h): h is string => typeof h === 'string' && h.trim() !== '').slice(0, 12) : [],
+    badge: str(d.badge, ''),
+    sample: bool(d.sample, false),
   };
+}
+
+/** Plans farms can choose, cheapest monthly value first unless sorted. */
+export const offeredPlans = (plans: Plan[]) =>
+  plans.filter((p) => p.active && p.priceUgx > 0).sort((a, b) => a.sort - b.sort || monthlyValue(a) - monthlyValue(b));
+
+/** Price of [periods] lots of a plan, in UGX. The server works it out the same way. */
+export const planPrice = (p: Pick<Plan, 'priceUgx'>, periods: number) => p.priceUgx * Math.max(1, Math.min(12, Math.round(periods)));
+
+/** Gateways a farm sees: live ones first, then "Coming soon" ones. */
+export function farmGateways(cfg: PlatformConfig) {
+  const shown = cfg.payments.gateways.filter((g) => !g.hidden);
+  return [...shown.filter((g) => g.enabled), ...shown.filter((g) => !g.enabled)];
 }
 
 /** Monthly value of a plan: a 12-month plan at 600,000 counts 50,000 a month. */
@@ -242,7 +279,22 @@ export const starterPlan: Plan = {
   farmLimit: 1,
   active: true,
   sort: 0,
+  highlights: [],
+  badge: '',
+  sample: true,
 };
+
+const allDairy = ['Milk, herd, health and breeding', 'Feeds, stock and suppliers', 'Workers, duty roster and pay', 'Money and monthly reports'];
+
+/**
+ * Sample plans the panel can load in one click. Names and prices are
+ * placeholders (marked "sample") until Victor sets his own.
+ */
+export const samplePlans: Plan[] = [
+  { ...starterPlan, id: 'monthly', name: 'Monthly', priceUgx: 70000, months: 1, description: 'Pay month by month.', highlights: allDairy, sort: 1 },
+  { ...starterPlan, id: 'quarterly', name: '3 months', priceUgx: 195000, months: 3, description: 'Save on three months.', highlights: allDairy, badge: 'Most popular', sort: 2 },
+  { ...starterPlan, id: 'yearly', name: 'Yearly', priceUgx: 700000, months: 12, description: 'Two months free.', highlights: [...allDairy, 'Priority WhatsApp support'], badge: 'Best value', sort: 3 },
+];
 
 export interface SmsPackage {
   id: string;
@@ -352,6 +404,8 @@ export const secretList = [
   { key: 'airtel_client_secret', group: 'Airtel Money', label: 'Client secret' },
   { key: 'flutterwave_secret_key', group: 'Card (Flutterwave)', label: 'Secret key' },
   { key: 'flutterwave_webhook_hash', group: 'Card (Flutterwave)', label: 'Webhook secret hash' },
+  { key: 'airtel_callback_token', group: 'Airtel Money', label: 'Callback secret (any long random text, also set in the Airtel portal callback URL)' },
+  { key: 'mtn_callback_token', group: 'MTN MoMo', label: 'Callback secret (any long random text)' },
   { key: 'maps_server_key', group: 'Maps', label: 'Server key (geocoding, district lookup)' },
 ] as const;
 

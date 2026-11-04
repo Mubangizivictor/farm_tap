@@ -29,10 +29,10 @@ export function planText(p: PlanState): { text: string; tone: 'ok' | 'warn' | 'b
         ? { text: 'Free trial ends today', tone: 'warn' }
         : { text: `Free trial: ${p.daysLeft} day${p.daysLeft === 1 ? '' : 's'} left`, tone: p.daysLeft <= 2 ? 'warn' : 'brand' };
     case 'paid':
-      return { text: `Paid until ${date(p.until)}`, tone: 'ok' };
-    case 'grace':
-      return { text: `Payment due: ${p.daysLeft} day${p.daysLeft === 1 ? '' : 's'} left`, tone: 'warn' };
+      return p.daysLeft <= 5
+        ? { text: `Plan ends in ${p.daysLeft} day${p.daysLeft === 1 ? '' : 's'}`, tone: 'warn' }
+        : { text: `Paid until ${date(p.until)}`, tone: 'ok' };
     case 'readOnly':
-      return { text: 'Read only: pay to keep recording', tone: 'bad' };
+      return { text: 'Locked: pay to continue', tone: 'bad' };
   }
 }

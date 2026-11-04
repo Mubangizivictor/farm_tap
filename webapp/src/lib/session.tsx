@@ -17,6 +17,12 @@ export interface Session {
   online: boolean;
   /** Online, not read-only, and allowed to save. */
   canSave: boolean;
+  /**
+   * Show "Switch farm": only for an account that owns two or more farms
+   * (support raised its farm limit), or works on several farms it does not
+   * own. One account is one farm by default (decision 0018).
+   */
+  canSwitch: boolean;
   openFarm: (id: string) => void;
   reloadFarms: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -114,7 +120,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       farm,
       farmsError,
       online,
-      canSave: online && farm != null && canWrite(farm.subscription, now),
+      canSave: online && farm != null && farm.farmStatus !== 'suspended' && canWrite(farm.subscription, now),
+      canSwitch: switchable(farms ?? []),
       openFarm,
       reloadFarms,
       signOut,
@@ -122,6 +129,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [user, farms, farm, farmsError, online, now, openFarm, reloadFarms, signOut],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+export function switchable(farms: { role: string }[]): boolean {
+  const owned = farms.filter((f) => f.role === 'owner').length;
+  return owned >= 2 || (owned === 0 && farms.length > 1);
 }
 
 export function useSession(): Session {

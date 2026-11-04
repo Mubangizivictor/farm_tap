@@ -15,7 +15,7 @@ const filters = [
   ['pending', 'To review'],
   ['trial', 'On trial'],
   ['paid', 'Paid'],
-  ['grace', 'Overdue'],
+  ['grace', 'Due soon'],
   ['readOnly', 'Lapsed'],
   ['suspended', 'Suspended'],
 ] as const;

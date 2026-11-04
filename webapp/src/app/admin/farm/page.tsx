@@ -67,7 +67,7 @@ function Summary({ f, reload }: { f: AdminFarm; reload: () => void }) {
       <Fit kind="stats" cols={[2, 4, 4, 4]}>
         <Stat icon="shield" label="Status" value={<span className={`chip ${st.tone}`}>{st.text}</span>} hint={f.review ? `Review: ${f.review}` : 'Reviewed before the panel'} />
         <Stat icon="tag" label="Plan" value={plan.name} hint={`${ugx(plan.priceUgx)} / ${plan.months === 1 ? 'month' : `${plan.months} months`}`} tone="gold" />
-        <Stat icon="calendar" label={f.paidUntil ? 'Paid until' : 'Trial ends'} value={date(f.paidUntil ?? f.trialEndsAt) || '—'} hint={p.kind === 'trial' ? `${p.daysLeft} days left` : p.kind === 'grace' ? `${p.daysLeft} days of grace left` : ''} tone="info" />
+        <Stat icon="calendar" label={f.paidUntil ? 'Paid until' : 'Trial ends'} value={date(f.paidUntil ?? f.trialEndsAt) || '—'} hint={p.kind === 'trial' ? `${p.daysLeft} days left` : p.kind === 'grace' ? `${p.daysLeft} days until it locks` : ''} tone="info" />
         <Stat icon="sms" label="SMS credits" value={String(f.smsCredits)} hint={f.autoSend ? 'Automatic SMS on' : 'Sends from the phone (free)'} />
       </Fit>
 
