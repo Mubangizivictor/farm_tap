@@ -13,7 +13,9 @@ const options: FirebaseOptions = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? 'farm-tap-1dd15',
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? 'farm-tap-1dd15.firebaseapp.com',
+  // firebaseapp.com is the only domain Firebase auto-registers as an OAuth redirect URI.
+  // Using web.app here breaks redirect sign-in unless that URI is manually added in GCP.
+  authDomain: 'farm-tap-1dd15.firebaseapp.com',
 };
 
 /** Local testing against `firebase emulators:start` (auth 9099, firestore 8080). */
