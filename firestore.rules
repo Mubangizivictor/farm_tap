@@ -41,7 +41,7 @@ service cloud.firestore {
     // Fields on a farm only the panel may set.
     function adminFarmKeys() {
       return ['subscription', 'review', 'status', 'planId', 'features', 'smsCredits',
-        'messaging', 'billing', 'lastAudit', 'suspendedReason'];
+        'messaging', 'billing', 'lastAudit', 'suspendedReason', 'closure'];
     }
     function platformConfig() {
       return /databases/$(database)/documents/platform/config;
@@ -88,7 +88,10 @@ service cloud.firestore {
     // by hand when a farm needs more time. Suspended farms are locked too.
     function canWrite(t) {
       let sub = tenantDoc(t).get('subscription', {});
-      return tenantDoc(t).get('status', 'active') != 'suspended' && ((sub.get('trialEndsAt', null) != null && request.time < sub.trialEndsAt)
+      return tenantDoc(t).get('status', 'active') != 'suspended'
+        // An owner who deleted their account closes the farm (decision 0024).
+        && tenantDoc(t).get('closure', null) == null
+        && ((sub.get('trialEndsAt', null) != null && request.time < sub.trialEndsAt)
         || (sub.get('paidUntil', null) != null && request.time < sub.paidUntil));
     }
 
@@ -134,7 +137,9 @@ service cloud.firestore {
     // Written only by Cloud Functions (admin SDK skips these rules).
     // subscriptionPayments: in-app payments, kept by functions/ (decision 0023).
     function serverOnly(c) {
-      return c in ['members', 'messages', 'aiQuestions', 'iotDevices', 'iotReadings', 'subscriptionPayments'];
+      return c in ['members', 'messages', 'aiQuestions', 'iotDevices', 'iotReadings', 'subscriptionPayments',
+        // Reminders already delivered (decision 0024), kept by the server.
+        'alertLog'];
     }
 
     function softDelete() {
@@ -177,7 +182,7 @@ service cloud.firestore {
       // The panel disables an account or raises its farm limit (decision 0020).
       allow update: if (can('users') || can('farms')) && audited()
         && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['disabled', 'disabledReason', 'farmLimit', 'lastAudit']);
+          .hasOnly(['disabled', 'disabledReason', 'farmLimit', 'lastAudit', 'deletion']);
       allow create: if signedIn() && request.auth.uid == uid
         && !('farmLimit' in request.resource.data)
         && !('disabled' in request.resource.data)
@@ -185,10 +190,24 @@ service cloud.firestore {
         && (linksUnchanged() || linkFromInvite(uid));
       allow update: if signedIn() && request.auth.uid == uid
         && (linksUnchanged() || linkFromInvite(uid))
+        // Asking to delete is final for the person; only support restores.
+        && (resource.data.get('deletion', null) == null
+          || request.resource.data.get('deletion', null) == resource.data.get('deletion', null))
+        && (request.resource.data.get('deletion', null) == null
+          || resource.data.get('deletion', null) != null
+          || request.resource.data.deletion.at == request.time)
         && farmLimit(request.resource.data) == farmLimit(resource.data)
         && request.resource.data.get('disabled', false) == resource.data.get('disabled', false)
         && ownedFarms(request.resource.data) >= ownedFarms(resource.data)
         && ownedFarms(request.resource.data) <= ownedFarms(resource.data) + 1;
+    }
+
+    // This person's phones, for reminders (decision 0024): the token only.
+    match /users/{uid}/devices/{device} {
+      allow read, delete: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['token', 'platform', 'updatedAt', 'app'])
+        && request.resource.data.token is string && request.resource.data.token.size() < 4096;
     }
 
     // Phone sign-in for workers (decision 0016 §5): which login version a
@@ -243,6 +262,15 @@ service cloud.firestore {
       // review stay server-side.
       allow update: if manages(t) && canWrite(t)
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(adminFarmKeys().concat(['ownerUid', 'owner']));
+
+      // Deleting the owner's account closes the farm at once (decision 0024).
+      // Only the panel can open it again (Restore), within the 90-day hold.
+      allow update: if member(t) && role(t) == 'owner'
+        && resource.data.get('closure', null) == null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['closure'])
+        && request.resource.data.closure.keys().hasOnly(['at', 'by', 'requestId'])
+        && request.resource.data.closure.at == request.time
+        && request.resource.data.closure.by == request.auth.uid;
 
       match /members/{uid} {
         allow read: if member(t);
@@ -322,6 +350,111 @@ service cloud.firestore {
         && request.resource.data.value is string && request.resource.data.value.size() <= 4096;
       allow delete: if false;
     }
+    // Landing page words and company details on documents (decision 0024).
+    match /platform/site {
+      allow get: if true;
+      allow write: if can('settings') && audited();
+    }
+    match /platform/company {
+      allow get: if true;
+      allow write: if can('settings') && audited();
+    }
+    // Logo, company stamp and signature (decision 0024): a small copy of the
+    // picture (data URL) for documents and pages, and the stored file's link.
+    match /platformAssets/{name} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow write: if can('settings') && audited() && name in ['logo', 'stamp', 'signature', 'logoDark']
+        && request.resource.data.keys().hasOnly(['dataUrl', 'url', 'path', 'width', 'height', 'updatedAt', 'updatedByName', 'lastAudit'])
+        && (!('dataUrl' in request.resource.data) || request.resource.data.dataUrl.size() < 700000);
+    }
+    // Privacy Policy and Terms of Use: the published version and every
+    // earlier one (kept for ever), and the draft being edited.
+    match /legalDocs/{kind} {
+      allow get: if kind in ['privacy', 'terms'];
+      allow list: if true;
+      allow write: if can('settings') && audited() && kind in ['privacy', 'terms']
+        && request.resource.data.version is int && request.resource.data.body is string
+        && (resource == null || request.resource.data.version == resource.data.version + 1)
+        && existsAfter(/databases/$(database)/documents/legalDocs/$(kind)/versions/$(string(request.resource.data.version)));
+      match /versions/{v} {
+        allow read: if true;
+        allow create: if can('settings') && audited();
+        allow update, delete: if false;
+      }
+    }
+    match /legalDrafts/{kind} {
+      allow read, write: if can('settings');
+    }
+
+    // Asking to delete an account (decision 0024). Signed in: the account
+    // closes at once (id = uid) and is erased after 90 days. Not signed in
+    // (the public page): a request support checks first.
+    match /deletionRequests/{id} {
+      allow read: if signedIn() && resource.data.get('uid', '') == request.auth.uid;
+      allow read: if can('users') || can('support');
+      allow create: if signedIn() && id == request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'closed'
+        && request.resource.data.closedAt == request.time
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'name', 'reason', 'status', 'closedAt', 'farms', 'source', 'confirmed']);
+      allow create: if (!signedIn() || id != request.auth.uid)
+        && request.resource.data.status == 'requested'
+        && request.resource.data.uid == null
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'email', 'phone', 'farmName', 'reason', 'status', 'createdAt', 'source'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 120
+        && request.resource.data.email is string && request.resource.data.email.size() <= 160
+        && request.resource.data.phone is string && request.resource.data.phone.size() <= 40
+        && request.resource.data.farmName is string && request.resource.data.farmName.size() <= 160
+        && request.resource.data.reason is string && request.resource.data.reason.size() <= 1000;
+      // Support: restore within 90 days, reject, or mark checked.
+      allow update: if can('users') && audited()
+        && request.resource.data.status in ['closed', 'restored', 'rejected', 'verified', 'requested']
+        && resource.data.status != 'erased';
+      allow delete: if false;
+    }
+
+    // Receipts, invoices and refund notes (decision 0024). One number
+    // sequence (counters/billing): each new document takes `next` and moves
+    // it on by one in the same write, so numbers never repeat.
+    function billingCounter() {
+      return /databases/$(database)/documents/counters/billing;
+    }
+    function nextBillingSeq() {
+      return exists(billingCounter()) ? get(billingCounter()).data.next : 1;
+    }
+    match /billingDocs/{id} {
+      allow read: if can('finance') || can('support');
+      allow read: if member(resource.data.tenantId);
+      allow create: if can('finance') && audited()
+        && request.resource.data.seq == nextBillingSeq()
+        && getAfter(billingCounter()).data.next == request.resource.data.seq + 1
+        && request.resource.data.tenantId is string
+        && request.resource.data.totalUgx is number;
+      allow update, delete: if false;
+    }
+    match /counters/billing {
+      allow read: if can('finance');
+      allow create, update: if can('finance') && audited()
+        && request.resource.data.next == nextBillingSeq() + 1
+        && getAfter(/databases/$(database)/documents/billingDocs/$(request.resource.data.lastDoc)).data.seq == nextBillingSeq();
+    }
+    // Refunds: recorded, approved, then sent (by the server through the
+    // provider, or by hand and marked done). Never deleted.
+    match /refunds/{id} {
+      allow read: if can('finance');
+      allow create: if can('finance') && audited() && request.resource.data.status == 'requested'
+        && request.resource.data.amountUgx is int && request.resource.data.amountUgx > 0;
+      allow update: if can('finance') && audited()
+        && (
+          (resource.data.status == 'requested' && request.resource.data.status in ['approved', 'rejected'])
+          || (resource.data.status in ['approved', 'failed'] && request.resource.data.status in ['done', 'approved', 'rejected'])
+          || (resource.data.status == 'sent' && request.resource.data.status == 'done')
+        );
+      allow delete: if false;
+    }
+
     // Plans and SMS packages: the apps show them; prices edited in the panel.
     match /plans/{id} {
       allow read: if true;
