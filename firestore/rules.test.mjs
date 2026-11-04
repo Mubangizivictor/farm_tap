@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
-import { Timestamp, doc, getDoc, serverTimestamp, setDoc, deleteDoc, updateDoc, writeBatch, increment, arrayUnion } from 'firebase/firestore';
+import { Timestamp, doc, getDoc, serverTimestamp, setDoc, deleteDoc, updateDoc, writeBatch, increment, arrayUnion, getDocs, query, collection, where } from 'firebase/firestore';
 
 const days = (n) => Timestamp.fromMillis(Date.now() + n * 86400000);
 
@@ -129,6 +129,23 @@ describe('roles and money', () => {
       rec('smsOutbox', 's1', { body: { status: 'queued', to: '+256772451908', text: 'Hi' } })));
     await assertFails(setDoc(doc(db, `tenants/${T}/smsOutbox/s2`),
       rec('smsOutbox', 's2', { body: { status: 'sent', to: '+256772451908', text: 'Hi' } })));
+  });
+
+  test('an SMS sent from the phone can be marked so, but not changed', async () => {
+    const db = as('worker');
+    const body = { status: 'queued', to: '+256772451908', text: 'Hi' };
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/smsOutbox/s3`), rec('smsOutbox', 's3', { body })));
+    await assertFails(setDoc(doc(db, `tenants/${T}/smsOutbox/s3`),
+      rec('smsOutbox', 's3', { version: 2, body: { ...body, status: 'sentFromPhone', text: 'Changed' } })));
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/smsOutbox/s3`),
+      rec('smsOutbox', 's3', { version: 2, body: { ...body, status: 'sentFromPhone', via: 'whatsapp' } })));
+    // Sent before it ever synced: created as sent from the phone.
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/smsOutbox/s4`),
+      rec('smsOutbox', 's4', { body: { ...body, status: 'sentFromPhone', via: 'sms' } })));
+  });
+
+  test('a farm cannot switch on paid automatic SMS itself', async () => {
+    await assertFails(updateDoc(doc(as('owner'), `tenants/${T}`), { 'messaging.autoSend': true }));
   });
 
   test('subscription cannot be changed from the app', async () => {
@@ -545,5 +562,159 @@ describe('linked spending (decision 0023)', () => {
     await assertSucceeds(getDoc(doc(as('worker'), `tenants/${T}/duties/d1`)));
     await assertFails(setDoc(doc(as('worker'), `tenants/${T}/duties/d2`), rec('duties', 'd2', { body: { activity: 'milking', staffId: 'me', days: [], shift: 'morning' } })));
     await assertFails(setDoc(doc(as('worker'), `tenants/${T}/contacts/c2`), rec('contacts', 'c2', { body: { name: 'x', kind: 'vet', phone: '1' } })));
+  });
+});
+
+describe('launch pack (decision 0024)', () => {
+  beforeEach(async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, 'platformAdmins/victor'), { role: 'owner', active: true });
+      await setDoc(doc(db, 'platformAdmins/fin'), { role: 'finance', perms: ['finance'], active: true });
+      await setDoc(doc(db, 'platformAdmins/help'), { role: 'support', perms: ['support'], active: true });
+      await setDoc(doc(db, 'platformAdmins/care'), { role: 'support', perms: ['support', 'users'], active: true });
+      await setDoc(doc(db, 'users/owner'), { name: 'Owner', ownedFarms: 1 });
+    });
+  });
+  const adminDb = (uid) => {
+    const db = as(uid);
+    db._uid = uid;
+    return db;
+  };
+  const batchAudited = (db, ops, auditId = `a-${Math.random()}`) => {
+    const b = writeBatch(db);
+    b.set(doc(db, `adminAudit/${auditId}`), { by: db._uid, at: serverTimestamp(), action: 'test' });
+    for (const [ref, data, merge] of ops) b.set(ref, { ...data, lastAudit: auditId }, { merge: merge ?? false });
+    return b.commit();
+  };
+
+  test('deleting an account: closed at once by the person, only support restores', async () => {
+    const db = as('owner');
+    const b = writeBatch(db);
+    b.set(doc(db, 'deletionRequests/owner'), { uid: 'owner', email: 'o@x.ug', name: 'Owner', reason: '', status: 'closed', closedAt: serverTimestamp(), farms: [T], source: 'app', confirmed: true });
+    b.update(doc(db, 'users/owner'), { deletion: { at: serverTimestamp(), requestId: 'owner' } });
+    b.update(doc(db, `tenants/${T}`), { closure: { at: serverTimestamp(), by: 'owner', requestId: 'owner' } });
+    await assertSucceeds(b.commit());
+    // The farm is closed for everyone.
+    await assertFails(setDoc(doc(as('worker'), `tenants/${T}/milkRecords/m9`), rec('milkRecords', 'm9')));
+    // The person cannot undo it themselves.
+    await assertFails(updateDoc(doc(db, 'users/owner'), { deletion: null }));
+    await assertFails(updateDoc(doc(db, `tenants/${T}`), { closure: null }));
+    await assertFails(updateDoc(doc(db, 'deletionRequests/owner'), { status: 'restored' }));
+    await assertSucceeds(getDoc(doc(db, 'deletionRequests/owner')));
+    // Support restores within the 90 days.
+    const v = adminDb('victor');
+    await assertSucceeds(batchAudited(v, [
+      [doc(v, 'deletionRequests/owner'), { status: 'restored' }, true],
+      [doc(v, 'users/owner'), { deletion: null }, true],
+      [doc(v, `tenants/${T}`), { closure: null }, true],
+    ]));
+    await assertSucceeds(setDoc(doc(as('worker'), `tenants/${T}/milkRecords/m9`), rec('milkRecords', 'm9')));
+  });
+
+  test('a worker cannot close the farm; a stranger cannot close your account', async () => {
+    await assertFails(updateDoc(doc(as('worker'), `tenants/${T}`), { closure: { at: serverTimestamp(), by: 'worker', requestId: 'x' } }));
+    await assertFails(setDoc(doc(as('stranger'), 'deletionRequests/owner'), { uid: 'owner', status: 'closed', closedAt: serverTimestamp() }));
+  });
+
+  test('the public deletion form: a request support checks, nothing more', async () => {
+    const pub = env.unauthenticatedContext().firestore();
+    const ok = { uid: null, name: 'Kato', email: 'k@x.ug', phone: '0772000000', farmName: 'Kato Farm', reason: '', status: 'requested', createdAt: serverTimestamp(), source: 'web' };
+    await assertSucceeds(setDoc(doc(pub, 'deletionRequests/r1'), ok));
+    await assertFails(setDoc(doc(pub, 'deletionRequests/r2'), { ...ok, status: 'closed' }));
+    await assertFails(setDoc(doc(pub, 'deletionRequests/r3'), { ...ok, uid: 'owner' }));
+    await assertFails(getDoc(doc(pub, 'deletionRequests/r1')));
+    await assertSucceeds(getDoc(doc(adminDb('help'), 'deletionRequests/r1')));
+  });
+
+  test('legal documents: public to read; a new version needs its copy kept', async () => {
+    const v = adminDb('victor');
+    const body = { title: 'Privacy Policy', version: 1, body: '# Hi', effectiveDate: '2026-11-04' };
+    await assertSucceeds(batchAudited(v, [[doc(v, 'legalDocs/privacy/versions/1'), body], [doc(v, 'legalDocs/privacy'), body]]));
+    await assertFails(batchAudited(v, [[doc(v, 'legalDocs/privacy'), { ...body, version: 2 }]]));
+    await assertFails(batchAudited(v, [[doc(v, 'legalDocs/privacy/versions/1'), { ...body, body: 'changed' }]]));
+    await assertSucceeds(getDoc(doc(env.unauthenticatedContext().firestore(), 'legalDocs/privacy')));
+    await assertSucceeds(getDoc(doc(env.unauthenticatedContext().firestore(), 'legalDocs/privacy/versions/1')));
+    await assertFails(getDoc(doc(as('owner'), 'legalDrafts/privacy')));
+    const fin = adminDb('fin');
+    await assertFails(batchAudited(fin, [[doc(fin, 'legalDocs/terms/versions/1'), body]]));
+  });
+
+  test('logo, stamp and signature: anyone sees them, only settings admins change them', async () => {
+    const v = adminDb('victor');
+    await assertSucceeds(batchAudited(v, [[doc(v, 'platformAssets/stamp'), { dataUrl: 'data:image/png;base64,AAAA', width: 10, height: 10 }]]));
+    await assertFails(batchAudited(v, [[doc(v, 'platformAssets/virus'), { dataUrl: 'x' }]]));
+    await assertSucceeds(getDoc(doc(env.unauthenticatedContext().firestore(), 'platformAssets/stamp')));
+    const f = adminDb('fin');
+    await assertFails(batchAudited(f, [[doc(f, 'platformAssets/logo'), { dataUrl: 'x' }]]));
+    await assertSucceeds(batchAudited(v, [[doc(v, 'platform/site'), { heroTitle: 'Hi' }]]));
+    await assertSucceeds(getDoc(doc(env.unauthenticatedContext().firestore(), 'platform/site')));
+  });
+
+  test('receipt numbers come one after another; the farm reads its own', async () => {
+    const f = adminDb('fin');
+    const take = (id, seq) =>
+      batchAudited(f, [
+        [doc(f, `billingDocs/${id}`), { seq, tenantId: T, totalUgx: 70000, receiptNo: `RCT-2026-00000${seq}` }],
+        [doc(f, 'counters/billing'), { next: seq + 1, lastDoc: id }],
+      ]);
+    await assertSucceeds(take('p1', 1));
+    await assertFails(take('p2', 1));
+    await assertFails(take('p3', 5));
+    await assertSucceeds(take('p4', 2));
+    await assertSucceeds(getDoc(doc(as('worker'), 'billingDocs/p1')));
+    await assertFails(getDoc(doc(as('stranger'), 'billingDocs/p1')));
+    await assertFails(updateDoc(doc(f, 'billingDocs/p1'), { totalUgx: 1 }));
+  });
+
+  test('refunds: requested, approved, done; never deleted', async () => {
+    const f = adminDb('fin');
+    await assertSucceeds(batchAudited(f, [[doc(f, 'refunds/r1'), { status: 'requested', amountUgx: 70000, tenantId: T, paymentId: 'p1' }]]));
+    await assertFails(batchAudited(f, [[doc(f, 'refunds/r2'), { status: 'done', amountUgx: 70000 }]]));
+    await assertFails(batchAudited(f, [[doc(f, 'refunds/r1'), { status: 'done' }, true]]));
+    await assertSucceeds(batchAudited(f, [[doc(f, 'refunds/r1'), { status: 'approved' }, true]]));
+    await assertSucceeds(batchAudited(f, [[doc(f, 'refunds/r1'), { status: 'done', reference: 'MP1' }, true]]));
+    await assertFails(deleteDoc(doc(f, 'refunds/r1')));
+    await assertFails(getDoc(doc(as('owner'), 'refunds/r1')));
+  });
+
+  test('phones for reminders: each person only their own', async () => {
+    await assertSucceeds(setDoc(doc(as('owner'), 'users/owner/devices/d1'), { token: 'tok', platform: 'android', updatedAt: serverTimestamp() }));
+    await assertFails(setDoc(doc(as('worker'), 'users/owner/devices/d2'), { token: 'tok' }));
+    await assertFails(setDoc(doc(as('owner'), `tenants/${T}/alertLog/x`), rec('alertLog', 'x')));
+  });
+
+  test('Users access alone restores a deleted account and reopens its farm', async () => {
+    const db = as('owner');
+    const b = writeBatch(db);
+    b.set(doc(db, 'deletionRequests/owner'), { uid: 'owner', email: '', name: '', reason: '', status: 'closed', closedAt: serverTimestamp(), farms: [T], source: 'web', confirmed: true });
+    b.update(doc(db, 'users/owner'), { deletion: { at: serverTimestamp(), requestId: 'owner' } });
+    b.update(doc(db, `tenants/${T}`), { closure: { at: serverTimestamp(), by: 'owner', requestId: 'owner' } });
+    await assertSucceeds(b.commit());
+    const c = adminDb('care');
+    // Users access cannot touch anything else on the farm.
+    await assertFails(batchAudited(c, [[doc(c, `tenants/${T}`), { status: 'suspended' }, true]]));
+    await assertSucceeds(batchAudited(c, [
+      [doc(c, 'deletionRequests/owner'), { status: 'restored' }, true],
+      [doc(c, 'users/owner'), { deletion: null }, true],
+      [doc(c, `tenants/${T}`), { closure: null }, true],
+    ]));
+  });
+
+  test('profile photo: a small copy only', async () => {
+    const db = as('owner');
+    await assertSucceeds(updateDoc(doc(db, 'users/owner'), { photo: { thumb: 'data:image/jpeg;base64,AAAA', url: null, updatedAt: serverTimestamp() } }));
+    await assertFails(updateDoc(doc(db, 'users/owner'), { photo: { thumb: 'x'.repeat(200001), url: null } }));
+    await assertFails(updateDoc(doc(db, 'users/owner'), { photo: { thumb: 'x', virus: true } }));
+  });
+
+  test('a farm lists its own receipts, not other farms\'', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'billingDocs/mine'), { seq: 1, tenantId: T, totalUgx: 1 });
+      await setDoc(doc(ctx.firestore(), 'billingDocs/theirs'), { seq: 2, tenantId: 'other-farm', totalUgx: 1 });
+    });
+    await assertSucceeds(getDocs(query(collection(as('owner'), 'billingDocs'), where('tenantId', '==', T))));
+    await assertFails(getDocs(query(collection(as('owner'), 'billingDocs'), where('tenantId', '==', 'other-farm'))));
+    await assertFails(getDocs(collection(as('owner'), 'billingDocs')));
   });
 });

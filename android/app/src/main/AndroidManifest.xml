@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Release builds need this stated (debug adds it by itself). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Farm reminders: duties, vaccinations, calving, plan ending (decision 0024). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Staff and farmer cards (NFC), ear-tag scanning and photos (camera). -->
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -38,6 +43,13 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Server reminders arrive on the same channel the phone uses. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="farm_reminders" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
@@ -57,6 +69,15 @@
         <intent>
             <action android:name="android.intent.action.SENDTO"/>
             <data android:scheme="smsto"/>
+        </intent>
+        <!-- Messages sent from the phone's own SMS app (decision 0015). -->
+        <intent>
+            <action android:name="android.intent.action.SENDTO"/>
+            <data android:scheme="sms"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="sms"/>
         </intent>
         <intent>
             <action android:name="android.intent.action.VIEW"/>

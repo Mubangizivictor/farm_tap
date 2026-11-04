@@ -57,7 +57,7 @@ export default function Setup() {
 
   useEffect(() => {
     if (user === null) router.replace('/sign-in/');
-    else if (farms && farms.length > 0) router.replace('/');
+    else if (farms && farms.length > 0) router.replace('/start/');
   }, [user, farms, router]);
 
   if (!user || farms === undefined || !cfgLoaded) return <Loading />;

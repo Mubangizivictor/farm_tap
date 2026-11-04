@@ -2,6 +2,7 @@
 
 import { onAuthStateChanged, signOut as fbSignOut, type User } from 'firebase/auth';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { readProfile, type Closure } from './account.ts';
 import { loadFarms } from './data.ts';
 import { canWrite, type Farm } from './domain.ts';
 import { firebase, firebaseConfigured } from './firebase.ts';
@@ -14,6 +15,12 @@ export interface Session {
   farms: Farm[] | undefined;
   farm: Farm | null;
   farmsError: string | null;
+  /** Set when this account was deleted (kept 90 days, decision 0024). */
+  closed: Closure | null;
+  /** The person's own picture (their upload, else their Google picture). */
+  photo: string | null;
+  /** Re-read the picture and closure after a change. */
+  reloadProfile: () => Promise<void>;
   online: boolean;
   /** Online, not read-only, and allowed to save. */
   canSave: boolean;
@@ -52,6 +59,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [farms, setFarms] = useState<Farm[] | undefined>(undefined);
   const [farmId, setFarmId] = useState<string | null>(null);
   const [farmsError, setFarmsError] = useState<string | null>(null);
+  const [closed, setClosed] = useState<Closure | null>(null);
+  const [photo, setPhoto] = useState<string | null>(null);
   const [online, setOnline] = useState(true);
   const [now, setNow] = useState(() => new Date());
 
@@ -74,9 +83,22 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const reloadProfile = useCallback(async () => {
+    if (!user) return;
+    try {
+      const p = await readProfile(user.uid);
+      setClosed(p.closed);
+      setPhoto(p.photo);
+    } catch {
+      setClosed(null);
+      setPhoto(null);
+    }
+  }, [user]);
+
   const reloadFarms = useCallback(async () => {
     if (!user) return;
     setFarmsError(null);
+    void reloadProfile();
     try {
       const list = await loadFarms(user.uid);
       setFarms(list);
@@ -89,13 +111,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setFarms([]);
       setFarmsError((e as { code?: string }).code ?? 'unknown');
     }
-  }, [user]);
+  }, [user, reloadProfile]);
 
   useEffect(() => {
     if (user) void reloadFarms();
     else if (user === null) {
       setFarms(undefined);
       setFarmId(null);
+      setClosed(null);
     }
   }, [user, reloadFarms]);
 
@@ -119,14 +142,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       farms,
       farm,
       farmsError,
+      closed,
+      photo: photo ?? user?.photoURL ?? null,
+      reloadProfile,
       online,
-      canSave: online && farm != null && farm.farmStatus !== 'suspended' && canWrite(farm.subscription, now),
+      canSave: online && farm != null && !farm.closed && closed == null && farm.farmStatus !== 'suspended' && canWrite(farm.subscription, now),
       canSwitch: switchable(farms ?? []),
       openFarm,
       reloadFarms,
       signOut,
     }),
-    [user, farms, farm, farmsError, online, now, openFarm, reloadFarms, signOut],
+    [user, farms, farm, farmsError, closed, photo, online, now, openFarm, reloadFarms, reloadProfile, signOut],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

@@ -7,6 +7,11 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
 import { PlansSection } from '@/components/plans';
+import { PhotoPicker } from '@/components/upload';
+import { BillingDocsSection } from '@/components/billingDocs';
+import { AlertSettingsSection } from '@/components/alertSettings';
+import { removeProfilePhoto, saveProfilePhoto } from '@/lib/account';
+import { storeImage } from '@/lib/images';
 import { Field, PageHead, Tabs, useSave, useToast } from '@/components/ui';
 import { saveError, upsertRecord, useRecords } from '@/lib/data';
 import { ugandaDistricts } from '@/lib/districts';
@@ -136,12 +141,11 @@ function HelpSection() {
           </a>
         )}
       </div>
-      {config.legal.termsUrl && (
-        <div className="row wrap">
-          <a className="small muted" href={config.legal.termsUrl} target="_blank" rel="noreferrer">Terms of use</a>
-          {config.legal.privacyUrl && <a className="small muted" href={config.legal.privacyUrl} target="_blank" rel="noreferrer">Privacy policy</a>}
-        </div>
-      )}
+      <div className="row wrap">
+        <a className="small muted" href={config.legal.termsUrl || '/terms/'} target="_blank" rel="noreferrer">Terms of use</a>
+        <a className="small muted" href={config.legal.privacyUrl || '/privacy/'} target="_blank" rel="noreferrer">Privacy policy</a>
+        <a className="small muted" href="/delete-account/">Delete my account</a>
+      </div>
     </section>
   );
 }
@@ -191,10 +195,11 @@ function CentrePrice() {
   );
 }
 
-type Tab = 'farm' | 'plan' | 'account' | 'help';
+type Tab = 'farm' | 'plan' | 'reminders' | 'account' | 'help';
 const TABS: readonly (readonly [Tab, string])[] = [
   ['farm', 'Farm'],
   ['plan', 'Plan and payment'],
+  ['reminders', 'Reminders'],
   ['account', 'Your account'],
   ['help', 'Help'],
 ];
@@ -230,7 +235,14 @@ export default function Settings() {
         </>
       )}
 
-      {tab === 'plan' && <PlansSection farm={farm} />}
+      {tab === 'plan' && (
+        <>
+          <PlansSection farm={farm} />
+          {manages(farm) && <BillingDocsSection farm={farm} />}
+        </>
+      )}
+
+      {tab === 'reminders' && <AlertSettingsSection farm={farm} />}
 
       {tab === 'account' && <AccountSection />}
 
@@ -248,7 +260,7 @@ const providerName: Record<string, string> = { 'google.com': 'Google', 'apple.co
  */
 function AccountSection() {
   const farm = useFarm();
-  const { user, canSwitch, reloadFarms } = useSession();
+  const { user, canSwitch, reloadFarms, photo, reloadProfile, online } = useSession();
   const { config } = usePlatform();
   const router = useRouter();
   const toast = useToast();
@@ -279,6 +291,31 @@ function AccountSection() {
 
   return (
     <Fit kind="cards" cols={[1, 2, 2, 2]}>
+      <section className="card stack">
+        <div className="card-head">
+          <h2>Your photo</h2>
+        </div>
+        <p className="small muted">Shown at the top of FarmTap and to people on your farm.</p>
+        <PhotoPicker
+          photo={photo}
+          name={user?.displayName || user?.email || ''}
+          disabled={!online || !user}
+          onPick={async (img) => {
+            if (!user) return;
+            const url = await storeImage(`profiles/${user.uid}/photo.jpg`, img.dataUrl);
+            await saveProfilePhoto(user.uid, img.dataUrl, url);
+            await reloadProfile();
+            toast('Photo saved');
+          }}
+          onRemove={async () => {
+            if (!user) return;
+            await removeProfilePhoto(user.uid);
+            await reloadProfile();
+            toast('Photo removed');
+          }}
+        />
+      </section>
+
       <section className="card">
         <form className="stack" onSubmit={saveName}>
           <div className="card-head">
@@ -365,30 +402,27 @@ function AccountSection() {
         <div className="card-head">
           <h2>Your data</h2>
         </div>
-        <p className="small muted">Your farm records belong to you. Download them from each page (CSV), ask for a full copy, or ask us to delete your account.</p>
+        <p className="small muted">
+          Your farm records belong to you. Download them from each page (CSV) or ask for a full copy. Deleting your account closes it at once; we keep the
+          records 90 days in case you change your mind, then erase them.
+        </p>
         <div className="row wrap">
           <a className="btn outline" href={ask('please send me a full copy of my farm records.')} target="_blank" rel="noreferrer">
             <Icon name="download" /> Ask for a copy
           </a>
-          <a className="btn ghost" style={{ color: 'var(--c-danger)' }} href={ask('please delete my account and my farm records.')} target="_blank" rel="noreferrer">
+          <a className="btn ghost danger-text" href="/delete-account/">
             <Icon name="close" /> Delete my account
           </a>
         </div>
-        {(config.legal.termsUrl || config.legal.privacyUrl) && (
-          <p className="small">
-            {config.legal.privacyUrl && (
-              <a href={config.legal.privacyUrl} target="_blank" rel="noreferrer">
-                Privacy policy
-              </a>
-            )}
-            {config.legal.termsUrl && config.legal.privacyUrl && ' · '}
-            {config.legal.termsUrl && (
-              <a href={config.legal.termsUrl} target="_blank" rel="noreferrer">
-                Terms of use
-              </a>
-            )}
-          </p>
-        )}
+        <p className="small">
+          <a href={config.legal.privacyUrl || '/privacy/'} target="_blank" rel="noreferrer">
+            Privacy policy
+          </a>
+          {' · '}
+          <a href={config.legal.termsUrl || '/terms/'} target="_blank" rel="noreferrer">
+            Terms of use
+          </a>
+        </p>
       </section>
     </Fit>
   );

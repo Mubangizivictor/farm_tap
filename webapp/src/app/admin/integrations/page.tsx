@@ -9,7 +9,7 @@ import { adminChange, loadConfig, loadIntegrations, setOp, type Integrations, ty
 import { useAdmin } from '@/lib/adminSession';
 import { firebase } from '@/lib/firebase';
 import { date } from '@/lib/format';
-import { defaultConfig, maskSecret, secretList, secretNameOk, type Gateway, type PlatformConfig } from '@/lib/platform';
+import { defaultConfig, maskSecret, secretList, secretNameOk, serverSwitchList, type Gateway, type PlatformConfig } from '@/lib/platform';
 
 /** Keys each in-app gateway needs (names in platformSecrets, read only by functions/). */
 const gatewayKeys: Record<string, string[]> = {
@@ -21,10 +21,13 @@ const DEFAULT_WEBHOOK_BASE = 'https://europe-west1-farm-tap-1dd15.cloudfunctions
 const webhookUrl = (base: string, provider: string) => `${(base || DEFAULT_WEBHOOK_BASE).replace(/\/+$/, '')}/${provider}`;
 
 const sections = [
+  ['server-jobs', 'Server jobs'],
   ['sms-provider', 'SMS'],
+  ['whatsapp', 'WhatsApp'],
   ['payments', 'Payments'],
   ['payment-keys', 'Payment keys'],
   ['maps', 'Maps'],
+  ['refund-keys', 'Refunds'],
   ['other-keys', 'Other keys'],
 ] as const;
 
@@ -128,17 +131,17 @@ export default function IntegrationsPage() {
   useEffect(() => cfg.data && setC(cfg.data.config), [cfg.data]);
   useEffect(() => integ.data && setI(integ.data), [integ.data]);
 
-  const cfgChanged = !!cfg.data && JSON.stringify({ p: c.payments, m: c.maps }) !== JSON.stringify({ p: cfg.data.config.payments, m: cfg.data.config.maps });
-  const intChanged = !!integ.data && !!i && JSON.stringify({ s: i.sms, p: i.payments, m: i.maps }) !== JSON.stringify({ s: integ.data.sms, p: integ.data.payments, m: integ.data.maps });
+  const cfgChanged = !!cfg.data && JSON.stringify({ p: c.payments, m: c.maps, s: c.server }) !== JSON.stringify({ p: cfg.data.config.payments, m: cfg.data.config.maps, s: cfg.data.config.server });
+  const intChanged = !!integ.data && !!i && JSON.stringify({ s: i.sms, p: i.payments, m: i.maps, w: i.whatsapp }) !== JSON.stringify({ s: integ.data.sms, p: integ.data.payments, m: integ.data.maps, w: integ.data.whatsapp });
 
   function save() {
     const { db } = firebase();
     const ops: Op[] = [];
     if (cfgChanged && can('settings')) ops.push(setOp(doc(db, 'platform', 'config'), c as unknown as Record<string, unknown>, false));
-    if (intChanged && i) ops.push(setOp(doc(db, 'platform', 'integrations'), { sms: i.sms, payments: i.payments, maps: i.maps }, true));
+    if (intChanged && i) ops.push(setOp(doc(db, 'platform', 'integrations'), { sms: i.sms, payments: i.payments, maps: i.maps, whatsapp: i.whatsapp }, true));
     if (!ops.length) return;
     void act
-      .run(() => adminChange(actor, { action: 'integrations.edit', target: 'platform/integrations', details: { sms: i?.sms.provider, gateways: c.payments.gateways.filter((g) => g.enabled).map((g) => g.id), maps: c.maps.provider } }, ops))
+      .run(() => adminChange(actor, { action: 'integrations.edit', target: 'platform/integrations', details: { server: c.server, sms: i?.sms.provider, gateways: c.payments.gateways.filter((g) => g.enabled).map((g) => g.id), maps: c.maps.provider } }, ops))
       .then(() => (cfg.reload(), integ.reload()));
   }
 
@@ -159,6 +162,21 @@ export default function IntegrationsPage() {
       </PageHead>
       <MsgBanner msg={act.msg} />
       <JumpNav items={sections} />
+
+      <section id="server-jobs" className="card stack anchor">
+        <div className="card-head">
+          <h2>Server jobs</h2>
+          <span className="chip warn">Needs the paid server plan</span>
+        </div>
+        <p className="small muted">
+          These run on FarmTap&apos;s server, which needs the paid (Blaze) plan. Everything is ready: after upgrading, run the one setup command from the
+          Blaze guide (it switches these on for you), or switch them on here one by one. Off means FarmTap works as today: phones remind and send
+          messages themselves, and receipts are made in the browser.
+        </p>
+        {serverSwitchList.map((x) => (
+          <Toggle key={x.key} label={x.label} hint={x.hint} checked={c.server[x.key]} disabled={!can('settings')} onChange={(v) => setC({ ...c, server: { ...c.server, [x.key]: v } })} />
+        ))}
+      </section>
 
       {i && (
         <section id="sms-provider" className="card stack anchor">
@@ -186,6 +204,36 @@ export default function IntegrationsPage() {
           </Fit>
           <div className="list">{keyRows('SMS')}</div>
           <p className="small muted">Automatic sending also needs the paid server plan and the sending job switched on, and each farm switched on (Farms, SMS).</p>
+        </section>
+      )}
+
+      {i && (
+        <section id="whatsapp" className="card stack anchor">
+          <div className="card-head">
+            <h2>WhatsApp Business API</h2>
+            <span className={`chip ${i.whatsapp.phoneNumberId && secrets.whatsapp_token?.last4 ? 'ok' : ''}`}>
+              {i.whatsapp.phoneNumberId && secrets.whatsapp_token?.last4 ? 'Ready' : 'Free: farms send from their phone'}
+            </span>
+          </div>
+          <p className="small muted">
+            From Meta Business (WhatsApp Manager): the phone number ID, and a message template approved for reminders with one text field. Without a
+            template WhatsApp only delivers to people who wrote to you in the last 24 hours.
+          </p>
+          <Fit cols={[1, 3, 3, 3]}>
+            <label className="field">
+              <span>Phone number ID</span>
+              <input className="input" value={i.whatsapp.phoneNumberId} onChange={(e) => setI({ ...i, whatsapp: { ...i.whatsapp, phoneNumberId: e.target.value.trim() } })} />
+            </label>
+            <label className="field">
+              <span>Template name</span>
+              <input className="input" value={i.whatsapp.template} onChange={(e) => setI({ ...i, whatsapp: { ...i.whatsapp, template: e.target.value.trim() } })} placeholder="farm_reminder" />
+            </label>
+            <label className="field">
+              <span>Template language</span>
+              <input className="input" value={i.whatsapp.language} onChange={(e) => setI({ ...i, whatsapp: { ...i.whatsapp, language: e.target.value.trim() } })} placeholder="en" />
+            </label>
+          </Fit>
+          <div className="list">{keyRows('WhatsApp')}</div>
         </section>
       )}
 
@@ -325,6 +373,14 @@ export default function IntegrationsPage() {
         </Fit>
         <p className="small muted">Put only a key restricted to the FarmTap app IDs and website here. Keys with billing power go below.</p>
         <div className="list">{keyRows('Maps')}</div>
+      </section>
+
+      <section id="refund-keys" className="card stack anchor">
+        <div className="card-head">
+          <h2>Refund keys</h2>
+        </div>
+        <p className="small muted">MTN refunds use the MoMo Disbursement product (a separate subscription). Airtel and card refunds use the payment keys above.</p>
+        <div className="list">{keyRows('Refunds')}</div>
       </section>
 
       <section id="other-keys" className="card stack anchor">

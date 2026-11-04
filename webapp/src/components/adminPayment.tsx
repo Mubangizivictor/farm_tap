@@ -4,6 +4,7 @@ import { Timestamp, collection, doc, increment } from 'firebase/firestore';
 import { useState, type FormEvent } from 'react';
 import { adminChange, extendPaidUntil, paymentMethods, setOp, updateOp, type AdminFarm } from '@/lib/admin';
 import { useAdmin } from '@/lib/adminSession';
+import { issueBillingDoc } from '@/lib/adminLaunch';
 import { firebase } from '@/lib/firebase';
 import { date, ugx } from '@/lib/format';
 import type { Plan, SmsPackage } from '@/lib/platform';
@@ -100,6 +101,8 @@ export function RecordPayment({
             : updateOp(tenant, { 'subscription.paidUntil': Timestamp.fromDate(newUntil!), planId }),
         ],
       );
+      // Number the receipt and invoice now (the server does it too once it is on).
+      await issueBillingDoc(actor, pay.id).catch(() => null);
       onSaved();
       onClose();
     } catch (e) {

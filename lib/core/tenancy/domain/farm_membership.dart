@@ -120,6 +120,22 @@ class FarmMembership extends Equatable {
   /// A dairy farm that also runs a milk collection centre (B05 "both").
   final bool withCentre;
 
+  /// The same farm with new subscription dates (after a payment).
+  FarmMembership withSubscription(Subscription s) => FarmMembership(
+    tenantId: tenantId,
+    name: name,
+    place: place,
+    kind: kind,
+    role: role,
+    subscription: s,
+    avatarIndex: avatarIndex,
+    sector: sector,
+    village: village,
+    herdSize: herdSize,
+    withCentre: withCentre,
+    staffId: staffId,
+  );
+
   /// The account owns this farm (counts towards the farm limit).
   bool get owned => role == PlaceRole.owner;
 

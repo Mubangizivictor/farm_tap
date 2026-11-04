@@ -7917,6 +7917,1404 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tell {name} this PIN. They choose their own the first time.'**
   String temporaryPinBody(String name);
+
+  /// No description provided for @sendOnWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get sendOnWhatsapp;
+
+  /// No description provided for @sendBySms.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS'**
+  String get sendBySms;
+
+  /// No description provided for @smsAppOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the SMS app on this phone.'**
+  String get smsAppOpenFailed;
+
+  /// No description provided for @whatsappOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open WhatsApp. Is it installed? Try SMS.'**
+  String get whatsappOpenFailed;
+
+  /// No description provided for @messagesToSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages to send'**
+  String get messagesToSend;
+
+  /// No description provided for @messagesFreeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages go out from this phone\'s WhatsApp or SMS app with the words already typed. Tap Send there. FarmTap charges nothing; SMS uses your own airtime or bundle.'**
+  String get messagesFreeNote;
+
+  /// No description provided for @noMessagesWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages waiting'**
+  String get noMessagesWaiting;
+
+  /// No description provided for @noMessagesWaitingSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk receipts and weekly statements appear here, ready to send.'**
+  String get noMessagesWaitingSub;
+
+  /// No description provided for @messagesWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 message waiting} other{{count} messages waiting}}'**
+  String messagesWaiting(int count);
+
+  /// No description provided for @sendNextTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {name}'**
+  String sendNextTo(String name);
+
+  /// No description provided for @sendNextOnWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'Send next · WhatsApp'**
+  String get sendNextOnWhatsapp;
+
+  /// No description provided for @sendNextBySms.
+  ///
+  /// In en, this message translates to:
+  /// **'Send next · SMS'**
+  String get sendNextBySms;
+
+  /// No description provided for @recentlySent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently sent'**
+  String get recentlySent;
+
+  /// No description provided for @sentFromThisPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent from this phone'**
+  String get sentFromThisPhone;
+
+  /// No description provided for @msgSentAutomatically.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent automatically'**
+  String get msgSentAutomatically;
+
+  /// No description provided for @msgKindReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get msgKindReceipt;
+
+  /// No description provided for @msgKindStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement'**
+  String get msgKindStatement;
+
+  /// No description provided for @removeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t send'**
+  String get removeMessage;
+
+  /// No description provided for @statementsQueued.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No farmer delivered this week, so there is nothing to send.} =1{1 statement is ready to send.} other{{count} statements are ready to send.}}'**
+  String statementsQueued(int count);
+
+  /// No description provided for @statementsReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Statements ready'**
+  String get statementsReady;
+
+  /// No description provided for @sendNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Send now'**
+  String get sendNow;
+
+  /// No description provided for @statementsFreeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent one by one from this phone\'s WhatsApp or SMS. FarmTap charges nothing.'**
+  String get statementsFreeNote;
+
+  /// No description provided for @readyEveryDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready every day at {time}. Tap a button to send it to {phone}.'**
+  String readyEveryDay(String phone, String time);
+
+  /// No description provided for @receiptWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt ready to send'**
+  String get receiptWaiting;
+
+  /// No description provided for @opsContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts'**
+  String get opsContacts;
+
+  /// No description provided for @opsAddContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Add contact'**
+  String get opsAddContact;
+
+  /// No description provided for @opsEditContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit contact'**
+  String get opsEditContact;
+
+  /// No description provided for @opsContactKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is this'**
+  String get opsContactKind;
+
+  /// No description provided for @opsContactNeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a name and a phone number of at least 9 digits.'**
+  String get opsContactNeeds;
+
+  /// No description provided for @opsContactOrg.
+  ///
+  /// In en, this message translates to:
+  /// **'Business or clinic (optional)'**
+  String get opsContactOrg;
+
+  /// No description provided for @opsContactPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Where they are (optional)'**
+  String get opsContactPlace;
+
+  /// No description provided for @opsShowWorkers.
+  ///
+  /// In en, this message translates to:
+  /// **'Workers can see this contact'**
+  String get opsShowWorkers;
+
+  /// No description provided for @opsSearchContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Search contacts'**
+  String get opsSearchContacts;
+
+  /// No description provided for @opsNoContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'No contacts yet'**
+  String get opsNoContacts;
+
+  /// No description provided for @opsNoContactsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your vet, AI technician, feed suppliers and buyers here so anyone on the farm can call them.'**
+  String get opsNoContactsBody;
+
+  /// No description provided for @opsWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get opsWhatsapp;
+
+  /// No description provided for @opsKindVet.
+  ///
+  /// In en, this message translates to:
+  /// **'Vets'**
+  String get opsKindVet;
+
+  /// No description provided for @opsKindAi.
+  ///
+  /// In en, this message translates to:
+  /// **'AI technicians'**
+  String get opsKindAi;
+
+  /// No description provided for @opsKindFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Feed suppliers'**
+  String get opsKindFeed;
+
+  /// No description provided for @opsKindAgrovet.
+  ///
+  /// In en, this message translates to:
+  /// **'Agrovet shops'**
+  String get opsKindAgrovet;
+
+  /// No description provided for @opsKindBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyers'**
+  String get opsKindBuyer;
+
+  /// No description provided for @opsKindTransport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get opsKindTransport;
+
+  /// No description provided for @opsKindEmergency.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency'**
+  String get opsKindEmergency;
+
+  /// No description provided for @opsKindOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get opsKindOther;
+
+  /// No description provided for @opsRoster.
+  ///
+  /// In en, this message translates to:
+  /// **'Duty roster'**
+  String get opsRoster;
+
+  /// No description provided for @opsAddDuty.
+  ///
+  /// In en, this message translates to:
+  /// **'Add duty'**
+  String get opsAddDuty;
+
+  /// No description provided for @opsEditDuty.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit duty'**
+  String get opsEditDuty;
+
+  /// No description provided for @opsDutyNeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick who does it and on which days.'**
+  String get opsDutyNeeds;
+
+  /// No description provided for @opsNoDuties.
+  ///
+  /// In en, this message translates to:
+  /// **'No duties yet'**
+  String get opsNoDuties;
+
+  /// No description provided for @opsNoDutiesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Give each job a person and the days they do it. Stand-ins cover when someone is away.'**
+  String get opsNoDutiesBody;
+
+  /// No description provided for @opsNothingThatDay.
+  ///
+  /// In en, this message translates to:
+  /// **'No duties on this day.'**
+  String get opsNothingThatDay;
+
+  /// No description provided for @opsTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get opsTomorrow;
+
+  /// No description provided for @opsYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get opsYou;
+
+  /// No description provided for @opsNobodyOn.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is away and nobody stands in'**
+  String opsNobodyOn(String name);
+
+  /// No description provided for @opsStandsIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{who} stands in for {colleague}'**
+  String opsStandsIn(String who, String colleague);
+
+  /// No description provided for @opsAway.
+  ///
+  /// In en, this message translates to:
+  /// **'Away'**
+  String get opsAway;
+
+  /// No description provided for @opsAddAway.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get opsAddAway;
+
+  /// No description provided for @opsNobodyAway.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody is away.'**
+  String get opsNobodyAway;
+
+  /// No description provided for @opsAddWorkersFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Add workers first, then give them duties.'**
+  String get opsAddWorkersFirst;
+
+  /// No description provided for @opsJob.
+  ///
+  /// In en, this message translates to:
+  /// **'Job'**
+  String get opsJob;
+
+  /// No description provided for @opsJobName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name of the job'**
+  String get opsJobName;
+
+  /// No description provided for @opsWho.
+  ///
+  /// In en, this message translates to:
+  /// **'Who does it'**
+  String get opsWho;
+
+  /// No description provided for @opsStandIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Stand-in when away'**
+  String get opsStandIn;
+
+  /// No description provided for @opsNoStandIn.
+  ///
+  /// In en, this message translates to:
+  /// **'No stand-in'**
+  String get opsNoStandIn;
+
+  /// No description provided for @opsShift.
+  ///
+  /// In en, this message translates to:
+  /// **'When'**
+  String get opsShift;
+
+  /// No description provided for @opsEveryDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day'**
+  String get opsEveryDay;
+
+  /// No description provided for @opsSomeDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Some days'**
+  String get opsSomeDays;
+
+  /// No description provided for @opsWhichDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Which days'**
+  String get opsWhichDays;
+
+  /// No description provided for @opsFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get opsFrom;
+
+  /// No description provided for @opsTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get opsTo;
+
+  /// No description provided for @opsReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason (optional)'**
+  String get opsReason;
+
+  /// No description provided for @opsDutyMilking.
+  ///
+  /// In en, this message translates to:
+  /// **'Milking'**
+  String get opsDutyMilking;
+
+  /// No description provided for @opsDutyFeeding.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeding'**
+  String get opsDutyFeeding;
+
+  /// No description provided for @opsDutyHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Health checks'**
+  String get opsDutyHealth;
+
+  /// No description provided for @opsDutyCleaning.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleaning'**
+  String get opsDutyCleaning;
+
+  /// No description provided for @opsDutyGrazing.
+  ///
+  /// In en, this message translates to:
+  /// **'Grazing'**
+  String get opsDutyGrazing;
+
+  /// No description provided for @opsDutySecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get opsDutySecurity;
+
+  /// No description provided for @opsDutyCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk collection'**
+  String get opsDutyCollection;
+
+  /// No description provided for @opsDutyManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Manager on duty'**
+  String get opsDutyManager;
+
+  /// No description provided for @opsDutyOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other job'**
+  String get opsDutyOther;
+
+  /// No description provided for @opsShiftMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get opsShiftMorning;
+
+  /// No description provided for @opsShiftAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get opsShiftAfternoon;
+
+  /// No description provided for @opsShiftEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get opsShiftEvening;
+
+  /// No description provided for @opsShiftNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get opsShiftNight;
+
+  /// No description provided for @opsShiftAllDay.
+  ///
+  /// In en, this message translates to:
+  /// **'All day'**
+  String get opsShiftAllDay;
+
+  /// No description provided for @opsFeedStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeds store'**
+  String get opsFeedStore;
+
+  /// No description provided for @opsAddFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Add feed'**
+  String get opsAddFeed;
+
+  /// No description provided for @opsEditFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit feed'**
+  String get opsEditFeed;
+
+  /// No description provided for @opsBuyOrFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Record buying or feeding'**
+  String get opsBuyOrFeed;
+
+  /// No description provided for @opsInStore.
+  ///
+  /// In en, this message translates to:
+  /// **'In the store'**
+  String get opsInStore;
+
+  /// No description provided for @opsNoFeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'No feeds yet'**
+  String get opsNoFeeds;
+
+  /// No description provided for @opsNoFeedsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the feeds you use. FarmTap works out how long each one lasts.'**
+  String get opsNoFeedsBody;
+
+  /// No description provided for @opsNoUseYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No feeding recorded yet'**
+  String get opsNoUseYet;
+
+  /// No description provided for @opsLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get opsLow;
+
+  /// No description provided for @opsLastsDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =0{Runs out today} =1{Lasts about 1 day} other{Lasts about {days} days}}'**
+  String opsLastsDays(int days);
+
+  /// No description provided for @opsRunningLow.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 feed running low} other{{count} feeds running low}}'**
+  String opsRunningLow(int count);
+
+  /// No description provided for @opsCountStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Count the store'**
+  String get opsCountStore;
+
+  /// No description provided for @opsCountStoreSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Set what is really left'**
+  String get opsCountStoreSub;
+
+  /// No description provided for @opsHowMuchLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'How much is left ({unit})'**
+  String opsHowMuchLeft(String unit);
+
+  /// No description provided for @opsFeedName.
+  ///
+  /// In en, this message translates to:
+  /// **'Feed name'**
+  String get opsFeedName;
+
+  /// No description provided for @opsFeedNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example dairy meal'**
+  String get opsFeedNameHint;
+
+  /// No description provided for @opsUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get opsUnit;
+
+  /// No description provided for @opsUnitHint.
+  ///
+  /// In en, this message translates to:
+  /// **'kg, bags or bales'**
+  String get opsUnitHint;
+
+  /// No description provided for @opsLowAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Warn me when below (optional)'**
+  String get opsLowAt;
+
+  /// No description provided for @opsVaccinations.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccinations'**
+  String get opsVaccinations;
+
+  /// No description provided for @opsRecordVaccination.
+  ///
+  /// In en, this message translates to:
+  /// **'Record vaccination'**
+  String get opsRecordVaccination;
+
+  /// No description provided for @opsNoVaccinations.
+  ///
+  /// In en, this message translates to:
+  /// **'No vaccinations yet'**
+  String get opsNoVaccinations;
+
+  /// No description provided for @opsNoVaccinationsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Record each vaccination and FarmTap reminds you when the next dose is due.'**
+  String get opsNoVaccinationsBody;
+
+  /// No description provided for @opsNextDoses.
+  ///
+  /// In en, this message translates to:
+  /// **'Next doses'**
+  String get opsNextDoses;
+
+  /// No description provided for @opsGiven.
+  ///
+  /// In en, this message translates to:
+  /// **'Given'**
+  String get opsGiven;
+
+  /// No description provided for @opsOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get opsOverdue;
+
+  /// No description provided for @opsSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Soon'**
+  String get opsSoon;
+
+  /// No description provided for @opsVaccine.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccine'**
+  String get opsVaccine;
+
+  /// No description provided for @opsWholeHerd.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole herd'**
+  String get opsWholeHerd;
+
+  /// No description provided for @opsWholeHerdNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave animals empty to record it for the whole herd.'**
+  String get opsWholeHerdNote;
+
+  /// No description provided for @opsGivenOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Given on'**
+  String get opsGivenOn;
+
+  /// No description provided for @opsNextDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Next dose due (optional)'**
+  String get opsNextDue;
+
+  /// No description provided for @opsCostUgx.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost in UGX (optional)'**
+  String get opsCostUgx;
+
+  /// No description provided for @opsVet.
+  ///
+  /// In en, this message translates to:
+  /// **'Vet (optional)'**
+  String get opsVet;
+
+  /// No description provided for @opsNoVet.
+  ///
+  /// In en, this message translates to:
+  /// **'No vet'**
+  String get opsNoVet;
+
+  /// No description provided for @opsRemoveVaccination.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this vaccination?'**
+  String get opsRemoveVaccination;
+
+  /// No description provided for @opsRemoveVaccinationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Its cost is removed from your spending too.'**
+  String get opsRemoveVaccinationBody;
+
+  /// No description provided for @opsUgx.
+  ///
+  /// In en, this message translates to:
+  /// **'UGX {amount}'**
+  String opsUgx(int amount);
+
+  /// No description provided for @opsAnimals.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 animal} other{{count} animals}}'**
+  String opsAnimals(int count);
+
+  /// No description provided for @opsNoDate.
+  ///
+  /// In en, this message translates to:
+  /// **'No date'**
+  String get opsNoDate;
+
+  /// No description provided for @opsClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get opsClear;
+
+  /// No description provided for @opsRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get opsRemove;
+
+  /// No description provided for @opsViewOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only owners and managers can change this.'**
+  String get opsViewOnly;
+
+  /// No description provided for @remindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get remindersTitle;
+
+  /// No description provided for @remindersSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Duties, vaccinations, calving and your plan'**
+  String get remindersSub;
+
+  /// No description provided for @remindersToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get remindersToday;
+
+  /// No description provided for @remindersNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to remind you of today'**
+  String get remindersNone;
+
+  /// No description provided for @remindersNoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Duties, vaccinations, calving and plan reminders show here on the day.'**
+  String get remindersNoneBody;
+
+  /// No description provided for @remindersWhat.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind about'**
+  String get remindersWhat;
+
+  /// No description provided for @remindersDuties.
+  ///
+  /// In en, this message translates to:
+  /// **'Duties for each worker'**
+  String get remindersDuties;
+
+  /// No description provided for @remindersVaccinations.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccinations due'**
+  String get remindersVaccinations;
+
+  /// No description provided for @remindersCalving.
+  ///
+  /// In en, this message translates to:
+  /// **'Calving, pregnancy checks and heat'**
+  String get remindersCalving;
+
+  /// No description provided for @remindersPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Free trial and plan ending'**
+  String get remindersPlan;
+
+  /// No description provided for @remindersHow.
+  ///
+  /// In en, this message translates to:
+  /// **'How'**
+  String get remindersHow;
+
+  /// No description provided for @remindersPush.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications on this phone'**
+  String get remindersPush;
+
+  /// No description provided for @remindersPushSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown once each day'**
+  String get remindersPushSub;
+
+  /// No description provided for @remindersWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp to workers'**
+  String get remindersWhatsapp;
+
+  /// No description provided for @remindersWhatsappSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to send from this phone, free'**
+  String get remindersWhatsappSub;
+
+  /// No description provided for @remindersSms.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS to workers'**
+  String get remindersSms;
+
+  /// No description provided for @remindersSmsSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent from this phone at your normal SMS rate'**
+  String get remindersSmsSub;
+
+  /// No description provided for @remindersHour.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind at'**
+  String get remindersHour;
+
+  /// No description provided for @remindersFreeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages go from your own phone, so FarmTap charges nothing for them.'**
+  String get remindersFreeNote;
+
+  /// No description provided for @subscriptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan and payment'**
+  String get subscriptionTitle;
+
+  /// No description provided for @payChoosePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a plan'**
+  String get payChoosePlan;
+
+  /// No description provided for @payPerMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} a month'**
+  String payPerMonth(String amount);
+
+  /// No description provided for @payHow.
+  ///
+  /// In en, this message translates to:
+  /// **'How to pay'**
+  String get payHow;
+
+  /// No description provided for @payPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Money number'**
+  String get payPhone;
+
+  /// No description provided for @payPhoneNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an MTN or Airtel number, like 0772 123 456.'**
+  String get payPhoneNeeded;
+
+  /// No description provided for @payAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay {amount}'**
+  String payAmount(String amount);
+
+  /// No description provided for @payMobileNote.
+  ///
+  /// In en, this message translates to:
+  /// **'A prompt comes to that phone. Enter your Mobile Money PIN to pay.'**
+  String get payMobileNote;
+
+  /// No description provided for @payCardNote.
+  ///
+  /// In en, this message translates to:
+  /// **'A secure card page opens. Come back here when you have paid.'**
+  String get payCardNote;
+
+  /// No description provided for @payByHand.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay, then send us the transaction ID'**
+  String get payByHand;
+
+  /// No description provided for @payByHandAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount: {amount}'**
+  String payByHandAmount(String amount);
+
+  /// No description provided for @payAccountName.
+  ///
+  /// In en, this message translates to:
+  /// **'Account name'**
+  String get payAccountName;
+
+  /// No description provided for @payCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Account or pay code'**
+  String get payCode;
+
+  /// No description provided for @payReference.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction ID'**
+  String get payReference;
+
+  /// No description provided for @payReferenceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'From your payment message'**
+  String get payReferenceHint;
+
+  /// No description provided for @payReferenceNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the transaction ID from your payment message.'**
+  String get payReferenceNeeded;
+
+  /// No description provided for @paySendDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Send payment details'**
+  String get paySendDetails;
+
+  /// No description provided for @payWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for your payment'**
+  String get payWaiting;
+
+  /// No description provided for @payWaitingPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your phone and enter your Mobile Money PIN. This page updates by itself.'**
+  String get payWaitingPhone;
+
+  /// No description provided for @payWaitingCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish paying on the card page. This page updates by itself.'**
+  String get payWaitingCard;
+
+  /// No description provided for @payCheckNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Check now'**
+  String get payCheckNow;
+
+  /// No description provided for @payDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment received'**
+  String get payDone;
+
+  /// No description provided for @payDoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you. Your farm is open and your receipt is below.'**
+  String get payDoneBody;
+
+  /// No description provided for @payClaimSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment details sent'**
+  String get payClaimSent;
+
+  /// No description provided for @payClaimSentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap checks your payment and opens your farm, usually within a few hours.'**
+  String get payClaimSentBody;
+
+  /// No description provided for @payFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment not finished'**
+  String get payFailed;
+
+  /// No description provided for @payFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was taken. Try again, or pay another way.'**
+  String get payFailedBody;
+
+  /// No description provided for @payTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get payTryAgain;
+
+  /// No description provided for @payNotStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'The payment could not start. Check your internet and try again.'**
+  String get payNotStarted;
+
+  /// No description provided for @paySoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Paying in the app is coming soon'**
+  String get paySoon;
+
+  /// No description provided for @paySoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'For now, WhatsApp or call FarmTap on {phone} to pay.'**
+  String paySoonBody(String phone);
+
+  /// No description provided for @payAskOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the owner or a manager pays'**
+  String get payAskOwner;
+
+  /// No description provided for @payAskOwnerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask them to pay for FarmTap. Recording starts again as soon as the payment is confirmed.'**
+  String get payAskOwnerBody;
+
+  /// No description provided for @payActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan is active'**
+  String get payActive;
+
+  /// No description provided for @payPaidUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid until {date}'**
+  String payPaidUntil(String date);
+
+  /// No description provided for @payTrialEnds.
+  ///
+  /// In en, this message translates to:
+  /// **'Your free trial ends on {date}'**
+  String payTrialEnds(String date);
+
+  /// No description provided for @payLockedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a plan and pay to record again. Your records are safe.'**
+  String get payLockedBody;
+
+  /// No description provided for @payReceipts.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipts and invoices'**
+  String get payReceipts;
+
+  /// No description provided for @payNoReceipts.
+  ///
+  /// In en, this message translates to:
+  /// **'Your receipts show here after each payment.'**
+  String get payNoReceipts;
+
+  /// No description provided for @payReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt (PDF)'**
+  String get payReceipt;
+
+  /// No description provided for @payInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice (PDF)'**
+  String get payInvoice;
+
+  /// No description provided for @payRefundNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund note (PDF)'**
+  String get payRefundNote;
+
+  /// No description provided for @payReceiptFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The PDF could not be made. Try again.'**
+  String get payReceiptFailed;
+
+  /// No description provided for @payHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Need help paying?'**
+  String get payHelp;
+
+  /// No description provided for @payHelpMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello FarmTap, I want to pay for {farm}.'**
+  String payHelpMessage(String farm);
+
+  /// No description provided for @lockedTrialTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your free trial has ended'**
+  String get lockedTrialTitle;
+
+  /// No description provided for @lockedPlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your FarmTap plan has ended'**
+  String get lockedPlanTitle;
+
+  /// No description provided for @lockedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing can be added or changed on {farm} until it is paid for. Your records are safe and nothing is deleted.'**
+  String lockedBody(String farm);
+
+  /// No description provided for @lockedPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a plan and pay'**
+  String get lockedPay;
+
+  /// No description provided for @lockedView.
+  ///
+  /// In en, this message translates to:
+  /// **'Look at my records'**
+  String get lockedView;
+
+  /// No description provided for @lockedOtherFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Open another farm'**
+  String get lockedOtherFarm;
+
+  /// No description provided for @readOnlyBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Read only'**
+  String get readOnlyBannerTitle;
+
+  /// No description provided for @readOnlyBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan has ended. Pay to record again; anything saved now will not be kept.'**
+  String get readOnlyBannerBody;
+
+  /// No description provided for @profilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo'**
+  String get profilePhoto;
+
+  /// No description provided for @profilePhotoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown on your account on this phone and the web.'**
+  String get profilePhotoBody;
+
+  /// No description provided for @profilePhotoRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get profilePhotoRemove;
+
+  /// No description provided for @legalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal'**
+  String get legalTitle;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @termsOfUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get termsOfUse;
+
+  /// No description provided for @deleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my account'**
+  String get deleteTitle;
+
+  /// No description provided for @deleteSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept 90 days, then erased'**
+  String get deleteSub;
+
+  /// No description provided for @deleteWarnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This closes your account'**
+  String get deleteWarnTitle;
+
+  /// No description provided for @deleteWarnBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Read what happens before you go on.'**
+  String get deleteWarnBody;
+
+  /// No description provided for @deleteWhatHappens.
+  ///
+  /// In en, this message translates to:
+  /// **'What happens'**
+  String get deleteWhatHappens;
+
+  /// No description provided for @deleteWhat1.
+  ///
+  /// In en, this message translates to:
+  /// **'You are signed out on every phone and computer, and cannot sign in again.'**
+  String get deleteWhat1;
+
+  /// No description provided for @deleteWhat2.
+  ///
+  /// In en, this message translates to:
+  /// **'Every farm you own closes with it: nobody can open or record on it.'**
+  String get deleteWhat2;
+
+  /// No description provided for @deleteWhat3.
+  ///
+  /// In en, this message translates to:
+  /// **'Your workers and managers lose access to those farms.'**
+  String get deleteWhat3;
+
+  /// No description provided for @deleteWhat4.
+  ///
+  /// In en, this message translates to:
+  /// **'Any time left on your plan is not refunded.'**
+  String get deleteWhat4;
+
+  /// No description provided for @deleteWhat5.
+  ///
+  /// In en, this message translates to:
+  /// **'For 90 days FarmTap keeps everything, so support can bring it back if you change your mind.'**
+  String get deleteWhat5;
+
+  /// No description provided for @deleteWhat6.
+  ///
+  /// In en, this message translates to:
+  /// **'After 90 days your account, farms and records are erased for good.'**
+  String get deleteWhat6;
+
+  /// No description provided for @deleteInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Only want to stop paying? You do not need to delete anything: the farm turns read-only and your records stay safe.'**
+  String get deleteInstead;
+
+  /// No description provided for @deleteContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'I still want to delete'**
+  String get deleteContinue;
+
+  /// No description provided for @deleteUnderstand.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand my farms close and are erased after 90 days'**
+  String get deleteUnderstand;
+
+  /// No description provided for @deleteTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Type DELETE to confirm'**
+  String get deleteTypeLabel;
+
+  /// No description provided for @deleteTypeNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the word DELETE.'**
+  String get deleteTypeNeeded;
+
+  /// No description provided for @deleteReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Why are you leaving? (optional)'**
+  String get deleteReason;
+
+  /// No description provided for @deleteNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my account'**
+  String get deleteNow;
+
+  /// No description provided for @deleteKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep my account'**
+  String get deleteKeep;
+
+  /// No description provided for @deleteLastTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account now?'**
+  String get deleteLastTitle;
+
+  /// No description provided for @deleteLastBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You are signed out straight away. Support can restore it within 90 days.'**
+  String get deleteLastBody;
+
+  /// No description provided for @deleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account was not deleted. Check your internet and try again.'**
+  String get deleteFailed;
+
+  /// No description provided for @closedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is closed'**
+  String get closedTitle;
+
+  /// No description provided for @closedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It can be brought back until {date}. After that it is erased for good.'**
+  String closedBody(String date);
+
+  /// No description provided for @closedBodySoon.
+  ///
+  /// In en, this message translates to:
+  /// **'It can be brought back for 90 days. After that it is erased for good.'**
+  String get closedBodySoon;
+
+  /// No description provided for @closedRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask FarmTap to bring it back'**
+  String get closedRestore;
+
+  /// No description provided for @closedRestoreMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello FarmTap, I closed my account and want it back.'**
+  String get closedRestoreMessage;
 }
 
 class _AppLocalizationsDelegate

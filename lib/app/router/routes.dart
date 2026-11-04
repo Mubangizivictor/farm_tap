@@ -54,6 +54,15 @@ abstract final class AppRoutes {
   static const healthSchedule = '/health/schedule';
   static const healthWithdrawal = '/health/withdrawal';
   static const more = '/more';
+
+  // Decision 0024: farm contacts, duty roster, vaccinations, reminders.
+  static const moreContacts = '/more/contacts';
+  static const moreRoster = '/more/roster';
+  static const moreVaccinations = '/more/vaccinations';
+  static const moreReminders = '/more/reminders';
+
+  /// The feeds store (counts, days left, running low).
+  static const feedingStore = '/feeding/store';
   static const collect = '/collect';
   static const farmers = '/farmers';
   static const pay = '/pay';
@@ -90,6 +99,14 @@ abstract final class AppRoutes {
   static const settings = '/settings';
   static const settingsSubscription = '/settings/subscription';
   static const settingsHelp = '/settings/help';
+  static const settingsMessages = '/settings/messages';
+  static const settingsDeleteAccount = '/settings/delete-account';
+
+  /// M05: the trial or plan ended (decision 0023 hard lock).
+  static const locked = '/locked';
+
+  /// The account was closed (decision 0024): kept 90 days, then erased.
+  static const accountClosed = '/account-closed';
 
   // Dev
   static const uiGallery = '/dev/gallery';

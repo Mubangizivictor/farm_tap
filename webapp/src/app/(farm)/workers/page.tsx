@@ -37,6 +37,8 @@ import {
 } from '@/lib/domain';
 import { count, date, initials, shortDate, time, ugx, words } from '@/lib/format';
 import { firebase } from '@/lib/firebase';
+import { base64Of, personPhotoSrc, storeImage } from '@/lib/images';
+import { PhotoPicker } from '@/components/upload';
 import { hashPin, pinProblem } from '@/lib/pin';
 import { useFarm, useSession } from '@/lib/session';
 import { expensesOf, removeWithExpenses, saveWithExpense } from '@/lib/linked';
@@ -435,7 +437,8 @@ function Profile({
   onClose: () => void;
   onUndo?: (w: FarmRecord<WageBody>) => void;
 }) {
-  const { canSave } = useSession();
+  const { canSave, user } = useSession();
+  const farm = useFarm();
   const ins = attendance.filter((a) => isClockIn(a) && a.body.staffId === s.id).sort((a, b) => inTime(b).getTime() - inTime(a).getTime());
   const outs = attendance.filter((a) => a.body.event === 'out' && a.body.staffId === s.id);
   const days = new Set(ins.map((a) => dayKey(inTime(a))));
@@ -445,7 +448,24 @@ function Profile({
   return (
     <Dialog title={s.body.name} subtitle={s.body.title || words(s.body.role)} onClose={onClose} size="lg">
       <div className="row wrap">
-        <span className="avatar lg">{s.body.photoUrl ? <img src={s.body.photoUrl} alt="" /> : initials(s.body.name)}</span>
+        {boss && canSave ? (
+          <PhotoPicker
+            photo={personPhotoSrc(s.body)}
+            name={s.body.name}
+            size={320}
+            onPick={async (img) => {
+              if (!user) return;
+              const url = await storeImage(`tenants/${farm.id}/people/${s.id}.jpg`, img.dataUrl);
+              await putRecord(firebase().db, farm.id, s, user.uid, mergeBody(s, { photo: base64Of(img.dataUrl), photoUrl: url }));
+            }}
+            onRemove={async () => {
+              if (!user) return;
+              await putRecord(firebase().db, farm.id, s, user.uid, mergeBody(s, { photo: null, photoUrl: null }));
+            }}
+          />
+        ) : (
+          <span className="avatar lg">{personPhotoSrc(s.body) ? <img src={personPhotoSrc(s.body)!} alt="" /> : initials(s.body.name)}</span>
+        )}
         <div className="stack grow" style={{ gap: 'var(--s-xxs)' }}>
           <span className="small muted">
             {s.body.phone || 'No phone'}
@@ -668,7 +688,7 @@ export default function Workers() {
                 <tr key={s.id} className="clickable" tabIndex={0} onClick={() => setOpenId(s.id)} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)}>
                   <td data-label="Name" className="lead">
                     <span className="row">
-                      <span className="avatar">{s.body.photoUrl ? <img src={s.body.photoUrl} alt="" /> : initials(s.body.name)}</span>
+                      <span className="avatar">{personPhotoSrc(s.body) ? <img src={personPhotoSrc(s.body)!} alt="" /> : initials(s.body.name)}</span>
                       <strong>{s.body.name}</strong>
                     </span>
                   </td>

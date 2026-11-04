@@ -27,6 +27,7 @@ import { addRecord, mergeBody, putRecord, removeRecord, upsertRecord, useRecords
 import { manages, recordDate, type DeliveryBody, type FarmRecord, type FarmerBody, type NfcCardBody, type StaffBody } from '@/lib/domain';
 import { count, date, initials, litres, num1, shortDate, time, words } from '@/lib/format';
 import { firebase } from '@/lib/firebase';
+import { personPhotoSrc } from '@/lib/images';
 import { useFarm, useSession } from '@/lib/session';
 import { useOpenFromUrl } from '@/lib/useOpen';
 
@@ -428,7 +429,7 @@ function SupplierDetail({
   return (
     <Dialog title={f.body.name} subtitle={f.body.village || 'Village not set'} onClose={onClose} size="lg">
       <div className="row wrap">
-        <span className="avatar lg">{f.body.photoUrl ? <img src={f.body.photoUrl} alt="" /> : initials(f.body.name)}</span>
+        <span className="avatar lg">{personPhotoSrc(f.body) ? <img src={personPhotoSrc(f.body)!} alt="" /> : initials(f.body.name)}</span>
         <div className="stack grow" style={{ gap: 'var(--s-xxs)' }}>
           <span>{f.body.phone}</span>
           <div className="chips">

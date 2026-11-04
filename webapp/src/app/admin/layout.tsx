@@ -24,11 +24,16 @@ const nav: NavItem[] = [
   { href: '/admin/farms/', label: 'Farms', icon: 'home', any: ['farms', 'support', 'finance', 'users'], group: 'Business' },
   { href: '/admin/money/', label: 'Payments', icon: 'receipt', any: ['finance'], group: 'Business' },
   { href: '/admin/plans/', label: 'Plans and SMS', icon: 'tag', any: ['finance'], group: 'Business' },
+  { href: '/admin/refunds/', label: 'Receipts and refunds', icon: 'receipt', any: ['finance'], group: 'Business' },
   { href: '/admin/users/', label: 'Users', icon: 'workers', any: ['users', 'support'], group: 'People' },
+  { href: '/admin/deletions/', label: 'Deleted accounts', icon: 'refresh', any: ['users', 'support'], group: 'People' },
   { href: '/admin/announce/', label: 'Announcements', icon: 'megaphone', any: ['messages'], group: 'People' },
   { href: '/admin/staff/', label: 'Admin staff', icon: 'shield', any: ['staff'], group: 'People' },
   { href: '/admin/settings/', label: 'App settings', icon: 'settings', any: ['settings'], group: 'Platform' },
   { href: '/admin/integrations/', label: 'APIs and keys', icon: 'key', any: ['settings', 'secrets'], group: 'Platform' },
+  { href: '/admin/branding/', label: 'Brand and documents', icon: 'edit', any: ['settings'], group: 'Platform' },
+  { href: '/admin/legal/', label: 'Legal documents', icon: 'shield', any: ['settings'], group: 'Platform' },
+  { href: '/admin/website/', label: 'Website', icon: 'globe', any: ['settings'], group: 'Platform' },
   { href: '/admin/audit/', label: 'Audit log', icon: 'list', any: ['audit'], group: 'Platform' },
 ];
 
@@ -87,7 +92,7 @@ function NotStaff() {
           </>
         )}
         <div className="row">
-          <button className="btn ghost sm" onClick={() => router.push('/')}>
+          <button className="btn ghost sm" onClick={() => router.push('/start/')}>
             Back to my farm
           </button>
           <button className="btn ghost sm" onClick={() => void signOut().then(() => router.replace('/admin-sign-in/'))}>
@@ -181,7 +186,7 @@ function Shell({ children }: { children: ReactNode }) {
           <span className="admin-badge">
             <Icon name="shield" className="icon" /> Admin
           </span>
-          <Link href="/" className="btn sm outline hide-sm" title="Open my farm">
+          <Link href="/start/" className="btn sm outline hide-sm" title="Open my farm">
             My farm
           </Link>
           <div className="rel">
@@ -196,7 +201,7 @@ function Shell({ children }: { children: ReactNode }) {
                     <strong>{me.name || user?.email}</strong>
                     <span className="small muted">{user?.email}</span>
                   </div>
-                  <Link href="/" role="menuitem">
+                  <Link href="/start/" role="menuitem">
                     <Icon name="home" /> My farm
                   </Link>
                   <button role="menuitem" disabled={signingOut} onClick={() => void handleSignOut()}>

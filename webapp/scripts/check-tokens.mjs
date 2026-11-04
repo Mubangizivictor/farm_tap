@@ -20,7 +20,8 @@ function walk(dir) {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
     if (statSync(p).isDirectory()) {
-      if (name !== 'theme') walk(p);
+      // shared/ is generated from ../shared (PDF page layout in points, like print).
+      if (name !== 'theme' && name !== 'shared') walk(p);
       continue;
     }
     if (!/\.(css|tsx?|mjs)$/.test(name) || name.endsWith('.test.ts')) continue;

@@ -46,6 +46,8 @@ function message(code: string): string {
       return 'This web address is not allowed to sign in yet. Ask the FarmTap team to allow this address.';
     case 'auth/network-request-failed':
       return 'No internet. Check your connection and try again.';
+    case 'auth/user-disabled':
+      return 'This account was deleted. To bring it back within 90 days, call or WhatsApp FarmTap support.';
     case 'auth/too-many-requests':
       return 'Too many tries. Wait a few minutes and try again.';
     case 'auth/account-exists-with-different-credential':
@@ -96,7 +98,7 @@ export default function SignIn() {
   useEffect(() => {
     try {
       const next = new URLSearchParams(window.location.search).get('next');
-      if (next && /^\/supplier(-invite)?\//.test(next)) sessionStorage.setItem('farmtap.next', next);
+      if (next && /^\/(supplier|supplier-invite|delete-account)\//.test(next)) sessionStorage.setItem('farmtap.next', next);
     } catch {
       /* storage blocked: the start page still opens the farm */
     }
@@ -104,7 +106,7 @@ export default function SignIn() {
 
   // Already signed in on this browser: never ask again (go to the farm).
   useEffect(() => {
-    if (user) router.replace('/');
+    if (user) router.replace('/start/');
   }, [user, router]);
 
   // Finish a redirect sign-in (used when the browser blocks pop-ups).

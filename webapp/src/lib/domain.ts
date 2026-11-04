@@ -49,6 +49,8 @@ export interface Farm {
   planId: string;
   /** Feature overrides: undefined means use plan/config default. */
   features: Record<string, boolean | undefined>;
+  /** The owner deleted their account: the farm is closed (kept 90 days). */
+  closed: boolean;
 }
 
 export function farmFromDoc(id: string, t: Record<string, unknown>, member: Record<string, unknown>): Farm {
@@ -77,6 +79,7 @@ export function farmFromDoc(id: string, t: Record<string, unknown>, member: Reco
     farmStatus: (t.status as string) ?? 'active',
     planId: (t.planId as string) ?? '',
     features: (t.features as Record<string, boolean | undefined>) ?? {},
+    closed: t.closure != null,
   };
 }
 

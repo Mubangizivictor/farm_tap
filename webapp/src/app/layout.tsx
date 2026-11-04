@@ -3,10 +3,11 @@ import type { ReactNode } from 'react';
 import { SessionProvider, themeBootScript } from '@/lib/session';
 import '@/theme/tokens.css';
 import '@/styles/app.css';
+import '@/styles/public.css';
 
 export const metadata: Metadata = {
   title: 'FarmTap',
-  description: 'Farm and milk-collection records for your farm, on any computer.',
+  description: 'FarmTap: farm and milk-collection records for Uganda, on your phone (even offline) and on the web. 14 days free.',
   icons: { icon: '/brand/farmtap_app_icon.svg' },
 };
 

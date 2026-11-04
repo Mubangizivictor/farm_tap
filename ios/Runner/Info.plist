@@ -10,7 +10,13 @@
 		</array>
 		<key>NFCReaderUsageDescription</key>
 		<string>FarmTap reads staff and farmer cards.</string>
-		<key>NSCameraUsageDescription</key>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>remote-notification</string>
+		</array>
+	<key>NSCameraUsageDescription</key>
 		<string>FarmTap scans ear tags and takes photos of animals and receipts.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>FarmTap attaches photos of animals and receipts.</string>

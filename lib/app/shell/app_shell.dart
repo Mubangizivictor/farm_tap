@@ -137,6 +137,7 @@ class AppShell extends StatelessWidget {
           },
           farm: farm == null ? null : FarmSwitcherInfo(name: farm.name, subtitle: l10n.farmRoleLine(farm.place, role)),
           trialDaysLeft: session.trialDaysLeft,
+          onUpgrade: () => GoRouter.of(context).push(AppRoutes.settingsSubscription),
           hasNotifications: true,
           onNotificationsTap: () => GoRouter.of(context).push(AppRoutes.homeAlerts),
           child: navigation,
