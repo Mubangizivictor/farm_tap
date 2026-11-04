@@ -126,7 +126,7 @@ void main() {
   screenGoldens(
     'G11_centre_sms_preview',
     (_) => shell(
-      SmsStatementsPage(repo: repo(), onSent: () {}),
+      SmsStatementsPage(repo: repo(), onQueued: () {}),
       '/pay',
       parent: '/pay',
     ),

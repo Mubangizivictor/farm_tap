@@ -20,6 +20,7 @@ enum MoreTarget {
   reports,
   cards,
   subscription,
+  messages,
   settings,
   help,
   lock,
@@ -122,6 +123,8 @@ class MorePage extends StatelessWidget {
                   FarmTapTone.gold,
                   subtitle: trialDaysLeft == null ? null : l10n.trialDaysLeftShort(trialDaysLeft!),
                 ),
+              if (shows(MoreTarget.messages))
+                row(MoreTarget.messages, Symbols.sms_rounded, l10n.messagesToSend, FarmTapTone.primary),
               if (shows(MoreTarget.settings))
                 row(MoreTarget.settings, Symbols.settings_rounded, l10n.settings, FarmTapTone.neutral),
               row(MoreTarget.help, Symbols.support_agent_rounded, l10n.helpSupport, FarmTapTone.info),

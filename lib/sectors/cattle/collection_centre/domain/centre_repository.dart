@@ -44,7 +44,9 @@ abstract interface class CentreRepository {
   Future<Result<PaymentPeriod>> payments();
   Future<Result<FarmerStatement>> statement(String farmerId);
   Future<Result<SmsPreview>> smsPreview();
-  Future<Result<void>> sendStatements();
+
+  /// Queues the week's statements to farmers; returns how many.
+  Future<Result<int>> sendStatements();
   Future<Result<void>> payOut(PayMethod method);
   Future<Result<Reconciliation>> reconciliation();
   Future<Result<void>> saveReconciliation(String explanation);

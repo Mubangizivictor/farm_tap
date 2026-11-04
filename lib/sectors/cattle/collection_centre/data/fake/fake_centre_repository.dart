@@ -8,8 +8,10 @@ import 'package:farm_tap/core/people/domain/photo_store.dart';
 import 'package:farm_tap/core/sms/sms_outbox.dart';
 import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
+import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_models.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_repository.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 /// UI phase: Kashari Milk Centre with the G01-G13 sample numbers. A few
 /// farmers are listed in full; the rest only count towards the totals.
@@ -393,16 +395,15 @@ class FakeCentreRepository implements CentreRepository, Restorable {
     if (f.smsReceipts) {
       final at = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
       await sms?.queue(
-        id: _receiptId(d.id),
+        id: SmsOutbox.receiptId(d.id),
         to: f.phone,
+        name: f.name,
         kind: 'deliveryReceipt',
         text: 'FarmTap: received ${litres.toStringAsFixed(1)} L of milk from ${f.name} at $at. Thank you.',
       );
     }
     return Result.success(d);
   }
-
-  static String _receiptId(String deliveryId) => 'receipt-$deliveryId';
 
   @override
   Future<Result<void>> undoDelivery(String deliveryId) async {
@@ -412,7 +413,7 @@ class FakeCentreRepository implements CentreRepository, Restorable {
     // Undo is a soft delete: the record stays, marked deleted.
     await journal?.remove('deliveries', d.id);
     final f = _farmers.where((x) => x.id == d.farmerId).firstOrNull;
-    if (f != null && f.smsReceipts) await sms?.cancel(_receiptId(d.id));
+    if (f != null && f.smsReceipts) await sms?.cancel(SmsOutbox.receiptId(d.id));
     _farmers = [
       for (final x in _farmers)
         if (x.id == d.farmerId) _less(x, d.litres) else x,
@@ -713,8 +714,34 @@ class FakeCentreRepository implements CentreRepository, Restorable {
     smsMonthly: 300,
   );
 
+  /// Queues this week's statement for every farmer with a phone number and
+  /// SMS receipts on. Returns how many were queued (none in the demo).
   @override
-  Future<Result<void>> sendStatements() async => const Result.success(null);
+  Future<Result<int>> sendStatements() async {
+    final outbox = sms;
+    if (outbox == null) return const Result.success(0);
+    final weekStart = _day.subtract(const Duration(days: 6));
+    await initializeDateFormatting('en');
+    final f = FarmTapFormat('en');
+    var queued = 0;
+    for (final farmer in _farmers) {
+      if (!farmer.smsReceipts || farmer.phone.trim().isEmpty) continue;
+      final litres = _deliveries
+          .where((d) => d.farmerId == farmer.id && !d.rejected && !d.at.isBefore(weekStart))
+          .fold<double>(0, (s, d) => s + d.litres);
+      if (litres == 0) continue;
+      await outbox.queue(
+        to: farmer.phone,
+        name: farmer.name,
+        kind: 'statement',
+        text:
+            'FarmTap: ${farmer.name}, ${f.period(weekStart, _day)} you delivered ${f.litresValue(litres, trim: false)} L. '
+            'Amount so far ${f.money(litres * _price)}. Pay day ${f.day(_payDay)}. Thank you!',
+      );
+      queued++;
+    }
+    return Result.success(queued);
+  }
 
   @override
   Future<Result<void>> payOut(PayMethod method) async => const Result.success(null);

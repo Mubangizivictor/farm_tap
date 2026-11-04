@@ -9,6 +9,7 @@ import 'package:farm_tap/core/people/domain/card_registry.dart';
 import 'package:farm_tap/core/people/domain/photo_store.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_directory.dart';
+import 'package:farm_tap/core/sms/sms_outbox.dart';
 import 'package:farm_tap/core/sync/sync_service.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership_repository.dart';
 import 'package:farm_tap/sectors/cattle/breeding/domain/breeding_repository.dart';
@@ -48,6 +49,7 @@ class AppDependencies {
     this._cards,
     this._photos,
     this.staffLogin,
+    this.outbox,
   });
 
   factory fromGetIt() => AppDependencies(
@@ -72,6 +74,7 @@ class AppDependencies {
     cards: getIt<CardRegistry>(),
     photos: getIt<PersonPhotoStore>(),
     staffLogin: getIt<StaffLoginRepository>(),
+    outbox: getIt.isRegistered<SmsOutbox>() ? getIt<SmsOutbox>() : null,
   );
 
   final CardRegistry? _cards;
@@ -111,4 +114,6 @@ class AppDependencies {
   /// L03 / L01 exports, built from the repositories above.
   FarmReports get reports =>
       FarmReports(money: farmMoney, milk: milk, treatments: treatments, centre: session.isCentre ? centre : null);
+  /// Messages waiting to be sent (decision 0015); null in the demo.
+  final SmsOutbox? outbox;
 }

@@ -131,6 +131,23 @@ describe('roles and money', () => {
       rec('smsOutbox', 's2', { body: { status: 'sent', to: '+256772451908', text: 'Hi' } })));
   });
 
+  test('an SMS sent from the phone can be marked so, but not changed', async () => {
+    const db = as('worker');
+    const body = { status: 'queued', to: '+256772451908', text: 'Hi' };
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/smsOutbox/s3`), rec('smsOutbox', 's3', { body })));
+    await assertFails(setDoc(doc(db, `tenants/${T}/smsOutbox/s3`),
+      rec('smsOutbox', 's3', { version: 2, body: { ...body, status: 'sentFromPhone', text: 'Changed' } })));
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/smsOutbox/s3`),
+      rec('smsOutbox', 's3', { version: 2, body: { ...body, status: 'sentFromPhone', via: 'whatsapp' } })));
+    // Sent before it ever synced: created as sent from the phone.
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/smsOutbox/s4`),
+      rec('smsOutbox', 's4', { body: { ...body, status: 'sentFromPhone', via: 'sms' } })));
+  });
+
+  test('a farm cannot switch on paid automatic SMS itself', async () => {
+    await assertFails(updateDoc(doc(as('owner'), `tenants/${T}`), { 'messaging.autoSend': true }));
+  });
+
   test('subscription cannot be changed from the app', async () => {
     await assertFails(updateDoc(doc(as('owner'), `tenants/${T}`), { 'subscription.paidUntil': days(365) }));
     await assertSucceeds(updateDoc(doc(as('owner'), `tenants/${T}`), { name: 'Rwemera Dairy' }));

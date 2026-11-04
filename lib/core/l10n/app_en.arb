@@ -3465,5 +3465,60 @@
         "type": "String"
       }
     }
-  }
+  },
+  "sendOnWhatsapp": "WhatsApp",
+  "sendBySms": "SMS",
+  "smsAppOpenFailed": "Couldn't open the SMS app on this phone.",
+  "whatsappOpenFailed": "Couldn't open WhatsApp. Is it installed? Try SMS.",
+  "messagesToSend": "Messages to send",
+  "messagesFreeNote": "Messages go out from this phone's WhatsApp or SMS app with the words already typed. Tap Send there. FarmTap charges nothing; SMS uses your own airtime or bundle.",
+  "noMessagesWaiting": "No messages waiting",
+  "noMessagesWaitingSub": "Milk receipts and weekly statements appear here, ready to send.",
+  "messagesWaiting": "{count, plural, =1{1 message waiting} other{{count} messages waiting}}",
+  "@messagesWaiting": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sendNextTo": "Next: {name}",
+  "@sendNextTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sendNextOnWhatsapp": "Send next · WhatsApp",
+  "sendNextBySms": "Send next · SMS",
+  "recentlySent": "Recently sent",
+  "sentFromThisPhone": "Sent from this phone",
+  "msgSentAutomatically": "Sent automatically",
+  "msgKindReceipt": "Receipt",
+  "msgKindStatement": "Statement",
+  "removeMessage": "Don't send",
+  "statementsQueued": "{count, plural, =0{No farmer delivered this week, so there is nothing to send.} =1{1 statement is ready to send.} other{{count} statements are ready to send.}}",
+  "@statementsQueued": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statementsReady": "Statements ready",
+  "sendNow": "Send now",
+  "statementsFreeNote": "Sent one by one from this phone's WhatsApp or SMS. FarmTap charges nothing.",
+  "readyEveryDay": "Ready every day at {time}. Tap a button to send it to {phone}.",
+  "@readyEveryDay": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptWaiting": "Receipt ready to send"
 }

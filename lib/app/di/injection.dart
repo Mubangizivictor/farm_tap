@@ -198,6 +198,8 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
   // Shared by both builds: the demo starts them with the mockup samples; the
   // Firebase build starts them empty and fills them from the farm's records.
   final samples = useFakeData;
+  // Text messages to farmers (decision 0015); the demo never queues any.
+  if (!samples) getIt.registerLazySingleton<SmsOutbox>(() => SmsOutbox(getIt<RecordJournal>()));
   getIt
     // One card register for staff and farmers (decision 0016 §1).
     ..registerLazySingleton<LocalCardRegistry>(
@@ -236,7 +238,7 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
       () => FakeCentreRepository(
         getIt<Clock>(),
         journal: getIt<RecordJournal>(),
-        sms: samples ? null : SmsOutbox(getIt<RecordJournal>()),
+        sms: samples ? null : getIt<SmsOutbox>(),
         withSamples: samples,
         verifyPin: samples ? null : _managerPinOk,
         cards: getIt<LocalCardRegistry>(),
