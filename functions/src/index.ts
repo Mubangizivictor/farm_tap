@@ -373,3 +373,12 @@ export const sweepPayments = onSchedule({ schedule: 'every 10 minutes', timeZone
     }
   }
 });
+
+// ---------------------------------------------------------------- Decision 0024
+// Each of these does nothing until its switch in platform/config.server is on
+// (tool/activate-blaze.sh switches them on after the Blaze upgrade).
+export { sendQueuedMessage } from './sms';
+export { farmAlerts } from './alerts';
+export { issueBillingDocs, issueRefundDocs } from './billingDocs';
+export { processRefund } from './refunds';
+export { onDeletionChange, eraseClosedAccounts } from './accounts';
