@@ -5,7 +5,7 @@ import { animalHealth } from '../shared/aiHerd.ts';
 import type { FarmData, MilkIn } from '../shared/aiData.ts';
 import type { Rec } from '../shared/aiCore.ts';
 import { addDays } from '../shared/aiCore.ts';
-import { animalFacts, buildChatPrompt, chatActions, caseText, chatAssessmentBody, chatDoActions, chatFailureOf, chatModels, cleanTemp, filterChatText, languageLine, needsSearch, nextDay, openCaseQuestions, partialChatText, triageOf, vetSummary, whatsappLink, chatFileKind, chatFollowUps, chatHistory, chatTitle, cleanSources, findAnimalMention, readChatReply } from '../shared/aiChat.ts';
+import { animalFacts, chatTopics, googleLinks, buildChatPrompt, chatActions, caseText, chatAssessmentBody, chatDoActions, chatFailureOf, chatModels, cleanTemp, filterChatText, languageLine, needsSearch, nextDay, openCaseQuestions, partialChatText, triageOf, vetSummary, whatsappLink, chatFileKind, chatFollowUps, chatHistory, chatTitle, cleanSources, findAnimalMention, readChatReply } from '../shared/aiChat.ts';
 
 const TODAY = '2026-11-06';
 const NOW = `${TODAY}T09:00:00`;
@@ -235,4 +235,11 @@ test('record treatment and reminder buttons', () => {
   const a = chatDoActions({ animal: { id: 'b1', name: 'Bella' }, triage: t, day: TODAY });
   assert.deepEqual(a.map((x) => x.href), ['/health/?new=1&animal=b1', '/tasks/?new=1&title=Recheck%20Bella&due=2026-11-07']);
   assert.deepEqual(chatDoActions({ animal: null, triage: null, day: TODAY }), []);
+});
+
+test('free topics and Google links', () => {
+  assert.deepEqual(chatTopics('How do I stop mastitis?').map((t) => t.wiki), ['Mastitis']);
+  assert.deepEqual(chatTopics('my cow has lumpy skin and ticks').map((t) => t.wiki), ['Lumpy_skin_disease', 'Tick']);
+  assert.equal(chatTopics('How much milk today?').length, 0);
+  assert.match(googleLinks('mastitis in dairy cows').images, /tbm=isch&q=mastitis%20in%20dairy%20cows/);
 });
