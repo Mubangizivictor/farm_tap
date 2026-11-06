@@ -10,7 +10,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState, type ClipboardEvent, type DragEvent, type KeyboardEvent } from 'react';
 import { ChatText } from '@/components/ChatText';
-import { CaseCard, ChatThinking, CowPicker, TriageCard, type SharePhoto } from '@/components/ChatCards';
+import { CaseCard, ChatRefs, ChatThinking, CowPicker, TriageCard, type SharePhoto } from '@/components/ChatCards';
 import { Icon, type IconName } from '@/components/Icon';
 import { MethodBadge } from '@/components/ai';
 import { ChatPopup, popupOf, type Popup } from '@/components/popups/ChatPopup';
@@ -584,6 +584,7 @@ export default function FarmTapChat() {
                     </div>
                   )}
                   {t.grounding?.suggestionsHtml && <iframe className="chat-suggest" title="Google Search suggestions" sandbox="allow-popups allow-popups-to-escape-sandbox" srcDoc={t.grounding.suggestionsHtml} />}
+                  {t.method === 'model' && t.asked && <ChatRefs question={t.asked} answer={t.text} cowNamed={!!t.animalId} general={!!t.grounding} />}
                   {(t.saved || t.note) && (
                     <div className="chat-meta">
                       {t.saved && (

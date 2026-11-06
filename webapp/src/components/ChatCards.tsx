@@ -5,7 +5,8 @@
 
 import { useEffect, useState } from 'react';
 import { Icon } from '@/components/Icon';
-import { cleanTemp, openCaseQuestions, type CaseAnswers, type CaseId, type Triage } from '@/shared/aiChat';
+import { wikiRef, type Ref } from '@/lib/aiRefs';
+import { chatTopics, cleanTemp, googleLinks, openCaseQuestions, type CaseAnswers, type CaseId, type Triage } from '@/shared/aiChat';
 
 const toBlob = (b64: string, mime: string) => {
   const bin = atob(b64);
@@ -225,5 +226,52 @@ export function ChatThinking({ status, hasText }: { status: string; hasText: boo
         </div>
       )}
     </div>
+  );
+}
+
+/** Free extras under an answer: a photo and a short read from Wikipedia, and links to Google's own results and pictures. */
+export function ChatRefs({ question, answer, cowNamed, general }: { question: string; answer: string; cowNamed: boolean; /** The answer was a general-knowledge one (it used Google Search). */ general: boolean }) {
+  const topics = chatTopics(question, answer);
+  const key = topics.map((t) => t.wiki).join('|');
+  const [refs, setRefs] = useState<Ref[]>([]);
+  useEffect(() => {
+    let live = true;
+    void Promise.all(topics.map((t) => wikiRef(t.wiki))).then((r) => live && setRefs(r.filter((x): x is Ref => !!x)));
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  // A named cow's name is never put in a Google link: use the topic, or nothing.
+  const query = topics[0]?.q ?? (general && !cowNamed ? question : '');
+  if (!refs.length && !query) return null;
+  const links = query ? googleLinks(query) : null;
+  return (
+    <section className="refs" aria-label="Learn more">
+      {refs.length > 0 && (
+        <div className="ref-cards">
+          {refs.map((r) => (
+            <a key={r.url} className="ref" href={r.url} target="_blank" rel="noopener noreferrer">
+              {r.thumb && <img src={r.thumb} alt="" loading="lazy" />}
+              <span className="ref-text">
+                <strong>{r.title}</strong>
+                <span className="small muted">{r.extract.length > 150 ? `${r.extract.slice(0, 147)}…` : r.extract}</span>
+                <span className="small muted">Wikipedia</span>
+              </span>
+            </a>
+          ))}
+        </div>
+      )}
+      {links && (
+        <div className="chips">
+          <a className="chip" href={links.images} target="_blank" rel="noopener noreferrer">
+            <Icon name="camera" /> See pictures on Google
+          </a>
+          <a className="chip" href={links.web} target="_blank" rel="noopener noreferrer">
+            <Icon name="search" /> Search Google
+          </a>
+        </div>
+      )}
+    </section>
   );
 }

@@ -598,3 +598,52 @@ export function chatDoActions(i: { animal: { id: string; name: string } | null; 
   out.push({ label: 'Remind me tomorrow', href: `/tasks/?new=1&title=${encodeURIComponent(what)}&due=${nextDay(i.day)}` });
   return out;
 }
+
+// ---------------------------------------------------------------- Free reading and pictures
+
+export interface ChatTopic {
+  /** Wikipedia page title (free, no Gemini credits). */
+  wiki: string;
+  /** Words to search Google with. */
+  q: string;
+}
+
+const TOPICS: [RegExp, ChatTopic][] = [
+  [/\bmastitis\b|\bclots?\b.*\bmilk\b/i, { wiki: 'Mastitis', q: 'mastitis in dairy cows' }],
+  [/lumpy skin/i, { wiki: 'Lumpy_skin_disease', q: 'lumpy skin disease cattle' }],
+  [/foot and mouth|foot-and-mouth|\bfmd\b/i, { wiki: 'Foot-and-mouth_disease', q: 'foot and mouth disease cattle' }],
+  [/east coast fever|theileri/i, { wiki: 'Theileriosis', q: 'east coast fever cattle' }],
+  [/\banthrax\b/i, { wiki: 'Anthrax', q: 'anthrax cattle' }],
+  [/brucell|aborted|abortion/i, { wiki: 'Brucellosis', q: 'brucellosis cattle' }],
+  [/milk fever|hypocalc/i, { wiki: 'Parturient_paresis', q: 'milk fever in dairy cows' }],
+  [/\bketosis\b/i, { wiki: 'Ketosis', q: 'ketosis dairy cows' }],
+  [/\bticks?\b|tick[- ]borne/i, { wiki: 'Tick', q: 'ticks on cattle control' }],
+  [/\brabies\b/i, { wiki: 'Rabies', q: 'rabies cattle' }],
+  [/tubercul|\btb\b/i, { wiki: 'Bovine_tuberculosis', q: 'bovine tuberculosis' }],
+  [/\bbloat\w*/i, { wiki: 'Bloat', q: 'bloat in cattle' }],
+  [/\bcolostrum\b/i, { wiki: 'Colostrum', q: 'colostrum for calves' }],
+  [/artificial insemination|\bai technician\b|\bin heat\b|\bheat signs?\b/i, { wiki: 'Estrus', q: 'signs of heat in cows' }],
+  [/\bnapier\b/i, { wiki: 'Pennisetum_purpureum', q: 'napier grass dairy' }],
+  [/\bsilage\b/i, { wiki: 'Silage', q: 'silage making small farm' }],
+  [/\bfriesian\b|\bholstein\b/i, { wiki: 'Holstein_Friesian_cattle', q: 'friesian dairy cow' }],
+  [/\bankole\b/i, { wiki: 'Ankole-Watusi', q: 'ankole cattle' }],
+  [/\bjersey\b/i, { wiki: 'Jersey_cattle', q: 'jersey dairy cow' }],
+];
+
+/** Up to two topics the farmer asked about, found in the question first and then in the answer. No network. */
+export function chatTopics(question: string, answer = ''): ChatTopic[] {
+  const out: ChatTopic[] = [];
+  for (const text of [question, answer]) {
+    for (const [re, t] of TOPICS) {
+      if (re.test(text) && !out.some((o) => o.wiki === t.wiki)) out.push(t);
+    }
+    if (out.length >= 2) break;
+  }
+  return out.slice(0, 2);
+}
+
+/** Free links to Google's own results and pictures: no Gemini credits. */
+export function googleLinks(query: string): { web: string; images: string } {
+  const q = encodeURIComponent(query.replace(/\s+/g, ' ').trim().slice(0, 120));
+  return { web: `https://www.google.com/search?q=${q}`, images: `https://www.google.com/search?tbm=isch&q=${q}` };
+}

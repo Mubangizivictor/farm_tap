@@ -782,3 +782,12 @@ ol.chat-points > li::before { content: counter(pt); position: absolute; left: va
 .chat-ideas { justify-content: center; max-width: var(--z-dialog-lg); }
 .case-open { align-self: flex-start; }
 .chat-sources .chips { gap: var(--s-xs); }
+
+/* Free extras: Wikipedia cards and Google links */
+.refs { display: flex; flex-direction: column; gap: var(--s-sm); }
+.ref-cards { display: flex; flex-wrap: wrap; gap: var(--s-md); }
+.ref { flex: 1; min-width: var(--z-plan-min); display: flex; gap: var(--s-md); padding: var(--s-md); border: var(--z-border) solid var(--c-outline-variant); border-radius: var(--r-card); background: var(--c-card); color: inherit; text-decoration: none; }
+.ref:hover { border-color: var(--c-primary); }
+.ref img { width: var(--z-avatar-lg); height: var(--z-avatar-lg); object-fit: cover; border-radius: var(--r-md); flex: none; }
+.ref-text { display: flex; flex-direction: column; gap: var(--s-xxs); min-width: 0; }
+.refs .chip { text-decoration: none; }
