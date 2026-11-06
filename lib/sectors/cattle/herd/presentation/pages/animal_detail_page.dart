@@ -46,6 +46,42 @@ class AnimalDetailPage extends StatefulWidget {
 class _AnimalDetailPageState extends State<AnimalDetailPage> {
   late Future<AnimalDetail?> _detail = widget.repo.detail(widget.animalId).then((r) => r.data);
   _Tab _tab = _Tab.timeline;
+  StreamSubscription<Object?>? _changes;
+
+  @override
+  void initState() {
+    super.initState();
+    // Edits, photos and new records show as soon as they are saved.
+    _changes = widget.repo.watchAnimals().skip(1).listen((_) => _reload());
+  }
+
+  @override
+  void dispose() {
+    unawaited(_changes?.cancel());
+    super.dispose();
+  }
+
+  void _reload() {
+    if (mounted) setState(() => _detail = widget.repo.detail(widget.animalId).then((r) => r.data));
+  }
+
+  Future<void> _sell(Animal animal) async {
+    final l10n = AppLocalizations.of(context);
+    final sale = await showSellAnimalSheet(context, animal.name.isEmpty ? animal.tagNumber : animal.name);
+    if (sale == null || !mounted) return;
+    await widget.repo.recordSale(animal.id, price: sale.$1, buyer: sale.$2);
+    if (!mounted) return;
+    FarmTapToast.show(context, message: l10n.animalSoldSaved(animal.name.isEmpty ? animal.tagNumber : animal.name));
+    widget.onGone?.call();
+  }
+
+  Future<void> _nameCalf(Animal calf) async {
+    final l10n = AppLocalizations.of(context);
+    final name = await showTextEntrySheet(context, title: l10n.nameTheCalf, label: l10n.nameLabel);
+    if (name == null || name.trim().isEmpty) return;
+    await widget.repo.updateAnimal(calf.copyWith(name: name.trim()));
+    if (mounted) FarmTapToast.show(context, message: l10n.animalSaved(name.trim()));
+  }
 
   Future<void> _record(Animal animal) async {
     final kind = await showRecordEventSheet(context, animal.name);
@@ -59,11 +95,12 @@ class _AnimalDetailPageState extends State<AnimalDetailPage> {
       case HerdEventKind.calving:
         final calf = (await widget.repo.recordCalving(animal.id, at: widget.today ?? context.clock.now())).data;
         if (calf == null || !mounted) return;
-        await showCalfBorn(context, mother: animal, calf: calf);
-        setState(() {
-          _detail = widget.repo.detail(widget.animalId).then((r) => r.data);
-        });
-      case HerdEventKind.milk || HerdEventKind.treatment || HerdEventKind.heat || HerdEventKind.sold:
+        final action = await showCalfBorn(context, mother: animal, calf: calf);
+        if (action == CelebrationAction.primary && mounted) await _nameCalf(calf);
+        _reload();
+      case HerdEventKind.sold:
+        await _sell(animal);
+      case HerdEventKind.milk || HerdEventKind.treatment || HerdEventKind.heat:
         widget.onEvent(kind);
     }
   }
@@ -95,7 +132,12 @@ class _AnimalDetailPageState extends State<AnimalDetailPage> {
                     FarmTapCard(
                       child: Row(
                         children: [
-                          CowAvatar(avatarIndex: a.avatarIndex, animalId: a.id, size: context.sizes.avatarXl),
+                          CowAvatar(
+                            avatarIndex: a.avatarIndex,
+                            animalId: a.id,
+                            photoUrl: a.photo,
+                            size: context.sizes.avatarXl,
+                          ),
                           context.space.gapLg,
                           Expanded(
                             child: Column(
@@ -132,10 +174,7 @@ class _AnimalDetailPageState extends State<AnimalDetailPage> {
                       ),
                     ],
                     context.space.gapLg,
-                    ResponsiveGrid(
-                      minItemWidth: context.sizes.gridMetric,
-                      spacing: context.space.lg,
-                      maxColumns: 3,
+                    MetricStrip(
                       children: [
                         MetricCard(
                           icon: Symbols.water_drop_rounded,
@@ -341,8 +380,125 @@ class _ConfirmDeathDialogState extends State<_ConfirmDeathDialog> {
   }
 }
 
+/// E06 "Sold": the price (UGX) and who bought, or null when cancelled.
+Future<(int, String?)?> showSellAnimalSheet(BuildContext context, String animalName) =>
+    showAdaptiveSheet<(int, String?)>(context, builder: (_) => _SellSheet(animalName: animalName));
+
+class _SellSheet extends StatefulWidget {
+  const new({required this.animalName});
+
+  final String animalName;
+
+  @override
+  State<_SellSheet> createState() => _SellSheetState();
+}
+
+class _SellSheetState extends State<_SellSheet> {
+  final _price = TextEditingController();
+  final _buyer = TextEditingController();
+  bool _tried = false;
+
+  @override
+  void dispose() {
+    _price.dispose();
+    _buyer.dispose();
+    super.dispose();
+  }
+
+  int? get _amount => int.tryParse(_price.text.replaceAll(RegExp('[^0-9]'), ''));
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SheetTitle(l10n.sellAnimalTitle(widget.animalName), subtitle: l10n.sellAnimalBody),
+        context.space.gapLg,
+        FarmTapTextField(
+          label: l10n.salePrice,
+          controller: _price,
+          prefixText: 'UGX ',
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          error: _tried && (_amount ?? 0) <= 0 ? l10n.enterPrice : null,
+          onChanged: (_) => setState(() {}),
+        ),
+        context.space.gapMd,
+        FarmTapTextField(label: l10n.boughtByOptional, controller: _buyer, icon: Symbols.person_rounded),
+        context.space.gapLg,
+        FarmTapButton(
+          label: l10n.recordSale,
+          icon: Symbols.sell_rounded,
+          onPressed: () {
+            setState(() => _tried = true);
+            final amount = _amount ?? 0;
+            if (amount <= 0) return;
+            final buyer = _buyer.text.trim();
+            Navigator.of(context).pop((amount, buyer.isEmpty ? null : buyer));
+          },
+        ),
+      ],
+    );
+  }
+}
+
+/// A one-line text sheet ("Name the calf"); null when cancelled.
+Future<String?> showTextEntrySheet(BuildContext context, {required String title, required String label}) =>
+    showAdaptiveSheet<String>(
+      context,
+      builder: (_) => _TextEntrySheet(title: title, label: label),
+    );
+
+class _TextEntrySheet extends StatefulWidget {
+  const new({required this.title, required this.label});
+
+  final String title;
+  final String label;
+
+  @override
+  State<_TextEntrySheet> createState() => _TextEntrySheetState();
+}
+
+class _TextEntrySheetState extends State<_TextEntrySheet> {
+  final _text = TextEditingController();
+
+  @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SheetTitle(widget.title),
+        context.space.gapLg,
+        FarmTapTextField(
+          label: widget.label,
+          controller: _text,
+          autofocus: true,
+          onSubmitted: (v) => Navigator.of(context).pop(v),
+        ),
+        context.space.gapLg,
+        FarmTapButton(
+          label: l10n.save,
+          icon: Symbols.check_rounded,
+          onPressed: () => Navigator.of(context).pop(_text.text),
+        ),
+      ],
+    );
+  }
+}
+
 /// E07 — calf born: full-screen celebration on phones, dialog wider.
-Future<void> showCalfBorn(BuildContext context, {required Animal mother, required Animal calf}) async {
+/// Resolves to the button pressed (primary = name the calf).
+Future<CelebrationAction?> showCalfBorn(BuildContext context, {required Animal mother, required Animal calf}) {
   final l10n = AppLocalizations.of(context);
   final f = FarmTapFormat(Localizations.localeOf(context).toLanguageTag());
   Widget row(String label, String value) => Row(
@@ -351,23 +507,21 @@ Future<void> showCalfBorn(BuildContext context, {required Animal mother, require
       Text(value, style: context.text.titleSmall),
     ],
   );
-  unawaited(
-    showCelebration(
-      context,
-      animation: FarmTapAnimations.calfBorn,
-      title: l10n.welcomeLittleOne,
-      message: l10n.calfBornBody(mother.name, calf.tagNumber),
-      primaryLabel: l10n.nameTheCalf,
-      primaryIcon: Symbols.edit_rounded,
-      secondaryLabel: l10n.done,
-      secondaryKind: ButtonKind.text,
-      summary: FarmTapCard(
-        children: [
-          row(l10n.mother, '${mother.name} · ${mother.tagNumber}'),
-          row(l10n.born, l10n.todayAt(f.time(calf.dateOfBirth))),
-          row(l10n.calf, l10n.heiferTag(calf.tagNumber)),
-        ],
-      ),
+  return showCelebration(
+    context,
+    animation: FarmTapAnimations.calfBorn,
+    title: l10n.welcomeLittleOne,
+    message: l10n.calfBornBody(mother.name, calf.tagNumber),
+    primaryLabel: l10n.nameTheCalf,
+    primaryIcon: Symbols.edit_rounded,
+    secondaryLabel: l10n.done,
+    secondaryKind: ButtonKind.text,
+    summary: FarmTapCard(
+      children: [
+        row(l10n.mother, '${mother.name} · ${mother.tagNumber}'),
+        row(l10n.born, l10n.todayAt(f.time(calf.dateOfBirth))),
+        row(l10n.calf, l10n.heiferTag(calf.tagNumber)),
+      ],
     ),
   );
 }

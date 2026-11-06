@@ -15,24 +15,24 @@ class FarmTapSpacing extends ThemeExtension<FarmTapSpacing> {
   /// One grid unit (4 by default).
   final double unit;
 
-  // ---- Scale ----
+  // ---- Scale (compact, decision 0013) ----
   double get xxs => unit * 0.5; // 2
   double get xs => unit; // 4
-  double get sm => unit * 2; // 8
-  double get md => unit * 3; // 12
-  double get lg => unit * 4; // 16
-  double get xl => unit * 6; // 24
-  double get xxl => unit * 8; // 32
-  double get xxxl => unit * 12; // 48
+  double get sm => unit * 1.5; // 6
+  double get md => unit * 2; // 8
+  double get lg => unit * 3; // 12
+  double get xl => unit * 4; // 16
+  double get xxl => unit * 6; // 24
+  double get xxxl => unit * 8; // 32
 
-  // ---- Named in-between steps from the mockups ----
-  double get keyGap => unit * 2.5; // 10: keypad keys, dialog buttons
-  double get banner => unit * 3.5; // 14: banner padding
-  double get pinGap => unit * 4.5; // 18: between PIN dots
-  double get fabIcon => unit * 5; // 20: FAB icon inset
-  double get wideTop => unit * 7; // 28: content top on desktop
-  double get authTop => unit * 14; // 56: auth column top on wide screens
-  double get chipRun => unit * 2; // 8: gap between chips (rows 48 apart)
+  // ---- Named in-between steps ----
+  double get keyGap => unit * 2; // 8: keypad keys, dialog buttons
+  double get banner => unit * 3; // 12: banner padding
+  double get pinGap => unit * 3.5; // 14: between PIN dots
+  double get fabIcon => unit * 4; // 16: FAB icon inset
+  double get wideTop => unit * 5; // 20: content top on desktop
+  double get authTop => unit * 10; // 40: auth column top on wide screens
+  double get chipRun => unit * 1.5; // 6: gap between chips
 
   // ---- Ready-made gaps (work in Row and Column) ----
   SizedBox get gapXxs => SizedBox.square(dimension: xxs);
@@ -45,45 +45,45 @@ class FarmTapSpacing extends ThemeExtension<FarmTapSpacing> {
   SizedBox get gapXxxl => SizedBox.square(dimension: xxxl);
 
   // ---- Ready-made paddings ----
-  /// Padding around a whole screen's content.
+  /// Padding around a whole screen's content (12).
   EdgeInsets get screen => EdgeInsets.all(lg);
 
-  /// Padding inside cards and panels.
+  /// Padding inside cards and panels (12).
   EdgeInsets get card => EdgeInsets.all(lg);
 
   /// Padding inside list items.
-  EdgeInsets get listItem => EdgeInsets.symmetric(horizontal: lg, vertical: sm);
+  EdgeInsets get listItem => EdgeInsets.symmetric(horizontal: lg, vertical: xs);
 
   /// Padding inside text fields.
-  EdgeInsets get input => EdgeInsets.symmetric(horizontal: lg + xxs, vertical: lg + xxs);
+  EdgeInsets get input => EdgeInsets.symmetric(horizontal: lg, vertical: lg);
 
   /// Padding inside buttons.
   EdgeInsets get button => EdgeInsets.symmetric(horizontal: xl, vertical: md);
 
-  /// Padding inside dialogs and bottom sheets.
+  /// Padding inside dialogs and bottom sheets (16).
   EdgeInsets get sheet => EdgeInsets.all(xl);
 
-  /// Padding inside a list card (rows bring their own 16 top and bottom).
-  EdgeInsets get listCard => EdgeInsets.symmetric(horizontal: md, vertical: xs);
+  /// Padding inside a list card.
+  EdgeInsets get listCard => EdgeInsets.symmetric(horizontal: lg, vertical: xs);
 
-  /// Content padding by form factor: compact 16 (top 8), medium 24, wide 32 (top 28).
+  /// Content padding by form factor: compact 12 (top 8), medium 20, wide 24 (top 20).
   EdgeInsets content(FormFactor form) => switch (form) {
-    FormFactor.compact => EdgeInsets.fromLTRB(lg, sm, lg, lg),
-    FormFactor.medium => EdgeInsets.all(xl),
+    FormFactor.compact => EdgeInsets.fromLTRB(lg, md, lg, lg),
+    FormFactor.medium => EdgeInsets.all(unit * 5),
     FormFactor.expanded => EdgeInsets.fromLTRB(xxl, wideTop, xxl, xxl),
   };
 
-  /// Side padding by form factor (16 / 24 / 32).
+  /// Side padding by form factor (12 / 20 / 24).
   double side(FormFactor form) => switch (form) {
     FormFactor.compact => lg,
-    FormFactor.medium => xl,
+    FormFactor.medium => unit * 5,
     FormFactor.expanded => xxl,
   };
 
-  /// Gap between items in a vertical list of cards.
+  /// Gap between items in a vertical list of cards (8).
   double get listGap => md;
 
-  /// Gap between sections on a screen.
+  /// Gap between sections on a screen (16).
   double get sectionGap => xl;
 
   @override

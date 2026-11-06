@@ -24,6 +24,7 @@ class HomePage extends StatefulWidget {
     super.key,
     this.staff,
     this.trialDaysLeft,
+    this.readOnly = false,
     this.onLock,
     this.onRefresh,
     this.today,
@@ -38,6 +39,9 @@ class HomePage extends StatefulWidget {
   /// Worker who unlocked the phone: shows the worker home (D02).
   final StaffMember? staff;
   final int? trialDaysLeft;
+
+  /// The plan ended and the owner chose to look at the records (M05).
+  final bool readOnly;
   final ValueChanged<HomeTarget> onOpen;
   final VoidCallback? onLock;
   final Future<void> Function()? onRefresh;
@@ -107,6 +111,17 @@ class _HomePageState extends State<HomePage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (widget.readOnly) ...[
+              FarmTapBanner(
+                tone: FarmTapTone.danger,
+                icon: Symbols.lock_rounded,
+                title: l10n.readOnlyBannerTitle,
+                message: l10n.readOnlyBannerBody,
+                actionLabel: l10n.payNow,
+                onAction: () => widget.onOpen(HomeTarget.pay),
+              ),
+              context.space.gapLg,
+            ],
             if (online && widget.trialDaysLeft != null) ...[
               TrialBanner(daysLeft: widget.trialDaysLeft!, onPay: () => widget.onOpen(HomeTarget.pay)),
               context.space.gapLg,
@@ -120,9 +135,7 @@ class _HomePageState extends State<HomePage> {
             if (summary == null)
               const _SkeletonGrid()
             else
-              ResponsiveGrid(
-                minItemWidth: context.sizes.gridMetric,
-                spacing: context.space.lg,
+              MetricStrip(
                 children: [
                   MetricCard(
                     icon: Symbols.water_drop_rounded,
@@ -163,26 +176,26 @@ class _HomePageState extends State<HomePage> {
             SectionLabel(l10n.quickActions),
             context.space.gapSm,
             ResponsiveGrid(
-              minItemWidth: context.sizes.gridAction,
-              spacing: context.space.lg,
+              minItemWidth: context.sizes.gridQuickAction,
+              spacing: context.space.md,
               children: [
-                ActionTile(
+                QuickActionTile(
                   icon: Symbols.water_drop_rounded,
                   label: l10n.recordMilk,
                   onTap: () => widget.onOpen(HomeTarget.recordMilk),
                 ),
-                ActionTile(
+                QuickActionTile(
                   icon: Symbols.contactless_rounded,
                   label: l10n.tapCard,
                   onTap: () => widget.onOpen(HomeTarget.tapCard),
                 ),
-                ActionTile(
+                QuickActionTile(
                   icon: Symbols.medication_rounded,
                   label: l10n.treatment,
                   tone: FarmTapTone.danger,
                   onTap: () => widget.onOpen(HomeTarget.treatment),
                 ),
-                ActionTile(
+                QuickActionTile(
                   icon: Symbols.grass_rounded,
                   label: l10n.feeding,
                   tone: FarmTapTone.gold,
@@ -193,7 +206,7 @@ class _HomePageState extends State<HomePage> {
             context.space.gapLg,
             ResponsiveGrid(
               minItemWidth: context.sizes.gridPaired,
-              spacing: context.space.lg,
+              spacing: context.space.md,
               maxColumns: 2,
               children: [
                 ListCard(
@@ -293,7 +306,7 @@ class _HomePageState extends State<HomePage> {
             context.space.gapSm,
             ResponsiveGrid(
               minItemWidth: context.sizes.gridAction,
-              spacing: context.space.lg,
+              spacing: context.space.md,
               children: [
                 ActionTile(
                   icon: Symbols.water_drop_rounded,
@@ -318,7 +331,7 @@ class _HomePageState extends State<HomePage> {
                 ActionTile(
                   icon: Symbols.vaccines_rounded,
                   label: l10n.dipping,
-                  subtitle: day == null ? null : l10n.dueOn(f.weekday(day.dippingDue)),
+                  subtitle: day?.dippingDue == null ? null : l10n.dueOn(f.weekday(day!.dippingDue!)),
                   tone: FarmTapTone.info,
                   onTap: () => widget.onOpen(HomeTarget.health),
                 ),
@@ -378,7 +391,7 @@ class _SkeletonGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveGrid(
       minItemWidth: context.sizes.gridMetric,
-      spacing: context.space.lg,
+      spacing: context.space.md,
       children: [
         for (var i = 0; i < 4; i++)
           Container(

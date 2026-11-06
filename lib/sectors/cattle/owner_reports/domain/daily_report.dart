@@ -41,6 +41,13 @@ class DailyReport {
 class DailyReportSettings {
   const new({required this.phone, required this.sendMinutes, required this.includeMoney, required this.smsFallback});
 
+  factory fromJson(Map<String, Object?> j, DailyReportSettings fallback) => DailyReportSettings(
+    phone: j['phone'] as String? ?? fallback.phone,
+    sendMinutes: (j['sendMinutes'] as num?)?.toInt() ?? fallback.sendMinutes,
+    includeMoney: j['includeMoney'] as bool? ?? fallback.includeMoney,
+    smsFallback: j['smsFallback'] as bool? ?? fallback.smsFallback,
+  );
+
   /// The owner's WhatsApp number (from farm contacts).
   final String phone;
 
@@ -49,12 +56,20 @@ class DailyReportSettings {
   final bool includeMoney;
   final bool smsFallback;
 
-  DailyReportSettings copyWith({int? sendMinutes, bool? includeMoney, bool? smsFallback}) => DailyReportSettings(
-    phone: phone,
-    sendMinutes: sendMinutes ?? this.sendMinutes,
-    includeMoney: includeMoney ?? this.includeMoney,
-    smsFallback: smsFallback ?? this.smsFallback,
-  );
+  DailyReportSettings copyWith({String? phone, int? sendMinutes, bool? includeMoney, bool? smsFallback}) =>
+      DailyReportSettings(
+        phone: phone ?? this.phone,
+        sendMinutes: sendMinutes ?? this.sendMinutes,
+        includeMoney: includeMoney ?? this.includeMoney,
+        smsFallback: smsFallback ?? this.smsFallback,
+      );
+
+  Map<String, Object?> toJson() => {
+    'phone': phone,
+    'sendMinutes': sendMinutes,
+    'includeMoney': includeMoney,
+    'smsFallback': smsFallback,
+  };
 }
 
 abstract interface class DailyReportRepository {

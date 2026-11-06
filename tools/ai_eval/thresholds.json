@@ -1,0 +1,10 @@
+{
+  "_note": "Same levels as shared/aiScreening.ts. A screening model may be switched on only when the lower end of its 95% interval meets these (decision 0025).",
+  "skin": { "minSensitivity": 0.9, "minSpecificity": 0.85, "minPerClass": 100 },
+  "eye": { "minSensitivity": 0.85, "minSpecificity": 0.85, "minPerClass": 100 },
+  "wound": { "minSensitivity": 0.85, "minSpecificity": 0.8, "minPerClass": 100 },
+  "bcs": { "minSensitivity": 0.8, "minSpecificity": 0.8, "minPerClass": 100 },
+  "lameness": { "minSensitivity": 0.85, "minSpecificity": 0.8, "minPerClass": 100 },
+  "udder": { "minSensitivity": 0.9, "minSpecificity": 0.85, "minPerClass": 100 },
+  "parasites": { "minSensitivity": 0.85, "minSpecificity": 0.8, "minPerClass": 100 }
+}

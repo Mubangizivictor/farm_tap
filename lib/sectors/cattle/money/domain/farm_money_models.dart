@@ -37,6 +37,7 @@ class MonthMoney {
     required this.litresProduced,
     required this.litresSold,
     required this.expenses,
+    this.otherIncome = const [],
   });
 
   final DateTime month;
@@ -49,7 +50,11 @@ class MonthMoney {
   /// This month's expenses, newest first.
   final List<Expense> expenses;
 
-  int get income => milkIncome;
+  /// Income that is not milk (an animal sold, manure), newest first.
+  final List<Income> otherIncome;
+
+  int get otherIncomeTotal => otherIncome.fold(0, (s, e) => s + e.amount);
+  int get income => milkIncome + otherIncomeTotal;
   int get totalExpenses => expenses.fold(0, (s, e) => s + e.amount);
   int get profit => income - totalExpenses;
 

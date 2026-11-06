@@ -1,5 +1,7 @@
 // E01 herd list (tiles on phones, sortable table from 700 dp), E02 filter
 // sheet, P01 empty herd.
+import 'dart:async';
+
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
@@ -35,7 +37,25 @@ class HerdListPage extends StatefulWidget {
 }
 
 class _HerdListPageState extends State<HerdListPage> {
-  late final Future<(List<HerdRow>, HerdCounts?)> _load = _fetch();
+  late Future<(List<HerdRow>, HerdCounts?)> _load = _fetch();
+  StreamSubscription<Object?>? _changes;
+
+  @override
+  void initState() {
+    super.initState();
+    // A new, edited, sold or dead animal shows at once, and records synced
+    // from the farm's other phones.
+    _changes = widget.repo.watchAnimals().skip(1).listen((_) {
+      if (mounted) setState(() => _load = _fetch());
+    });
+  }
+
+  @override
+  void dispose() {
+    unawaited(_changes?.cancel());
+    super.dispose();
+  }
+
   late HerdFilter _filter = widget.initialFilter;
   String _query = '';
 
@@ -115,7 +135,9 @@ class _HerdListPageState extends State<HerdListPage> {
                       ),
                     ),
                     context.space.gapSm,
-                    if (snapshot.hasData && shown.isEmpty)
+                    if (!snapshot.hasData)
+                      const FarmTapPageLoader()
+                    else if (shown.isEmpty)
                       Padding(
                         padding: EdgeInsets.all(context.space.xl),
                         child: Text(l10n.noMatches, textAlign: TextAlign.center, style: context.text.bodyMedium),
@@ -125,7 +147,11 @@ class _HerdListPageState extends State<HerdListPage> {
                         items: shown,
                         onTap: (r) => widget.onAnimal(r.animal),
                         tileBuilder: (context, r) => RecordTile(
-                          leading: CowAvatar(avatarIndex: r.animal.avatarIndex, animalId: r.animal.id),
+                          leading: CowAvatar(
+                            avatarIndex: r.animal.avatarIndex,
+                            animalId: r.animal.id,
+                            photoUrl: r.animal.photo,
+                          ),
                           title: r.animal.name,
                           subtitle: l10n.tagAndBreedAge(r.animal.tagNumber, r.animal.breed, r.animal.ageYears(today)),
                           badge: DairyStatusBadge(r.animal.dairyStatus),
@@ -139,7 +165,11 @@ class _HerdListPageState extends State<HerdListPage> {
                             sortKey: (r) => r.animal.name,
                             cell: (context, r) => Row(
                               children: [
-                                CowAvatar(avatarIndex: r.animal.avatarIndex, size: context.sizes.avatarSm),
+                                CowAvatar(
+                                  avatarIndex: r.animal.avatarIndex,
+                                  photoUrl: r.animal.photo,
+                                  size: context.sizes.avatarSm,
+                                ),
                                 context.space.gapMd,
                                 Flexible(child: Text(r.animal.name, overflow: TextOverflow.ellipsis)),
                               ],

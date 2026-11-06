@@ -20,6 +20,10 @@ String feedLabel(AppLocalizations l10n, FeedKind f) => switch (f) {
   FeedKind.maizeBran => l10n.feedMaizeBran,
   FeedKind.mineralLick => l10n.feedMineralLick,
   FeedKind.silage => l10n.feedSilage,
+  FeedKind.napierGrass => l10n.feedNapier,
+  FeedKind.hay => l10n.feedHay,
+  FeedKind.cottonSeedCake => l10n.feedCottonCake,
+  FeedKind.brewersWaste => l10n.feedBrewersWaste,
 };
 
 String groupLabel(AppLocalizations l10n, FeedGroup g) => switch (g) {
@@ -51,11 +55,14 @@ String _perDay(AppLocalizations l10n, FarmTapFormat f, FeedKind feed, double v) 
 
 FarmTapTone _tone(FeedKind feed) => switch (feed) {
   FeedKind.mineralLick => FarmTapTone.info,
-  FeedKind.silage => FarmTapTone.primary,
+  FeedKind.silage || FeedKind.napierGrass || FeedKind.hay => FarmTapTone.primary,
   _ => FarmTapTone.gold,
 };
 
-IconData _icon(FeedKind feed) => feed == FeedKind.silage ? Symbols.grass_rounded : Symbols.inventory_2_rounded;
+IconData _icon(FeedKind feed) => switch (feed) {
+  FeedKind.silage || FeedKind.napierGrass || FeedKind.hay => Symbols.grass_rounded,
+  _ => Symbols.inventory_2_rounded,
+};
 
 // ---------------------------------------------------------------- I01 / I03
 
@@ -94,6 +101,47 @@ class _FeedStockPageState extends State<FeedStockPage> {
     });
   }
 
+  /// Tap on a feed: buy more, or count what is in the store.
+  Future<void> _open(FeedKind feed) async {
+    final l10n = AppLocalizations.of(context);
+    final choice = await showAdaptiveSheet<int>(
+      context,
+      builder: (sheet) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SheetTitle(feedLabel(l10n, feed)),
+          sheet.space.gapMd,
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const IconBubble(icon: Symbols.shopping_cart_rounded, tone: FarmTapTone.gold),
+            title: Text(l10n.buyFeed),
+            subtitle: Text(l10n.buyFeedSub),
+            onTap: () => Navigator.of(sheet).pop(0),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const IconBubble(icon: Symbols.inventory_rounded),
+            title: Text(l10n.countFeedStock),
+            subtitle: Text(l10n.countFeedStockSub),
+            onTap: () => Navigator.of(sheet).pop(1),
+          ),
+        ],
+      ),
+    );
+    if (choice == null || !mounted) return;
+    if (choice == 0) {
+      await _buy(feed);
+      return;
+    }
+    final amount = await showAdaptiveSheet<double>(context, builder: (_) => _CountSheet(feed: feed));
+    if (amount == null || !mounted) return;
+    await widget.repo.countStock(feed, feed.unit == FeedUnit.kg ? amount * 1000 : amount);
+    if (!mounted) return;
+    FarmTapToast.show(context, message: l10n.stockSaved);
+    setState(() => _load = _fetch());
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -110,7 +158,7 @@ class _FeedStockPageState extends State<FeedStockPage> {
         future: _load,
         builder: (context, snapshot) {
           final s = snapshot.data;
-          if (s == null) return const SizedBox.shrink();
+          if (s == null) return const FarmTapPageLoader();
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -136,7 +184,7 @@ class _FeedStockPageState extends State<FeedStockPage> {
                       : st.feed.unit == FeedUnit.kg
                       ? _stockShort(l10n, f, st.feed, st.left)
                       : f.litresValue(st.left),
-                  onTap: () => _buy(st.feed),
+                  onTap: () => _open(st.feed),
                 ),
                 columns: [
                   RecordColumn(
@@ -187,7 +235,7 @@ class _BuyFeedSheetState extends State<_BuyFeedSheet> {
   static const _defaultPrice = '52,000';
   final _amount = TextEditingController(text: _defaultAmount);
   final _price = TextEditingController(text: _defaultPrice);
-  late final _supplier = TextEditingController(text: widget.repo.suppliers.first);
+  late final _supplier = TextEditingController(text: widget.repo.suppliers.firstOrNull ?? '');
 
   @override
   void dispose() {
@@ -206,7 +254,7 @@ class _BuyFeedSheetState extends State<_BuyFeedSheet> {
       _feed != widget.feed ||
       _amount.text != _defaultAmount ||
       _price.text != _defaultPrice ||
-      _supplier.text != widget.repo.suppliers.first;
+      _supplier.text != (widget.repo.suppliers.firstOrNull ?? '');
 
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context);
@@ -298,6 +346,53 @@ class _BuyFeedSheetState extends State<_BuyFeedSheet> {
   }
 }
 
+/// I01 "Count stock": bags / blocks / tonnes in the store now.
+class _CountSheet extends StatefulWidget {
+  const new({required this.feed});
+
+  final FeedKind feed;
+
+  @override
+  State<_CountSheet> createState() => _CountSheetState();
+}
+
+class _CountSheetState extends State<_CountSheet> {
+  var _entry = const DecimalEntry(maxIntegerDigits: 4);
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final unit = switch (widget.feed.unit) {
+      FeedUnit.bags => l10n.unitBagsLabel,
+      FeedUnit.blocks => l10n.unitBlocksLabel,
+      FeedUnit.kg => l10n.unitTonnes,
+    };
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SheetTitle(l10n.countFeedStock, subtitle: feedLabel(l10n, widget.feed)),
+        context.space.gapLg,
+        KeypadDisplay(text: _entry.text, unit: unit),
+        context.space.gapLg,
+        Center(
+          child: BigNumberKeypad(
+            showDecimal: true,
+            onDigit: (d) => setState(() => _entry = _entry.press(d)),
+            onBackspace: () => setState(() => _entry = _entry.backspace()),
+          ),
+        ),
+        context.space.gapSm,
+        FarmTapButton(
+          label: l10n.save,
+          icon: Symbols.check_rounded,
+          onPressed: _entry.text.isEmpty ? null : () => Navigator.of(context).pop(_entry.value),
+        ),
+      ],
+    );
+  }
+}
+
 // ---------------------------------------------------------------- I02
 
 class RecordFeedingPage extends StatefulWidget {
@@ -319,6 +414,10 @@ class _RecordFeedingPageState extends State<RecordFeedingPage> {
     FeedKind.maizeBran,
     FeedKind.silage,
     FeedKind.mineralLick,
+    FeedKind.napierGrass,
+    FeedKind.hay,
+    FeedKind.cottonSeedCake,
+    FeedKind.brewersWaste,
   ];
 
   FeedGroup _group = FeedGroup.milkingCows;

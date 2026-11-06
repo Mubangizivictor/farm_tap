@@ -44,7 +44,7 @@ Read this first, then `docs/ROADMAP.md`, `docs/THEME.md`, `docs/design/UX_SPEC.m
 - Read-back before any save affecting money or milk (`showReadBack`). Confirmation dialogs name the verb ("Record death", never "OK").
 - Celebrations (`showCelebration`): full screen on phones, dialog wider; milk/delivery flows auto-advance after 2 s. Toasts 3 s; Undo 5 s on deliveries.
 - States every screen handles: loading (skeleton), empty (animation + one action), error, offline banner, read-only (lock), treated animal (red badge, milk blocked).
-- Colour always comes with an icon or word. Touch targets >= 48 dp, keypad keys >= 64 dp. Text must survive 1.3x scale. Every screen exists in light and dark.
+- Colour always comes with an icon or word. Touch targets >= 48 dp, keypad keys >= 56 dp (decision 0013). Text must survive 1.3x scale. Every screen exists in light and dark.
 - Respect `MediaQuery.disableAnimations` (`FarmTapAnimationView` does). Haptics and sounds as in UX_SPEC section 5; sounds go through `SoundService` and obey Settings > Sounds.
 - Money "UGX 70,000", litres "42.5 L", dates "Thu 12 Nov", times "6:52 am".
 

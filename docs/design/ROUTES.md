@@ -23,8 +23,9 @@ Source of truth for navigation (go_router). Overlays (sheets, dialogs, toasts, c
 | A03 | /sign-in/email | /sign-in | push | pop |
 | A04 | /sign-in/email/sign-up | /sign-in/email | push | pop |
 | A05 | /sign-in/email/forgot | /sign-in/email | push | pop |
+| A08 | /sign-in/staff | /sign-in | push | pop. Worker phone + PIN; first time forces a new PIN (decision 0016) |
 | A06 | /verify?email= | — | go (after sign-up) | root; Continue → go /setup/language |
-| A07 | /farms | — | go (signed in, several places) | root; pick → go /home |
+| A07 | /farms | `auto=1` opens the last-used or only farm (0018) | go (after splash / sign-in when signed in) | root; pick → go /home |
 | B01 | /setup/language | — | go (signed in, no farm) | root of onboarding |
 | B02 | /setup/sector | /setup/language | push | pop (previous step) |
 | B03 | sheet on B02 | /setup/sector | overlay | back closes sheet |
@@ -73,6 +74,7 @@ Source of truth for navigation (go_router). Overlays (sheets, dialogs, toasts, c
 | G05 | /collect?saved=:deliveryId | /collect | state after save (toast + Undo 5 s) | stack resets to G02 (go /collect) |
 | G06 | /farmers | — | tab | root tab |
 | G07 | /farmers/:farmerId | /farmers | push | pop |
+| G07b | /farmers/:farmerId/id-card | /farmers/:farmerId | push | pop. Supplier ID card: print, download |
 | G08 | dialog on G01 | /home | overlay | back closes dialog |
 | G09 | /pay | — | tab | root tab |
 | G10 | /pay/sheet | /pay | push | pop |
@@ -94,6 +96,10 @@ Source of truth for navigation (go_router). Overlays (sheets, dialogs, toasts, c
 | K01 | /workers | /more (phones) | branch (rail, sidebar) / push from More | phones: pop → /more. Bar icons push K04/K05/K06 |
 | K02 | /workers/:staffId | /workers | push | pop |
 | K03 | /workers/:staffId/card | /workers/:staffId | push | pop |
+| K03b | /workers/:staffId/id-card | /workers/:staffId | push | pop. Staff ID card: print, download |
+| K07 | /workers/scan | /workers | push | pop. Scan station; `?mode=clock` clocks in/out. Open to every role |
+| K08 | /workers/cards | /workers | push | pop. Card register |
+| K09 | /me | — | branch | My page for an unlocked worker; hidden sections redirect to /home |
 | K04 | /workers/attendance | /workers | push | pop |
 | K05 | /workers/tasks | /workers | push | pop |
 | K06 | /workers/wages | /workers | push | pop |

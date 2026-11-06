@@ -53,13 +53,14 @@ class DefaultFirebaseOptions {
     projectId: 'farm-tap-1dd15',
     storageBucket: 'farm-tap-1dd15.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBZo8aemyGVMGYVk3lYZwCXFgVujy-d_WE',
     appId: '1:913049305053:ios:9e1f48a1d76aebd92ac034',
     messagingSenderId: '913049305053',
     projectId: 'farm-tap-1dd15',
     storageBucket: 'farm-tap-1dd15.firebasestorage.app',
+    androidClientId: '913049305053-4sd5562ct6er40vdmn6uiaj7id75hnco.apps.googleusercontent.com',
+    iosClientId: '913049305053-73cp00c1a335d91cpo8iksnodcgs6g2l.apps.googleusercontent.com',
     iosBundleId: 'com.victorbee.farmTap',
   );
 }

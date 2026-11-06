@@ -9,9 +9,15 @@ abstract final class AppRoutes {
   static const checkEmail = '/verify';
   static const farmPicker = '/farms';
 
+  /// A08 — staff sign-in with phone + PIN (decision 0016).
+  static const staffSignIn = '/sign-in/staff';
+
+  /// A07 opening the remembered (or only) farm by itself: after the splash
+  /// and after signing in (decision 0018).
+  static const farmPickerAuto = '/farms?auto=1';
+
   // B — onboarding
   static const setup = '/setup';
-  static const setupLanguage = '/setup/language';
   static const setupSector = '/setup/sector';
   static const setupWaitlistDone = '/setup/waitlist-done';
   static const setupDairyType = '/setup/dairy-type';
@@ -48,6 +54,15 @@ abstract final class AppRoutes {
   static const healthSchedule = '/health/schedule';
   static const healthWithdrawal = '/health/withdrawal';
   static const more = '/more';
+
+  // Decision 0024: farm contacts, duty roster, vaccinations, reminders.
+  static const moreContacts = '/more/contacts';
+  static const moreRoster = '/more/roster';
+  static const moreVaccinations = '/more/vaccinations';
+  static const moreReminders = '/more/reminders';
+
+  /// The feeds store (counts, days left, running low).
+  static const feedingStore = '/feeding/store';
   static const collect = '/collect';
   static const farmers = '/farmers';
   static const pay = '/pay';
@@ -68,6 +83,15 @@ abstract final class AppRoutes {
   static String worker(String staffId) => '/workers/$staffId';
   static String workerEdit(String staffId) => '/workers/$staffId/edit';
   static String workerCard(String staffId) => '/workers/$staffId/card';
+
+  // Cards (decision 0016)
+  static const workersScan = '/workers/scan';
+  static const workersCards = '/workers/cards';
+  static String workerIdCard(String staffId) => '/workers/$staffId/id-card';
+  static String farmerIdCard(String farmerId) => '/farmers/$farmerId/id-card';
+
+  /// K08 — a worker's own page.
+  static const me = '/me';
   static const money = '/money';
   static const moneyExpense = '/money/expense';
   static const reports = '/reports';
@@ -75,6 +99,14 @@ abstract final class AppRoutes {
   static const settings = '/settings';
   static const settingsSubscription = '/settings/subscription';
   static const settingsHelp = '/settings/help';
+  static const settingsMessages = '/settings/messages';
+  static const settingsDeleteAccount = '/settings/delete-account';
+
+  /// M05: the trial or plan ended (decision 0023 hard lock).
+  static const locked = '/locked';
+
+  /// The account was closed (decision 0024): kept 90 days, then erased.
+  static const accountClosed = '/account-closed';
 
   // Dev
   static const uiGallery = '/dev/gallery';

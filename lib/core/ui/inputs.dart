@@ -128,6 +128,7 @@ class FarmTapSelectField<T> extends StatelessWidget {
     this.value,
     this.icon,
     this.error,
+    this.picker,
   });
 
   final String label;
@@ -138,7 +139,16 @@ class FarmTapSelectField<T> extends StatelessWidget {
   final IconData? icon;
   final String? error;
 
+  /// Replaces the plain list sheet, e.g. [showSearchPicker].
+  final Future<T?> Function(BuildContext context)? picker;
+
   Future<void> _pick(BuildContext context) async {
+    final custom = picker;
+    if (custom != null) {
+      final picked = await custom(context);
+      if (picked != null) onChanged(picked);
+      return;
+    }
     final picked = await showAdaptiveSheet<T>(
       context,
       builder: (sheet) => Column(
@@ -220,4 +230,98 @@ class UgPhoneFormatter extends TextInputFormatter {
 
   /// True when 9 digits were typed.
   static bool isComplete(String text) => text.replaceAll(RegExp(r'\D'), '').length == 9;
+}
+
+/// A long list with a search box (all of Uganda's districts, roles...).
+/// With [allowCustom] the typed text can be used when it is not listed.
+Future<String?> showSearchPicker(
+  BuildContext context, {
+  required String title,
+  required List<String> options,
+  String? selected,
+  bool allowCustom = true,
+}) => showAdaptiveSheet<String>(
+  context,
+  builder: (sheet) => _SearchPicker(title: title, options: options, selected: selected, allowCustom: allowCustom),
+);
+
+class _SearchPicker extends StatefulWidget {
+  const new({required this.title, required this.options, required this.allowCustom, this.selected});
+
+  final String title;
+  final List<String> options;
+  final String? selected;
+  final bool allowCustom;
+
+  @override
+  State<_SearchPicker> createState() => _SearchPickerState();
+}
+
+class _SearchPickerState extends State<_SearchPicker> {
+  final _query = TextEditingController();
+
+  @override
+  void dispose() {
+    _query.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final q = _query.text.trim();
+    final shown = [
+      for (final o in widget.options)
+        if (q.isEmpty || o.toLowerCase().contains(q.toLowerCase())) o,
+    ];
+    final exact = widget.options.any((o) => o.toLowerCase() == q.toLowerCase());
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SheetTitle(widget.title),
+        context.space.gapMd,
+        FarmTapTextField(
+          label: l10n.searchList,
+          icon: Symbols.search_rounded,
+          controller: _query,
+          autofocus: true,
+          textInputAction: TextInputAction.done,
+          onChanged: (_) => setState(() {}),
+          onSubmitted: (_) {
+            if (shown.length == 1) Navigator.of(context).pop(shown.single);
+          },
+        ),
+        context.space.gapSm,
+        if (widget.allowCustom && q.isNotEmpty && !exact)
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Symbols.edit_rounded, color: context.colors.primary),
+            title: Text(l10n.useTyped(q)),
+            onTap: () => Navigator.of(context).pop(q),
+          ),
+        if (shown.isEmpty && !widget.allowCustom)
+          Padding(padding: EdgeInsets.all(context.space.lg), child: Text(l10n.nothingFound)),
+        Flexible(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.5),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                for (final o in shown)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(o),
+                    trailing: o == widget.selected
+                        ? Icon(Symbols.check_circle_rounded, fill: 1, color: context.colors.primary)
+                        : null,
+                    onTap: () => Navigator.of(context).pop(o),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

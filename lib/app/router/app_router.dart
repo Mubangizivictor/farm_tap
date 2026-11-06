@@ -6,9 +6,13 @@ import 'dart:async';
 
 import 'package:farm_tap/app/router/app_dependencies.dart';
 import 'package:farm_tap/app/router/routes.dart';
+import 'package:farm_tap/app/session/reminder_viewer.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/app/shell/app_shell.dart';
 import 'package:farm_tap/app/shell/pending_section.dart';
+import 'package:farm_tap/app/startup.dart';
+import 'package:farm_tap/core/account/presentation/account_pages.dart';
+import 'package:farm_tap/core/alerts/presentation/reminders_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/check_email_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/email_sign_in_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/email_sign_up_page.dart';
@@ -16,24 +20,45 @@ import 'package:farm_tap/core/auth/presentation/pages/farm_picker_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/forgot_password_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/sign_in_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/splash_page.dart';
+import 'package:farm_tap/core/auth/presentation/pages/staff_sign_in_page.dart';
+import 'package:farm_tap/core/billing/presentation/locked_page.dart';
+import 'package:farm_tap/core/billing/presentation/subscription_page.dart';
+import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/export/table_export.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
 import 'package:farm_tap/core/onboarding/presentation/cubit/onboarding_cubit.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/choice_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/form_steps.dart';
 import 'package:farm_tap/core/onboarding/presentation/pages/waitlist_and_done.dart';
+import 'package:farm_tap/core/people/domain/card_registry.dart';
+import 'package:farm_tap/core/people/domain/staff_directory.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
+import 'package:farm_tap/core/people/domain/staff_permissions.dart';
+import 'package:farm_tap/core/people/presentation/pages/card_register_page.dart';
+import 'package:farm_tap/core/people/presentation/pages/id_card_page.dart';
 import 'package:farm_tap/core/people/presentation/pages/unlock_pages.dart';
-import 'package:farm_tap/core/settings/app_settings_cubit.dart';
+import 'package:farm_tap/core/people/presentation/widgets/choose_pin_sheet.dart';
+import 'package:farm_tap/core/people/presentation/widgets/give_card_sheet.dart';
+import 'package:farm_tap/core/people/presentation/widgets/id_card.dart';
+import 'package:farm_tap/core/people/presentation/widgets/photo_picker.dart';
+import 'package:farm_tap/core/settings/presentation/pages/help_page.dart';
 import 'package:farm_tap/core/settings/presentation/pages/more_page.dart';
+import 'package:farm_tap/core/settings/presentation/pages/settings_page.dart';
+import 'package:farm_tap/core/sms/presentation/messages_page.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
+import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
+import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/breeding/presentation/pages/breeding_pages.dart';
+import 'package:farm_tap/sectors/cattle/cards/presentation/card_scan_page.dart';
+import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_models.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_collect_pages.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/presentation/pages/centre_farmers_pay_pages.dart';
 import 'package:farm_tap/sectors/cattle/feeding/presentation/pages/feeding_pages.dart';
 import 'package:farm_tap/sectors/cattle/health/presentation/pages/health_pages.dart';
+import 'package:farm_tap/sectors/cattle/herd/domain/entities/animal.dart';
 import 'package:farm_tap/sectors/cattle/herd/domain/herd_models.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/animal_detail_page.dart';
 import 'package:farm_tap/sectors/cattle/herd/presentation/pages/herd_list_page.dart';
@@ -42,10 +67,15 @@ import 'package:farm_tap/sectors/cattle/home/presentation/pages/alerts_page.dart
 import 'package:farm_tap/sectors/cattle/home/presentation/pages/home_page.dart';
 import 'package:farm_tap/sectors/cattle/milk/presentation/pages/milk_pages.dart';
 import 'package:farm_tap/sectors/cattle/money/presentation/pages/money_pages.dart';
+import 'package:farm_tap/sectors/cattle/operations/presentation/pages/contacts_page.dart';
+import 'package:farm_tap/sectors/cattle/operations/presentation/pages/feed_store_page.dart';
+import 'package:farm_tap/sectors/cattle/operations/presentation/pages/roster_page.dart';
+import 'package:farm_tap/sectors/cattle/operations/presentation/pages/vaccinations_page.dart';
+import 'package:farm_tap/sectors/cattle/workers/presentation/pages/my_page.dart';
 import 'package:farm_tap/sectors/cattle/workers/presentation/pages/workers_pages.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 typedef PageBuilder = Widget Function(BuildContext context, GoRouterState state);
@@ -95,6 +125,9 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
 
   final setup = OnboardingCubit();
 
+  /// The PIN a worker chose at phone sign-in, saved once their farm opens.
+  String? pendingStaffPin;
+
   // Roots of the shell branches; filled in section by section.
   final sectionRoots = <String, PageBuilder>{
     AppRoutes.home: (context, state) => session.isCentre
@@ -115,6 +148,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
             ownerName: session.auth.currentUser?.name ?? '',
             staff: session.staff,
             trialDaysLeft: session.trialDaysLeft,
+            readOnly: session.readOnly,
             onRefresh: deps.sync.sync,
             onLock: () {
               session.lock();
@@ -123,6 +157,127 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
             onOpen: (target) => _openFromHome(context, target),
           ),
   };
+  // ---- ID cards (decision 0016) ----
+  Future<IdCardData?> staffCardData(BuildContext context, String staffId) async {
+    final l10n = AppLocalizations.of(context);
+    final s = (await deps.staffDirectory.staffById(staffId)).data;
+    if (s == null) return null;
+    final farm = session.farm;
+    return staffIdCard(
+      l10n,
+      s,
+      tenantId: farm?.tenantId ?? '',
+      farmName: farm?.name ?? '',
+      farmPlace: farm?.place,
+      card: (await deps.cards.activeCardOf(s.id)).data,
+    );
+  }
+
+  Future<IdCardData?> farmerCardData(String farmerId) async {
+    final x = (await deps.centre.farmer(farmerId)).data;
+    if (x == null) return null;
+    final farm = session.farm;
+    return IdCardData(
+      kind: CardHolderKind.farmer,
+      tenantId: farm?.tenantId ?? '',
+      farmName: farm?.name ?? '',
+      farmPlace: farm?.place,
+      name: x.name,
+      personCode: x.supplierCode,
+      cardNumber: x.card,
+      phone: x.localPhone,
+      village: x.village,
+      since: x.since,
+      issued: (await deps.cards.activeCardOf(x.id)).data?.issuedAt,
+      photo: x.photo,
+    );
+  }
+
+  Future<void> staffPhoto(BuildContext context, String staffId) async {
+    final photo = await takePersonPhoto(context, deps.photos, staffId);
+    if (photo == null) return;
+    final saved = (await deps.staffDirectory.setPhoto(staffId, photo)).data;
+    if (saved != null) session.refreshStaff(saved);
+  }
+
+  Future<void> farmerPhoto(BuildContext context, CentreFarmer f) async {
+    final photo = await takePersonPhoto(context, deps.photos, f.id);
+    if (photo != null) await deps.centre.setPhoto(f.id, photo);
+  }
+
+  /// Phone + PIN sign-in for a worker (decision 0016 §5).
+  Future<void> makeStaffLogin(BuildContext context, StaffMember s, String pin) async {
+    final repo = deps.staffLogin;
+    final farm = session.farm;
+    final phone = s.phone;
+    if (repo == null || farm == null || phone == null || phone.isEmpty) return;
+    final r = await repo.createLogin(
+      tenantId: farm.tenantId,
+      staffId: s.id,
+      name: s.name,
+      phone: phone,
+      pin: pin,
+      role: s.role,
+    );
+    await deps.staffDirectory.setLoginStatus(
+      s.id,
+      r.isSuccess ? StaffLoginStatus.mustChangePin : StaffLoginStatus.failed,
+    );
+    if (!context.mounted) return;
+    final l10n = AppLocalizations.of(context);
+    FarmTapToast.show(
+      context,
+      message: r.isSuccess
+          ? l10n.staffLoginMade(s.greetingName, '0${phone.replaceAll(' ', '')}')
+          : r.failure?.message == 'staff-login-other-farm'
+          ? l10n.staffLoginOtherFarm
+          : l10n.staffLoginNotMade,
+    );
+  }
+
+  Future<void> giveFarmerCard(BuildContext context, CentreFarmer f) async {
+    final l10n = AppLocalizations.of(context);
+    final choice = await showGiveCardSheet(context, name: f.name.split(' ').first);
+    if (choice == null || !context.mounted) return;
+    final r = await deps.centre.assignCard(f.id, choice.scanned, replace: f.card != null);
+    if (!context.mounted) return;
+    switch (r) {
+      case Success(:final data):
+        FarmTapToast.show(context, message: l10n.cardAssigned(data.card ?? '', f.name.split(' ').first));
+      case FailureResult(:final failure):
+        await showFarmTapDialog(
+          context,
+          icon: Symbols.gpp_bad_rounded,
+          tone: FarmTapTone.danger,
+          title: l10n.cardNotGivenTitle,
+          message: cardIssueMessage(l10n, choice.scanned ?? '', failure),
+          primaryLabel: l10n.close,
+        );
+    }
+  }
+
+  Future<void> revokeFarmerCard(BuildContext context, CentreFarmer f) async {
+    final why = await askRevokeCard(context, f.card!, f.name.split(' ').first);
+    if (why == null || !context.mounted) return;
+    await deps.centre.revokeCard(f.id, why);
+    if (context.mounted) FarmTapToast.show(context, message: AppLocalizations.of(context).cardRevokedToast(f.card!));
+  }
+
+  void openPerson(BuildContext context, CardHolderKind kind, String id) =>
+      unawaited(context.push(kind == CardHolderKind.staff ? AppRoutes.worker(id) : AppRoutes.centreFarmer(id)));
+
+  Widget scanStation(BuildContext context, ScanMode mode) => CardScanPage(
+    cards: deps.cards,
+    directory: deps.staffDirectory,
+    workers: deps.workers,
+    centre: deps.centre,
+    mode: canManageStaff() ? mode : ScanMode.lookUp,
+    preferFarmers: session.isCentre,
+    canManage: canManageStaff(),
+    onGiveCard: () => context.go(AppRoutes.workers),
+    onOpenPerson: canManageStaff() ? (k, id) => openPerson(context, k, id) : null,
+  );
+
   sectionRoots[AppRoutes.herd] = (context, state) => HerdListPage(
     repo: deps.herd,
     onAnimal: (a) => context.push(AppRoutes.herdAnimal(a.id)),
@@ -131,6 +286,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
   );
   sectionRoots[AppRoutes.milk] = (context, state) => MilkTodayPage(
     repo: deps.milk,
+    onCow: (id) => context.push(AppRoutes.herdAnimal(id)),
     onRecord: () => context.push(AppRoutes.milkRecord),
     onTool: (i) => context.push([AppRoutes.milkTotal, AppRoutes.milkUse, AppRoutes.milkSales, AppRoutes.milkTrends][i]),
   );
@@ -138,33 +294,82 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     repo: deps.centre,
     savedDeliveryId: state.uri.queryParameters['saved'],
     onFarmer: (farmer) => context.push(AppRoutes.collectFarmer(farmer.id)),
+    workerByCard: (card) async => (await staffAccess.findByCard(card)).data?.name,
+    onAddFarmer: (card) => showAddFarmerSheet(context, deps.centre, card: card),
+    onWorkerCard: () => unawaited(context.push(AppRoutes.workersAttendance)),
+    outbox: deps.outbox,
   );
   sectionRoots[AppRoutes.farmers] = (context, state) => CentreFarmersPage(
     repo: deps.centre,
     onFarmer: (farmer) => context.push(AppRoutes.centreFarmer(farmer.id)),
-    onAdd: () => unawaited(showAddFarmerSheet(context, deps.centre)),
+    onAdd: () => showAddFarmerSheet(context, deps.centre),
+    onDownload: () => unawaited(_download(context, deps.reports.farmersTable, session.farm?.name ?? '')),
   );
   sectionRoots[AppRoutes.pay] = (context, state) => CentrePaymentsPage(
     repo: deps.centre,
     onSendSms: () => context.push(AppRoutes.paySms),
     onPaymentSheet: () => context.push(AppRoutes.payFarmers),
     onFarmer: (farmer) => context.go(AppRoutes.centreFarmer(farmer.id)),
+    onDownload: () => unawaited(_download(context, deps.reports.statementsTable, session.farm?.name ?? '')),
   );
   sectionRoots[AppRoutes.more] = (context, state) {
     final l10n = AppLocalizations.of(context);
     final user = session.auth.currentUser;
+    final role = session.staff?.role;
+    final sections = StaffPermissions.sections(role);
+    final manages = StaffPermissions.managesStaff(role);
     return MorePage(
-      name: session.staff?.name ?? user?.name ?? '',
-      role: switch (session.farm?.role) {
-        PlaceRole.owner => l10n.roleOwner,
-        PlaceRole.manager => l10n.roleManager,
-        PlaceRole.clerk => l10n.roleClerk,
-        PlaceRole.worker => l10n.roleWorker,
-        null => '',
+      photo: session.staff?.photo ?? session.photo,
+      visible: {
+        if (session.staff != null) MoreTarget.me,
+        if (sections.contains(AppSection.feeding)) MoreTarget.feeding,
+        if (sections.contains(AppSection.breeding)) MoreTarget.breeding,
+        if (deps.operations != null && !session.isCentre) ...{
+          MoreTarget.vaccinations,
+          if (sections.contains(AppSection.feeding)) MoreTarget.feedStore,
+          MoreTarget.roster,
+        },
+        if (deps.operations != null) MoreTarget.contacts,
+        if (deps.reminders != null) MoreTarget.reminders,
+        if (manages) ...{MoreTarget.workers, MoreTarget.money, MoreTarget.reports, MoreTarget.cards},
+        MoreTarget.scan,
+        if (manages) ...{MoreTarget.subscription, MoreTarget.settings},
+        MoreTarget.help,
+        MoreTarget.profile,
+        if (!session.staffLogin) MoreTarget.lock,
+        MoreTarget.signOut,
       },
+      name: session.staff?.name ?? user?.name ?? '',
+      role: _roleLabel(l10n, session.farm?.role),
       email: user?.email ?? '',
       trialDaysLeft: session.trialDaysLeft,
       onOpen: (t) => _openMore(context, session, t),
+    );
+  };
+  bool managesFarm() {
+    final staff = session.staff;
+    if (staff != null) return StaffPermissions.managesStaff(staff.role);
+    final role = session.farm?.role;
+    return role == PlaceRole.owner || role == PlaceRole.manager;
+  }
+
+  sectionRoots[AppRoutes.settings] = (context, state) {
+    final user = session.auth.currentUser;
+    return SettingsPage(
+      name: session.staff?.name ?? user?.name ?? '',
+      email: user?.email ?? '',
+      role: _roleLabel(AppLocalizations.of(context), session.farm?.role),
+      farmName: session.farm?.name ?? '',
+      onSignOut: () => unawaited(_confirmSignOut(context, session)),
+      photo: session.staff == null ? session.photo : session.staff?.photo,
+      onPhoto: user == null || session.staff != null || session.staffLogin
+          ? null
+          : () => unawaited(_changeProfilePhoto(context, deps, user.id)),
+      onReminders: deps.reminders == null ? null : () => unawaited(context.push(AppRoutes.moreReminders)),
+      onSubscription: managesFarm() ? () => unawaited(context.push(AppRoutes.settingsSubscription)) : null,
+      onDeleteAccount: user == null || session.staffLogin || session.staff != null
+          ? null
+          : () => unawaited(context.push(AppRoutes.settingsDeleteAccount)),
     );
   };
   sectionRoots[AppRoutes.workers] = (context, state) => WorkersPage(
@@ -172,16 +377,58 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     onStaff: (id) => context.push(AppRoutes.worker(id)),
     onAdd: () => context.push(AppRoutes.workersAdd),
     canManageStaff: canManageStaff(),
+    onScan: () => unawaited(context.push(AppRoutes.workersScan)),
+    onCards: () => unawaited(context.push(AppRoutes.workersCards)),
+    onPrintAll: () async {
+      final staff = (await deps.staffDirectory.staff()).data ?? const <StaffMember>[];
+      final cards = <IdCardData>[];
+      for (final s in staff.where((s) => s.hasCard)) {
+        if (!context.mounted) return;
+        final d = await staffCardData(context, s.id);
+        if (d != null) cards.add(d);
+      }
+      if (!context.mounted) return;
+      if (cards.isEmpty) {
+        FarmTapToast.show(context, message: AppLocalizations.of(context).noCardsToPrint);
+        return;
+      }
+      await shareIdCards(context, cards, sheet: true);
+    },
     onOpen: (t) => context.push(switch (t) {
       WorkersTarget.attendance => AppRoutes.workersAttendance,
       WorkersTarget.tasks => AppRoutes.workersTasks,
       WorkersTarget.wages => AppRoutes.workersWages,
     }),
   );
-  sectionRoots[AppRoutes.money] = (context, state) =>
-      MoneyPage(repo: deps.farmMoney, onAddExpense: () => context.push(AppRoutes.moneyExpense));
+  sectionRoots[AppRoutes.me] = (context, state) {
+    final s = session.staff;
+    if (s == null) return const PendingSection(path: AppRoutes.me);
+    return FutureBuilder<IdCardData?>(
+      future: staffCardData(context, s.id),
+      builder: (context, snap) {
+        final card = snap.data;
+        if (card == null) return const FarmTapPageLoader();
+        return MyPage(
+          staff: s,
+          directory: deps.staffDirectory,
+          workers: deps.workers,
+          card: card,
+          onCard: () => unawaited(context.push(AppRoutes.workerIdCard(s.id))),
+          onChangePin: session.staffLogin ? (pin) async => await deps.staffLogin?.changePin(pin) : null,
+          onSignOut: session.staffLogin ? () => unawaited(_confirmSignOut(context, session)) : null,
+        );
+      },
+    );
+  };
+  sectionRoots[AppRoutes.money] = (context, state) => MoneyPage(
+    repo: deps.farmMoney,
+    reports: deps.reports,
+    farmName: session.farm?.name ?? '',
+    onAddExpense: () => context.push(AppRoutes.moneyExpense),
+  );
   sectionRoots[AppRoutes.reports] = (context, state) => ReportsPage(
     money: deps.farmMoney,
+    reports: deps.reports,
     farmName: session.farm?.name ?? '',
     onDaily: () => context.push(AppRoutes.reportsWhatsapp),
   );
@@ -213,7 +460,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) => PickCowPage(
           repo: deps.milk,
           onCow: (cow, {required notForSale}) => context.push(AppRoutes.milkCow(cow.id, notForSale: notForSale)),
-          onScan: () => context.go(AppRoutes.herdScan),
+          onScan: () => context.go('${AppRoutes.herdScan}?for=milk'),
         ),
         routes: [
           page(
@@ -247,12 +494,16 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         'sales',
         parent: AppRoutes.milk,
-        builder: (context, state) => MilkSalesPage(repo: deps.milk),
+        builder: (context, state) => MilkSalesPage(repo: deps.milk, farmName: session.farm?.name ?? ''),
       ),
       page(
         'trends',
         parent: AppRoutes.milk,
-        builder: (context, state) => MilkTrendsPage(repo: deps.milk),
+        builder: (context, state) => MilkTrendsPage(
+          repo: deps.milk,
+          farmName: session.farm?.name ?? '',
+          onCow: (id) => context.push(AppRoutes.herdAnimal(id)),
+        ),
       ),
     ],
     AppRoutes.herd: [
@@ -264,14 +515,29 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         'scan',
         parent: AppRoutes.herd,
-        builder: (context, state) => ScanTagPage(
-          onTypeTag: () async {
-            final animal = await showTypeTagSheet(context, deps.herd);
-            if (animal != null && context.mounted) {
-              context.pushReplacement(AppRoutes.herdAnimal(animal.id));
+        builder: (context, state) {
+          // ?for=milk opens the cow's milk keypad, ?for=health a treatment
+          // for her; otherwise her page.
+          void open(Animal animal) {
+            switch (state.uri.queryParameters['for']) {
+              case 'milk':
+                context.go(AppRoutes.milkCow(animal.id));
+              case 'health':
+                context.go('${AppRoutes.healthTreatment}?animal=${animal.id}');
+              default:
+                context.pushReplacement(AppRoutes.herdAnimal(animal.id));
             }
-          },
-        ),
+          }
+
+          return ScanTagPage(
+            repo: deps.herd,
+            onAnimal: open,
+            onTypeTag: () async {
+              final animal = await showTypeTagSheet(context, deps.herd);
+              if (animal != null && context.mounted) open(animal);
+            },
+          );
+        },
       ),
       page(
         'count',
@@ -290,14 +556,33 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           repo: deps.herd,
           animalId: state.pathParameters['animalId']!,
           onLabels: () => context.push(AppRoutes.herdLabels),
+          onEdit: () => context.push('${AppRoutes.herdAnimal(state.pathParameters['animalId']!)}/edit'),
           onGone: () => popOrGo(context, AppRoutes.herd),
           onEvent: (kind) => context.go(switch (kind) {
-            HerdEventKind.milk => AppRoutes.milk,
+            HerdEventKind.milk => AppRoutes.milkCow(state.pathParameters['animalId']!),
             HerdEventKind.treatment => '${AppRoutes.healthTreatment}?animal=${state.pathParameters['animalId']}',
             HerdEventKind.heat => AppRoutes.breeding,
             _ => AppRoutes.money,
           }),
         ),
+        routes: [
+          page(
+            'edit',
+            parent: AppRoutes.herd,
+            builder: (context, state) => FutureBuilder(
+              future: deps.herd.detail(state.pathParameters['animalId']!),
+              builder: (context, snapshot) {
+                final animal = snapshot.data?.data?.animal;
+                if (animal == null) return const FarmTapPageLoader();
+                return AddAnimalPage(
+                  repo: deps.herd,
+                  initial: animal,
+                  onSaved: (a) => popOrGo(context, AppRoutes.herdAnimal(a.id)),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     ],
     AppRoutes.collect: [
@@ -317,7 +602,35 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         ':farmerId',
         parent: AppRoutes.farmers,
-        builder: (context, state) => CentreFarmerPage(repo: deps.centre, farmerId: state.pathParameters['farmerId']!),
+        builder: (context, state) => CentreFarmerPage(
+          repo: deps.centre,
+          farmerId: state.pathParameters['farmerId']!,
+          canManage: StaffPermissions.can(session.staff?.role, AppSection.farmers),
+          onIdCard: () => context.push(AppRoutes.farmerIdCard(state.pathParameters['farmerId']!)),
+          onPhoto: (f) => farmerPhoto(context, f),
+          onAssignCard: (f) => giveFarmerCard(context, f),
+          onRevokeCard: (f) => revokeFarmerCard(context, f),
+        ),
+        routes: [
+          page(
+            'id-card',
+            parent: AppRoutes.farmers,
+            builder: (context, state) {
+              final id = state.pathParameters['farmerId']!;
+              return IdCardPage(
+                load: () => farmerCardData(id),
+                onGiveCard: () async {
+                  final f = (await deps.centre.farmer(id)).data;
+                  if (f != null && context.mounted) await giveFarmerCard(context, f);
+                },
+                onPhoto: () async {
+                  final f = (await deps.centre.farmer(id)).data;
+                  if (f != null && context.mounted) await farmerPhoto(context, f);
+                },
+              );
+            },
+          ),
+        ],
       ),
     ],
     AppRoutes.pay: [
@@ -330,7 +643,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         'sms',
         parent: AppRoutes.pay,
         builder: (context, state) =>
-            SmsStatementsPage(repo: deps.centre, onSent: () => popOrGo(context, AppRoutes.pay)),
+            SmsStatementsPage(repo: deps.centre, onQueued: () => context.pushReplacement(AppRoutes.settingsMessages)),
       ),
     ],
     AppRoutes.health: [
@@ -340,7 +653,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) => AddTreatmentPage(
           repo: deps.treatments,
           animalId: state.uri.queryParameters['animal'],
-          onScan: () => context.go(AppRoutes.herdScan),
+          onScan: () => context.go('${AppRoutes.herdScan}?for=health'),
           // "Add another" starts a fresh form; Done returns to Health.
           onDone: (another) =>
               another ? context.pushReplacement(AppRoutes.healthTreatment) : popOrGo(context, AppRoutes.health),
@@ -370,12 +683,44 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) =>
             RecordFeedingPage(repo: deps.feed, onSaved: () => popOrGo(context, AppRoutes.feeding)),
       ),
+      page(
+        'store',
+        parent: AppRoutes.feeding,
+        builder: (context, state) {
+          final ops = deps.operations;
+          if (ops == null) return const PendingSection(path: AppRoutes.feedingStore);
+          return FeedStorePage(
+            repo: ops,
+            canEdit: managesFarm(),
+            onRecordFeeding: () => unawaited(context.push(AppRoutes.feedingRecord)),
+          );
+        },
+      ),
     ],
     AppRoutes.workers: [
       page(
         'attendance',
         parent: AppRoutes.workers,
-        builder: (context, state) => AttendancePage(repo: deps.workers, directory: deps.staffDirectory),
+        builder: (context, state) => AttendancePage(
+          repo: deps.workers,
+          directory: deps.staffDirectory,
+          farmerByCard: (card) async => (await deps.centre.farmerByCard(card)).data?.name,
+          onGiveCard: () => popOrGo(context, AppRoutes.workers),
+          onScanStation: () =>
+              unawaited(context.push(Uri(path: AppRoutes.workersScan, queryParameters: {'mode': 'clock'}).toString())),
+        ),
+      ),
+      page(
+        'scan',
+        parent: AppRoutes.workers,
+        builder: (context, state) =>
+            scanStation(context, state.uri.queryParameters['mode'] == 'clock' ? ScanMode.attendance : ScanMode.lookUp),
+      ),
+      page(
+        'cards',
+        parent: AppRoutes.workers,
+        builder: (context, state) =>
+            CardRegisterPage(cards: deps.cards, onHolder: (c) => openPerson(context, c.holderKind, c.holderId)),
       ),
       page(
         'tasks',
@@ -390,8 +735,11 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         'add',
         parent: AppRoutes.workers,
-        builder: (context, state) =>
-            StaffFormPage(directory: deps.staffDirectory, onSaved: (_) => popOrGo(context, AppRoutes.workers)),
+        builder: (context, state) => StaffFormPage(
+          directory: deps.staffDirectory,
+          onSaved: (_) => popOrGo(context, AppRoutes.workers),
+          onCreatedWithPhone: (s, pin) => makeStaffLogin(context, s, pin),
+        ),
       ),
       page(
         ':staffId',
@@ -403,8 +751,31 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           onAssignCard: () => context.push(AppRoutes.workerCard(state.pathParameters['staffId']!)),
           onEdit: () => context.push(AppRoutes.workerEdit(state.pathParameters['staffId']!)),
           canManageStaff: canManageStaff(),
+          onIdCard: () => context.push(AppRoutes.workerIdCard(state.pathParameters['staffId']!)),
+          onPhoto: (s) => staffPhoto(context, s.id),
+          onResetLogin: (s, pin) async {
+            if (s.login != StaffLoginStatus.none) await makeStaffLogin(context, s, pin);
+          },
+          onSetUpLogin: (s) async {
+            final pin = await showChooseNewPin(context, name: s.greetingName);
+            if (pin == null || !context.mounted) return;
+            await deps.staffDirectory.resetPin(s.id, pin);
+            if (context.mounted) await makeStaffLogin(context, s, pin);
+          },
         ),
         routes: [
+          page(
+            'id-card',
+            parent: AppRoutes.workers,
+            builder: (context, state) {
+              final id = state.pathParameters['staffId']!;
+              return IdCardPage(
+                load: () => staffCardData(context, id),
+                onGiveCard: canManageStaff() ? () => context.push(AppRoutes.workerCard(id)) : null,
+                onPhoto: canManageStaff() ? () => staffPhoto(context, id) : null,
+              );
+            },
+          ),
           page(
             'edit',
             parent: AppRoutes.workers,
@@ -440,19 +811,93 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         'whatsapp',
         parent: AppRoutes.reports,
-        builder: (context, state) => DailyReportPage(repo: deps.dailyReport),
+        builder: (context, state) => DailyReportPage(repo: deps.dailyReport, outbox: deps.outbox),
       ),
     ],
     AppRoutes.settings: [
       page(
         'subscription',
         parent: AppRoutes.settings,
-        builder: (context, state) => const PendingSection(path: AppRoutes.settingsSubscription),
+        builder: (context, state) {
+          final farm = session.farm;
+          if (farm == null) return const PendingSection(path: AppRoutes.settingsSubscription);
+          return SubscriptionPage(
+            repo: deps.billing,
+            tenantId: farm.tenantId,
+            farmName: farm.name,
+            subscription: farm.subscription,
+            canPay: managesFarm(),
+            onPaid: session.updateSubscription,
+          );
+        },
       ),
       page(
-        'help',
+        'delete-account',
         parent: AppRoutes.settings,
-        builder: (context, state) => const PendingSection(path: AppRoutes.settingsHelp),
+        builder: (context, state) => DeleteAccountPage(
+          ownsFarms: session.farm?.role == PlaceRole.owner,
+          onClose: (reason) async {
+            final user = session.auth.currentUser;
+            if (user == null) return;
+            await deps.account.close(uid: user.id, email: user.email, name: user.name, reason: reason);
+            session.setProfile(await deps.account.profile(user.id));
+          },
+        ),
+      ),
+      page('help', parent: AppRoutes.settings, builder: (context, state) => const HelpPage()),
+      page(
+        'messages',
+        parent: AppRoutes.settings,
+        builder: (context, state) => MessagesPage(outbox: deps.outbox),
+      ),
+    ],
+    AppRoutes.more: [
+      page(
+        'contacts',
+        parent: AppRoutes.more,
+        builder: (context, state) {
+          final ops = deps.operations;
+          if (ops == null) return const PendingSection(path: AppRoutes.moreContacts);
+          return ContactsPage(repo: ops, canEdit: managesFarm());
+        },
+      ),
+      page(
+        'roster',
+        parent: AppRoutes.more,
+        builder: (context, state) {
+          final ops = deps.operations;
+          if (ops == null) return const PendingSection(path: AppRoutes.moreRoster);
+          return RosterPage(
+            repo: ops,
+            staff: deps.staffDirectory,
+            canEdit: managesFarm(),
+            myStaffId: session.staff?.id ?? session.farm?.staffId,
+          );
+        },
+      ),
+      page(
+        'vaccinations',
+        parent: AppRoutes.more,
+        builder: (context, state) {
+          final ops = deps.operations;
+          if (ops == null) return const PendingSection(path: AppRoutes.moreVaccinations);
+          return VaccinationsPage(repo: ops, canEdit: managesFarm());
+        },
+      ),
+      page(
+        'reminders',
+        parent: AppRoutes.more,
+        builder: (context, state) {
+          final r = deps.reminders;
+          if (r == null) return const PendingSection(path: AppRoutes.moreReminders);
+          return RemindersPage(
+            reminders: r,
+            viewer: reminderViewer(session),
+            onMessages: deps.outbox == null || !managesFarm()
+                ? null
+                : () => unawaited(context.push(AppRoutes.settingsMessages)),
+          );
+        },
       ),
     ],
     AppRoutes.home: [
@@ -494,23 +939,41 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         AppRoutes.splash,
         parent: null,
-        builder: (context, state) => SplashPage(onDone: () => context.go(AppRoutes.signIn)),
+        // A returning person stays signed in on this phone until they sign
+        // out: straight to their farm, never back to the sign-in screen.
+        builder: (context, state) => SplashPage(
+          ready: startupWork,
+          onDone: () => context.go(session.signedIn ? AppRoutes.farmPickerAuto : AppRoutes.signIn),
+        ),
       ),
       page(
         AppRoutes.signIn,
         parent: null,
         builder: (context, state) => SignInPage(
           auth: auth,
-          onSignedIn: () => context.go(AppRoutes.farmPicker),
+          onSignedIn: () => context.go(AppRoutes.farmPickerAuto),
           onEmail: () => context.push(AppRoutes.emailSignIn),
+          onStaff: deps.staffLogin == null ? null : () => context.push(AppRoutes.staffSignIn),
         ),
         routes: [
+          if (deps.staffLogin != null)
+            page(
+              'staff',
+              parent: AppRoutes.signIn,
+              builder: (context, state) => StaffSignInPage(
+                repo: deps.staffLogin!,
+                onSignedIn: (signIn, newPin) {
+                  pendingStaffPin = newPin;
+                  context.go(AppRoutes.farmPickerAuto);
+                },
+              ),
+            ),
           page(
             'email',
             parent: AppRoutes.signIn,
             builder: (context, state) => EmailSignInPage(
               auth: auth,
-              onSignedIn: () => context.go(AppRoutes.farmPicker),
+              onSignedIn: () => context.go(AppRoutes.farmPickerAuto),
               onForgotPassword: () => context.push(AppRoutes.forgotPassword),
               onCreateAccount: () => context.push(AppRoutes.signUp),
             ),
@@ -539,7 +1002,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) => CheckEmailPage(
           auth: auth,
           email: state.uri.queryParameters['email'] ?? auth.currentUser?.email ?? '',
-          onContinue: () => context.go(AppRoutes.setupLanguage),
+          onContinue: () => context.go(AppRoutes.setupSector),
         ),
       ),
       page(
@@ -547,30 +1010,36 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         parent: null,
         builder: (context, state) => FarmPickerPage(
           places: places,
-          onOpened: (farm) {
+          account: auth.currentUser,
+          autoOpen: state.uri.queryParameters['auto'] == '1',
+          prepare: deps.prepareFarm,
+          onOpened: (farm) async {
             session.openFarm(farm);
-            context.go(AppRoutes.home);
+            // A worker signed in with phone + PIN is that staff member
+            // (decision 0016 §5); the PIN they just chose works on the farm
+            // phone's card unlock too.
+            final staffId = farm.staffId;
+            if (staffId != null) {
+              final pin = pendingStaffPin;
+              pendingStaffPin = null;
+              if (pin != null) await deps.staffDirectory.setOwnPin(staffId, pin);
+              final s = (await deps.staffDirectory.staffById(staffId)).data;
+              if (s != null) session.unlock(s);
+            }
+            if (context.mounted) context.go(AppRoutes.home);
           },
           onAddFarm: () {
             setup.reset();
-            unawaited(context.push(AppRoutes.setupLanguage));
+            unawaited(context.push(AppRoutes.setupSector));
           },
+          onSignOut: () => unawaited(session.signOut()),
         ),
       ),
 
       // ---- B: onboarding (each step pushes the next; back = previous step) ----
       page(
-        AppRoutes.setupLanguage,
-        parent: null,
-        builder: (context, state) => OnboardLanguagePage(
-          cubit: setup,
-          onLanguage: (code) => context.read<AppSettingsCubit>().setLanguage(code),
-          onContinue: () => context.push(AppRoutes.setupSector),
-        ),
-      ),
-      page(
         AppRoutes.setupSector,
-        parent: AppRoutes.setupLanguage,
+        parent: null,
         builder: (context, state) => OnboardSectorPage(
           cubit: setup,
           onContinue: () => context.push(AppRoutes.setupDairyType),
@@ -606,11 +1075,8 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       page(
         AppRoutes.setupFarm,
         parent: AppRoutes.setupDairyType,
-        builder: (context, state) => OnboardFarmDetailsPage(
-          cubit: setup,
-          districts: onboarding.districts,
-          onContinue: () => context.push(AppRoutes.setupContacts),
-        ),
+        builder: (context, state) =>
+            OnboardFarmDetailsPage(cubit: setup, onContinue: () => context.push(AppRoutes.setupContacts)),
       ),
       page(
         AppRoutes.setupContacts,
@@ -635,10 +1101,13 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) => FarmReadyPage(
           setup: setup.state,
           repo: onboarding,
-          onStart: (farm) {
+          onStart: (farm) async {
+            final worker = setup.state.firstWorker;
             session.openFarm(farm);
+            // B09's worker is saved into the new farm (and its card given).
+            if (worker != null) await saveFirstWorker(deps.staffDirectory, worker);
             setup.reset();
-            context.go(AppRoutes.home);
+            if (context.mounted) context.go(AppRoutes.home);
           },
         ),
       ),
@@ -675,7 +1144,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
               future: staffAccess.findByCard(state.uri.queryParameters['card'] ?? ''),
               builder: (context, snapshot) {
                 final staff = snapshot.data?.data;
-                if (staff == null) return const SizedBox.shrink();
+                if (staff == null) return const FarmTapPageLoader();
                 return StaffPinPage(
                   staff: staff,
                   access: staffAccess,
@@ -684,11 +1153,39 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
                     context.go(AppRoutes.home);
                   },
                   onNotMe: () => popOrGo(context, AppRoutes.unlock),
+                  onNewPin: (s, pin) async => await deps.staffDirectory.setOwnPin(s.id, pin),
                 );
               },
             ),
           ),
         ],
+      ),
+
+      // ---- M05 trial or plan ended; account closed (decisions 0023, 0024) ----
+      page(
+        AppRoutes.locked,
+        parent: null,
+        builder: (context, state) => LockedPage(
+          farmName: session.farm?.name ?? '',
+          wasPaid: session.farm?.subscription.paidUntil != null,
+          manages: managesFarm(),
+          onPay: () => unawaited(context.push(AppRoutes.settingsSubscription)),
+          onView: () {
+            session.viewLocked();
+            context.go(AppRoutes.home);
+          },
+          onSwitchFarm: () => context.go(AppRoutes.farmPicker),
+          onSignOut: () => unawaited(_confirmSignOut(context, session)),
+        ),
+      ),
+      page(
+        AppRoutes.accountClosed,
+        parent: null,
+        builder: (context, state) {
+          final closed = session.closed;
+          if (closed == null) return const FarmTapPageLoader();
+          return ClosedAccountPage(closure: closed, onSignOut: () => unawaited(session.signOut()));
+        },
       ),
 
       // ---- Main shell: one branch per section ----
@@ -718,10 +1215,10 @@ void _openFromHome(BuildContext context, HomeTarget target) {
     HomeTarget.feeding => AppRoutes.feeding,
     HomeTarget.breeding => AppRoutes.breeding,
     HomeTarget.report => AppRoutes.health,
-    HomeTarget.pay => AppRoutes.settings,
+    HomeTarget.pay => AppRoutes.settingsSubscription,
     HomeTarget.alerts => AppRoutes.homeAlerts,
   };
-  if (target == HomeTarget.alerts) {
+  if (target == HomeTarget.alerts || target == HomeTarget.pay) {
     unawaited(context.push(path));
   } else {
     context.go(path);
@@ -732,25 +1229,62 @@ void _openFromHome(BuildContext context, HomeTarget target) {
 String? _guard(SessionController session, String location) {
   if (location == AppRoutes.splash || location.startsWith('/dev')) return null;
   if (!session.signedIn) return location.startsWith(AppRoutes.signIn) ? null : AppRoutes.signIn;
-  if (location.startsWith(AppRoutes.signIn)) return session.hasFarm ? AppRoutes.home : AppRoutes.farmPicker;
+  // A worker stays on phone sign-in to choose their own PIN (decision 0016 §5).
+  if (location.startsWith(AppRoutes.staffSignIn) && !session.hasFarm) return null;
+  // A closed account sees only the closed screen (decision 0024).
+  if (session.closed != null) return location == AppRoutes.accountClosed ? null : AppRoutes.accountClosed;
+  if (location == AppRoutes.accountClosed) return AppRoutes.farmPickerAuto;
+  if (location.startsWith(AppRoutes.signIn)) return session.hasFarm ? AppRoutes.home : AppRoutes.farmPickerAuto;
   final settingUp =
       location.startsWith(AppRoutes.farmPicker) ||
       location.startsWith(AppRoutes.setup) ||
       location.startsWith(AppRoutes.checkEmail);
-  if (!session.hasFarm) return settingUp ? null : AppRoutes.farmPicker;
+  if (!session.hasFarm) return settingUp ? null : AppRoutes.farmPickerAuto;
   final unlocking = location.startsWith(AppRoutes.unlock) || location.startsWith(AppRoutes.farmPicker);
   if (session.locked && !unlocking) return AppRoutes.unlock;
+  // Trial or plan ended: nothing can be added (decision 0023, hard lock).
+  // Paying, help and the farm list stay open; owners may look at records.
+  if (session.readOnly && !session.viewingLocked) {
+    final open =
+        location == AppRoutes.locked ||
+        location.startsWith(AppRoutes.settingsSubscription) ||
+        location.startsWith(AppRoutes.settingsHelp) ||
+        location.startsWith(AppRoutes.farmPicker);
+    if (!open) return AppRoutes.locked;
+  } else if (location == AppRoutes.locked) {
+    return AppRoutes.home;
+  }
+  // A worker only opens their sections (decision 0016 §7).
+  final section = sectionOf(location);
+  final staff = session.staff;
+  if (section != null && staff != null && !StaffPermissions.can(staff.role, section)) {
+    // Their own ID card lives under Workers.
+    if (location == AppRoutes.workerIdCard(staff.id)) return null;
+    // Scanning cards is open to all; giving cards is not.
+    if (location.startsWith(AppRoutes.workersScan)) return null;
+    return AppRoutes.home;
+  }
+  if (section == AppSection.me && staff == null) return AppRoutes.home;
   return null;
 }
 
 /// N01: More-sections push from /more (back arrow returns to More).
 Future<void> _openMore(BuildContext context, SessionController session, MoreTarget t) async {
-  final l10n = AppLocalizations.of(context);
   switch (t) {
     case MoreTarget.feeding:
       await context.push(AppRoutes.feeding);
     case MoreTarget.breeding:
       await context.push(AppRoutes.breeding);
+    case MoreTarget.contacts:
+      await context.push(AppRoutes.moreContacts);
+    case MoreTarget.roster:
+      await context.push(AppRoutes.moreRoster);
+    case MoreTarget.vaccinations:
+      await context.push(AppRoutes.moreVaccinations);
+    case MoreTarget.reminders:
+      await context.push(AppRoutes.moreReminders);
+    case MoreTarget.feedStore:
+      await context.push(AppRoutes.feedingStore);
     // Staff NFC cards are assigned under Workers (K03).
     case MoreTarget.workers || MoreTarget.cards:
       await context.push(AppRoutes.workers);
@@ -764,19 +1298,123 @@ Future<void> _openMore(BuildContext context, SessionController session, MoreTarg
       await context.push(AppRoutes.settingsSubscription);
     case MoreTarget.help:
       await context.push(AppRoutes.settingsHelp);
+    case MoreTarget.me:
+      context.go(AppRoutes.me);
+    case MoreTarget.scan:
+      await context.push(AppRoutes.workersScan);
+    case MoreTarget.messages:
+      await context.push(AppRoutes.settingsMessages);
     case MoreTarget.lock:
       session.lock();
     case MoreTarget.signOut:
-      final ok = await showFarmTapDialog(
-        context,
-        icon: Symbols.logout_rounded,
-        title: l10n.signOutTitle,
-        message: l10n.signOutBody,
-        primaryLabel: l10n.signOutLabel,
-        primaryKind: ButtonKind.danger,
-        secondaryLabel: l10n.cancel,
-        tone: FarmTapTone.danger,
-      );
-      if (ok) await session.signOut();
+      await _confirmSignOut(context, session);
+  }
+}
+
+String _roleLabel(AppLocalizations l10n, PlaceRole? role) => switch (role) {
+  PlaceRole.owner => l10n.roleOwner,
+  PlaceRole.manager => l10n.roleManager,
+  PlaceRole.clerk => l10n.roleClerk,
+  PlaceRole.worker => l10n.roleWorker,
+  null => '',
+};
+
+Future<void> _confirmSignOut(BuildContext context, SessionController session) async {
+  final l10n = AppLocalizations.of(context);
+  final ok = await showFarmTapDialog(
+    context,
+    icon: Symbols.logout_rounded,
+    title: l10n.signOutTitle,
+    message: l10n.signOutBody,
+    primaryLabel: l10n.signOutLabel,
+    primaryKind: ButtonKind.danger,
+    secondaryLabel: l10n.cancel,
+    tone: FarmTapTone.danger,
+  );
+  if (ok) await session.signOut();
+}
+
+/// Saves the first worker from onboarding (B09) into the farm just opened.
+Future<void> saveFirstWorker(StaffDirectory staff, FirstWorker w) async {
+  final added = (await staff.addStaff(
+    name: w.name,
+    role: w.role,
+    pin: w.pin,
+    title: w.title,
+    phone: w.phone,
+    monthlyWage: w.monthlyWage,
+  )).data;
+  final card = w.cardNumber;
+  if (added != null && card != null) await staff.assignCard(added.id, card);
+}
+
+/// Makes a table from the farm's records and shares it (PDF or spreadsheet).
+Future<void> _download(
+  BuildContext context,
+  Future<ExportTable> Function(AppLocalizations, FarmTapFormat) make,
+  String farmName,
+) async {
+  final table = await make(
+    AppLocalizations.of(context),
+    FarmTapFormat(Localizations.localeOf(context).toLanguageTag()),
+  );
+  if (context.mounted) await exportTable(context, table, farmName: farmName);
+}
+
+/// The person's own photo (decision 0024): camera or gallery, shrunk to a
+/// small square-ish JPEG and saved on the account; or removed.
+Future<void> _changeProfilePhoto(BuildContext context, AppDependencies deps, String uid) async {
+  final l10n = AppLocalizations.of(context);
+  final session = deps.session;
+  final pick = await showAdaptiveSheet<String>(
+    context,
+    builder: (sheet) => Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SheetTitle(l10n.profilePhoto, subtitle: l10n.profilePhotoBody),
+        sheet.space.gapLg,
+        FarmTapButton(
+          label: l10n.takePhoto,
+          icon: Symbols.photo_camera_rounded,
+          onPressed: () => Navigator.of(sheet).pop('camera'),
+        ),
+        sheet.space.gapSm,
+        FarmTapButton(
+          label: l10n.chooseFromGallery,
+          icon: Symbols.photo_library_rounded,
+          kind: ButtonKind.outlined,
+          onPressed: () => Navigator.of(sheet).pop('gallery'),
+        ),
+        if (session.photo != null) ...[
+          sheet.space.gapSm,
+          FarmTapButton(
+            label: l10n.profilePhotoRemove,
+            kind: ButtonKind.text,
+            onPressed: () => Navigator.of(sheet).pop('remove'),
+          ),
+        ],
+      ],
+    ),
+  );
+  if (pick == null || !context.mounted) return;
+  try {
+    if (pick == 'remove') {
+      await deps.account.removePhoto(uid);
+      session.setPhoto(null);
+      return;
+    }
+    final file = await ImagePicker().pickImage(
+      source: pick == 'camera' ? ImageSource.camera : ImageSource.gallery,
+      maxWidth: 320,
+      maxHeight: 320,
+      imageQuality: 70,
+      preferredCameraDevice: CameraDevice.front,
+    );
+    if (file == null) return;
+    session.setPhoto(await deps.account.savePhoto(uid, await file.readAsBytes()));
+    if (context.mounted) FarmTapToast.show(context, message: l10n.photoSaved);
+  } on Object {
+    if (context.mounted) FarmTapToast.show(context, message: l10n.photoNotSaved, tone: FarmTapTone.danger);
   }
 }

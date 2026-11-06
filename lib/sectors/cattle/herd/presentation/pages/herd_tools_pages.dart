@@ -15,14 +15,19 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:uuid/uuid.dart';
 
 // ---------------------------------------------------------------- E04
 
 enum _Sex { female, bull, calf }
 
-/// E04 — add an animal. Asks "Discard changes?" when left with input.
+/// What a cow or heifer is doing now (E04 "Status").
+enum _CowStatus { milking, dry, heifer }
+
+/// E04 — add an animal, or edit one ([initial]). Asks "Discard changes?"
+/// when left with input.
 class AddAnimalPage extends StatefulWidget {
-  const new({required this.repo, required this.onSaved, super.key, this.now});
+  const new({required this.repo, required this.onSaved, super.key, this.now, this.initial});
 
   final HerdRepository repo;
   final ValueChanged<Animal> onSaved;
@@ -30,20 +35,40 @@ class AddAnimalPage extends StatefulWidget {
   /// Overrides the clock (goldens).
   final DateTime? now;
 
+  /// Edit mode: the animal as saved.
+  final Animal? initial;
+
   @override
   State<AddAnimalPage> createState() => _AddAnimalPageState();
 }
 
 class _AddAnimalPageState extends State<AddAnimalPage> {
-  final _tag = TextEditingController();
-  final _name = TextEditingController();
-  final _national = TextEditingController();
-  String? _breed;
-  DateTime? _born;
-  _Sex _sex = _Sex.female;
+  late final Animal? _initial = widget.initial;
+  late final _tag = TextEditingController(text: _initial?.tagNumber);
+  late final _name = TextEditingController(text: _initial?.name);
+  late final _national = TextEditingController(text: _initial?.govIdTag);
+  late String? _breed = (_initial?.breed ?? '').isEmpty ? null : _initial!.breed;
+  late String? _group = _initial?.group;
+  late DateTime? _born = _initial?.dateOfBirth;
+  late String? _photo = _initial?.photo;
+  late _Sex _sex = switch (_initial) {
+    null => _Sex.female,
+    final a when a.dairyStatus == DairyStatus.calf => _Sex.calf,
+    final a when a.sex == AnimalSex.male => _Sex.bull,
+    _ => _Sex.female,
+  };
+  late _CowStatus _status = switch (_initial?.dairyStatus) {
+    DairyStatus.dry => _CowStatus.dry,
+    DairyStatus.heifer => _CowStatus.heifer,
+    null => _CowStatus.milking,
+    _ => _CowStatus.milking,
+  };
   Animal? _mother;
   String? _tagError;
+  bool _saving = false;
   List<Animal> _mothers = const [];
+
+  bool get _editing => _initial != null;
 
   @override
   void initState() {
@@ -52,19 +77,23 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
   }
 
   Future<void> _load() async {
-    final tag = (await widget.repo.nextTag()).data;
+    final tag = _editing ? null : (await widget.repo.nextTag()).data;
     final rows = (await widget.repo.rows()).data ?? const <HerdRow>[];
     if (!mounted) return;
     setState(() {
       if (tag != null && _tag.text.isEmpty) _tag.text = tag;
       _mothers = [
         for (final r in rows)
-          if (r.animal.sex == AnimalSex.female) r.animal,
+          if (r.animal.sex == AnimalSex.female && r.animal.id != _initial?.id) r.animal,
       ];
+      final motherTag = _initial?.motherTag;
+      if (motherTag != null) _mother = _mothers.where((m) => m.tagNumber == motherTag).firstOrNull;
     });
   }
 
-  bool get _dirty => _name.text.isNotEmpty || _breed != null || _born != null || _national.text.isNotEmpty;
+  bool get _dirty => _editing
+      ? _name.text != _initial!.name || _tag.text != _initial.tagNumber || _photo != _initial.photo
+      : _name.text.isNotEmpty || _breed != null || _born != null || _national.text.isNotEmpty || _photo != null;
 
   @override
   void dispose() {
@@ -85,35 +114,90 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
     if (picked != null) setState(() => _born = picked);
   }
 
+  Future<void> _pickPhoto() async {
+    final key = await pickPhoto(context, canRemove: _photo != null);
+    if (key == null || !mounted) return;
+    setState(() => _photo = key.isEmpty ? null : key);
+  }
+
+  DairyStatus get _dairyStatus => switch (_sex) {
+    _Sex.bull => DairyStatus.bull,
+    _Sex.calf => DairyStatus.calf,
+    _Sex.female => switch (_status) {
+      _CowStatus.milking => DairyStatus.milking,
+      _CowStatus.dry => DairyStatus.dry,
+      _CowStatus.heifer => DairyStatus.heifer,
+    },
+  };
+
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context);
-    setState(() => _tagError = _tag.text.trim().isEmpty ? l10n.tagRequired : null);
-    if (_tagError != null) return;
+    final tag = _tag.text.trim();
+    setState(() => _tagError = tag.isEmpty ? l10n.tagRequired : null);
+    if (_tagError != null || _saving) return;
+    setState(() => _saving = true);
     final now = widget.now ?? context.clock.now();
-    final animal = Animal(
-      id: 'animal-${_tag.text.trim()}',
-      tenantId: '',
-      tagNumber: _tag.text.trim(),
-      name: _name.text.trim(),
-      sex: _sex == _Sex.bull ? AnimalSex.male : AnimalSex.female,
-      breed: _breed ?? '',
-      dateOfBirth: _born ?? now,
-      status: AnimalStatus.active,
-      govIdTag: _national.text.trim().isEmpty ? null : _national.text.trim(),
-      createdAt: now,
-      updatedAt: now,
-      createdBy: 'staff',
-      updatedBy: 'staff',
-      deviceId: 'device',
-      syncStatus: SyncStatus.pending,
-      dairyStatus: switch (_sex) {
-        _Sex.female => DairyStatus.heifer,
-        _Sex.bull => DairyStatus.bull,
-        _Sex.calf => DairyStatus.calf,
-      },
-      motherTag: _mother?.tagNumber,
-    );
-    await widget.repo.addAnimal(animal);
+    final national = _national.text.trim();
+    final initial = _initial;
+    Animal animal;
+    if (initial != null) {
+      animal = initial.copyWith(
+        tagNumber: tag,
+        name: _name.text.trim(),
+        sex: _sex == _Sex.bull ? AnimalSex.male : AnimalSex.female,
+        breed: _breed ?? '',
+        dateOfBirth: _born,
+        govIdTag: national,
+        // A treated or pregnant cow keeps that status unless changed here.
+        dairyStatus: _dairyStatus == DairyStatus.milking && initial.sex == AnimalSex.female
+            ? (initial.dairyStatus == DairyStatus.pregnant ? DairyStatus.pregnant : DairyStatus.milking)
+            : _dairyStatus,
+        group: _group,
+        motherTag: _mother?.tagNumber,
+        photo: _photo,
+        clearPhoto: _photo == null,
+      );
+      final ok = (await widget.repo.updateAnimal(animal)).data ?? false;
+      if (!mounted) return;
+      if (!ok) {
+        setState(() {
+          _saving = false;
+          _tagError = l10n.tagTaken(tag);
+        });
+        return;
+      }
+    } else {
+      if ((await widget.repo.findByTag(tag)).data != null) {
+        if (!mounted) return;
+        setState(() {
+          _saving = false;
+          _tagError = l10n.tagTaken(tag);
+        });
+        return;
+      }
+      animal = Animal(
+        id: const Uuid().v4(),
+        tenantId: '',
+        tagNumber: tag,
+        name: _name.text.trim(),
+        sex: _sex == _Sex.bull ? AnimalSex.male : AnimalSex.female,
+        breed: _breed ?? '',
+        dateOfBirth: _born ?? now,
+        status: AnimalStatus.active,
+        govIdTag: national.isEmpty ? null : national,
+        createdAt: now,
+        updatedAt: now,
+        createdBy: 'staff',
+        updatedBy: 'staff',
+        deviceId: 'device',
+        syncStatus: SyncStatus.pending,
+        dairyStatus: _dairyStatus,
+        group: _group,
+        motherTag: _mother?.tagNumber,
+        photo: _photo,
+      );
+      await widget.repo.addAnimal(animal);
+    }
     if (!mounted) return;
     FarmTapToast.show(context, message: l10n.animalSaved(animal.name.isEmpty ? animal.tagNumber : animal.name));
     widget.onSaved(animal);
@@ -129,6 +213,7 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
       labelOf: (b) => b,
       value: _breed,
       onChanged: (b) => setState(() => _breed = b),
+      picker: (c) => showSearchPicker(c, title: l10n.breedLabel, options: widget.repo.breeds, selected: _breed),
     );
     final born = Semantics(
       button: true,
@@ -151,9 +236,13 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
     return DiscardGuard(
       dirty: _dirty,
       child: AdaptiveScaffold(
-        title: l10n.addAnimal2,
+        title: _editing ? l10n.editAnimal : l10n.addAnimal2,
         showNavigation: false,
-        floatingActionButton: FarmTapFab(label: l10n.saveAnimal, icon: Symbols.check_rounded, onPressed: _save),
+        floatingActionButton: FarmTapFab(
+          label: l10n.saveAnimal,
+          icon: Symbols.check_rounded,
+          onPressed: _saving ? null : _save,
+        ),
         body: LayoutBuilder(
           builder: (context, constraints) {
             final wide = constraints.maxWidth >= context.sizes.gridPaired;
@@ -163,7 +252,11 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _PhotoBox(label: l10n.addPhoto),
+                    _PhotoBox(
+                      label: _photo == null ? l10n.addPhoto : l10n.changePhoto,
+                      photo: _photo,
+                      onTap: _pickPhoto,
+                    ),
                     context.space.gapLg,
                     Expanded(
                       child: Column(
@@ -174,6 +267,7 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
                             controller: _tag,
                             error: _tagError,
                             textInputAction: TextInputAction.next,
+                            onChanged: (_) => setState(() => _tagError = null),
                           ),
                           context.space.gapLg,
                           FarmTapTextField(
@@ -214,6 +308,31 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
                   selected: _sex,
                   onChanged: (s) => setState(() => _sex = s),
                 ),
+                if (_sex == _Sex.female) ...[
+                  context.space.gapLg,
+                  Text(l10n.statusNow, style: context.text.titleSmall),
+                  context.space.gapSm,
+                  SegmentedTabs<_CowStatus>(
+                    options: [
+                      TabOption(value: _CowStatus.milking, label: l10n.statusMilking),
+                      TabOption(value: _CowStatus.dry, label: l10n.statusDry),
+                      TabOption(value: _CowStatus.heifer, label: l10n.statusHeifer),
+                    ],
+                    selected: _status,
+                    onChanged: (s) => setState(() => _status = s),
+                  ),
+                ],
+                context.space.gapLg,
+                FarmTapSelectField<String>(
+                  label: l10n.groupLabel,
+                  icon: Symbols.fence_rounded,
+                  options: widget.repo.groups,
+                  labelOf: (g) => g,
+                  value: _group,
+                  onChanged: (g) => setState(() => _group = g),
+                  picker: (c) =>
+                      showSearchPicker(c, title: l10n.groupLabel, options: widget.repo.groups, selected: _group),
+                ),
                 context.space.gapLg,
                 FarmTapTextField(
                   label: l10n.nationalTagLabel,
@@ -239,15 +358,26 @@ class _AddAnimalPageState extends State<AddAnimalPage> {
   }
 }
 
-/// "Add photo" box beside the tag and name fields.
+/// "Add photo" box beside the tag and name fields; shows the photo once
+/// taken.
 class _PhotoBox extends StatelessWidget {
-  const new({required this.label});
+  const new({required this.label, required this.onTap, this.photo});
 
   final String label;
+  final String? photo;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final height = context.sizes.inputHeight * 2 + context.space.lg;
+    final empty = Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconBubble(icon: Symbols.photo_camera_rounded, size: context.sizes.bubbleLg),
+        context.space.gapSm,
+        Text(label, style: context.text.labelMedium?.copyWith(color: context.colors.primary)),
+      ],
+    );
     return Semantics(
       button: true,
       label: label,
@@ -260,18 +390,11 @@ class _PhotoBox extends StatelessWidget {
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () {},
+          onTap: onTap,
           child: SizedBox(
             width: context.sizes.photoPreview * 0.68,
             height: height,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconBubble(icon: Symbols.photo_camera_rounded, size: context.sizes.bubbleLg),
-                context.space.gapSm,
-                Text(label, style: context.text.labelMedium?.copyWith(color: context.colors.primary)),
-              ],
-            ),
+            child: photo == null ? empty : StoredPhoto(photoKey: photo!, placeholder: empty),
           ),
         ),
       ),
@@ -281,59 +404,67 @@ class _PhotoBox extends StatelessWidget {
 
 // ---------------------------------------------------------------- E05
 
-/// E05 — scan the QR code on an ear tag. UI phase: the viewfinder without
-/// the live camera (P03 asks for the camera permission first).
-class ScanTagPage extends StatelessWidget {
-  const new({required this.onTypeTag, super.key});
+/// The animal tag in a scanned code: our printed labels hold
+/// "farmtap:animal:FT-014"; any other QR is read as the tag itself.
+String tagFromQr(String code) {
+  const prefix = 'farmtap:animal:';
+  final c = code.trim();
+  return c.startsWith(prefix) ? c.substring(prefix.length) : c;
+}
+
+/// E05 — scan the QR code on an ear tag with the camera. The animal found
+/// goes to [onAnimal]; an unknown code says so and keeps scanning.
+class ScanTagPage extends StatefulWidget {
+  const new({required this.onTypeTag, super.key, this.repo, this.onAnimal});
 
   final VoidCallback onTypeTag;
+  final HerdRepository? repo;
+  final ValueChanged<Animal>? onAnimal;
+
+  @override
+  State<ScanTagPage> createState() => _ScanTagPageState();
+}
+
+class _ScanTagPageState extends State<ScanTagPage> {
+  bool _busy = false;
+
+  Future<void> _found(String code) async {
+    final repo = widget.repo;
+    if (repo == null || _busy) return;
+    setState(() => _busy = true);
+    final tag = tagFromQr(code);
+    final animal = (await repo.findByTag(tag)).data;
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (animal == null) {
+      FarmTapToast.show(
+        context,
+        message: AppLocalizations.of(context).noAnimalWithTag(tag),
+        tone: FarmTapTone.warning,
+        icon: Symbols.search_off_rounded,
+      );
+      return;
+    }
+    widget.onAnimal?.call(animal);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final on = context.status.onViewfinder;
     return AdaptiveScaffold(
       title: l10n.scanTag,
       showNavigation: false,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AspectRatio(
-            aspectRatio: context.isCompact ? context.sizes.viewfinderAspect : context.sizes.viewfinderAspectWide,
-            child: Container(
-              decoration: BoxDecoration(color: context.status.viewfinder, borderRadius: context.radii.dialog),
-              padding: EdgeInsets.all(context.space.xl),
-              child: Column(
-                children: [
-                  Text(
-                    l10n.pointAtQr,
-                    textAlign: TextAlign.center,
-                    style: context.text.titleSmall?.copyWith(color: on),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: context.space.xl),
-                      child: const _ScanFrame(),
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        tooltip: l10n.torch,
-                        onPressed: () {},
-                        icon: Icon(Symbols.flash_on_rounded, color: on, size: context.sizes.iconLg),
-                      ),
-                      context.space.gapXl,
-                      IconButton(
-                        tooltip: l10n.typeTagInstead,
-                        onPressed: onTypeTag,
-                        icon: Icon(Symbols.dialpad_rounded, color: on, size: context.sizes.iconLg),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          QrScanView(
+            prompt: l10n.pointAtQr,
+            paused: _busy,
+            onCode: _found,
+            extraAction: IconButton(
+              tooltip: l10n.typeTagInstead,
+              onPressed: widget.onTypeTag,
+              icon: Icon(Symbols.dialpad_rounded, color: context.status.onViewfinder, size: context.sizes.iconLg),
             ),
           ),
           context.space.gapLg,
@@ -341,69 +472,12 @@ class ScanTagPage extends StatelessWidget {
             label: l10n.typeTagInstead,
             icon: Symbols.dialpad_rounded,
             kind: ButtonKind.outlined,
-            onPressed: onTypeTag,
+            onPressed: widget.onTypeTag,
           ),
         ],
       ),
     );
   }
-}
-
-/// Four corner brackets and a gold scan line.
-class _ScanFrame extends StatelessWidget {
-  const new();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _FramePainter(
-        corner: context.status.viewfinderAccent,
-        line: context.status.brandGold,
-        stroke: context.sizes.scanFrameStroke,
-        arm: context.sizes.scanFrameArm,
-      ),
-      child: const SizedBox.expand(),
-    );
-  }
-}
-
-class _FramePainter extends CustomPainter {
-  new({required this.corner, required this.line, required this.stroke, required this.arm});
-
-  final Color corner;
-  final Color line;
-  final double stroke;
-  final double arm;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final side = size.shortestSide;
-    final rect = Rect.fromCenter(center: size.center(Offset.zero), width: side, height: side);
-    final p = Paint()
-      ..color = corner
-      ..strokeWidth = stroke
-      ..style = PaintingStyle.stroke;
-    for (final (o, dx, dy) in [
-      (rect.topLeft, 1.0, 1.0),
-      (rect.topRight, -1.0, 1.0),
-      (rect.bottomLeft, 1.0, -1.0),
-      (rect.bottomRight, -1.0, -1.0),
-    ]) {
-      canvas
-        ..drawLine(o, o + Offset(arm * dx, 0), p)
-        ..drawLine(o, o + Offset(0, arm * dy), p);
-    }
-    canvas.drawLine(
-      Offset(rect.left + arm / 2, rect.center.dy),
-      Offset(rect.right - arm / 2, rect.center.dy),
-      Paint()
-        ..color = line
-        ..strokeWidth = stroke / 1.5,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_FramePainter old) => old.corner != corner || old.line != line;
 }
 
 // ---------------------------------------------------------------- E09
@@ -443,9 +517,7 @@ class HeadCountPage extends StatelessWidget {
                   children: [
                     HeroCard(label: l10n.totalAnimals, value: '${c.total}', animation: FarmTapAnimations.cowGrazing),
                     context.space.gapLg,
-                    ResponsiveGrid(
-                      minItemWidth: context.sizes.gridMetric,
-                      spacing: context.space.lg,
+                    MetricStrip(
                       children: [
                         MetricCard(icon: Symbols.water_drop_rounded, label: l10n.milkingCows, value: '${c.milking}'),
                         MetricCard(
@@ -573,6 +645,7 @@ class QrLabelsPage extends StatelessWidget {
                     return ResponsiveGrid(
                       minItemWidth: (c.maxWidth - context.space.md * (cols - 1)) / cols,
                       maxColumns: cols,
+                      fillLastRow: false,
                       spacing: context.space.md,
                       children: [for (final a in animals) _QrLabel(animal: a)],
                     );

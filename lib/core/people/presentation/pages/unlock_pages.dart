@@ -4,11 +4,13 @@ import 'dart:async';
 
 import 'package:farm_tap/core/auth/presentation/widgets/auth_widgets.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
+import 'package:farm_tap/core/nfc/card_reader.dart';
+import 'package:farm_tap/core/nfc/card_tap_listener.dart';
 import 'package:farm_tap/core/people/domain/staff_access_repository.dart';
 import 'package:farm_tap/core/people/domain/staff_member.dart';
+import 'package:farm_tap/core/people/presentation/widgets/choose_pin_sheet.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -25,8 +27,7 @@ class TapCardPage extends StatefulWidget {
     super.key,
     this.onOwnerSignIn,
     this.onSwitchFarm,
-    this.onOpenSettings,
-    this.showSimulate = kDebugMode,
+    this.showSimulate = false,
   });
 
   final String farmName;
@@ -37,7 +38,6 @@ class TapCardPage extends StatefulWidget {
   final VoidCallback onTypeNumber;
   final VoidCallback? onOwnerSignIn;
   final VoidCallback? onSwitchFarm;
-  final VoidCallback? onOpenSettings;
 
   /// Debug builds only: pretend card 0142 was tapped.
   final bool showSimulate;
@@ -54,8 +54,8 @@ class _TapCardPageState extends State<TapCardPage> {
   }
 
   Future<void> _checkNfc() async {
-    if (await widget.access.nfcAvailable() || !mounted) return;
-    await showNfcOffDialog(context, onOpenSettings: widget.onOpenSettings, onTypeNumber: widget.onTypeNumber);
+    if ((await widget.access.nfcAvailable() && await CardReader.instance.available()) || !mounted) return;
+    await showNfcOffDialog(context, onTypeNumber: widget.onTypeNumber);
   }
 
   void _simulate() {
@@ -66,63 +66,66 @@ class _TapCardPageState extends State<TapCardPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return CenteredLayout(
-      bottom: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FarmTapButton(
-            label: l10n.enterCardInstead,
-            icon: Symbols.dialpad_rounded,
-            kind: ButtonKind.outlined,
-            onPressed: widget.onTypeNumber,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextAction(label: l10n.ownerSignIn, onPressed: widget.onOwnerSignIn, small: true),
-              ExcludeSemantics(child: Text(' · ', style: context.text.labelMedium)),
-              TextAction(label: l10n.switchFarm2, onPressed: widget.onSwitchFarm, small: true),
-            ],
-          ),
-          if (widget.showSimulate) TextAction(label: l10n.simulateTap, onPressed: _simulate, small: true),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FarmTapLogo(height: context.sizes.authLogoHeight),
-          Text(widget.farmName, style: context.text.bodySmall),
-          context.space.gapXxl,
-          FarmTapAnimationView(animation: FarmTapAnimations.tapCard, size: context.sizes.animationMd),
-          context.space.gapXxl,
-          Text(l10n.tapYourCard, textAlign: TextAlign.center, style: context.text.titleMedium),
-          context.space.gapXs,
-          Text(l10n.tapYourCardBody, textAlign: TextAlign.center, style: context.text.bodySmall),
-        ],
+    return CardTapListener(
+      onCard: widget.onCard,
+      prompt: l10n.tapYourCard,
+      child: CenteredLayout(
+        bottom: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (ScanCardButton.needed) ...[ScanCardButton(label: l10n.scanCard), context.space.gapMd],
+            FarmTapButton(
+              label: l10n.enterCardInstead,
+              icon: Symbols.dialpad_rounded,
+              kind: ButtonKind.outlined,
+              onPressed: widget.onTypeNumber,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextAction(label: l10n.ownerSignIn, onPressed: widget.onOwnerSignIn, small: true),
+                ExcludeSemantics(child: Text(' · ', style: context.text.labelMedium)),
+                TextAction(label: l10n.switchFarm2, onPressed: widget.onSwitchFarm, small: true),
+              ],
+            ),
+            if (widget.showSimulate) TextAction(label: l10n.simulateTap, onPressed: _simulate, small: true),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FarmTapLogo(height: context.sizes.authLogoHeight),
+            Text(widget.farmName, style: context.text.bodySmall),
+            context.space.gapXxl,
+            FarmTapAnimationView(animation: FarmTapAnimations.tapCard, size: context.sizes.animationMd),
+            context.space.gapXxl,
+            Text(l10n.tapYourCard, textAlign: TextAlign.center, style: context.text.titleMedium),
+            context.space.gapXs,
+            Text(l10n.tapYourCardBody, textAlign: TextAlign.center, style: context.text.bodySmall),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// C05 — NFC is turned off.
-Future<void> showNfcOffDialog(BuildContext context, {VoidCallback? onOpenSettings, VoidCallback? onTypeNumber}) async {
+/// C05 — NFC is turned off (or the phone has none): type the number. The
+/// person turns NFC on in the phone's own settings; the page reads cards
+/// again when it next opens.
+Future<void> showNfcOffDialog(BuildContext context, {VoidCallback? onTypeNumber}) async {
   final l10n = AppLocalizations.of(context);
-  final settings = await showFarmTapDialog(
+  final type = await showFarmTapDialog(
     context,
     icon: Symbols.contactless_rounded,
     tone: FarmTapTone.gold,
     title: l10n.nfcOffTitle,
     message: l10n.nfcOffBody,
-    primaryLabel: l10n.openSettings,
-    primaryIcon: Symbols.settings_rounded,
-    secondaryLabel: l10n.typeCardNumber,
+    primaryLabel: l10n.typeCardNumber,
+    primaryIcon: Symbols.dialpad_rounded,
+    secondaryLabel: l10n.cancel,
     secondaryKind: ButtonKind.text,
   );
-  if (settings) {
-    onOpenSettings?.call();
-  } else {
-    onTypeNumber?.call();
-  }
+  if (type) onTypeNumber?.call();
 }
 
 /// C02 — type the card number.
@@ -193,7 +196,18 @@ class _CardNumberPageState extends State<CardNumberPage> {
 /// C03 — enter your PIN; C04 is the wrong-PIN state (dots shake, red ring,
 /// tries left). After 5 wrong tries the card locks for 5 minutes.
 class StaffPinPage extends StatefulWidget {
-  const new({required this.staff, required this.access, required this.onUnlocked, super.key, this.onNotMe});
+  const new({
+    required this.staff,
+    required this.access,
+    required this.onUnlocked,
+    super.key,
+    this.onNotMe,
+    this.onNewPin,
+  });
+
+  /// A manager set this PIN: the worker chooses their own before going on
+  /// (decision 0016 §5). Saves it; null skips the step.
+  final Future<void> Function(StaffMember staff, String pin)? onNewPin;
 
   final StaffMember staff;
   final StaffAccessRepository access;
@@ -224,6 +238,18 @@ class _StaffPinPageState extends State<StaffPinPage> {
     if (!mounted) return;
     _busy = false;
     if (check is PinAccepted) {
+      final save = widget.onNewPin;
+      if (check.mustChange && save != null) {
+        final pin = await showChooseNewPin(context, name: widget.staff.greetingName);
+        if (!mounted) return;
+        if (pin == null) {
+          setState(() => _pin = '');
+          return;
+        }
+        await save(widget.staff, pin);
+        if (!mounted) return;
+        FarmTapToast.show(context, message: AppLocalizations.of(context).pinChangedToast);
+      }
       widget.onUnlocked(widget.staff);
       return;
     }
@@ -261,6 +287,7 @@ class _StaffPinPageState extends State<StaffPinPage> {
         children: [
           PersonAvatar(
             name: widget.staff.name,
+            photo: widget.staff.photo,
             size: context.sizes.avatarReadBack,
             ring: true,
             ringColor: _wrong ? context.status.danger : null,

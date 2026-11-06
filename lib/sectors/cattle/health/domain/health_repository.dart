@@ -18,6 +18,15 @@ abstract interface class TreatmentRepository {
   Future<Result<TreatmentRecord>> addTreatment(NewTreatment input);
   Future<Result<List<HealthTask>>> schedule();
   Future<Result<void>> addTask(HealthTask task);
+
+  /// H05: a dipping, deworming or vaccination job was done.
+  Future<Result<void>> setTaskDone(String taskId, {required bool done});
   Future<Result<Drug>> addDrug({required String name, required double stock, required int withdrawalDays});
+
+  /// H04 "Bought more": adds to the stock; a [price] is a vet expense.
+  Future<Result<void>> restockDrug(String drugId, {required double amount, int? price});
+
+  /// H04 "Count": what is on the shelf now.
+  Future<Result<void>> setDrugStock(String drugId, double stock);
   List<String> get vets;
 }

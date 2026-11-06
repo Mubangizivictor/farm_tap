@@ -52,7 +52,23 @@ void main() {
     await tester.enterText(fields.at(0), 'Muhwezi Robert');
     await tester.enterText(fields.at(1), 'muhwezi.robert@gmail.com');
     await tester.enterText(fields.at(2), 'secret123');
+    await tester.enterText(fields.at(3), 'secret123');
     await tester.tap(find.byType(Checkbox));
+    await tester.tap(find.byType(FarmTapButton));
+    await tester.pump();
+    expect(find.text('Add a capital letter, a small letter and a number.'), findsOneWidget);
+    expect(created, isNull);
+
+    await tester.enterText(fields.at(2), 'Secret123');
+    await tester.enterText(fields.at(3), 'Secret124');
+    await tester.tap(find.byType(FarmTapButton));
+    await tester.pump();
+    expect(find.text('The passwords do not match.'), findsOneWidget);
+    expect(created, isNull);
+
+    await tester.tap(find.text('Suggest a strong password'));
+    await tester.pump();
+    expect(find.textContaining('Suggested: '), findsOneWidget);
     await tester.tap(find.byType(FarmTapButton));
     await tester.pump();
     expect(created, 'muhwezi.robert@gmail.com');

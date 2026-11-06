@@ -24,6 +24,17 @@ abstract class HerdRepository {
   /// E08: the animal moves to "Past animals"; records are kept.
   Future<Result<void>> recordDeath(String animalId, {String? cause});
 
+  /// E04 in edit mode: saves changed details (name, tag, breed, status,
+  /// group, photo). False when another animal already has the tag.
+  Future<Result<bool>> updateAnimal(Animal animal);
+
+  /// E06 "Sold": the animal moves to past animals and the price is farm
+  /// income.
+  Future<Result<void>> recordSale(String animalId, {required int price, String? buyer});
+
+  /// Animals that died or were sold (E02 "Past animals").
+  Future<Result<List<Animal>>> pastAnimals();
+
   /// E07: a calf is added and linked to its mother; returns the calf.
   Future<Result<Animal>> recordCalving(String motherId, {required DateTime at});
 }

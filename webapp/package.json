@@ -1,0 +1,31 @@
+{
+  "name": "farmtap-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FarmTap for Chrome and other browsers (decision 0017). Online only.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "npx serve out",
+    "typecheck": "tsc --noEmit",
+    "check:tokens": "node scripts/check-tokens.mjs",
+    "check": "npm run typecheck && npm run check:tokens && npm test",
+    "test": "node --test --experimental-strip-types src/lib/*.test.ts"
+  },
+  "dependencies": {
+    "firebase": "12.19.0",
+    "next": "16.4.2",
+    "pdf-lib": "1.17.1",
+    "react": "19.2.9",
+    "react-dom": "19.2.9"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=20.9"
+  }
+}

@@ -1,12 +1,13 @@
 import 'package:farm_tap/core/error/result.dart';
+import 'package:farm_tap/core/sync/record_journal.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_models.dart';
 import 'package:farm_tap/sectors/cattle/health/domain/health_repository.dart';
 
 /// UI phase: the H01-H06 sample treatments. Milk, herd and home fakes read
 /// withdrawal from this one store.
-class FakeTreatmentRepository implements TreatmentRepository {
-  new(this.clock) {
+class FakeTreatmentRepository implements TreatmentRepository, Restorable {
+  new(this.clock, {this.journal}) {
     final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
     _records = [
@@ -80,6 +81,9 @@ class FakeTreatmentRepository implements TreatmentRepository {
   }
 
   final Clock clock;
+
+  /// Saves records on the phone for sync (decision 0014); null in tests.
+  final RecordJournal? journal;
   late List<TreatmentRecord> _records;
   late List<HealthTask> _schedule;
   late List<Drug> _drugList = List.of(_drugs);
@@ -157,10 +161,56 @@ class FakeTreatmentRepository implements TreatmentRepository {
   Future<Result<List<TreatableAnimal>>> animals() async => const Result.success(_animals);
 
   @override
+  Future<void> restore() async {
+    final j = journal;
+    if (j == null) return;
+    for (final r in await j.load('stockItems')) {
+      if (r.body['kind'] != 'drug' || _drugList.any((d) => d.id == r.id)) continue;
+      final name = r.body['name'] as String? ?? '';
+      _drugList = [
+        ..._drugList,
+        Drug(
+          id: r.id,
+          name: name,
+          shortName: name.split(' ').first,
+          withdrawalDays: r.body['withdrawalDays'] as int? ?? 0,
+          stock: (r.body['stock'] as num? ?? 0).toDouble(),
+        ),
+      ];
+    }
+    final saved = await j.load('treatments')
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    for (final r in saved) {
+      if (_records.any((x) => x.id == r.id)) continue;
+      final b = r.body;
+      final a = _animals.where((a) => a.id == b['animalId']).firstOrNull;
+      final drug = _drugList.where((d) => d.id == b['drugId']).firstOrNull;
+      if (a == null || drug == null) continue;
+      final record = TreatmentRecord(
+        id: r.id,
+        animalId: a.id,
+        animalName: a.name,
+        tag: a.tag,
+        avatarIndex: a.avatarIndex,
+        condition: Condition.values.byName(b['condition']! as String),
+        drug: drug,
+        given: DateTime.parse(b['given']! as String),
+        courseDays: 3,
+        animalDry: a.dry,
+        dose: b['dose'] as String?,
+        route: DrugRoute.values.byName(b['route']! as String),
+        givenBy: b['givenBy'] as String?,
+      );
+      // Same rule as addTreatment: the newest course per animal.
+      _records = [record, ..._records.where((x) => x.animalId != a.id)];
+    }
+  }
+
+  @override
   Future<Result<TreatmentRecord>> addTreatment(NewTreatment input) async {
     final a = _animals.firstWhere((a) => a.id == input.animalId);
     final record = TreatmentRecord(
-      id: 'treat-${_next++}',
+      id: journal?.newId() ?? 'treat-${_next++}',
       animalId: a.id,
       animalName: a.name,
       tag: a.tag,
@@ -173,31 +223,92 @@ class FakeTreatmentRepository implements TreatmentRepository {
       dose: input.dose,
       route: input.route,
       givenBy: input.givenBy,
+      photo: input.photo,
+      note: input.note,
     );
     // One open course per animal: the new record replaces the old one.
     _records = [record, ..._records.where((r) => r.animalId != a.id)];
+    await journal?.add('treatments', {
+      'animalId': a.id,
+      'condition': input.condition.name,
+      'drugId': input.drugId,
+      'withdrawalDays': record.drug.withdrawalDays,
+      'given': input.given.toIso8601String(),
+      'dose': input.dose,
+      'route': input.route.name,
+      'givenBy': input.givenBy,
+      'photo': input.photo,
+      'note': input.note,
+    }, id: record.id);
     return Result.success(record);
   }
 
   @override
-  Future<Result<List<HealthTask>>> schedule() async => Result.success(_schedule);
+  Future<Result<List<HealthTask>>> schedule() async => Result.success([
+    for (final t in _schedule)
+      if (!_doneTasks.contains(t.id.isEmpty ? t.title : t.id)) t,
+  ]);
 
   @override
   Future<Result<void>> addTask(HealthTask task) async {
     _schedule = [..._schedule, task]..sort((a, b) => a.due.compareTo(b.due));
+    await journal?.add('reminders', {'kind': 'health', 'title': task.title, 'due': task.due.toIso8601String()});
     return const Result.success(null);
   }
 
   @override
+  Future<Result<void>> setTaskDone(String taskId, {required bool done}) async {
+    done ? _doneTasks.add(taskId) : _doneTasks.remove(taskId);
+    return const Result.success(null);
+  }
+
+  final Set<String> _doneTasks = {};
+
+  @override
+  Future<Result<void>> restockDrug(String drugId, {required double amount, int? price}) async {
+    _drugList = [
+      for (final d in _drugList)
+        if (d.id == drugId) _withStock(d, d.stock + amount) else d,
+    ];
+    return const Result.success(null);
+  }
+
+  @override
+  Future<Result<void>> setDrugStock(String drugId, double stock) async {
+    _drugList = [
+      for (final d in _drugList)
+        if (d.id == drugId) _withStock(d, stock) else d,
+    ];
+    return const Result.success(null);
+  }
+
+  static Drug _withStock(Drug d, double stock) => Drug(
+    id: d.id,
+    name: d.name,
+    shortName: d.shortName,
+    withdrawalDays: d.withdrawalDays,
+    stock: stock,
+    unit: d.unit,
+    reorderAt: d.reorderAt,
+    inStockList: d.inStockList,
+  );
+
+  @override
   Future<Result<Drug>> addDrug({required String name, required double stock, required int withdrawalDays}) async {
     final drug = Drug(
-      id: 'drug-${_next++}',
+      id: journal?.newId() ?? 'drug-${_next++}',
       name: name,
       shortName: name.split(' ').first,
       withdrawalDays: withdrawalDays,
       stock: stock,
     );
     _drugList = [..._drugList, drug];
+    await journal?.add('stockItems', {
+      'kind': 'drug',
+      'name': name,
+      'stock': stock,
+      'withdrawalDays': withdrawalDays,
+    }, id: drug.id);
     return Result.success(drug);
   }
 

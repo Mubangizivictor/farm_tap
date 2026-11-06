@@ -7,6 +7,7 @@ import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/avatars.dart';
 import 'package:farm_tap/core/ui/controls.dart';
+import 'package:farm_tap/core/ui/farmtap_loader.dart';
 import 'package:farm_tap/core/ui/navigation_scope.dart';
 import 'package:farm_tap/core/ui/status_banner.dart';
 import 'package:flutter/material.dart';
@@ -191,6 +192,9 @@ class AdaptiveScaffold extends StatelessWidget {
             onSyncTap: onSyncTap,
           );
     final useDrawer = form == FormFactor.compact && showMenu && sidebar != null;
+    // Decision 0013: tab roots on phones and tablets get the brand bar (farm + role,
+    // sync, alerts, profile) and the page title moves to a header under it.
+    final brand = form != FormFactor.expanded && !hasBack && !useDrawer && farm != null && (showLogo || title != null);
     final showBottomBar = form == FormFactor.compact && nav != null && !useDrawer && showNavigation;
     final topBar = form == FormFactor.expanded
         ? _WideTopBar(
@@ -204,6 +208,18 @@ class AdaptiveScaffold extends StatelessWidget {
             hasNotifications: hasNotifications,
             onNotificationsTap: onNotificationsTap,
             onSearchChanged: onSearchChanged,
+          )
+        : brand
+        ? _BrandBar(
+            farm: farm,
+            showSync: showSync,
+            syncState: syncState,
+            pendingCount: pendingCount,
+            onSyncTap: onSyncTap,
+            hasNotifications: hasNotifications,
+            onNotificationsTap: onNotificationsTap,
+            profileName: profileName,
+            onProfileTap: onProfileTap,
           )
         : _AppBar(
             title: title,
@@ -240,6 +256,7 @@ class AdaptiveScaffold extends StatelessWidget {
         child: Column(
           children: [
             topBar,
+            if (brand && title != null && !showLogo) PageHeader(title: title!, subtitle: subtitle, actions: actions),
             Expanded(child: content),
           ],
         ),
@@ -308,14 +325,173 @@ class _Content extends StatelessWidget {
     if (!scrollable) return framed;
     final refresh = onRefresh;
     if (refresh == null) return SingleChildScrollView(child: framed);
-    return RefreshIndicator(
+    return _LogoRefresh(
       onRefresh: refresh,
       child: SingleChildScrollView(physics: const AlwaysScrollableScrollPhysics(), child: framed),
     );
   }
 }
 
+/// Pull to refresh with the FarmTap loader at the top instead of the
+/// Material spinner.
+class _LogoRefresh extends StatefulWidget {
+  const new({required this.onRefresh, required this.child});
+
+  final RefreshCallback onRefresh;
+  final Widget child;
+
+  @override
+  State<_LogoRefresh> createState() => _LogoRefreshState();
+}
+
+class _LogoRefreshState extends State<_LogoRefresh> {
+  RefreshIndicatorStatus? _status;
+
+  @override
+  Widget build(BuildContext context) {
+    final showing = switch (_status) {
+      RefreshIndicatorStatus.armed || RefreshIndicatorStatus.snap || RefreshIndicatorStatus.refresh => true,
+      _ => false,
+    };
+    return Stack(
+      children: [
+        RefreshIndicator.noSpinner(
+          onRefresh: widget.onRefresh,
+          onStatusChange: (s) {
+            if (mounted && s != _status) setState(() => _status = s);
+          },
+          child: widget.child,
+        ),
+        if (showing)
+          Positioned(
+            top: context.space.md,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: context.colors.surfaceContainerLowest,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: context.colors.outlineVariant, width: context.sizes.borderThin),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(context.space.sm),
+                  child: FarmTapLoader(size: context.sizes.iconXl),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 // ---------------------------------------------------------------- compact/medium
+
+/// Phone tab roots (decision 0013): logo mark, farm name over "place · role",
+/// then sync, alerts and the profile avatar.
+class _BrandBar extends StatelessWidget {
+  const new({
+    required this.farm,
+    required this.showSync,
+    required this.syncState,
+    required this.pendingCount,
+    required this.hasNotifications,
+    this.onSyncTap,
+    this.onNotificationsTap,
+    this.profileName,
+    this.onProfileTap,
+  });
+
+  final FarmSwitcherInfo farm;
+  final bool showSync;
+  final SyncState syncState;
+  final int pendingCount;
+  final VoidCallback? onSyncTap;
+  final bool hasNotifications;
+  final VoidCallback? onNotificationsTap;
+  final String? profileName;
+  final VoidCallback? onProfileTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final side = context.space.side(context.formFactor);
+    return Container(
+      height: context.sizes.appBarHeight,
+      padding: EdgeInsets.symmetric(horizontal: side),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: context.colors.outlineVariant, width: context.sizes.borderThin),
+        ),
+      ),
+      child: Row(
+        children: [
+          // The rail already shows the mark on tablets.
+          if (context.formFactor == FormFactor.compact) ...[const FarmTapLogoMark(), context.space.gapMd],
+          Expanded(
+            child: InkWell(
+              onTap: farm.onTap,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(farm.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.titleSmall),
+                  Text(farm.subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.bodySmall),
+                ],
+              ),
+            ),
+          ),
+          if (showSync) SyncBadge(state: syncState, pending: pendingCount, onTap: onSyncTap),
+          if (onNotificationsTap != null)
+            BarAction(
+              icon: Symbols.notifications_rounded,
+              tooltip: l10n.alerts,
+              badge: hasNotifications,
+              onPressed: onNotificationsTap,
+            ),
+          if (profileName != null && context.formFactor == FormFactor.compact) ...[
+            context.space.gapSm,
+            PersonAvatar(name: profileName!, ring: true, size: context.sizes.avatarXs, onTap: onProfileTap),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Page title (18) and one-line subtitle under the brand bar, with the
+/// page's own actions on the right (decision 0013).
+class PageHeader extends StatelessWidget {
+  const new({required this.title, super.key, this.subtitle, this.actions = const []});
+
+  final String title;
+  final String? subtitle;
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    final side = context.space.side(context.formFactor);
+    return Padding(
+      padding: EdgeInsets.fromLTRB(side, context.space.md, side - context.space.xs, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.titleLarge),
+                if (subtitle != null)
+                  Text(subtitle!, maxLines: 2, overflow: TextOverflow.ellipsis, style: context.text.bodySmall),
+              ],
+            ),
+          ),
+          for (final a in actions) a,
+        ],
+      ),
+    );
+  }
+}
 
 class _AppBar extends StatelessWidget {
   const new({

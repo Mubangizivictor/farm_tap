@@ -41,13 +41,11 @@ void main() {
       expect(trial.trialBanner(DateTime(2026, 11, 17)), isNull);
     });
 
-    test('overdue payment: 7 days grace, then read-only', () {
+    test('plan ends -> locked the same day, no grace (decision 0023)', () {
       final paid = Subscription(trialEndsAt: DateTime(2026, 11, 21), paidUntil: DateTime(2026, 12, 21));
       expect(paid.state(DateTime(2026, 12, 20)), SubscriptionState.active);
-      expect(paid.state(DateTime(2026, 12, 21)), SubscriptionState.grace);
-      expect(paid.graceDaysLeft(DateTime(2026, 12, 21)), 7);
-      expect(paid.state(DateTime(2026, 12, 27)), SubscriptionState.grace);
-      expect(paid.state(DateTime(2026, 12, 28)), SubscriptionState.readOnly);
+      expect(paid.state(DateTime(2026, 12, 21)), SubscriptionState.readOnly);
+      expect(paid.graceDaysLeft(DateTime(2026, 12, 21)), 0);
     });
   });
 

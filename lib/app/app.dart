@@ -1,9 +1,10 @@
+import 'dart:async';
+
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/app/flavor.dart';
 import 'package:farm_tap/app/router/app_dependencies.dart';
 import 'package:farm_tap/app/router/app_router.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
-import 'package:farm_tap/core/l10n/nyn_delegates.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/theme/farmtap_theme.dart';
 import 'package:farm_tap/core/utils/clock.dart';
@@ -35,31 +36,34 @@ class _FarmTapAppState extends State<FarmTapApp> {
     return ClockScope(
       clock: getIt<Clock>(),
       child: BlocProvider(
-        create: (_) => AppSettingsCubit(),
+        create: (_) {
+          final settings = AppSettingsCubit();
+          unawaited(settings.load());
+          return settings;
+        },
         child: BlocBuilder<AppSettingsCubit, AppSettings>(
-          buildWhen: (a, b) => a.languageCode != b.languageCode,
-          builder: (context, settings) => _app(Locale(settings.languageCode)),
+          buildWhen: (a, b) => a.themeMode != b.themeMode,
+          builder: (context, settings) => _app(settings.themeMode),
         ),
       ),
     );
   }
 
-  Widget _app(Locale locale) {
+  Widget _app(ThemeMode themeMode) {
     return MaterialApp.router(
       title: widget.config.appName,
-      locale: locale,
+      locale: const Locale('en'),
       theme: FarmTapTheme.light,
       darkTheme: FarmTapTheme.dark,
+      themeMode: themeMode,
       routerConfig: _router,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
-        RunyankoreMaterialLocalizationsDelegate(),
-        RunyankoreCupertinoLocalizationsDelegate(),
       ],
-      supportedLocales: const [Locale('en'), Locale('nyn')],
+      supportedLocales: const [Locale('en')],
       debugShowCheckedModeBanner: false,
     );
   }

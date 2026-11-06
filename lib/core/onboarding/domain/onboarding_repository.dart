@@ -2,11 +2,12 @@ import 'package:farm_tap/core/error/result.dart';
 import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
 import 'package:farm_tap/core/tenancy/domain/farm_membership.dart';
 
-abstract interface class OnboardingRepository {
-  /// Districts offered on B06 (Western Uganda first).
-  List<String> get districts;
+/// Failure message when the account already owns as many farms as its plan
+/// allows (one, unless on a multi-farm plan; decision 0018).
+const farmLimitReached = 'farm-limit';
 
-  /// Creates the farm and starts the 14-day trial (B10).
+abstract interface class OnboardingRepository {
+  /// Creates the farm and starts the free trial (B10).
   Future<Result<FarmMembership>> createFarm(FarmSetup setup);
 
   /// Day the free trial ends for a farm created now.

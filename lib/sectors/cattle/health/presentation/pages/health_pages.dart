@@ -80,7 +80,7 @@ class HealthHomePage extends StatelessWidget {
         future: _load(),
         builder: (context, snapshot) {
           final data = snapshot.data;
-          if (data == null) return const SizedBox.shrink();
+          if (data == null) return const FarmTapPageLoader();
           final (records, tasks, drugs) = data;
           final active = records.where((r) => r.active(now)).toList();
           final blocked = records.where((r) => r.inWithdrawal(now)).length;
@@ -90,10 +90,7 @@ class HealthHomePage extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ResponsiveGrid(
-                minItemWidth: context.sizes.gridMetric,
-                maxColumns: 3,
-                spacing: context.space.lg,
+              MetricStrip(
                 children: [
                   MetricCard(
                     icon: Symbols.medication_rounded,
@@ -189,7 +186,15 @@ class _AddTreatmentPageState extends State<AddTreatmentPage> {
   DrugRoute _route = DrugRoute.injection;
   String? _vet;
   late final _dose = TextEditingController(text: widget.initialCondition == null ? '' : '20 ml');
+  final _note = TextEditingController();
   bool _dirty = false;
+  String? _photo;
+
+  Future<void> _takePhoto() async {
+    final key = await pickPhoto(context, canRemove: _photo != null);
+    if (key == null || !mounted) return;
+    _touch(() => _photo = key.isEmpty ? null : key);
+  }
 
   Future<(List<TreatableAnimal>, List<Drug>)> _fetch() async {
     final animals = (await widget.repo.animals()).data ?? const <TreatableAnimal>[];
@@ -203,6 +208,7 @@ class _AddTreatmentPageState extends State<AddTreatmentPage> {
   @override
   void dispose() {
     _dose.dispose();
+    _note.dispose();
     super.dispose();
   }
 
@@ -269,6 +275,8 @@ class _AddTreatmentPageState extends State<AddTreatmentPage> {
         dose: _dose.text.trim().isEmpty ? null : _dose.text.trim(),
         route: _route,
         givenBy: _vet,
+        photo: _photo,
+        note: _note.text.trim().isEmpty ? null : _note.text.trim(),
       ),
     )).data;
     if (saved == null || !mounted) return;
@@ -303,8 +311,13 @@ class _AddTreatmentPageState extends State<AddTreatmentPage> {
           child: AdaptiveScaffold(
             title: l10n.newTreatment,
             showNavigation: false,
-            body: data == null || animal == null
-                ? const SizedBox.shrink()
+            body: data == null
+                ? const FarmTapPageLoader()
+                : animal == null
+                ? SizedBox(
+                    height: context.sizes.photoPreview * 3,
+                    child: EmptyState(title: l10n.emptyHerdTitle, message: l10n.addAnimalsFirst),
+                  )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -356,6 +369,13 @@ class _AddTreatmentPageState extends State<AddTreatmentPage> {
                         ],
                       ),
                       context.space.gapMd,
+                      FarmTapTextField(
+                        label: _condition == Condition.other ? l10n.diseaseName : l10n.whatYouSee,
+                        icon: Symbols.visibility_rounded,
+                        controller: _note,
+                        onChanged: (_) => _touch(() {}),
+                      ),
+                      context.space.gapMd,
                       FarmTapSelectField<Drug>(
                         label: l10n.drugLabel,
                         icon: Symbols.medication_rounded,
@@ -395,6 +415,8 @@ class _AddTreatmentPageState extends State<AddTreatmentPage> {
                         value: _vet,
                         labelOf: (v) => v,
                         onChanged: (v) => _touch(() => _vet = v),
+                        picker: (c) =>
+                            showSearchPicker(c, title: l10n.givenBy, options: widget.repo.vets, selected: _vet),
                       ),
                       if (drug != null) ...[
                         context.space.gapLg,
@@ -412,14 +434,27 @@ class _AddTreatmentPageState extends State<AddTreatmentPage> {
                             title: l10n.noWithdrawal,
                           ),
                       ],
+                      if (_photo != null) ...[
+                        context.space.gapLg,
+                        ClipRRect(
+                          borderRadius: context.radii.card,
+                          child: SizedBox(
+                            height: context.sizes.photoPreview,
+                            child: StoredPhoto(
+                              photoKey: _photo!,
+                              placeholder: const IconBubble(icon: Symbols.photo_camera_rounded),
+                            ),
+                          ),
+                        ),
+                      ],
                       context.space.gapLg,
                       ButtonPair(
                         forceRow: true,
                         first: FarmTapButton(
-                          label: l10n.addPhoto,
+                          label: _photo == null ? l10n.addPhoto : l10n.changePhoto,
                           icon: Symbols.photo_camera_rounded,
                           kind: ButtonKind.outlined,
-                          onPressed: () {},
+                          onPressed: _takePhoto,
                         ),
                         second: FarmTapButton(
                           label: l10n.save,
@@ -453,6 +488,17 @@ class _DrugStockPageState extends State<DrugStockPage> {
   Future<List<Drug>> _fetch() async =>
       ((await widget.repo.drugs()).data ?? const <Drug>[]).where((d) => d.inStockList).toList();
 
+  Future<void> _openDrug(Drug d) async {
+    final l10n = AppLocalizations.of(context);
+    final done = await showAdaptiveSheet<bool>(
+      context,
+      builder: (_) => _DrugStockSheet(repo: widget.repo, drug: d),
+    );
+    if (done != true || !mounted) return;
+    FarmTapToast.show(context, message: l10n.stockSaved);
+    setState(() => _load = _fetch());
+  }
+
   Future<void> _add() async {
     final drug = await showAdaptiveSheet<Drug>(context, builder: (_) => _AddDrugSheet(repo: widget.repo));
     if (drug == null || !mounted) return;
@@ -484,8 +530,8 @@ class _DrugStockPageState extends State<DrugStockPage> {
                         icon: Symbols.warning_rounded,
                         title: l10n.drugIsLow(d.shortName),
                         message: l10n.drugLowBody(f.count(d.stock)),
-                        actionLabel: l10n.reorder,
-                        onAction: () => FarmTapToast.show(context, message: l10n.reorderNoted),
+                        actionLabel: l10n.boughtMore,
+                        onAction: () => _openDrug(d),
                       ),
                       context.space.gapLg,
                     ],
@@ -513,7 +559,7 @@ class _DrugStockPageState extends State<DrugStockPage> {
                         ].join(' · '),
                         badge: d.low ? StatusBadge(label: l10n.lowBadge, tone: FarmTapTone.warning) : null,
                         trailingValue: d.unit == DrugUnit.litres ? '${f.litresValue(d.stock)} L' : f.count(d.stock),
-                        onTap: () {},
+                        onTap: () => _openDrug(d),
                       ),
                       columns: [
                         RecordColumn(
@@ -626,6 +672,90 @@ class _AddDrugSheetState extends State<_AddDrugSheet> {
   }
 }
 
+/// H04 tap on a drug: "Bought more" (adds stock, price is a vet expense)
+/// or "Count" (sets what is on the shelf).
+class _DrugStockSheet extends StatefulWidget {
+  const new({required this.repo, required this.drug});
+
+  final TreatmentRepository repo;
+  final Drug drug;
+
+  @override
+  State<_DrugStockSheet> createState() => _DrugStockSheetState();
+}
+
+class _DrugStockSheetState extends State<_DrugStockSheet> {
+  final _amount = TextEditingController();
+  final _price = TextEditingController();
+  bool _count = false;
+  bool _tried = false;
+
+  @override
+  void dispose() {
+    _amount.dispose();
+    _price.dispose();
+    super.dispose();
+  }
+
+  double? get _value => double.tryParse(_amount.text.replaceAll(',', '.').trim());
+
+  Future<void> _save() async {
+    setState(() => _tried = true);
+    final v = _value;
+    if (v == null || v < 0 || (!_count && v == 0)) return;
+    if (_count) {
+      await widget.repo.setDrugStock(widget.drug.id, v);
+    } else {
+      final price = int.tryParse(_price.text.replaceAll(RegExp('[^0-9]'), ''));
+      await widget.repo.restockDrug(widget.drug.id, amount: v, price: price);
+    }
+    if (mounted) Navigator.of(context).pop(true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final f = _fmt(context);
+    final d = widget.drug;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SheetTitle(d.name, subtitle: '${_stockText(l10n, f, d)} · ${l10n.withdrawalDaysLine(d.withdrawalDays)}'),
+        context.space.gapMd,
+        SegmentedTabs<bool>(
+          options: [
+            TabOption(value: false, label: l10n.boughtMore),
+            TabOption(value: true, label: l10n.countStock),
+          ],
+          selected: _count,
+          onChanged: (v) => setState(() => _count = v),
+        ),
+        context.space.gapMd,
+        FarmTapTextField(
+          label: _count ? l10n.howManyNow : l10n.howManyBought,
+          icon: Symbols.inventory_2_rounded,
+          controller: _amount,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          autofocus: true,
+          error: _tried && (_value == null || _value! < 0) ? l10n.enterAmount : null,
+        ),
+        if (!_count) ...[
+          context.space.gapMd,
+          FarmTapTextField(
+            label: l10n.pricePaidOptional,
+            controller: _price,
+            prefixText: 'UGX ',
+            keyboardType: TextInputType.number,
+          ),
+        ],
+        context.space.gapLg,
+        FarmTapButton(label: l10n.save, icon: Symbols.check_rounded, onPressed: _save),
+      ],
+    );
+  }
+}
+
 // ---------------------------------------------------------------- H05
 
 class HealthCalendarPage extends StatefulWidget {
@@ -655,6 +785,22 @@ class _HealthCalendarPageState extends State<HealthCalendarPage> {
     HealthTaskKind.deworming => FarmTapTone.gold,
     HealthTaskKind.vaccination => FarmTapTone.success,
   };
+
+  Future<void> _done(HealthTask t) async {
+    final l10n = AppLocalizations.of(context);
+    final ok = await showFarmTapDialog(
+      context,
+      icon: Symbols.check_circle_rounded,
+      title: l10n.markJobDone(t.title),
+      primaryLabel: l10n.markDone,
+      secondaryLabel: l10n.cancel,
+    );
+    if (!ok || !mounted) return;
+    await widget.repo.setTaskDone(t.id.isEmpty ? t.title : t.id, done: true);
+    if (!mounted) return;
+    FarmTapToast.show(context, message: l10n.jobDone);
+    setState(() => _load = _fetch());
+  }
 
   Future<void> _add() async {
     final task = await showAdaptiveSheet<HealthTask>(
@@ -694,22 +840,26 @@ class _HealthCalendarPageState extends State<HealthCalendarPage> {
                 onChanged: (v) => setState(() => _month = v),
               ),
               context.space.gapLg,
-              FarmTapCard(
-                child: _month
-                    ? _MonthGrid(month: now, tasks: tasks, toneOf: _tone)
-                    : Timeline(
-                        entries: [
-                          for (final t in tasks)
-                            TimelineEntry(
-                              icon: _icon(t.kind),
-                              title: t.title,
-                              subtitle: t.detail,
-                              time: when(t.due),
-                              tone: _tone(t.kind),
-                            ),
-                        ],
+              if (_month)
+                FarmTapCard(
+                  child: _MonthGrid(month: now, tasks: tasks, toneOf: _tone),
+                )
+              else if (snapshot.hasData && tasks.isEmpty)
+                EmptyState(title: l10n.noHealthJobs, message: l10n.noHealthJobsBody)
+              else
+                ListCard(
+                  children: [
+                    for (final t in tasks)
+                      RecordTile(
+                        leading: IconBubble(icon: _icon(t.kind), tone: _tone(t.kind), size: context.sizes.bubbleMd),
+                        title: t.title,
+                        subtitle: t.detail.isEmpty ? null : t.detail,
+                        trailingValue: when(t.due),
+                        trailingSub: t.due.isBefore(DateTime(now.year, now.month, now.day)) ? l10n.overdue : null,
+                        onTap: () => _done(t),
                       ),
-              ),
+                  ],
+                ),
               context.space.gapLg,
               FarmTapButton(
                 label: l10n.addToCalendar,

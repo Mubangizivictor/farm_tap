@@ -8,9 +8,9 @@ Use the available **width** of the window, never the device type.
 
 | Class | Width | Navigation | Content | Popups |
 |---|---|---|---|---|
-| Compact | < 600 dp (phones, mobile web) | Bottom navigation bar (5 items) | One column, 16 dp side padding | Bottom sheets; dialogs full-width minus 32 dp |
-| Medium | 600–1279 dp (tablets portrait and landscape, small laptops) | Navigation rail (left, 96 dp): Home, Herd, Milk, Collect, Health, Workers, More | Grids of 2–3 columns, 24 dp padding | Centered dialogs (max 560 dp) |
-| Expanded | ≥ 1280 dp (desktop web) | Sidebar (264 dp) with farm switcher, trial card, sync status; top bar with search, notifications, profile | Max content width 1120 dp, centered; 32 dp padding; lists become tables | Centered dialogs (max 560 dp); toasts bottom-right |
+| Compact | < 600 dp (phones, mobile web) | Bottom navigation bar (5 items) | One column, 12 dp side padding | Bottom sheets; dialogs full-width minus 32 dp |
+| Medium | 600–1279 dp (tablets portrait and landscape, small laptops) | Navigation rail (left, 80 dp): Home, Herd, Milk, Collect, Health, Workers, More | Grids of 2–3 columns, 20 dp padding | Centered dialogs (max 560 dp) |
+| Expanded | ≥ 1280 dp (desktop web) | Sidebar (240 dp) with farm switcher, trial card, sync status; top bar with search, notifications, profile | Max content width 1120 dp, centered; 24 dp padding; lists become tables | Centered dialogs (max 560 dp); toasts bottom-right |
 
 ### Rules so any NEW screen fits automatically
 1. Build every screen inside `AdaptiveScaffold` (shared shell): it picks bottom bar / rail / sidebar.
@@ -27,6 +27,7 @@ Use the available **width** of the window, never the device type.
 - "Both" farms show the farm bar plus a Collect shortcut on Home.
 - Rail (7 items): Home · Herd · Milk · Collect · Health · Workers · More. "More" opens the remaining sections (Feeding, Breeding, Money, Reports, Settings).
 - Sidebar shows all 11 sections: Home, Herd, Milk, Collection centre, Health, Feeding, Breeding, Workers, Money, Reports, Settings.
+- Layout density, type scale and the phone brand bar + page header pattern: decision 0013 (`docs/decisions/0013-compact-ui-redesign.md`). It replaces the mockups as the layout reference.
 - Breakpoints changed by decision 0012 (`docs/decisions/0012-tablet-rail-breakpoint.md`).
 - Back arrow on every non-root screen. Android back closes sheets and dialogs first.
 
@@ -86,7 +87,7 @@ Rules:
 ## 6. Low-literacy rules (every screen)
 
 - Numbers, icons and photos first; text second. Every action has an icon.
-- Minimum touch target 48 dp; primary buttons 56 dp; keypad keys 64 dp+.
+- Minimum touch target 48 dp; primary buttons 48 dp; keypad keys 56 dp+ (decision 0013: compact visuals, hit areas never below 48).
 - One main action per screen; it is the biggest, filled button.
 - Read-back before any save that affects money or milk ("Bihogo — 9.5 litres — Is this correct?").
 - Voice prompts (Runyankore) on key steps when enabled in Settings.

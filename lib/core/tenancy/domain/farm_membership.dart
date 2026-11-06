@@ -1,8 +1,16 @@
 import 'package:equatable/equatable.dart';
+import 'package:farm_tap/core/onboarding/domain/farm_setup.dart';
+
+export 'package:farm_tap/core/onboarding/domain/farm_setup.dart' show Sector;
 
 enum PlaceKind { dairyFarm, collectionCentre }
 
 enum PlaceRole { owner, manager, clerk, worker }
+
+/// Length of the free trial for a new farm (Victor, 4 Nov 2026; decision
+/// 0023). The control panel can change it for new farms (platform/config
+/// trialDays); the server caps what a phone may set.
+const freeTrialDays = 14;
 
 /// What the farm may do today. Calculated from [Subscription], never stored.
 enum SubscriptionState { trial, active, grace, readOnly }
@@ -15,14 +23,15 @@ class Subscription extends Equatable {
   /// Day the free trial started (end of onboarding).
   final DateTime? trialStartedAt;
 
-  /// First day without the free trial (14 days after onboarding).
+  /// First day without the free trial ([freeTrialDays] after onboarding).
   final DateTime? trialEndsAt;
 
   /// First day not covered by the last payment.
   final DateTime? paidUntil;
 
-  /// An overdue payment gets 7 days' grace before read-only.
-  static const graceDays = 7;
+  /// No grace (decision 0023): the farm locks the day its plan ends, the
+  /// same as firestore.rules. Support extends paid-until when needed.
+  static const graceDays = 0;
 
   static DateTime _day(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -52,9 +61,10 @@ class Subscription extends Equatable {
   int graceDaysLeft(DateTime today) =>
       paidUntil == null ? 0 : _daysBetween(today, _day(paidUntil!).add(const Duration(days: graceDays)));
 
-  /// Trial length in days (14) and how many are used ("5 of 14").
-  int get trialLength =>
-      trialStartedAt == null || trialEndsAt == null ? 14 : _day(trialEndsAt!).difference(_day(trialStartedAt!)).inDays;
+  /// Trial length in days and how many are used ("5 of 7").
+  int get trialLength => trialStartedAt == null || trialEndsAt == null
+      ? freeTrialDays
+      : _day(trialEndsAt!).difference(_day(trialStartedAt!)).inDays;
 
   int trialDaysUsed(DateTime today) => trialLength - trialDaysLeft(today);
 
@@ -77,7 +87,16 @@ class FarmMembership extends Equatable {
     required this.role,
     required this.subscription,
     this.avatarIndex = 1,
+    this.sector = Sector.dairy,
+    this.village,
+    this.herdSize,
+    this.withCentre = false,
+    this.staffId,
   });
+
+  /// Set when a worker signed in with phone + PIN (decision 0016 §5): the
+  /// staff record they are. Null for owners and managers with an account.
+  final String? staffId;
 
   final String tenantId;
   final String name;
@@ -89,6 +108,54 @@ class FarmMembership extends Equatable {
   final Subscription subscription;
   final int avatarIndex;
 
+  /// What the farm does (chosen at B02). Picks the farm's picture and words.
+  final Sector sector;
+
+  /// Village or parish under the district, when given ("Kashari").
+  final String? village;
+
+  /// Animals at set-up (cows for dairy); null for a centre.
+  final int? herdSize;
+
+  /// A dairy farm that also runs a milk collection centre (B05 "both").
+  final bool withCentre;
+
+  /// The same farm with new subscription dates (after a payment).
+  FarmMembership withSubscription(Subscription s) => FarmMembership(
+    tenantId: tenantId,
+    name: name,
+    place: place,
+    kind: kind,
+    role: role,
+    subscription: s,
+    avatarIndex: avatarIndex,
+    sector: sector,
+    village: village,
+    herdSize: herdSize,
+    withCentre: withCentre,
+    staffId: staffId,
+  );
+
+  /// The account owns this farm (counts towards the farm limit).
+  bool get owned => role == PlaceRole.owner;
+
   @override
-  List<Object?> get props => [tenantId, name, place, kind, role, subscription, avatarIndex];
+  List<Object?> get props => [
+    tenantId,
+    name,
+    place,
+    kind,
+    role,
+    subscription,
+    avatarIndex,
+    sector,
+    village,
+    herdSize,
+    withCentre,
+    staffId,
+  ];
 }
+
+/// How many farms one account may own. One by default; a multi-farm plan
+/// (set by Victorbee on the server, never from the app) raises it.
+const defaultFarmLimit = 1;

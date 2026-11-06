@@ -57,7 +57,6 @@ void main() {
         staffId: 'staff-np',
         farmName: 'Rwemera Dairy Farm',
         onDone: () {},
-        showSimulate: false,
       ),
       current: '/workers',
       parent: '/workers',
@@ -67,7 +66,7 @@ void main() {
   screenGoldens('K04_attendance', (_) {
     final r = repo();
     return inShell(
-      AttendancePage(repo: r, directory: staff, now: now, showSimulate: false),
+      AttendancePage(repo: r, directory: staff, now: now),
       current: '/workers',
       parent: '/workers',
     );

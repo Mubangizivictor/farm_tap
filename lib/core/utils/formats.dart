@@ -8,7 +8,7 @@ class FarmTapFormat {
   /// BCP-47 tag, e.g. Localizations.localeOf(context).toLanguageTag().
   final String locale;
 
-  // Runyankore has no CLDR data yet: fall back to English patterns.
+  // Unknown locales fall back to English patterns.
   String get _l => DateFormat.localeExists(locale) ? locale : 'en';
 
   String money(num ugx) => 'UGX ${NumberFormat.decimalPattern(_l).format(ugx.round())}';

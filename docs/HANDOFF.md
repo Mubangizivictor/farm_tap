@@ -62,6 +62,14 @@ docs/design/screens/{phone,tablet,web_desktop,web_mobile}/{light,dark}/<ID>_<nam
   every section commit. "This month" = calendar month everywhere (owner
   decision in Section L): F10 1,965.5 L, I01 UGX 938/L.
 
+- Launch pack (decision 0024, 4 Nov 2026): phone Contacts, Duty roster,
+  Feeds store, Vaccinations, Reminders, Plan and payment + receipts, trial
+  lock screen, delete account (90-day hold), profile photo, legal links;
+  web landing/legal/deletion/receipts; admin legal, brand, website,
+  refunds, deleted accounts. Store pack in docs/store/, Blaze switch-on in
+  docs/BLAZE.md (`bash tool/activate-blaze.sh`). Non-golden Flutter tests
+  pass (266); goldens are made on Victor's Mac only.
+
 ## Decisions to keep (from review)
 - Data wins over mockup when mockups disagree (e.g. E03 "5 days left",
   H02 new treatment "Wed 11 Nov").

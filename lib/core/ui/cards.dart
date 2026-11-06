@@ -3,6 +3,7 @@ import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/animation_view.dart';
 import 'package:farm_tap/core/ui/buttons.dart';
 import 'package:farm_tap/core/ui/icon_bubble.dart';
+import 'package:farm_tap/core/ui/responsive_grid.dart';
 import 'package:farm_tap/core/ui/status_badge.dart';
 import 'package:farm_tap/core/ui/tone.dart';
 import 'package:flutter/material.dart';
@@ -76,10 +77,10 @@ class SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: context.space.xl,
+      height: context.space.xxl,
       child: Row(
         children: [
-          Expanded(child: Text(label.toUpperCase(), style: context.textStyles.sectionLabel)),
+          Expanded(child: Text(label, style: context.textStyles.sectionLabel)),
           if (actionLabel != null)
             InkWell(
               onTap: onAction,
@@ -289,7 +290,7 @@ class MetricCard extends StatelessWidget {
           ),
           context.space.gapMd,
           Text(label, style: context.textStyles.metricLabel, maxLines: 1, overflow: TextOverflow.ellipsis),
-          context.space.gapXs,
+          context.space.gapXxs,
           // One line: long money values ("UGX 1.52M") shrink to fit.
           FittedBox(
             fit: BoxFit.scaleDown,
@@ -310,7 +311,7 @@ class MetricCard extends StatelessWidget {
             ),
           ),
           if (caption != null) ...[
-            context.space.gapSm,
+            context.space.gapXxs,
             Text(caption!, style: context.text.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
           ],
         ],
@@ -360,8 +361,8 @@ class RecordTile extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: dense ? context.sizes.listTileDense : context.sizes.listTile),
         child: Padding(
-          // Rows in lists sit about 76 apart (D03, D04); dense rows 8.
-          padding: EdgeInsets.symmetric(vertical: dense ? context.space.sm : context.space.lg),
+          // Compact rows (decision 0013): 8 above and below, dense 6.
+          padding: EdgeInsets.symmetric(vertical: dense ? context.space.sm : context.space.md),
           child: Row(
             children: [
               if (leading != null)
@@ -374,10 +375,18 @@ class RecordTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: context.text.titleSmall),
+                    // Badge sits on the title line (decision 0013), wrapping under it when narrow.
+                    Wrap(
+                      spacing: context.space.md,
+                      runSpacing: context.space.xxs,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: context.text.titleSmall),
+                        ?badge,
+                      ],
+                    ),
                     if (subtitle != null)
                       Text(subtitle!, maxLines: 2, overflow: TextOverflow.ellipsis, style: context.text.bodySmall),
-                    if (badge != null) ...[SizedBox(height: context.space.xs + context.space.xxs), badge!],
                   ],
                 ),
               ),
@@ -405,7 +414,7 @@ class RecordTile extends StatelessWidget {
   }
 }
 
-/// Quick-action tile: 110 tall (124 with subtitle), radius 18, card + border,
+/// Quick-action tile (decision 0013): compact row, min 56 (60 with subtitle), bubble 32, label titleSmall, optional subtitle bodySmall.
 /// IconBubble 52, label titleSmall, optional subtitle bodySmall.
 /// When [locked] (read-only after the trial) it shows a lock and ignores taps.
 class ActionTile extends StatelessWidget {
@@ -453,41 +462,44 @@ class ActionTile extends StatelessWidget {
             constraints: BoxConstraints(
               minHeight: subtitle == null ? context.sizes.actionTile : context.sizes.actionTileWithSubtitle,
             ),
-            padding: EdgeInsets.fromLTRB(context.space.lg, context.space.lg, context.space.lg, context.space.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+            padding: EdgeInsets.symmetric(horizontal: context.space.lg, vertical: context.space.md),
+            // Decision 0013: compact row tile (bubble, label, subtitle).
+            child: Row(
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    IconBubble(icon: icon, tone: locked ? FarmTapTone.neutral : tone, size: context.sizes.bubbleLg),
-                    const Spacer(),
-                    if (selected)
-                      Icon(
-                        Symbols.check_circle_rounded,
-                        fill: 1,
-                        size: context.sizes.iconMd,
-                        color: context.colors.primary,
+                IconBubble(icon: icon, tone: locked ? FarmTapTone.neutral : tone, size: context.sizes.bubbleSm),
+                context.space.gapMd,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        label,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.text.titleSmall?.copyWith(
+                          color: locked ? context.colors.onSurfaceVariant : null,
+                        ),
                       ),
-                    if (locked)
-                      Icon(
-                        Symbols.lock_rounded,
-                        fill: 1,
-                        size: context.sizes.iconSm,
-                        color: context.colors.onSurfaceVariant,
-                      ),
-                  ],
+                      if (subtitle != null)
+                        Text(subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.bodySmall),
+                    ],
+                  ),
                 ),
-                context.space.gapSm,
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.text.titleSmall?.copyWith(color: locked ? context.colors.onSurfaceVariant : null),
-                ),
-                if (subtitle != null)
-                  Text(subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis, style: context.text.bodySmall),
+                if (selected)
+                  Icon(
+                    Symbols.check_circle_rounded,
+                    fill: 1,
+                    size: context.sizes.iconMd,
+                    color: context.colors.primary,
+                  ),
+                if (locked)
+                  Icon(
+                    Symbols.lock_rounded,
+                    fill: 1,
+                    size: context.sizes.iconSm,
+                    color: context.colors.onSurfaceVariant,
+                  ),
               ],
             ),
           ),
@@ -690,6 +702,107 @@ class SummaryRow extends StatelessWidget {
             context.space.gapMd,
             Text(value, textAlign: TextAlign.end, style: valueStyle),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Metric cards in one horizontal, swipeable row on phones; a grid on wider
+/// screens (decision 0013: the whole dashboard fits the first screen).
+class MetricStrip extends StatelessWidget {
+  const new({required this.children, super.key});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final gap = context.space.md;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= FarmTapBreakpoints.medium) {
+          return ResponsiveGrid(
+            minItemWidth: context.sizes.gridMetric,
+            maxColumns: children.length.clamp(1, 6),
+            spacing: gap,
+            children: children,
+          );
+        }
+        final n = children.length;
+        if (n * context.sizes.metricStripMin + (n - 1) * gap <= constraints.maxWidth) {
+          // Everything fits: one row of equal cards.
+          return IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < n; i++) ...[if (i > 0) SizedBox(width: gap), Expanded(child: children[i])],
+              ],
+            ),
+          );
+        }
+        // Cards scroll out under the side padding (no clip), like CONC.
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.none,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < children.length; i++) ...[
+                  if (i > 0) SizedBox(width: gap),
+                  SizedBox(width: context.sizes.metricStripItem, child: children[i]),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Small quick action: bubble over a one-line label, 4 across on phones
+/// (decision 0013, like the CONC "More" tiles).
+class QuickActionTile extends StatelessWidget {
+  const new({required this.icon, required this.label, super.key, this.tone = FarmTapTone.primary, this.onTap});
+
+  final IconData icon;
+  final String label;
+  final FarmTapTone tone;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      enabled: onTap != null,
+      child: Material(
+        color: context.status.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: context.radii.tile,
+          side: BorderSide(color: context.colors.outlineVariant, width: context.sizes.borderThin),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            constraints: BoxConstraints(minHeight: context.sizes.quickAction),
+            padding: EdgeInsets.symmetric(horizontal: context.space.xs, vertical: context.space.md),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconBubble(icon: icon, tone: tone, size: context.sizes.bubbleMd),
+                context.space.gapSm,
+                Text(
+                  label,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.text.labelMedium,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

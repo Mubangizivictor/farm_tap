@@ -191,7 +191,7 @@ IoT  phases 2+ (per sector)                       Gate GI
 | SMS | Ugandan bulk SMS provider via Cloud Functions | Server-side only; no Android SMS permission |
 | WhatsApp | WhatsApp Business Platform (Cloud API) via Cloud Functions | Approved message templates |
 | Payments | MTN MoMo / Airtel Money API or licensed aggregator | Phase B |
-| AI (V1.x) | Firebase AI Logic (`firebase_ai`) + Gemini | Section 13 |
+| AI (V1.x) | Free, self-hosted only: shared TypeScript engine; optional Ollama + Qwen3 (decision 0025 replaces Gemini) | Section 13 |
 | IoT (V1.x+) | Bluetooth LE (scales); ESP32 devices posting to Cloud Functions over HTTPS | Section 12 |
 | Web (V1.x) | Next.js + TypeScript + Tailwind on Cloudflare (OpenNext) | Website first, dashboard later |
 | Lints | very_good_analysis | |
@@ -1002,7 +1002,9 @@ Warm introductions -> visit at the right time (milk centres after morning collec
 | 0007 | Onboarding chooses sector; only Dairy active; others join waitlist; collects WhatsApp + SMS numbers with consent | 31 Oct 2026 |
 | 0008 | Dairy first and complete (V1 + V1.x) before any other sector | 31 Oct 2026 |
 | 0009 | IoT (FarmTap Sense) added: Phase 0 Bluetooth scale/printer, Phase 1 cold-chain pilot; no cattle GPS trackers | 31 Oct 2026 |
-| 0010 | Ask FarmTap AI via Firebase AI Logic in V1.1, with vet-safety and privacy rules | 31 Oct 2026 |
+| 0010 | Ask FarmTap AI via Firebase AI Logic in V1.1, with vet-safety and privacy rules (technology replaced by 0025) | 31 Oct 2026 |
+| 0025 | Free AI Intelligence: calculated and statistical engine in shared/, no paid AI, optional self-hosted Ollama | 6 Nov 2026 |
+| 0014 | Offline-first data layer: Isar record store + outbox + sync engine; Firestore rules; Phase 1 and 2 together | 3 Nov 2026 |
 
 ---
 

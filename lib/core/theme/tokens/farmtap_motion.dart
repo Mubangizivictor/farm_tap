@@ -7,12 +7,13 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
     this.fast = const Duration(milliseconds: 150),
     this.normal = const Duration(milliseconds: 250),
     this.slow = const Duration(milliseconds: 400),
-    this.splash = const Duration(milliseconds: 2000),
+    this.splash = const Duration(milliseconds: 900),
     this.snackBar = const Duration(seconds: 3),
     this.shake = const Duration(milliseconds: 300),
     this.celebration = const Duration(milliseconds: 1800),
     this.autoAdvance = const Duration(seconds: 2),
     this.undoWindow = const Duration(seconds: 5),
+    this.scanResult = const Duration(seconds: 4),
     this.standard = Curves.easeOutCubic,
     this.emphasized = Curves.easeOutBack,
     this.exit = Curves.easeInCubic,
@@ -22,7 +23,7 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
   final Duration normal;
   final Duration slow;
 
-  /// How long the animated splash plays before moving on.
+  /// Shortest time the animated splash shows (it also waits for start-up).
   final Duration splash;
 
   /// How long confirmation messages stay on screen.
@@ -40,6 +41,10 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
   /// How long Undo stays available on a saved delivery.
   final Duration undoWindow;
 
+  /// Scan station: how long a person's ID stays up before the next card
+  /// (decision 0016 §4).
+  final Duration scanResult;
+
   final Curve standard;
   final Curve emphasized;
   final Curve exit;
@@ -55,6 +60,7 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
     Duration? celebration,
     Duration? autoAdvance,
     Duration? undoWindow,
+    Duration? scanResult,
     Curve? standard,
     Curve? emphasized,
     Curve? exit,
@@ -68,6 +74,7 @@ class FarmTapMotion extends ThemeExtension<FarmTapMotion> {
     celebration: celebration ?? this.celebration,
     autoAdvance: autoAdvance ?? this.autoAdvance,
     undoWindow: undoWindow ?? this.undoWindow,
+    scanResult: scanResult ?? this.scanResult,
     standard: standard ?? this.standard,
     emphasized: emphasized ?? this.emphasized,
     exit: exit ?? this.exit,

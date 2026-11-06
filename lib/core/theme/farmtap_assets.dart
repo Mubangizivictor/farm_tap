@@ -26,6 +26,9 @@ abstract final class FarmTapAssets {
   static const wordmarkLight = '$_b/wordmark_light.png';
   static const wordmarkDark = '$_b/wordmark_dark.png';
 
+  // Google's own "G" for Continue with Google (brand guidelines).
+  static const googleG = '$_s/google_g.svg';
+
   // SVG versions (use with flutter_svg)
   static const logoMarkLightSvg = '$_s/logo_mark_light.svg';
   static const logoMarkDarkSvg = '$_s/logo_mark_dark.svg';
