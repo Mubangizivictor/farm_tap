@@ -4148,5 +4148,88 @@
   "aiPhotoSure": "Clear in the photo",
   "aiPhotoMaybe": "Possible",
   "aiPhotoUnsure": "Not sure",
-  "aiPhotoNewCheck": "Check another photo"
+  "aiPhotoNewCheck": "Check another photo",
+  "aiChatTitle": "FarmTap AI",
+  "aiChatNew": "New chat",
+  "aiChatTools": "Insights and tools",
+  "aiChatEmpty": "How can I help on your farm today?",
+  "aiChatThinking": "Thinking…",
+  "aiChatAbout": "About {name}",
+  "@aiChatAbout": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "aiChatSavedTo": "Saved to {name}’s history",
+  "@aiChatSavedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "aiChatDisclaimer": "FarmTap AI can make mistakes and never replaces your vet.",
+  "aiChatHint": "Ask anything…",
+  "aiChatSend": "Send",
+  "aiChatAttach": "Attach",
+  "aiChatVideo": "Choose a video",
+  "aiChatRecord": "Record a video",
+  "aiChatTooBig": "Those files are too big together. Remove one or use a shorter video.",
+  "aiChatFileLimit": "You can attach up to {count} files at a time.",
+  "@aiChatFileLimit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiChatNotOn": "Online AI is not switched on for FarmTap yet.",
+  "aiChatOffLimit": "Your farm has used all online AI answers for today.",
+  "aiChatFilesNotRead": "Files and photos could not be read.",
+  "aiChatOfflineHelp": "I can answer simple questions about your milk, animals, feed and money from your records, even without internet.",
+  "aiChatMedsLeftOut": "Some details about medicines were left out. Ask your vet.",
+  "aiChatLookAtThis": "Please look at what I attached.",
+  "aiChatHistory": "Chats",
+  "aiChatHistoryTitle": "Your chats",
+  "aiChatSearch": "Search your chats",
+  "aiChatNoChats": "Your chats will show here.",
+  "aiChatNoMatch": "No chat matches that.",
+  "aiChatSources": "Sources from Google",
+  "aiChatCopy": "Copy",
+  "aiChatCopied": "Copied",
+  "aiChatAgain": "Ask again",
+  "aiChatDetails": "Details for the FarmTap owner",
+  "aiChatStop": "Stop",
+  "aiChatDeleteChat": "Delete chat",
+  "aiChatStopped": "Stopped.",
+  "aiChatStoppedNote": "You stopped this answer.",
+  "aiChatKeptHere": "Kept on this phone only.",
+  "aiChatWhatsapp": "Send to my vet on WhatsApp",
+  "aiChatSharePhoto": "Share with photo",
+  "aiChatSeeMessage": "See the message",
+  "aiChatHideMessage": "Hide message",
+  "aiChatCopyMessage": "Copy message",
+  "aiChatWhileWaiting": "While you wait for the vet:",
+  "aiChatWhichCow": "Which cow is this?",
+  "aiChatWhichCowHint": "Choose it to save this answer in that cow’s history.",
+  "aiChatChooseCow": "Choose a cow",
+  "aiChatSave": "Save",
+  "aiChatNotNow": "Not now",
+  "aiChatVetHelp": "Help the vet help you",
+  "aiChatVetHelpHint": "Tap what you know. It goes into your message for the vet.",
+  "aiChatUpdateAdvice": "Update the advice with these",
+  "aiChatTempHint": "e.g. 40.5",
+  "aiChatAdd": "Add",
+  "aiChatLanguage": "Reply language",
+  "aiChatMessageCopied": "Message copied",
+  "aiChatWhatsappName": "WhatsApp {name}",
+  "@aiChatWhatsappName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

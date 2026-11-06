@@ -764,3 +764,52 @@ describe('AI Intelligence (decision 0025)', () => {
     await assertSucceeds(setDoc(doc(as('owner'), `tenants/${T}/settings/aiMilk`), rec('settings', 'aiMilk', { body: { rules: [] } })));
   });
 });
+
+describe('AI allowance and monitoring (decision 0028)', () => {
+  beforeEach(async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, 'platformAdmins/victor'), { role: 'owner', active: true });
+      await setDoc(doc(db, 'platformAdmins/fin'), { role: 'finance', perms: ['finance'], active: true });
+      await setDoc(doc(db, `tenants/${T}/aiUsage/2026-11-07`), { day: '2026-11-07', tenantId: T, used: 3, pending: {}, failed: 0, limitHits: 0, limit: 10, resetAt: 0 });
+      await setDoc(doc(db, `tenants/${T}/aiCache/abc`), { text: 'cached answer', tenantId: T });
+      await setDoc(doc(db, 'aiStats/2026-11-07'), { ok: 3 });
+      await setDoc(doc(db, `aiStats/2026-11-07/farms/${T}`), { ok: 3 });
+      await setDoc(doc(db, 'aiErrors/e1'), { kind: 'capacity' });
+    });
+  });
+  const usage = `tenants/${T}/aiUsage/2026-11-07`;
+
+  test('farm members read their own allowance; nobody can change it from an app', async () => {
+    await assertSucceeds(getDoc(doc(as('worker'), usage)));
+    await assertSucceeds(getDoc(doc(as('owner'), usage)));
+    for (const uid of ['worker', 'owner', 'victor'])
+      await assertFails(setDoc(doc(as(uid), usage), { day: '2026-11-07', tenantId: T, used: 0, pending: {}, failed: 0, limitHits: 0, limit: 999, resetAt: 0 }));
+    await assertFails(updateDoc(doc(as('owner'), usage), { used: 0 }));
+    await assertFails(deleteDoc(doc(as('owner'), usage)));
+    await assertFails(setDoc(doc(as('owner'), `tenants/${T}/aiUsage/2026-11-08`), rec('aiUsage', '2026-11-08')));
+  });
+
+  test('another farm cannot see the allowance or cached answers', async () => {
+    await assertFails(getDoc(doc(as('stranger'), usage)));
+    await assertFails(getDoc(doc(as('stranger'), `tenants/${T}/aiCache/abc`)));
+  });
+
+  test('cached AI answers are server-only, even for the farm itself and the panel', async () => {
+    await assertFails(getDoc(doc(as('owner'), `tenants/${T}/aiCache/abc`)));
+    await assertFails(getDocs(collection(as('owner'), `tenants/${T}/aiCache`)));
+    await assertFails(getDoc(doc(as('victor'), `tenants/${T}/aiCache/abc`)));
+    await assertFails(setDoc(doc(as('owner'), `tenants/${T}/aiCache/x`), rec('aiCache', 'x')));
+  });
+
+  test('AI totals and errors: admins with the right access read, farms and finance staff do not', async () => {
+    await assertSucceeds(getDoc(doc(as('victor'), 'aiStats/2026-11-07')));
+    await assertSucceeds(getDoc(doc(as('victor'), `aiStats/2026-11-07/farms/${T}`)));
+    await assertSucceeds(getDoc(doc(as('victor'), 'aiErrors/e1')));
+    await assertFails(getDoc(doc(as('owner'), 'aiStats/2026-11-07')));
+    await assertFails(getDoc(doc(as('owner'), `aiStats/2026-11-07/farms/${T}`)));
+    await assertFails(getDoc(doc(as('fin'), 'aiErrors/e1')));
+    await assertFails(setDoc(doc(as('victor'), 'aiStats/2026-11-07'), { ok: 0 }));
+    await assertFails(getDoc(doc(as('owner'), 'aiRate/owner')));
+  });
+});

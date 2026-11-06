@@ -382,3 +382,4 @@ export { farmAlerts } from './alerts';
 export { issueBillingDocs, issueRefundDocs } from './billingDocs';
 export { processRefund } from './refunds';
 export { onDeletionChange, eraseClosedAccounts } from './accounts';
+export { aiAssistant, aiUsageNow } from './ai';

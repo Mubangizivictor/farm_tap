@@ -15,7 +15,13 @@ String? phoneRouteForAiLink(String href) {
       final id = q['animal'];
       return id == null || id.isEmpty ? AppRoutes.herd : AppRoutes.herdAnimal(id);
     case '/health':
+      if (q['new'] == '1') {
+        final cow = q['animal'];
+        return cow == null || cow.isEmpty ? AppRoutes.healthTreatment : '${AppRoutes.healthTreatment}?animal=$cow';
+      }
       return AppRoutes.health;
+    case '/tasks':
+      return AppRoutes.workersTasks;
     case '/feeds':
       return AppRoutes.feeding;
     case '/breeding':
@@ -24,6 +30,8 @@ String? phoneRouteForAiLink(String href) {
       return AppRoutes.money;
     case '/reports':
       return AppRoutes.reports;
+    case '/contacts':
+      return AppRoutes.moreContacts;
     case '/farmers':
       final id = q['farmer'];
       return id == null || id.isEmpty ? AppRoutes.farmers : AppRoutes.centreFarmer(id);

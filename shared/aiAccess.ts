@@ -2,6 +2,7 @@
 // Display only: Firestore rules still decide what can be read at all.
 
 import { aiModules, type AiModule } from './aiCore.ts';
+import { assistantConfigFrom, defaultAssistantConfig, type AssistantConfig } from './aiQuota.ts';
 
 export type FarmRole = 'owner' | 'manager' | 'clerk' | 'worker' | string;
 
@@ -36,6 +37,8 @@ export interface AiConfig {
    * photo checks; the Google free tier has its own limits as well.
    */
   photo: { enabled: boolean; model: string; perFarmPerDay: number };
+  /** The AI chat (layer 3, decision 0028): switch, provider, model, daily allowance and limits. */
+  assistant: AssistantConfig;
   /** How many alerts "Today's insights" shows. */
   insightsCount: number;
 }
@@ -46,6 +49,7 @@ export const defaultAiConfig: AiConfig = {
   experimental: true,
   llm: { enabled: false, model: 'qwen3:4b', timeoutMs: 20000 },
   photo: { enabled: false, model: 'gemini-3.8-flash', perFarmPerDay: 20 },
+  assistant: defaultAssistantConfig,
   insightsCount: 5,
 };
 
@@ -71,6 +75,7 @@ export function aiConfigFrom(v: unknown): AiConfig {
       model: typeof ph.model === 'string' && /^[\w.\-]{3,64}$/.test(ph.model) ? ph.model : D.photo.model,
       perFarmPerDay: typeof ph.perFarmPerDay === 'number' && ph.perFarmPerDay >= 1 && ph.perFarmPerDay <= 500 ? Math.round(ph.perFarmPerDay) : D.photo.perFarmPerDay,
     },
+    assistant: assistantConfigFrom(o),
     insightsCount: typeof o.insightsCount === 'number' && o.insightsCount >= 1 && o.insightsCount <= 10 ? Math.round(o.insightsCount) : D.insightsCount,
   };
 }

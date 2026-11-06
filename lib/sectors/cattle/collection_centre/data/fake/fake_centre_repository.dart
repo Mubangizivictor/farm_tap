@@ -477,7 +477,10 @@ class FakeCentreRepository implements CentreRepository, Restorable {
         // Undone on another phone or the web: take it off the lists.
         final gone = _deliveries.where((d) => d.id == r.id).firstOrNull;
         if (gone == null) continue;
-        _deliveries = [for (final d in _deliveries) if (d.id != r.id) d];
+        _deliveries = [
+          for (final d in _deliveries)
+            if (d.id != r.id) d,
+        ];
         if (gone.rejectReason == null && !gone.at.isBefore(_day)) {
           _farmers = [
             for (final x in _farmers)

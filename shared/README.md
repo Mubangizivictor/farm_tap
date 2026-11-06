@@ -19,6 +19,10 @@ fails when a copy is out of date; the web and functions tests run it.
   `aiStock`, `aiMoney` (the analyses), `aiRisk` (all findings, ranked),
   `aiAccess` (roles and platform switches), `aiAssistant`, `aiVet`,
   `aiReports`, `aiPrivacy` (what may go to a self-hosted model),
-  `aiScreening` (experimental photo checks; no model installed). Tests:
-  `webapp/src/lib/ai.test.ts`. These files import each other with `.ts`
+  `aiScreening` (experimental photo checks; no model installed),
+  `aiInsights` (milk against the previous recording, record gaps, spending,
+  farm summary), `aiRoute` (which layer answers: records, built-in insight or
+  AI) and `aiQuota` (the AI assistant's settings, daily allowance, warnings
+  and error texts; decision 0028). Tests:
+  `webapp/src/lib/ai.test.ts`, `webapp/src/lib/aiLayers.test.ts`. These files import each other with `.ts`
   extensions; functions compile them with `rewriteRelativeImportExtensions`.

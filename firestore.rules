@@ -141,7 +141,9 @@ service cloud.firestore {
     function serverOnly(c) {
       return c in ['members', 'messages', 'aiQuestions', 'iotDevices', 'iotReadings', 'subscriptionPayments',
         // Reminders already delivered (decision 0024), kept by the server.
-        'alertLog'];
+        'alertLog',
+        // AI allowance and cached AI answers (decision 0028), kept by the server.
+        'aiUsage', 'aiCache'];
     }
 
     // The AI use log (decision 0025) holds only what was used and how it
@@ -311,9 +313,10 @@ service cloud.firestore {
       }
 
       match /{c}/{id} {
-        allow read: if member(t) && c != 'members';
+        // aiCache: answers kept by the server only (decision 0028); no app reads them.
+        allow read: if member(t) && c != 'members' && c != 'aiCache';
         // Open a farm read-only from the panel (decision 0020).
-        allow read: if c != 'members' && (can('farms') || can('support') || can('users') || can('finance'));
+        allow read: if c != 'members' && c != 'aiCache' && (can('farms') || can('support') || can('users') || can('finance'));
         // Support: reset a card PIN to a temporary one, or revoke a card.
         allow update: if c in ['staffPins', 'nfcCards'] && can('users') && audited()
           && validRecord(t, c, id)
@@ -521,6 +524,24 @@ service cloud.firestore {
     // only; aiLogOk keeps farm figures and names out of these records.
     match /{path=**}/aiLog/{id} {
       allow read: if can('farms') || can('support') || can('settings');
+    }
+    // AI totals, per-farm counts and provider errors for the AI Control Centre
+    // (decision 0028). Written only by the server; no farm figures or names.
+    match /aiStats/{day} {
+      allow read: if can('farms') || can('support') || can('settings');
+      allow write: if false;
+      match /farms/{t} {
+        allow read: if can('farms') || can('support') || can('settings');
+        allow write: if false;
+      }
+    }
+    match /aiErrors/{id} {
+      allow read: if can('settings');
+      allow write: if false;
+    }
+    // Questions per minute per person (abuse guard), server only.
+    match /aiRate/{uid} {
+      allow read, write: if false;
     }
     // Append-only log of every panel change.
     match /adminAudit/{id} {

@@ -10311,6 +10311,336 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Check another photo'**
   String get aiPhotoNewCheck;
+
+  /// No description provided for @aiChatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap AI'**
+  String get aiChatTitle;
+
+  /// No description provided for @aiChatNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New chat'**
+  String get aiChatNew;
+
+  /// No description provided for @aiChatTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Insights and tools'**
+  String get aiChatTools;
+
+  /// No description provided for @aiChatEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'How can I help on your farm today?'**
+  String get aiChatEmpty;
+
+  /// No description provided for @aiChatThinking.
+  ///
+  /// In en, this message translates to:
+  /// **'Thinking…'**
+  String get aiChatThinking;
+
+  /// No description provided for @aiChatAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About {name}'**
+  String aiChatAbout(String name);
+
+  /// No description provided for @aiChatSavedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {name}’s history'**
+  String aiChatSavedTo(String name);
+
+  /// No description provided for @aiChatDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap AI can make mistakes and never replaces your vet.'**
+  String get aiChatDisclaimer;
+
+  /// No description provided for @aiChatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask anything…'**
+  String get aiChatHint;
+
+  /// No description provided for @aiChatSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get aiChatSend;
+
+  /// No description provided for @aiChatAttach.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach'**
+  String get aiChatAttach;
+
+  /// No description provided for @aiChatVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a video'**
+  String get aiChatVideo;
+
+  /// No description provided for @aiChatRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a video'**
+  String get aiChatRecord;
+
+  /// No description provided for @aiChatTooBig.
+  ///
+  /// In en, this message translates to:
+  /// **'Those files are too big together. Remove one or use a shorter video.'**
+  String get aiChatTooBig;
+
+  /// No description provided for @aiChatFileLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You can attach up to {count} files at a time.'**
+  String aiChatFileLimit(int count);
+
+  /// No description provided for @aiChatNotOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Online AI is not switched on for FarmTap yet.'**
+  String get aiChatNotOn;
+
+  /// No description provided for @aiChatOffLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Your farm has used all online AI answers for today.'**
+  String get aiChatOffLimit;
+
+  /// No description provided for @aiChatFilesNotRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Files and photos could not be read.'**
+  String get aiChatFilesNotRead;
+
+  /// No description provided for @aiChatOfflineHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'I can answer simple questions about your milk, animals, feed and money from your records, even without internet.'**
+  String get aiChatOfflineHelp;
+
+  /// No description provided for @aiChatMedsLeftOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Some details about medicines were left out. Ask your vet.'**
+  String get aiChatMedsLeftOut;
+
+  /// No description provided for @aiChatLookAtThis.
+  ///
+  /// In en, this message translates to:
+  /// **'Please look at what I attached.'**
+  String get aiChatLookAtThis;
+
+  /// No description provided for @aiChatHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats'**
+  String get aiChatHistory;
+
+  /// No description provided for @aiChatHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your chats'**
+  String get aiChatHistoryTitle;
+
+  /// No description provided for @aiChatSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search your chats'**
+  String get aiChatSearch;
+
+  /// No description provided for @aiChatNoChats.
+  ///
+  /// In en, this message translates to:
+  /// **'Your chats will show here.'**
+  String get aiChatNoChats;
+
+  /// No description provided for @aiChatNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No chat matches that.'**
+  String get aiChatNoMatch;
+
+  /// No description provided for @aiChatSources.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources from Google'**
+  String get aiChatSources;
+
+  /// No description provided for @aiChatCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get aiChatCopy;
+
+  /// No description provided for @aiChatCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get aiChatCopied;
+
+  /// No description provided for @aiChatAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask again'**
+  String get aiChatAgain;
+
+  /// No description provided for @aiChatDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Details for the FarmTap owner'**
+  String get aiChatDetails;
+
+  /// No description provided for @aiChatStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get aiChatStop;
+
+  /// No description provided for @aiChatDeleteChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete chat'**
+  String get aiChatDeleteChat;
+
+  /// No description provided for @aiChatStopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped.'**
+  String get aiChatStopped;
+
+  /// No description provided for @aiChatStoppedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You stopped this answer.'**
+  String get aiChatStoppedNote;
+
+  /// No description provided for @aiChatKeptHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept on this phone only.'**
+  String get aiChatKeptHere;
+
+  /// No description provided for @aiChatWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to my vet on WhatsApp'**
+  String get aiChatWhatsapp;
+
+  /// No description provided for @aiChatSharePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Share with photo'**
+  String get aiChatSharePhoto;
+
+  /// No description provided for @aiChatSeeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'See the message'**
+  String get aiChatSeeMessage;
+
+  /// No description provided for @aiChatHideMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide message'**
+  String get aiChatHideMessage;
+
+  /// No description provided for @aiChatCopyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy message'**
+  String get aiChatCopyMessage;
+
+  /// No description provided for @aiChatWhileWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'While you wait for the vet:'**
+  String get aiChatWhileWaiting;
+
+  /// No description provided for @aiChatWhichCow.
+  ///
+  /// In en, this message translates to:
+  /// **'Which cow is this?'**
+  String get aiChatWhichCow;
+
+  /// No description provided for @aiChatWhichCowHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose it to save this answer in that cow’s history.'**
+  String get aiChatWhichCowHint;
+
+  /// No description provided for @aiChatChooseCow.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a cow'**
+  String get aiChatChooseCow;
+
+  /// No description provided for @aiChatSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get aiChatSave;
+
+  /// No description provided for @aiChatNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get aiChatNotNow;
+
+  /// No description provided for @aiChatVetHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Help the vet help you'**
+  String get aiChatVetHelp;
+
+  /// No description provided for @aiChatVetHelpHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap what you know. It goes into your message for the vet.'**
+  String get aiChatVetHelpHint;
+
+  /// No description provided for @aiChatUpdateAdvice.
+  ///
+  /// In en, this message translates to:
+  /// **'Update the advice with these'**
+  String get aiChatUpdateAdvice;
+
+  /// No description provided for @aiChatTempHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 40.5'**
+  String get aiChatTempHint;
+
+  /// No description provided for @aiChatAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get aiChatAdd;
+
+  /// No description provided for @aiChatLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply language'**
+  String get aiChatLanguage;
+
+  /// No description provided for @aiChatMessageCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Message copied'**
+  String get aiChatMessageCopied;
+
+  /// No description provided for @aiChatWhatsappName.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp {name}'**
+  String aiChatWhatsappName(String name);
 }
 
 class _AppLocalizationsDelegate

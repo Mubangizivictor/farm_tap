@@ -167,6 +167,11 @@ const OVERCLAIM = /\b(definitely|certainly|for sure|100%|is diagnosed|diagnosis 
 const NOTIFIABLE = /\b(foot[- ]and[- ]mouth|fmd|lumpy skin|lsd|anthrax|rabies|brucellosis|rift valley|rvf|contagious bovine pleuropneumonia|cbpp)\b/i;
 const EMERGENCY = /\b(cannot (get up|stand)|down and|bloat|swollen left side|heavy bleeding|bleeding a lot|collapse|convuls|seiz|struggling to breathe|not breathing|straining|prolapse|maggots? in)\b/i;
 
+/** True when a sentence names a drug, an amount or sounds like a diagnosis. */
+export const sentenceUnsafe = (s: string): boolean => DRUGS.test(s) || AMOUNT.test(s) || OVERCLAIM.test(s);
+export const isNotifiable = (s: string): boolean => NOTIFIABLE.test(s);
+export const isEmergency = (s: string): boolean => EMERGENCY.test(s);
+
 /** Splits text into sentences; a sentence that mentions a drug or an amount is removed. Returns [kept, removedCount]. */
 export function cleanText(text: string): [string, number] {
   const parts = text.split(/(?<=[.!?])\s+/);

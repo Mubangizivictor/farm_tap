@@ -95,24 +95,20 @@ class FirestoreRemoteStore implements RemoteStore {
         for (final c in collections) {
           var first = true;
           subs.add(
-            _col(tenantId, c)
-                .orderBy(serverTimeField, descending: true)
-                .limit(1)
-                .snapshots()
-                .listen(
-                  (snap) {
-                    // The first snapshot is what is already there.
-                    if (first) {
-                      first = false;
-                      return;
-                    }
-                    if (snap.metadata.hasPendingWrites) return;
-                    out.add(null);
-                  },
-                  // Permission or network trouble on one collection: the
-                  // periodic pull still covers it.
-                  onError: (Object _) {},
-                ),
+            _col(tenantId, c).orderBy(serverTimeField, descending: true).limit(1).snapshots().listen(
+              (snap) {
+                // The first snapshot is what is already there.
+                if (first) {
+                  first = false;
+                  return;
+                }
+                if (snap.metadata.hasPendingWrites) return;
+                out.add(null);
+              },
+              // Permission or network trouble on one collection: the
+              // periodic pull still covers it.
+              onError: (Object _) {},
+            ),
           );
         }
       }

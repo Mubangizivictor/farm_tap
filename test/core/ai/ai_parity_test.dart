@@ -29,6 +29,14 @@ void main() {
     expect(problems.take(30).toList(), isEmpty);
   });
 
+  test('chat reader, animal finder, prompt and record match the web engine', () {
+    final got = chatSnapshot(
+      expected['chatReplyCases']! as List<Object?>,
+      expected['chatMentionCases']! as List<Object?>,
+    );
+    expect(diff(expected['chat'], got).take(30).toList(), isEmpty);
+  });
+
   test('photo reader, catalog and prompts match the web engine', () {
     expect(diff(expected['photo'], photoSnapshot(expected['photoCases']! as List<Object?>)).take(30).toList(), isEmpty);
     expect(diff(expected['photoChecks'], photoCatalog()).take(30).toList(), isEmpty);

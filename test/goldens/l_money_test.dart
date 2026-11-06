@@ -49,7 +49,10 @@ void main() {
 
   screenGoldens(
     'L01_money_overview',
-    (_) => inShell(MoneyPage(repo: farm(), onAddExpense: () async {}), current: '/money'),
+    (_) => inShell(
+      MoneyPage(repo: farm(), onAddExpense: () async {}),
+      current: '/money',
+    ),
     act: (tester, _) => settle(tester),
   );
 
@@ -72,12 +75,12 @@ void main() {
     act: (tester, _) => settle(tester),
   );
 
-  screenGoldens(
-    'L04_whatsapp_report_preview',
-    (_) {
-      farm();
-      return inShell(DailyReportPage(repo: daily), current: '/reports', parent: '/reports');
-    },
-    act: (tester, _) => settle(tester),
-  );
+  screenGoldens('L04_whatsapp_report_preview', (_) {
+    farm();
+    return inShell(
+      DailyReportPage(repo: daily),
+      current: '/reports',
+      parent: '/reports',
+    );
+  }, act: (tester, _) => settle(tester));
 }

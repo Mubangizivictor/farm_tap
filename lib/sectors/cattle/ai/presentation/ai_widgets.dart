@@ -1,8 +1,10 @@
 // Shared pieces of the AI screens (decision 0025, phone phase 2).
 import 'dart:async';
 
+import 'package:farm_tap/core/ai/ai_chat.dart';
 import 'package:farm_tap/core/ai/ai_core.dart';
 import 'package:farm_tap/core/ai/ai_photo.dart';
+import 'package:farm_tap/core/ai/ai_quota.dart';
 import 'package:farm_tap/core/ai/ai_repository.dart';
 import 'package:farm_tap/core/ai/ai_risk.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
@@ -312,6 +314,9 @@ class AiPageContext {
     required this.onLink,
     required this.onModule,
     this.photo,
+    this.chat,
+    this.server,
+    this.tenantId = '',
   });
 
   final AiRepository repo;
@@ -329,6 +334,15 @@ class AiPageContext {
 
   /// Sends a photo to the model (decision 0026); null where there is no model.
   final PhotoAnalyzer? photo;
+
+  /// Sends a chat message to the model (decision 0027); null where there is no model.
+  final ChatAnalyzer? chat;
+
+  /// The server assistant (decision 0028), used when the AI Control Centre sets the route to 'server'.
+  final AiServerClient? server;
+
+  /// The farm, for the server's daily allowance (the server checks membership).
+  final String tenantId;
 
   bool get manages => role == 'owner' || role == 'manager';
 }

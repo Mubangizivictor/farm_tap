@@ -23,6 +23,7 @@ const reports = await sh('aiReports.ts');
 const vet = await sh('aiVet.ts');
 const data = await sh('aiData.ts');
 const photo = await sh('aiPhoto.ts');
+const chat = await sh('aiChat.ts');
 
 const finding = (f) => ({ id: f.id, module: f.module, severity: f.severity, title: f.title, why: f.why, action: f.action, method: f.method, links: f.links.map((l) => [l.label, l.href]), subjects: f.subjects, state: f.state ?? null });
 const answer = (a) => ({ intent: a.intent, ok: a.ok, text: a.text, bullets: a.bullets, links: a.links.map((l) => [l.label, l.href]), method: a.method });
@@ -59,6 +60,7 @@ export function snapshot(farm) {
   out.vaccines = herd.vaccinesDue(d);
   out.calving = herd.calvingInterval(d);
   out.health = (d.animals ?? []).map((a) => [a.id, herd.animalHealth(d, a.id)]);
+  out.chatFacts = (d.animals ?? []).map((a) => [a.id, chat.animalFacts(herd.animalHealth(d, a.id), { sex: a.body.sex ?? null, dairyStatus: a.body.dairyStatus ?? null, dateOfBirth: a.body.dateOfBirth ?? null }, data.today(d))]);
   const day = data.today(d);
   out.breeding = (d.animals ?? []).map((a) => [a.id, data.breedingState(a.id, d.breeding ?? [], day)]);
   out.reports = {};
@@ -115,6 +117,32 @@ export const photoCases = [
   { check: 'dung', reply: '[]' },
   { check: 'calf', reply: JSON.stringify({ imageUsable: true, summary: 'Wet swollen navel. The calf looks weak.', signs: Array.from({ length: 9 }, (_, i) => ({ what: `sign ${i}`, where: 'x', certainty: 'possible' })), possibleCauses: Array.from({ length: 6 }, (_, i) => ({ name: `cause ${i}`, why: 'y' })), urgency: 'soon', whatToDoNow: Array.from({ length: 9 }, (_, i) => `step ${i}.`), questionsForFarmer: ['a', 'b', 'c', 'd', 'e'] }) },
 ];
+export const chatReplyCases = [
+  { text: 'She may have a udder problem.\n- Milk her out often.\n- Give her 10 ml of oxytetracycline.\n- Give her clean water and shade.\nThis is definitely mastitis.', asked: 'my cow is sick' },
+  { text: 'Keep her cool and watch her eat.', asked: 'she looks sick' },
+  { text: 'Napier grass is a good feed in the rainy season.\n\n\n\nPlant it early.', asked: 'what grass is best' },
+  { text: 'Keep her in the shade.', asked: 'she cannot get up' },
+  { text: 'Blisters on the mouth can happen with foot and mouth disease. Keep her away from other cattle.', asked: 'blisters in the mouth' },
+  { text: 'Inject 5 ml of penicillin.', asked: 'what do I give' },
+  { text: '', asked: 'hello' },
+  { text: 'The foot and mouth vaccination is due next month. Ask your vet to book it.', asked: 'when is the foot and mouth vaccine due' },
+  { text: 'Your milk is down 22% this week. Check the feed.', asked: 'why is milk low' },
+];
+export const chatMentionCases = [
+  { message: 'Bella has not eaten since morning', animals: [['bella', 'Bella', 'FT-001'], ['zuri', 'Zuri', 'FT-002'], ['ox', 'Ox', null]] },
+  { message: 'why is ft-002 giving less milk?', animals: [['bella', 'Bella', 'FT-001'], ['zuri', 'Zuri', 'FT-002'], ['ox', 'Ox', null]] },
+  { message: 'the box was heavy', animals: [['bella', 'Bella', 'FT-001'], ['zuri', 'Zuri', 'FT-002'], ['ox', 'Ox', null]] },
+  { message: 'Bella and Zuri both limp', animals: [['bella', 'Bella', 'FT-001'], ['zuri', 'Zuri', 'FT-002'], ['ox', 'Ox', null]] },
+  { message: 'Nakato (FT.9) is thin', animals: [['n', 'Nakato', 'FT.9'], ['x', 'Nak', null]] },
+];
+export function chatSnapshot() {
+  return {
+    replies: chatReplyCases.map((c) => JSON.parse(JSON.stringify(chat.readChatReply(c.text, c.asked)))),
+    mentions: chatMentionCases.map((c) => chat.findAnimalMention(c.message, c.animals.map(([id, name, tag]) => ({ id, name, tag }))) ?? null),
+    prompt: chat.buildChatPrompt({ message: ' Animal 1  is not\neating ', facts: ['A.', 'B.'], calculated: 'Milk today: 40 L', files: [{ kind: 'photo' }, { kind: 'pdf' }] }),
+    body: chat.chatAssessmentBody('bella', ' is she  ok? ', chat.readChatReply('Watch her closely.', 'is she ok?'), ['photo'], 'm', '2026-11-06T09:00:00'),
+  };
+}
 export function photoSnapshot() {
   return photoCases.map((c) => JSON.parse(JSON.stringify(photo.readPhotoReply(c.reply, photo.photoCheckByKey(c.check)), (k, v) => (v === undefined ? null : v))));
 }
@@ -124,7 +152,7 @@ export function vetSnapshot() {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const farms = JSON.parse(readFileSync(join(root, 'test', 'core', 'ai', 'fixtures', 'farms.json'), 'utf8'));
-  const expected = { farms: farms.map((f) => snapshot(f)), vet: vetSnapshot(), vetCases, photo: photoSnapshot(), photoCases, photoChecks: photo.photoChecks.map((c) => [c.key, c.label, c.kind, c.how, c.focus]), photoPrompt: photo.photoChecks.map((c) => photo.buildPhotoPrompt({ check: c, note: ' Is it  serious?\n', animal: 'cow', daysSinceCalving: 12 })) };
+  const expected = { farms: farms.map((f) => snapshot(f)), vet: vetSnapshot(), vetCases, photo: photoSnapshot(), photoCases, photoChecks: photo.photoChecks.map((c) => [c.key, c.label, c.kind, c.how, c.focus]), photoPrompt: photo.photoChecks.map((c) => photo.buildPhotoPrompt({ check: c, note: ' Is it  serious?\n', animal: 'cow', daysSinceCalving: 12 })), chat: chatSnapshot(), chatReplyCases, chatMentionCases };
   writeFileSync(join(root, 'test', 'core', 'ai', 'fixtures', 'expected.json'), JSON.stringify(expected));
   console.log(`wrote expected.json for ${farms.length} farms`);
 }

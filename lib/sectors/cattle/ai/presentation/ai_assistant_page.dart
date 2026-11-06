@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:farm_tap/core/ai/ai_assistant.dart';
+import 'package:farm_tap/core/ai/ai_route.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
@@ -38,7 +39,7 @@ class _AiAssistantPageState extends State<AiAssistantPage> {
     final clock = context.clock;
     final started = clock.now();
     final farm = await widget.ctx.repo.load(role: widget.ctx.role);
-    final a = ask(text, farm.data, role: widget.ctx.role, cfg: farm.config);
+    final a = answerInternally(text, farm.data, role: widget.ctx.role, cfg: farm.config);
     unawaited(
       widget.ctx.repo.log('assistant', ok: a.ok, ms: clock.now().difference(started).inMilliseconds, method: a.method),
     );

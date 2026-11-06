@@ -5894,7 +5894,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiPhotoOffTitle => 'Photo Check is not switched on yet';
 
   @override
-  String get aiPhotoOffBody => 'The FarmTap team turns this on when it is ready for your farm. You can still choose a check and take a photo.';
+  String get aiPhotoOffBody =>
+      'The FarmTap team turns this on when it is ready for your farm. You can still choose a check and take a photo.';
 
   @override
   String get aiPhotoWhat => 'What do you want to check?';
@@ -5921,10 +5922,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiPhotoCheckAnyway => 'Check anyway';
 
   @override
-  String get aiPhotoConsent => 'The photo is sent to Google to be read. It is not saved by FarmTap. Do not include people in the photo.';
+  String get aiPhotoConsent =>
+      'The photo is sent to Google to be read. It is not saved by FarmTap. Do not include people in the photo.';
 
   @override
-  String get aiPhotoLimit => 'Your farm has used all photo checks for today. Try again tomorrow, or call your vet.';
+  String get aiPhotoLimit =>
+      'Your farm has used all photo checks for today. Try again tomorrow, or call your vet.';
 
   @override
   String aiPhotoLeft(int count) {
@@ -5932,16 +5935,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get aiPhotoErrNetwork => 'No internet. Photo Check needs a connection.';
+  String get aiPhotoErrNetwork =>
+      'No internet. Photo Check needs a connection.';
 
   @override
   String get aiPhotoErrBusy => 'Photo Check is busy. Try again in a minute.';
 
   @override
-  String get aiPhotoErrAppCheck => 'Photo Check could not confirm this is the real FarmTap app.';
+  String get aiPhotoErrAppCheck =>
+      'Photo Check could not confirm this is the real FarmTap app.';
 
   @override
-  String get aiPhotoErrRead => 'The answer could not be read. Take another photo and try again.';
+  String get aiPhotoErrRead =>
+      'The answer could not be read. Take another photo and try again.';
 
   @override
   String get aiPhotoSeen => 'What can be seen';
@@ -5966,4 +5972,184 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiPhotoNewCheck => 'Check another photo';
+
+  @override
+  String get aiChatTitle => 'FarmTap AI';
+
+  @override
+  String get aiChatNew => 'New chat';
+
+  @override
+  String get aiChatTools => 'Insights and tools';
+
+  @override
+  String get aiChatEmpty => 'How can I help on your farm today?';
+
+  @override
+  String get aiChatThinking => 'Thinking…';
+
+  @override
+  String aiChatAbout(String name) {
+    return 'About $name';
+  }
+
+  @override
+  String aiChatSavedTo(String name) {
+    return 'Saved to $name’s history';
+  }
+
+  @override
+  String get aiChatDisclaimer =>
+      'FarmTap AI can make mistakes and never replaces your vet.';
+
+  @override
+  String get aiChatHint => 'Ask anything…';
+
+  @override
+  String get aiChatSend => 'Send';
+
+  @override
+  String get aiChatAttach => 'Attach';
+
+  @override
+  String get aiChatVideo => 'Choose a video';
+
+  @override
+  String get aiChatRecord => 'Record a video';
+
+  @override
+  String get aiChatTooBig =>
+      'Those files are too big together. Remove one or use a shorter video.';
+
+  @override
+  String aiChatFileLimit(int count) {
+    return 'You can attach up to $count files at a time.';
+  }
+
+  @override
+  String get aiChatNotOn => 'Online AI is not switched on for FarmTap yet.';
+
+  @override
+  String get aiChatOffLimit =>
+      'Your farm has used all online AI answers for today.';
+
+  @override
+  String get aiChatFilesNotRead => 'Files and photos could not be read.';
+
+  @override
+  String get aiChatOfflineHelp =>
+      'I can answer simple questions about your milk, animals, feed and money from your records, even without internet.';
+
+  @override
+  String get aiChatMedsLeftOut =>
+      'Some details about medicines were left out. Ask your vet.';
+
+  @override
+  String get aiChatLookAtThis => 'Please look at what I attached.';
+
+  @override
+  String get aiChatHistory => 'Chats';
+
+  @override
+  String get aiChatHistoryTitle => 'Your chats';
+
+  @override
+  String get aiChatSearch => 'Search your chats';
+
+  @override
+  String get aiChatNoChats => 'Your chats will show here.';
+
+  @override
+  String get aiChatNoMatch => 'No chat matches that.';
+
+  @override
+  String get aiChatSources => 'Sources from Google';
+
+  @override
+  String get aiChatCopy => 'Copy';
+
+  @override
+  String get aiChatCopied => 'Copied';
+
+  @override
+  String get aiChatAgain => 'Ask again';
+
+  @override
+  String get aiChatDetails => 'Details for the FarmTap owner';
+
+  @override
+  String get aiChatStop => 'Stop';
+
+  @override
+  String get aiChatDeleteChat => 'Delete chat';
+
+  @override
+  String get aiChatStopped => 'Stopped.';
+
+  @override
+  String get aiChatStoppedNote => 'You stopped this answer.';
+
+  @override
+  String get aiChatKeptHere => 'Kept on this phone only.';
+
+  @override
+  String get aiChatWhatsapp => 'Send to my vet on WhatsApp';
+
+  @override
+  String get aiChatSharePhoto => 'Share with photo';
+
+  @override
+  String get aiChatSeeMessage => 'See the message';
+
+  @override
+  String get aiChatHideMessage => 'Hide message';
+
+  @override
+  String get aiChatCopyMessage => 'Copy message';
+
+  @override
+  String get aiChatWhileWaiting => 'While you wait for the vet:';
+
+  @override
+  String get aiChatWhichCow => 'Which cow is this?';
+
+  @override
+  String get aiChatWhichCowHint =>
+      'Choose it to save this answer in that cow’s history.';
+
+  @override
+  String get aiChatChooseCow => 'Choose a cow';
+
+  @override
+  String get aiChatSave => 'Save';
+
+  @override
+  String get aiChatNotNow => 'Not now';
+
+  @override
+  String get aiChatVetHelp => 'Help the vet help you';
+
+  @override
+  String get aiChatVetHelpHint =>
+      'Tap what you know. It goes into your message for the vet.';
+
+  @override
+  String get aiChatUpdateAdvice => 'Update the advice with these';
+
+  @override
+  String get aiChatTempHint => 'e.g. 40.5';
+
+  @override
+  String get aiChatAdd => 'Add';
+
+  @override
+  String get aiChatLanguage => 'Reply language';
+
+  @override
+  String get aiChatMessageCopied => 'Message copied';
+
+  @override
+  String aiChatWhatsappName(String name) {
+    return 'WhatsApp $name';
+  }
 }

@@ -2,6 +2,7 @@
 // Display only: Firestore rules still decide what can be read at all.
 // Hand port of shared/aiAccess.ts.
 import 'package:farm_tap/core/ai/ai_core.dart';
+import 'package:farm_tap/core/ai/ai_quota.dart';
 
 final List<String> _all = aiModules.map((m) => m.key).toList();
 
@@ -45,6 +46,7 @@ class AiConfig {
     this.photoEnabled = false,
     this.photoModel = 'gemini-3.8-flash',
     this.photoPerFarmPerDay = 20,
+    this.assistant = defaultAssistantConfig,
   });
   final bool enabled;
   final Map<String, bool> modules;
@@ -59,6 +61,9 @@ class AiConfig {
   final bool photoEnabled;
   final String photoModel;
   final int photoPerFarmPerDay;
+
+  /// The AI chat (layer 3, decision 0028): switch, model, daily allowance and route.
+  final AssistantConfig assistant;
 }
 
 final defaultAiConfig = AiConfig(
@@ -94,7 +99,10 @@ AiConfig aiConfigFrom(Object? v) {
     insightsCount: count is num && count >= 1 && count <= 10 ? jsRound(count).toInt() : d.insightsCount,
     photoEnabled: ph['enabled'] is bool ? ph['enabled']! as bool : d.photoEnabled,
     photoModel: phModel is String && RegExp(r'^[\w.\-]{3,64}$').hasMatch(phModel) ? phModel : d.photoModel,
-    photoPerFarmPerDay: phLimit is num && phLimit >= 1 && phLimit <= 500 ? jsRound(phLimit).toInt() : d.photoPerFarmPerDay,
+    photoPerFarmPerDay: phLimit is num && phLimit >= 1 && phLimit <= 500
+        ? jsRound(phLimit).toInt()
+        : d.photoPerFarmPerDay,
+    assistant: assistantConfigFrom(o),
   );
 }
 

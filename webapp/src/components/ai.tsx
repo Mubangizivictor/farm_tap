@@ -45,7 +45,7 @@ export const moduleHref: Record<AiModule, string> = {
   inventory: '/ai/inventory/',
   reports: '/ai/reports/',
   risks: '/ai/risks/',
-  recommendations: '/ai/',
+  recommendations: '/ai/tools/',
   alerts: '/ai/alerts/',
 };
 
@@ -255,8 +255,8 @@ export function ModuleHead({ module, title, subtitle, children }: { module: AiMo
   return (
     <div className="page-head">
       <div className="stack head-text">
-        <Link className="small muted no-print" href="/ai/">
-          AI Intelligence
+        <Link className="small muted no-print" href="/ai/tools/">
+          Insights and tools
         </Link>
         <h1 className="row ai-title">
           <span className="icon-chip ai-chip" aria-hidden>

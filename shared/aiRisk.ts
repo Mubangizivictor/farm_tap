@@ -8,6 +8,7 @@ import { breedingFindings, healthFindings } from './aiHerd.ts';
 import { milkFindings, qualityFindings } from './aiMilk.ts';
 import { financeFindings } from './aiMoney.ts';
 import { drugFindings, feedFindings } from './aiStock.ts';
+import { insightFindings } from './aiInsights.ts';
 
 /** aiAlertStates body: someone acknowledged or resolved an alert (doc id = alert id). */
 export interface AlertStateIn {
@@ -46,6 +47,8 @@ export function allFindings(
   if (on('feed') || on('inventory')) safe(() => feedFindings(d));
   if (on('inventory')) safe(() => drugFindings(d));
   if (on('finance') && seesMoney(opts.role)) safe(() => financeFindings(d));
+  // Decision 0028: milk against the previous recording, incomplete animal records.
+  safe(() => insightFindings(d).filter((f) => on(f.module)));
   const visible = fs.filter((f) => (f.module === 'finance' ? seesMoney(opts.role) : true));
   return rankFindings(visible)
     .filter((f) => opts.states?.get(f.id)?.status !== 'resolved')

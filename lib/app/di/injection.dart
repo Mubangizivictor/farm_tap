@@ -313,7 +313,8 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
       () => OperationsRepository(journal: getIt<RecordJournal>(), clock: getIt<Clock>()),
     )
     // Decision 0025: AI Intelligence on the phone (the engine runs here, offline).
-    ..registerLazySingleton<AiRepository>(() => AiRepository(
+    ..registerLazySingleton<AiRepository>(
+      () => AiRepository(
         journal: getIt<RecordJournal>(),
         clock: getIt<Clock>(),
         // platform/config is readable by anyone (the admin panel writes it).
