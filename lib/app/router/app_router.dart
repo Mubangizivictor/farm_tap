@@ -138,6 +138,29 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
   /// The PIN a worker chose at phone sign-in, saved once their farm opens.
   String? pendingStaffPin;
 
+  // Decision 0025: AI Intelligence. The engine runs on the phone from the
+  // saved records, so it works offline; who is looking decides what shows.
+  AiPageContext? aiContext(BuildContext context) {
+    final repo = deps.ai;
+    if (repo == null) return null;
+    return AiPageContext(
+      repo: repo,
+      role: aiRoleOf(staffRole: session.staff?.role.name, farmRole: session.farm?.role.name),
+      byName: session.staff?.name ?? session.auth.currentUser?.name ?? '',
+      farmName: session.farm?.name ?? '',
+      onLink: (href) {
+        final route = phoneRouteForAiLink(href);
+        if (route != null) unawaited(context.push(route));
+      },
+      onModule: (key) => unawaited(context.push(AppRoutes.moreAiModule(key))),
+    );
+  }
+
+  Widget? homeAiStrip(BuildContext context) {
+    final ctx = aiContext(context);
+    return ctx == null ? null : AiInsightsStrip(ctx: ctx);
+  }
+
   // Roots of the shell branches; filled in section by section.
   final sectionRoots = <String, PageBuilder>{
     AppRoutes.home: (context, state) => session.isCentre
@@ -363,29 +386,6 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     if (staff != null) return StaffPermissions.managesStaff(staff.role);
     final role = session.farm?.role;
     return role == PlaceRole.owner || role == PlaceRole.manager;
-  }
-
-  // Decision 0025: AI Intelligence. The engine runs on the phone from the
-  // saved records, so it works offline; who is looking decides what shows.
-  AiPageContext? aiContext(BuildContext context) {
-    final repo = deps.ai;
-    if (repo == null) return null;
-    return AiPageContext(
-      repo: repo,
-      role: aiRoleOf(staffRole: session.staff?.role.name, farmRole: session.farm?.role.name),
-      byName: session.staff?.name ?? session.auth.currentUser?.name ?? '',
-      farmName: session.farm?.name ?? '',
-      onLink: (href) {
-        final route = phoneRouteForAiLink(href);
-        if (route != null) unawaited(context.push(route));
-      },
-      onModule: (key) => unawaited(context.push(AppRoutes.moreAiModule(key))),
-    );
-  }
-
-  Widget? homeAiStrip(BuildContext context) {
-    final ctx = aiContext(context);
-    return ctx == null ? null : AiInsightsStrip(ctx: ctx);
   }
 
   sectionRoots[AppRoutes.settings] = (context, state) {

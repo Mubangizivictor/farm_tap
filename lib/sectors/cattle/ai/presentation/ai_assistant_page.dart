@@ -4,7 +4,6 @@
 import 'dart:async';
 
 import 'package:farm_tap/core/ai/ai_assistant.dart';
-import 'package:farm_tap/core/ai/ai_core.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';

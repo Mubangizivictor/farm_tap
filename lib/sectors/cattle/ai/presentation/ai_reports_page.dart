@@ -7,6 +7,7 @@ import 'package:farm_tap/core/ai/ai_assistant.dart';
 import 'package:farm_tap/core/ai/ai_core.dart';
 import 'package:farm_tap/core/ai/ai_data.dart';
 import 'package:farm_tap/core/ai/ai_reports.dart';
+import 'package:farm_tap/core/ai/ai_repository.dart';
 import 'package:farm_tap/core/export/table_export.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
