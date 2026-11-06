@@ -83,7 +83,7 @@ export async function askGemini(opts: {
       res = await run(true);
     } catch (e) {
       const f = chatFailureOf(String((e as Error)?.message ?? e));
-      if ((e as Error)?.name === 'AbortError' || f === 'network' || f === 'appCheck' || f === 'busy') throw e;
+      if ((e as Error)?.name === 'AbortError' || f === 'network' || f === 'appCheck') throw e;
       searched = false;
       res = await run(false);
     }
