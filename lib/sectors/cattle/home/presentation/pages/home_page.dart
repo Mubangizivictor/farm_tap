@@ -28,6 +28,7 @@ class HomePage extends StatefulWidget {
     this.onLock,
     this.onRefresh,
     this.today,
+    this.aiStrip,
   });
 
   final HomeRepository repo;
@@ -48,6 +49,9 @@ class HomePage extends StatefulWidget {
 
   /// Overrides "today" (goldens use the mockups' Sat 7 Nov).
   final DateTime? today;
+
+  /// AI "Today's insights" (decision 0025); null leaves Home as it was.
+  final Widget? aiStrip;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -132,6 +136,7 @@ class _HomePageState extends State<HomePage> {
               style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
             ),
             context.space.gapLg,
+            if (widget.aiStrip != null) widget.aiStrip!,
             if (summary == null)
               const _SkeletonGrid()
             else

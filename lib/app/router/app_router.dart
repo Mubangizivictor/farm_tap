@@ -4,6 +4,7 @@
 // even after a deep link or a web refresh.
 import 'dart:async';
 
+import 'package:farm_tap/app/router/ai_links.dart';
 import 'package:farm_tap/app/router/app_dependencies.dart';
 import 'package:farm_tap/app/router/routes.dart';
 import 'package:farm_tap/app/session/reminder_viewer.dart';
@@ -12,6 +13,7 @@ import 'package:farm_tap/app/shell/app_shell.dart';
 import 'package:farm_tap/app/shell/pending_section.dart';
 import 'package:farm_tap/app/startup.dart';
 import 'package:farm_tap/core/account/presentation/account_pages.dart';
+import 'package:farm_tap/core/ai/ai_repository.dart';
 import 'package:farm_tap/core/alerts/presentation/reminders_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/check_email_page.dart';
 import 'package:farm_tap/core/auth/presentation/pages/email_sign_in_page.dart';
@@ -51,6 +53,14 @@ import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/formats.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_assistant_page.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_hub_page.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_insights_strip.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_module_pages.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_reports_page.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_screening_page.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_vet_page.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_widgets.dart';
 import 'package:farm_tap/sectors/cattle/breeding/presentation/pages/breeding_pages.dart';
 import 'package:farm_tap/sectors/cattle/cards/presentation/card_scan_page.dart';
 import 'package:farm_tap/sectors/cattle/collection_centre/domain/centre_models.dart';
@@ -155,6 +165,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
               context.go(AppRoutes.unlock);
             },
             onOpen: (target) => _openFromHome(context, target),
+            aiStrip: homeAiStrip(context),
           ),
   };
   // ---- ID cards (decision 0016) ----
@@ -331,6 +342,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         },
         if (deps.operations != null) MoreTarget.contacts,
         if (deps.reminders != null) MoreTarget.reminders,
+        if (deps.ai != null && !session.isCentre) MoreTarget.ai,
         if (manages) ...{MoreTarget.workers, MoreTarget.money, MoreTarget.reports, MoreTarget.cards},
         MoreTarget.scan,
         if (manages) ...{MoreTarget.subscription, MoreTarget.settings},
@@ -351,6 +363,29 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
     if (staff != null) return StaffPermissions.managesStaff(staff.role);
     final role = session.farm?.role;
     return role == PlaceRole.owner || role == PlaceRole.manager;
+  }
+
+  // Decision 0025: AI Intelligence. The engine runs on the phone from the
+  // saved records, so it works offline; who is looking decides what shows.
+  AiPageContext? aiContext(BuildContext context) {
+    final repo = deps.ai;
+    if (repo == null) return null;
+    return AiPageContext(
+      repo: repo,
+      role: aiRoleOf(staffRole: session.staff?.role.name, farmRole: session.farm?.role.name),
+      byName: session.staff?.name ?? session.auth.currentUser?.name ?? '',
+      farmName: session.farm?.name ?? '',
+      onLink: (href) {
+        final route = phoneRouteForAiLink(href);
+        if (route != null) unawaited(context.push(route));
+      },
+      onModule: (key) => unawaited(context.push(AppRoutes.moreAiModule(key))),
+    );
+  }
+
+  Widget? homeAiStrip(BuildContext context) {
+    final ctx = aiContext(context);
+    return ctx == null ? null : AiInsightsStrip(ctx: ctx);
   }
 
   sectionRoots[AppRoutes.settings] = (context, state) {
@@ -899,6 +934,44 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
           );
         },
       ),
+      page(
+        'ai',
+        parent: AppRoutes.more,
+        builder: (context, state) {
+          final ctx = aiContext(context);
+          if (ctx == null) return const PendingSection(path: AppRoutes.moreAi);
+          return AiHubPage(ctx: ctx);
+        },
+        routes: [
+          page(
+            ':module',
+            parent: AppRoutes.moreAi,
+            builder: (context, state) {
+              final ctx = aiContext(context);
+              final key = state.pathParameters['module'] ?? '';
+              if (ctx == null) return const PendingSection(path: AppRoutes.moreAi);
+              return switch (key) {
+                'assistant' => AiAssistantPage(ctx: ctx),
+                'vet' => AiVetPage(ctx: ctx, animalId: state.uri.queryParameters['animal']),
+                'screening' => AiScreeningPage(ctx: ctx),
+                'milk' => AiMilkPage(ctx: ctx),
+                'quality' => AiQualityPage(ctx: ctx),
+                'predictions' => AiPredictionsPage(ctx: ctx),
+                'feed' => AiFeedPage(ctx: ctx),
+                'breeding' => AiBreedingPage(ctx: ctx),
+                'health' => AiHealthPage(ctx: ctx),
+                'finance' => AiFinancePage(ctx: ctx),
+                'inventory' => AiInventoryPage(ctx: ctx),
+                'reports' => AiReportsPage(ctx: ctx),
+                'risks' => AiRisksPage(ctx: ctx),
+                'recommendations' => AiRecommendationsPage(ctx: ctx),
+                'alerts' => AiAlertsPage(ctx: ctx),
+                _ => PendingSection(path: AppRoutes.moreAiModule(key)),
+              };
+            },
+          ),
+        ],
+      ),
     ],
     AppRoutes.home: [
       page(
@@ -1283,6 +1356,8 @@ Future<void> _openMore(BuildContext context, SessionController session, MoreTarg
       await context.push(AppRoutes.moreVaccinations);
     case MoreTarget.reminders:
       await context.push(AppRoutes.moreReminders);
+    case MoreTarget.ai:
+      await context.push(AppRoutes.moreAi);
     case MoreTarget.feedStore:
       await context.push(AppRoutes.feedingStore);
     // Staff NFC cards are assigned under Workers (K03).

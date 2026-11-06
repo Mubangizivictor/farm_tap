@@ -9347,4 +9347,850 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
     'that was used.',
   );
+
+  /// No description provided for @aiTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Intelligence'**
+  String get aiTitle;
+
+  /// No description provided for @aiIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Your farm records, read for you. Every answer says how it was made.'**
+  String get aiIntro;
+
+  /// No description provided for @aiTodaysInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s insights'**
+  String get aiTodaysInsights;
+
+  /// No description provided for @aiTools.
+  ///
+  /// In en, this message translates to:
+  /// **'AI tools'**
+  String get aiTools;
+
+  /// No description provided for @aiNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing needs attention'**
+  String get aiNothing;
+
+  /// No description provided for @aiNothingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap found nothing to warn you about from your records today.'**
+  String get aiNothingBody;
+
+  /// No description provided for @aiSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen'**
+  String get aiSeen;
+
+  /// No description provided for @aiMarkSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as seen'**
+  String get aiMarkSeen;
+
+  /// No description provided for @aiMarkFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as fixed'**
+  String get aiMarkFixed;
+
+  /// No description provided for @aiFindings.
+  ///
+  /// In en, this message translates to:
+  /// **'Findings'**
+  String get aiFindings;
+
+  /// No description provided for @aiToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get aiToday;
+
+  /// No description provided for @aiYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get aiYesterday;
+
+  /// No description provided for @aiAvg7.
+  ///
+  /// In en, this message translates to:
+  /// **'7-day average'**
+  String get aiAvg7;
+
+  /// No description provided for @aiNotRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Not recorded'**
+  String get aiNotRecorded;
+
+  /// No description provided for @aiBalanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where the milk went'**
+  String get aiBalanceTitle;
+
+  /// No description provided for @aiProduced.
+  ///
+  /// In en, this message translates to:
+  /// **'Produced'**
+  String get aiProduced;
+
+  /// No description provided for @aiSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get aiSold;
+
+  /// No description provided for @aiHomeUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Used at home'**
+  String get aiHomeUse;
+
+  /// No description provided for @aiThrownAway.
+  ///
+  /// In en, this message translates to:
+  /// **'Thrown away'**
+  String get aiThrownAway;
+
+  /// No description provided for @aiNotAccounted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not accounted for'**
+  String get aiNotAccounted;
+
+  /// No description provided for @aiNoSalesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No sales recorded yet'**
+  String get aiNoSalesYet;
+
+  /// No description provided for @aiCowsDropping.
+  ///
+  /// In en, this message translates to:
+  /// **'Cows giving less milk'**
+  String get aiCowsDropping;
+
+  /// No description provided for @aiNoForecast.
+  ///
+  /// In en, this message translates to:
+  /// **'No forecast yet'**
+  String get aiNoForecast;
+
+  /// No description provided for @aiForecastNeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'A forecast needs about two weeks of milk records.'**
+  String get aiForecastNeeds;
+
+  /// No description provided for @aiNext7.
+  ///
+  /// In en, this message translates to:
+  /// **'Next 7 days'**
+  String get aiNext7;
+
+  /// No description provided for @aiNext30.
+  ///
+  /// In en, this message translates to:
+  /// **'Next 30 days'**
+  String get aiNext30;
+
+  /// No description provided for @aiNextDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming days'**
+  String get aiNextDays;
+
+  /// No description provided for @aiPerCow.
+  ///
+  /// In en, this message translates to:
+  /// **'Per cow'**
+  String get aiPerCow;
+
+  /// No description provided for @aiForecastNote.
+  ///
+  /// In en, this message translates to:
+  /// **'A forecast is an estimate from your past records. Disease, weather and feed can change it.'**
+  String get aiForecastNote;
+
+  /// No description provided for @aiNoUseYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No use recorded yet'**
+  String get aiNoUseYet;
+
+  /// No description provided for @aiNoFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'No feeds yet'**
+  String get aiNoFeed;
+
+  /// No description provided for @aiNoFeedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add feeds and record what you use, and FarmTap will tell you when they run out.'**
+  String get aiNoFeedBody;
+
+  /// No description provided for @aiFeedInStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Feed in the store'**
+  String get aiFeedInStore;
+
+  /// No description provided for @aiCostPerLitre.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost per litre'**
+  String get aiCostPerLitre;
+
+  /// No description provided for @aiLitresPer1000.
+  ///
+  /// In en, this message translates to:
+  /// **'Litres per 1,000 of feed spend'**
+  String get aiLitresPer1000;
+
+  /// No description provided for @aiDrugStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Drugs and supplies'**
+  String get aiDrugStock;
+
+  /// No description provided for @aiNotCounted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not counted yet'**
+  String get aiNotCounted;
+
+  /// No description provided for @aiInCalf.
+  ///
+  /// In en, this message translates to:
+  /// **'In calf'**
+  String get aiInCalf;
+
+  /// No description provided for @aiOpenCows.
+  ///
+  /// In en, this message translates to:
+  /// **'Open cows'**
+  String get aiOpenCows;
+
+  /// No description provided for @aiCalvingInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Calving interval'**
+  String get aiCalvingInterval;
+
+  /// No description provided for @aiServedOrInCalf.
+  ///
+  /// In en, this message translates to:
+  /// **'Served or in calf'**
+  String get aiServedOrInCalf;
+
+  /// No description provided for @aiConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get aiConfirmed;
+
+  /// No description provided for @aiNotConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Not confirmed'**
+  String get aiNotConfirmed;
+
+  /// No description provided for @aiNoHeatRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'No heat recorded'**
+  String get aiNoHeatRecorded;
+
+  /// No description provided for @aiBreedingNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Dates come from your breeding records. A vet check confirms pregnancy.'**
+  String get aiBreedingNote;
+
+  /// No description provided for @aiNeedAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Need attention'**
+  String get aiNeedAttention;
+
+  /// No description provided for @aiInWithdrawal.
+  ///
+  /// In en, this message translates to:
+  /// **'In withdrawal'**
+  String get aiInWithdrawal;
+
+  /// No description provided for @aiVaccinesDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Vaccines due'**
+  String get aiVaccinesDue;
+
+  /// No description provided for @aiLastMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Last months'**
+  String get aiLastMonths;
+
+  /// No description provided for @aiIncomeShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get aiIncomeShort;
+
+  /// No description provided for @aiSpentShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get aiSpentShort;
+
+  /// No description provided for @aiNet.
+  ///
+  /// In en, this message translates to:
+  /// **'Net'**
+  String get aiNet;
+
+  /// No description provided for @aiLargeExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Unusually large expenses'**
+  String get aiLargeExpenses;
+
+  /// No description provided for @aiNoRisks.
+  ///
+  /// In en, this message translates to:
+  /// **'No risks found'**
+  String get aiNoRisks;
+
+  /// No description provided for @aiFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get aiFilterAll;
+
+  /// No description provided for @aiFilterNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get aiFilterNew;
+
+  /// No description provided for @aiUseByNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Use-by times follow the farm rule below. Your buyer decides what they accept.'**
+  String get aiUseByNote;
+
+  /// No description provided for @aiAddBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a batch'**
+  String get aiAddBatch;
+
+  /// No description provided for @aiNoBatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No batches yet'**
+  String get aiNoBatches;
+
+  /// No description provided for @aiNoBatchesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the milk you keep on the farm to watch how long it stays good.'**
+  String get aiNoBatchesBody;
+
+  /// No description provided for @aiInStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'In storage'**
+  String get aiInStorage;
+
+  /// No description provided for @aiClosedBatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished batches'**
+  String get aiClosedBatches;
+
+  /// No description provided for @aiExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Past use-by'**
+  String get aiExpired;
+
+  /// No description provided for @aiUseSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Use soon'**
+  String get aiUseSoon;
+
+  /// No description provided for @aiFresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Fresh'**
+  String get aiFresh;
+
+  /// No description provided for @aiNoReading.
+  ///
+  /// In en, this message translates to:
+  /// **'No temperature yet'**
+  String get aiNoReading;
+
+  /// No description provided for @aiRecordTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'Record temperature'**
+  String get aiRecordTemp;
+
+  /// No description provided for @aiMarkSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as sold'**
+  String get aiMarkSold;
+
+  /// No description provided for @aiMarkUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as used'**
+  String get aiMarkUsed;
+
+  /// No description provided for @aiMarkDiscarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as thrown away'**
+  String get aiMarkDiscarded;
+
+  /// No description provided for @aiLitresNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the litres'**
+  String get aiLitresNeeded;
+
+  /// No description provided for @aiLitres.
+  ///
+  /// In en, this message translates to:
+  /// **'Litres'**
+  String get aiLitres;
+
+  /// No description provided for @aiPlaceOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Where it is kept (optional)'**
+  String get aiPlaceOptional;
+
+  /// No description provided for @aiPlaceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Cooler 1, Can A'**
+  String get aiPlaceHint;
+
+  /// No description provided for @aiCooledQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Is it in a cooler or cooling tank?'**
+  String get aiCooledQuestion;
+
+  /// No description provided for @aiTempNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the temperature'**
+  String get aiTempNeeded;
+
+  /// No description provided for @aiTempC.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature (°C)'**
+  String get aiTempC;
+
+  /// No description provided for @aiRuleInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the numbers in the rule'**
+  String get aiRuleInvalid;
+
+  /// No description provided for @aiRuleNote.
+  ///
+  /// In en, this message translates to:
+  /// **'These are starting rules. Check them with your buyer or the Dairy Development Authority.'**
+  String get aiRuleNote;
+
+  /// No description provided for @aiCooledHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours it keeps when cooled'**
+  String get aiCooledHours;
+
+  /// No description provided for @aiWarmHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours it keeps when warm'**
+  String get aiWarmHours;
+
+  /// No description provided for @aiMaxTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'Warmest safe temperature (°C)'**
+  String get aiMaxTemp;
+
+  /// No description provided for @aiAssistantNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Answers come from your own records and are worked out on your phone.'**
+  String get aiAssistantNote;
+
+  /// No description provided for @aiAskLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about your farm'**
+  String get aiAskLabel;
+
+  /// No description provided for @aiAskHint.
+  ///
+  /// In en, this message translates to:
+  /// **'How much milk did we get this week?'**
+  String get aiAskHint;
+
+  /// No description provided for @aiAskButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask'**
+  String get aiAskButton;
+
+  /// No description provided for @aiTryAsking.
+  ///
+  /// In en, this message translates to:
+  /// **'Try asking'**
+  String get aiTryAsking;
+
+  /// No description provided for @aiWhichAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Which animal?'**
+  String get aiWhichAnimal;
+
+  /// No description provided for @aiChooseAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an animal'**
+  String get aiChooseAnimal;
+
+  /// No description provided for @aiTempOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature (optional)'**
+  String get aiTempOptional;
+
+  /// No description provided for @aiTempHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal for a cow is about 38 to 39.'**
+  String get aiTempHelp;
+
+  /// No description provided for @aiDaysSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Days she has been unwell'**
+  String get aiDaysSeen;
+
+  /// No description provided for @aiCheckNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Check now'**
+  String get aiCheckNow;
+
+  /// No description provided for @aiNoteOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get aiNoteOptional;
+
+  /// No description provided for @aiSavedToHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to her health history'**
+  String get aiSavedToHistory;
+
+  /// No description provided for @aiChooseAnimalToSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an animal to save this check'**
+  String get aiChooseAnimalToSave;
+
+  /// No description provided for @aiSaveToHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to health history'**
+  String get aiSaveToHistory;
+
+  /// No description provided for @aiCallVetNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Call the vet now'**
+  String get aiCallVetNow;
+
+  /// No description provided for @aiCallVetToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Call the vet today'**
+  String get aiCallVetToday;
+
+  /// No description provided for @aiCallVetSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Call the vet soon'**
+  String get aiCallVetSoon;
+
+  /// No description provided for @aiWarningSigns.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning signs'**
+  String get aiWarningSigns;
+
+  /// No description provided for @aiPossibleCauses.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible causes'**
+  String get aiPossibleCauses;
+
+  /// No description provided for @aiMustReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report this to the authorities'**
+  String get aiMustReport;
+
+  /// No description provided for @aiWhatToDoNow.
+  ///
+  /// In en, this message translates to:
+  /// **'What to do now'**
+  String get aiWhatToDoNow;
+
+  /// No description provided for @aiScreeningNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Disease screening from photos is experimental and cannot replace a vet.'**
+  String get aiScreeningNote;
+
+  /// No description provided for @aiPhotoCheckTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check a photo'**
+  String get aiPhotoCheckTitle;
+
+  /// No description provided for @aiPhotoCheckBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Check that a photo is clear enough before you send it to a vet.'**
+  String get aiPhotoCheckBody;
+
+  /// No description provided for @aiPhotoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo is not clear enough'**
+  String get aiPhotoFailed;
+
+  /// No description provided for @aiPhotoGood.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo is clear enough'**
+  String get aiPhotoGood;
+
+  /// No description provided for @aiPhotoRetake.
+  ///
+  /// In en, this message translates to:
+  /// **'Take it again in good light, closer and steady.'**
+  String get aiPhotoRetake;
+
+  /// No description provided for @aiScreeningTargets.
+  ///
+  /// In en, this message translates to:
+  /// **'What screening will look for'**
+  String get aiScreeningTargets;
+
+  /// No description provided for @aiNoModel.
+  ///
+  /// In en, this message translates to:
+  /// **'No model yet'**
+  String get aiNoModel;
+
+  /// No description provided for @aiScreeningPromise.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap will not guess from a photo until a tested model is added.'**
+  String get aiScreeningPromise;
+
+  /// No description provided for @aiReportAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for a report'**
+  String get aiReportAsk;
+
+  /// No description provided for @aiReportAskHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk report for last month'**
+  String get aiReportAskHint;
+
+  /// No description provided for @aiReportNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap could not tell which report you want. Choose one below.'**
+  String get aiReportNotFound;
+
+  /// No description provided for @aiReportKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get aiReportKind;
+
+  /// No description provided for @aiReportPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Period'**
+  String get aiReportPeriod;
+
+  /// No description provided for @aiShowReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Show report'**
+  String get aiShowReport;
+
+  /// No description provided for @aiReportEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to show for this period'**
+  String get aiReportEmpty;
+
+  /// No description provided for @aiExportReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export report'**
+  String get aiExportReport;
+
+  /// No description provided for @aiPeriodLastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Last month'**
+  String get aiPeriodLastMonth;
+
+  /// No description provided for @aiPeriod7.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 days'**
+  String get aiPeriod7;
+
+  /// No description provided for @aiPeriod30.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days'**
+  String get aiPeriod30;
+
+  /// No description provided for @aiPeriodThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get aiPeriodThisMonth;
+
+  /// No description provided for @aiSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all {count}'**
+  String aiSeeAll(int count);
+
+  /// No description provided for @aiConfidence.
+  ///
+  /// In en, this message translates to:
+  /// **'{level} confidence'**
+  String aiConfidence(String level);
+
+  /// No description provided for @aiMadeFromDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Made from {count} days of records'**
+  String aiMadeFromDays(int count);
+
+  /// No description provided for @aiDaysAtRate.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left at {perDay} {unit} a day'**
+  String aiDaysAtRate(int days, String perDay, String unit);
+
+  /// No description provided for @aiReorderAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder at {level}'**
+  String aiReorderAt(String level);
+
+  /// No description provided for @aiDaysShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days'**
+  String aiDaysShort(int count);
+
+  /// No description provided for @aiDueAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'Due about {date}'**
+  String aiDueAbout(String date);
+
+  /// No description provided for @aiNextHeatAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'Next heat about {date}'**
+  String aiNextHeatAbout(String date);
+
+  /// No description provided for @aiSafeFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe from {date}'**
+  String aiSafeFrom(String date);
+
+  /// No description provided for @aiOverdueDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days overdue'**
+  String aiOverdueDays(int count);
+
+  /// No description provided for @aiDueOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {date}'**
+  String aiDueOn(String date);
+
+  /// No description provided for @aiNextMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate for {month}'**
+  String aiNextMonth(String month);
+
+  /// No description provided for @aiUsually.
+  ///
+  /// In en, this message translates to:
+  /// **'usually {amount}'**
+  String aiUsually(String amount);
+
+  /// No description provided for @aiShelfRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps {cooledHours} hours at {maxTemp} °C or colder, {warmHours} hours when warm'**
+  String aiShelfRule(String cooledHours, String maxTemp, String warmHours);
+
+  /// No description provided for @aiUseBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Use by {time}'**
+  String aiUseBy(String time);
+
+  /// No description provided for @aiPhotoNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Light {brightness}, contrast {contrast}, sharpness {sharpness}'**
+  String aiPhotoNumbers(int brightness, int contrast, int sharpness);
 }

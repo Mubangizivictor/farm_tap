@@ -1,6 +1,7 @@
 import 'package:farm_tap/app/di/injection.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/account/account_repository.dart';
+import 'package:farm_tap/core/ai/ai_repository.dart';
 import 'package:farm_tap/core/alerts/farm_reminders.dart';
 import 'package:farm_tap/core/auth/domain/staff_login_repository.dart';
 import 'package:farm_tap/core/billing/billing_repository.dart';
@@ -56,6 +57,7 @@ class AppDependencies {
     this.outbox,
     this.operations,
     this.reminders,
+    this.ai,
     this._billing,
     this._account,
   });
@@ -85,6 +87,7 @@ class AppDependencies {
     outbox: getIt.isRegistered<SmsOutbox>() ? getIt<SmsOutbox>() : null,
     operations: getIt<OperationsRepository>(),
     reminders: getIt<FarmReminders>(),
+    ai: getIt<AiRepository>(),
     billing: getIt<BillingRepository>(),
     account: getIt<AccountRepository>(),
   );
@@ -99,6 +102,10 @@ class AppDependencies {
 
   /// Farm reminders on this phone; null in tests.
   final FarmReminders? reminders;
+
+  /// AI Intelligence (decision 0025): the engine and its saved records;
+  /// null in tests that do not need it.
+  final AiRepository? ai;
 
   /// Plans, payments and receipts; tests get the sample plans.
   BillingRepository get billing => _billing ?? _fakeBilling;

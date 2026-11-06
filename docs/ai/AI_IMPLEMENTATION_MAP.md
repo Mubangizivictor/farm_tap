@@ -95,3 +95,10 @@ No new npm or pub packages for phase 1. The evaluation harness uses Python `onnx
 7. Checks, screenshots, PR.
 8. Phase 2: Dart port and phone screens, which need Flutter.
 9. Phase 3, optional: Ollama server and the `aiAsk` function.
+
+## Phone AI (phase 2) — what was built
+
+- Engine: `lib/core/ai/*.dart` is a by-hand Dart port of `shared/ai*.ts`. `test/core/ai/ai_parity_test.dart` runs both engines over the same six farms (`tools/ai_parity/`) and fails on any difference. After changing `shared/ai*.ts`, run `node tools/ai_parity/make_farms.mjs && node tools/ai_parity/snapshot.mjs`, then update the Dart port until the test passes.
+- Data: `AiRepository` reads the phone's saved records (works offline). It writes alert states, milk batches, temperature readings, shelf rules, vet checks and the usage log through the same journal as everything else. `healthAssessments` and `storageReadings` are append-only on the phone, like the rules.
+- Screens: More → **AI Intelligence** (`/more/ai`) and one page per tool (`/more/ai/:module`), plus an insights strip on Home. Code is in `lib/sectors/cattle/ai/presentation/`.
+- Not on the phone yet: platform AI on/off switches and farm feature flags (the phone uses the default settings), the Ollama model call (privacy helpers are ported), and photo screening models (only a photo-quality check runs).

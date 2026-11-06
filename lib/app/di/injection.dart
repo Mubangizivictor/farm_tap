@@ -5,6 +5,7 @@ import 'package:farm_tap/app/flavor.dart';
 import 'package:farm_tap/app/session/reminder_viewer.dart';
 import 'package:farm_tap/app/session/session_controller.dart';
 import 'package:farm_tap/core/account/account_repository.dart';
+import 'package:farm_tap/core/ai/ai_repository.dart';
 import 'package:farm_tap/core/alerts/farm_reminders.dart';
 import 'package:farm_tap/core/alerts/push_tokens.dart';
 import 'package:farm_tap/core/audit/audit_logger.dart';
@@ -308,6 +309,8 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
     ..registerLazySingleton<OperationsRepository>(
       () => OperationsRepository(journal: getIt<RecordJournal>(), clock: getIt<Clock>()),
     )
+    // Decision 0025: AI Intelligence on the phone (the engine runs here, offline).
+    ..registerLazySingleton<AiRepository>(() => AiRepository(journal: getIt<RecordJournal>(), clock: getIt<Clock>()))
     ..registerLazySingleton<FarmReminders>(
       () => FarmReminders(
         journal: getIt<RecordJournal>(),
@@ -547,6 +550,10 @@ const List<String> syncedCollections = [
   'duties',
   'absences',
   'feedTypes',
+  // Decision 0025 (AI): milk batches and alert actions. The AI use log
+  // (aiLog) is only sent, never pulled: only the control panel reads it.
+  'milkBatches',
+  'aiAlertStates',
 ];
 
 /// Reloads what was saved on this phone before the first screen shows
