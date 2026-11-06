@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { HealthAi } from '@/components/aiPage';
 import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
 import { CardHead, ConfirmDialog, Empty, ExportButtons, Field, FormDialog, LoadError, PageHead, SearchBox, SkelRows, Stat, Tabs, useSave, useToast } from '@/components/ui';
@@ -412,6 +413,7 @@ export default function Health() {
           <Icon name="plus" /> Record treatment
         </button>
       </PageHead>
+      <HealthAi />
       {vets.length > 0 ? (
         <section className="card emergency">
           <div className="row wrap">

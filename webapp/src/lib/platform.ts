@@ -3,6 +3,7 @@
 // phone has the same shapes in lib/core/platform/platform_config.dart.
 
 import { parseDate } from './dates.ts';
+import { aiConfigFrom, defaultAiConfig, type AiConfig } from '../shared/aiAccess.ts';
 
 // ---------------------------------------------------------------- Features
 
@@ -20,6 +21,7 @@ export const featureList = [
   { key: 'exports', label: 'PDF and Excel exports', hint: 'Download and print reports' },
   { key: 'webApp', label: 'Web app', hint: 'Use FarmTap in Chrome' },
   { key: 'smsAutoSend', label: 'Automatic SMS', hint: 'Sent by the server, uses SMS credits' },
+  { key: 'ai', label: 'AI Intelligence', hint: 'Assistant, alerts, predictions (decision 0025)' },
 ] as const;
 
 export type FeatureKey = (typeof featureList)[number]['key'];
@@ -38,6 +40,7 @@ export const defaultFeatures: Record<FeatureKey, boolean> = {
   exports: true,
   webApp: true,
   smsAutoSend: false,
+  ai: true,
 };
 
 /** The farm's own switch wins, then its plan's, then the default. */
@@ -92,6 +95,8 @@ export interface PlatformConfig {
   defaultPlanId: string;
   /** Server jobs that need the paid server plan (decision 0024); all off until switched on. */
   server: Record<ServerSwitch, boolean>;
+  /** AI Intelligence switches (decision 0025), edited in the AI Control Centre. */
+  ai: AiConfig;
 }
 
 export const serverSwitchList = [
@@ -137,6 +142,7 @@ export const defaultConfig: PlatformConfig = {
   legal: { termsUrl: '/terms/', privacyUrl: '/privacy/' },
   defaultPlanId: '',
   server: { alerts: false, autoSms: false, whatsappApi: false, billingPdf: false, refundsApi: false, accountErase: false },
+  ai: defaultAiConfig,
 };
 
 const obj = (v: unknown): Record<string, unknown> => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
@@ -208,6 +214,7 @@ export function configFromDoc(data: unknown): PlatformConfig {
     legal: { termsUrl: str(legal.termsUrl, '') || '/terms/', privacyUrl: str(legal.privacyUrl, '') || '/privacy/' },
     defaultPlanId: str(d.defaultPlanId, ''),
     server: Object.fromEntries(serverSwitchList.map((x) => [x.key, bool(obj(d.server)[x.key], false)])) as Record<ServerSwitch, boolean>,
+    ai: aiConfigFrom(d.ai),
   };
 }
 

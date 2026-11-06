@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
-import { Timestamp, doc, getDoc, serverTimestamp, setDoc, deleteDoc, updateDoc, writeBatch, increment, arrayUnion, getDocs, query, collection, where } from 'firebase/firestore';
+import { Timestamp, doc, getDoc, serverTimestamp, setDoc, deleteDoc, updateDoc, writeBatch, increment, arrayUnion, getDocs, query, collection, collectionGroup, where } from 'firebase/firestore';
 
 const days = (n) => Timestamp.fromMillis(Date.now() + n * 86400000);
 
@@ -716,5 +716,51 @@ describe('launch pack (decision 0024)', () => {
     await assertSucceeds(getDocs(query(collection(as('owner'), 'billingDocs'), where('tenantId', '==', T))));
     await assertFails(getDocs(query(collection(as('owner'), 'billingDocs'), where('tenantId', '==', 'other-farm'))));
     await assertFails(getDocs(collection(as('owner'), 'billingDocs')));
+  });
+});
+
+describe('AI Intelligence (decision 0025)', () => {
+  beforeEach(async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, 'platformAdmins/victor'), { role: 'owner', active: true });
+      await setDoc(doc(db, 'platformAdmins/fin'), { role: 'finance', perms: ['finance'], active: true });
+    });
+  });
+  const log = (id, body) => rec('aiLog', id, { body });
+
+  test('a member logs AI use with only feature, outcome, time and method', async () => {
+    const db = as('worker');
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/aiLog/l1`), log('l1', { feature: 'assistant', ok: true, ms: 12, method: 'calculated', at: '2026-11-07T08:00:00' })));
+    // A question, an answer or a figure is never allowed in the log.
+    await assertFails(setDoc(doc(db, `tenants/${T}/aiLog/l2`), log('l2', { feature: 'assistant', ok: true, ms: 12, method: 'calculated', question: 'Is Bella sick?' })));
+    await assertFails(setDoc(doc(db, `tenants/${T}/aiLog/l3`), log('l3', { feature: 'assistant', ok: 'yes', ms: 12, method: 'calculated' })));
+  });
+
+  test('assessments, temperatures and the log are append-only; batches and alert states can change', async () => {
+    const db = as('worker');
+    const a = rec('healthAssessments', 'h1', { body: { animalId: 'bella', kind: 'vet', risk: 'high' } });
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/healthAssessments/h1`), a));
+    await assertFails(setDoc(doc(db, `tenants/${T}/healthAssessments/h1`), { ...a, version: 2, body: { animalId: 'bella', kind: 'vet', risk: 'low' } }));
+    const b = rec('milkBatches', 'b1', { body: { litres: 40, collectedAt: '2026-11-07T06:00:00', cooled: true, status: 'stored' } });
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/milkBatches/b1`), b));
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/milkBatches/b1`), { ...b, version: 2, body: { ...b.body, status: 'sold' } }));
+    const s = rec('aiAlertStates', 'vaccine-x', { body: { status: 'acknowledged' } });
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/aiAlertStates/vaccine-x`), s));
+    await assertSucceeds(setDoc(doc(db, `tenants/${T}/aiAlertStates/vaccine-x`), { ...s, version: 2, body: { status: 'resolved' } }));
+  });
+
+  test('another farm cannot read AI results; the control centre counts use but finance staff cannot', async () => {
+    await assertSucceeds(setDoc(doc(as('worker'), `tenants/${T}/aiLog/l1`), log('l1', { feature: 'vet', ok: true, ms: 3, method: 'rules', at: '2026-11-07T08:00:00' })));
+    await assertFails(getDoc(doc(as('stranger'), `tenants/${T}/healthAssessments/h1`)));
+    await assertFails(getDocs(collection(as('stranger'), `tenants/${T}/aiLog`)));
+    await assertSucceeds(getDocs(query(collectionGroup(as('victor'), 'aiLog'))));
+    await assertFails(getDocs(query(collectionGroup(as('fin'), 'aiLog'))));
+  });
+
+  test('farm AI switch is set only by the panel; shelf-life settings only by managers', async () => {
+    await assertFails(updateDoc(doc(as('owner'), `tenants/${T}`), { features: { ai: true } }));
+    await assertFails(setDoc(doc(as('worker'), `tenants/${T}/settings/aiMilk`), rec('settings', 'aiMilk', { body: { rules: [] } })));
+    await assertSucceeds(setDoc(doc(as('owner'), `tenants/${T}/settings/aiMilk`), rec('settings', 'aiMilk', { body: { rules: [] } })));
   });
 });

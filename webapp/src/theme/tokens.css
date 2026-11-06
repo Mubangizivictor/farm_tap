@@ -54,6 +54,8 @@
   /* ---- Public site, legal pages and documents (decision 0024) ---- */
   --fs-hero: 40px; --fs-hero-sm: 30px; --z-public: 1120px; --z-doc: 820px; --z-hero-art: 360px;
   --z-asset: 160px; --z-stamp: 120px; --z-signature: 64px; --z-feature-icon: 44px; --z-avatar-xl: 96px; --z-toc: 240px;
+  /* AI Intelligence (decision 0025): symptom tick-box width, photo preview height. */
+  --z-sign: 220px; --z-photo: 320px;
 
   /* ---- Breakpoints are in app.css media queries: 600px (medium) and 1024px (wide), decision 0012 ---- */
 

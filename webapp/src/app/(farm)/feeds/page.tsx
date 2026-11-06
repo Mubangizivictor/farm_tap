@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { FeedAi } from '@/components/aiPage';
 import { useMemo, useState } from 'react';
 import { CallButtons } from '@/components/farm';
 import { Fit } from '@/components/fit';
@@ -387,6 +388,7 @@ export default function Feeds() {
           </button>
         )}
       </PageHead>
+      <FeedAi />
       <LoadError code={moves.error ?? uses.error} />
 
       {low.length > 0 && (

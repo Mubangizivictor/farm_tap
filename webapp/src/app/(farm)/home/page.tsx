@@ -1,6 +1,7 @@
 'use client';
 
 import { personPhotoSrc } from '@/lib/images';
+import { HomeAi } from '@/components/aiPage';
 import Link from 'next/link';
 import { Fit } from '@/components/fit';
 import { Icon, type IconName } from '@/components/Icon';
@@ -415,6 +416,8 @@ export default function Home() {
       )}
 
       <Fit kind="stats">{stats}</Fit>
+
+      <HomeAi />
 
       {anyLoading ? (
         <Fit kind="cards">

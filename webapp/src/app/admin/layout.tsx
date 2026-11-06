@@ -31,6 +31,7 @@ const nav: NavItem[] = [
   { href: '/admin/staff/', label: 'Admin staff', icon: 'shield', any: ['staff'], group: 'People' },
   { href: '/admin/settings/', label: 'App settings', icon: 'settings', any: ['settings'], group: 'Platform' },
   { href: '/admin/integrations/', label: 'APIs and keys', icon: 'key', any: ['settings', 'secrets'], group: 'Platform' },
+  { href: '/admin/ai/', label: 'AI Control Centre', icon: 'spark', any: ['settings', 'farms', 'support'], group: 'Platform' },
   { href: '/admin/branding/', label: 'Brand and documents', icon: 'edit', any: ['settings'], group: 'Platform' },
   { href: '/admin/legal/', label: 'Legal documents', icon: 'shield', any: ['settings'], group: 'Platform' },
   { href: '/admin/website/', label: 'Website', icon: 'globe', any: ['settings'], group: 'Platform' },

@@ -29,6 +29,8 @@ function navFor(f: Farm, cfg: PlatformConfig): NavItem[] {
   const feat = (k: FeatureKey) => featureOn(k, cfg.features, null, f.features as Record<FeatureKey, boolean | undefined>);
   return [
     { href: '/home/', label: 'Home', icon: 'home' as const },
+    // AI Intelligence (decision 0025): second, so it is on the phone's bottom bar too.
+    ...(feat('ai') && cfg.ai.enabled ? [{ href: '/ai/', label: 'AI Intelligence', icon: 'spark' as const }] : []),
     ...(hasHerd(f) && feat('milk') ? [{ href: '/milk/', label: 'Milk', icon: 'drop' as const }] : []),
     ...(hasHerd(f) && feat('herd') ? [{ href: '/herd/', label: 'Herd', icon: 'tag' as const }] : []),
     ...(hasHerd(f) && feat('health') ? [{ href: '/health/', label: 'Health', icon: 'health' as const }] : []),
@@ -304,7 +306,7 @@ function FarmShell({ children }: { children: ReactNode }) {
   const state = planState(farm.subscription, new Date());
   const plan = planText(state);
   const locked = state.kind === 'readOnly' && !path.startsWith('/settings') && !(viewing && manages(farm));
-  const current = (href: string) => (path === href || path === href.slice(0, -1) ? 'page' : undefined);
+  const current = (href: string) => (path === href || path === href.slice(0, -1) || (href === '/ai/' && path.startsWith('/ai/')) ? 'page' : undefined);
   const phoneMain = nav.slice(0, 4);
   const phoneMore = nav.slice(4);
 

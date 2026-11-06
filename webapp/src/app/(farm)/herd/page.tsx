@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { AnimalAi } from '@/components/aiPage';
 import { useEffect, useState } from 'react';
 import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
@@ -295,6 +296,7 @@ function AnimalDetail({
           </button>
         </div>
       )}
+      <AnimalAi animalId={a.id} />
       <Fit kind="stats" cols={[2, 3, 3, 3]}>
         <div className="card flat stat">
           <span className="label">Milk, 30 days</span>
@@ -363,6 +365,15 @@ export default function Herd() {
   const [view, setView] = useState<View>('herd');
   const [adding, setAdding] = useOpenFromUrl();
   const [openId, setOpenId] = useState<string | null>(null);
+  // /herd/?animal=<id> opens that animal (links from AI Intelligence, decision 0025).
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const id = url.searchParams.get('animal');
+    if (!id) return;
+    setOpenId(id);
+    url.searchParams.delete('animal');
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
+  }, []);
   const [editing, setEditing] = useState<FarmRecord<AnimalBody> | null>(null);
   const [leaving, setLeaving] = useState<FarmRecord<AnimalBody> | null>(null);
 

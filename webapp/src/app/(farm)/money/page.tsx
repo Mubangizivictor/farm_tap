@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { MoneyAi } from '@/components/aiPage';
 import { doc, getDoc } from 'firebase/firestore';
 import { useState } from 'react';
 import { Fit } from '@/components/fit';
@@ -276,6 +277,7 @@ export default function Money() {
           <Icon name="plus" /> Add expense
         </button>
       </PageHead>
+      <MoneyAi />
       <LoadError code={expenses.error ?? income.error ?? sales.error} />
 
       <Fit kind="stats" cols={[2, 2, 4, 4]}>

@@ -98,7 +98,9 @@ service cloud.firestore {
     function appendOnly(c) {
       return c in ['milkRecords', 'milkSales', 'deliveries', 'qualityTests', 'treatments',
         'vaccinations', 'attendance', 'payments', 'payouts', 'expenses', 'income', 'wages',
-        'feedUsage', 'stockMovements', 'animalEvents', 'breedingEvents', 'auditLog', 'smsOutbox'];
+        'feedUsage', 'stockMovements', 'animalEvents', 'breedingEvents', 'auditLog', 'smsOutbox',
+        // Decision 0025: AI results, cooler temperatures and the AI use log.
+        'healthAssessments', 'storageReadings', 'aiLog'];
     }
 
     // Only an owner or manager may create these.
@@ -142,6 +144,15 @@ service cloud.firestore {
         'alertLog'];
     }
 
+    // The AI use log (decision 0025) holds only what was used and how it
+    // went, never farm figures or names, so the AI Control Centre can count
+    // use across farms without reading farm records.
+    function aiLogOk(c) {
+      let b = request.resource.data.body;
+      return c != 'aiLog' || (b.keys().hasOnly(['feature', 'ok', 'ms', 'method', 'at'])
+        && b.feature is string && b.feature.size() <= 32 && b.ok is bool
+        && b.ms is number && b.method is string && b.method.size() <= 16);
+    }
     function softDelete() {
       let d = request.resource.data;
       return resource.data.isDeleted == false && d.isDeleted == true
@@ -314,6 +325,7 @@ service cloud.firestore {
           && (!managerOnly(c) || manages(t))
           && paymentOk(c)
           && smsOk(c)
+          && aiLogOk(c)
           && pinOk(t, c, id)
           && validRecord(t, c, id);
         allow update: if member(t) && !serverOnly(c) && canWrite(t)
@@ -504,6 +516,11 @@ service cloud.firestore {
     // Payment claims farms send from the app, across all farms (finance).
     match /{path=**}/payments/{id} {
       allow read: if can('finance');
+    }
+    // AI use across farms for the AI Control Centre (decision 0025): counts
+    // only; aiLogOk keeps farm figures and names out of these records.
+    match /{path=**}/aiLog/{id} {
+      allow read: if can('farms') || can('support') || can('settings');
     }
     // Append-only log of every panel change.
     match /adminAudit/{id} {

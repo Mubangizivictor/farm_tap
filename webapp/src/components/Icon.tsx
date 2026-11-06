@@ -54,6 +54,12 @@ const paths: Record<string, string> = {
   chart: 'M3 3v18h18M7 15v2M11 11v6M15 7v10M19 12v5',
   export: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12',
   whatsapp: 'M3 21l1.7-5A9 9 0 1 1 8 19.3zM9 8c0 4 3 7 7 7l1-2-2-1-1 1c-1.5-.5-2.5-1.5-3-3l1-1-1-2z',
+  // AI Intelligence (decision 0025): a spark, plus a chat bubble, a camera and a thermometer.
+  spark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z',
+  chat: 'M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.2A8 8 0 1 1 21 12zM8 11h.01M12 11h.01M16 11h.01',
+  camera: 'M4 7h3l2-3h6l2 3h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+  thermo: 'M14 14.8V5a2 2 0 1 0-4 0v9.8a4 4 0 1 0 4 0zM12 11v6',
+  trend: 'M3 17l6-6 4 4 8-8M15 7h6v6',
 };
 
 const apple =

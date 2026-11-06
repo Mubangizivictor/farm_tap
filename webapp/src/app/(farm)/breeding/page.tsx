@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { BreedingAi } from '@/components/aiPage';
 import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
 import { ConfirmDialog, Empty, ExportButtons, Field, FormDialog, LoadError, PageHead, Seg, SkelRows, Stat, Tabs, useSave, useToast } from '@/components/ui';
@@ -253,6 +254,7 @@ export default function Breeding() {
           <Icon name="plus" /> Served
         </button>
       </PageHead>
+      <BreedingAi />
       <LoadError code={events.error ?? animals.error} />
 
       <Fit kind="stats" cols={[2, 2, 4, 4]}>

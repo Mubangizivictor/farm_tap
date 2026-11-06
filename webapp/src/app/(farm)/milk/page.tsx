@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { MilkAi } from '@/components/aiPage';
 import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
 import { MilkChart } from '@/components/MilkChart';
@@ -579,6 +580,7 @@ export default function Milk() {
           <Icon name="plus" /> Record milk
         </button>
       </PageHead>
+      <MilkAi />
       <LoadError code={milk.error ?? sales.error} />
 
       <Fit kind="stats">
