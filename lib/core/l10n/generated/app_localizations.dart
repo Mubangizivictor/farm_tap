@@ -10437,6 +10437,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please look at what I attached.'**
   String get aiChatLookAtThis;
+
+  /// No description provided for @aiChatHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats'**
+  String get aiChatHistory;
+
+  /// No description provided for @aiChatHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your chats'**
+  String get aiChatHistoryTitle;
+
+  /// No description provided for @aiChatSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search your chats'**
+  String get aiChatSearch;
+
+  /// No description provided for @aiChatNoChats.
+  ///
+  /// In en, this message translates to:
+  /// **'Your chats will show here.'**
+  String get aiChatNoChats;
+
+  /// No description provided for @aiChatNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No chat matches that.'**
+  String get aiChatNoMatch;
+
+  /// No description provided for @aiChatSources.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources from Google'**
+  String get aiChatSources;
+
+  /// No description provided for @aiChatCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get aiChatCopy;
+
+  /// No description provided for @aiChatCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get aiChatCopied;
+
+  /// No description provided for @aiChatAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask again'**
+  String get aiChatAgain;
+
+  /// No description provided for @aiChatDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Details for the FarmTap owner'**
+  String get aiChatDetails;
+
+  /// No description provided for @aiChatStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get aiChatStop;
+
+  /// No description provided for @aiChatDeleteChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete chat'**
+  String get aiChatDeleteChat;
+
+  /// No description provided for @aiChatStopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped.'**
+  String get aiChatStopped;
+
+  /// No description provided for @aiChatStoppedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You stopped this answer.'**
+  String get aiChatStoppedNote;
+
+  /// No description provided for @aiChatKeptHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept on this phone only.'**
+  String get aiChatKeptHere;
 }
 
 class _AppLocalizationsDelegate

@@ -24,6 +24,8 @@ String? phoneRouteForAiLink(String href) {
       return AppRoutes.money;
     case '/reports':
       return AppRoutes.reports;
+    case '/contacts':
+      return AppRoutes.moreContacts;
     case '/farmers':
       final id = q['farmer'];
       return id == null || id.isEmpty ? AppRoutes.farmers : AppRoutes.centreFarmer(id);

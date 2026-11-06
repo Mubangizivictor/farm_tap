@@ -5,7 +5,7 @@ import { animalHealth } from '../shared/aiHerd.ts';
 import type { FarmData, MilkIn } from '../shared/aiData.ts';
 import type { Rec } from '../shared/aiCore.ts';
 import { addDays } from '../shared/aiCore.ts';
-import { animalFacts, buildChatPrompt, chatAssessmentBody, chatFileKind, findAnimalMention, readChatReply } from '../shared/aiChat.ts';
+import { animalFacts, buildChatPrompt, chatActions, chatAssessmentBody, chatFailureOf, chatFileKind, chatFollowUps, chatHistory, chatTitle, cleanSources, findAnimalMention, readChatReply } from '../shared/aiChat.ts';
 
 const TODAY = '2026-11-06';
 const NOW = `${TODAY}T09:00:00`;
@@ -99,4 +99,74 @@ test('the saved record keeps words, not files', () => {
   assert.equal(body.photo, null);
   assert.deepEqual(body.files, ['photo']);
   assert.ok(body.summary.length > 0 && body.summary.length <= 600);
+});
+
+test('history starts with the farmer and never repeats a side', () => {
+  const h = chatHistory([
+    { role: 'model', text: 'Hello' },
+    { role: 'user', text: 'a' },
+    { role: 'user', text: 'b' },
+    { role: 'model', text: '' },
+    { role: 'model', text: 'c' },
+  ]);
+  assert.deepEqual(h, [
+    { role: 'user', text: 'a\nb' },
+    { role: 'model', text: 'c' },
+  ]);
+  assert.deepEqual(chatHistory([{ role: 'model', text: 'x' }]), []);
+});
+
+test('chat title is short', () => {
+  assert.equal(chatTitle('  '), 'New chat');
+  assert.equal(chatTitle('x'.repeat(80)).length, 46);
+});
+
+test('only https sources are kept, once each', () => {
+  const s = cleanSources([{ uri: 'http://a.com' }, { uri: 'https://www.b.com/x', title: '' }, { uri: 'https://www.b.com/x' }, { uri: 'https://c.com', title: 'C' }]);
+  assert.deepEqual(s, [
+    { title: 'b.com', uri: 'https://www.b.com/x' },
+    { title: 'C', uri: 'https://c.com' },
+  ]);
+});
+
+test('a milk question about a named cow opens milk, the cow and the vet when sick', () => {
+  const a = chatActions({ question: 'Bella gives sour milk', answer: 'It may be mastitis.', health: true, callVet: 'soon', animal: { id: 'bella', name: 'Bella' } });
+  assert.deepEqual(a.map((x) => x.href), ['/herd/?animal=bella', '/ai/vet/?animal=bella', '/contacts/', '/milk/']);
+  const m = chatActions({ question: 'How much milk did I get this week?', answer: '90 litres.', health: false, callVet: null, animal: null });
+  assert.deepEqual(m.map((x) => x.href), ['/milk/']);
+  assert.deepEqual(chatActions({ question: 'hello', answer: 'Hi', health: false, callVet: null, animal: null }), []);
+});
+
+test('follow-ups depend on the topic', () => {
+  assert.equal(chatFollowUps({ question: 'cow has fever', answer: '', health: true })[1], 'When must I call the vet?');
+  assert.equal(chatFollowUps({ question: 'milk', answer: '', health: false })[0], 'Why would milk go down?');
+  assert.equal(chatFollowUps({ question: 'hi', answer: '', health: false }).length, 3);
+});
+
+test('Google errors become plain failures', () => {
+  assert.equal(chatFailureOf('AI: Error fetching from https://x: [403] Firebase AI Logic API has not been used in project'), 'setup');
+  assert.equal(chatFailureOf('[403] App Check token is invalid'), 'appCheck');
+  assert.equal(chatFailureOf('[404] models/gemini-2.5-flash is not found'), 'model');
+  assert.equal(chatFailureOf('[429] Resource has been exhausted (quota)'), 'busy');
+  assert.equal(chatFailureOf('TypeError: Failed to fetch'), 'network');
+  assert.equal(chatFailureOf('weird'), 'unreadable');
+});
+
+test('saved chats: newest first, searchable, grouped by day', async () => {
+  const { upsertChat, searchChats, groupChats } = await import('./aiChatStore.ts');
+  const now = new Date(2026, 10, 6, 12).getTime();
+  const mk = (id: string, title: string, ago: number, text = '') => ({ id, title, updatedAt: now - ago, turns: [{ id: 1, who: 'me' as const, text }] });
+  let list = upsertChat([], mk('a', 'Milk drop', 3_600_000, 'Bella milk is low'));
+  list = upsertChat(list, mk('b', 'Feed mix', 86_400_000 + 1000));
+  list = upsertChat(list, mk('c', 'Old one', 20 * 86_400_000));
+  list = upsertChat(list, mk('a', 'Milk drop', 100, 'again'));
+  assert.deepEqual(list.map((c) => c.id), ['a', 'b', 'c']);
+  assert.deepEqual(searchChats(list, 'feed').map((c) => c.id), ['b']);
+  assert.deepEqual(searchChats(list, 'milk again').map((c) => c.id), ['a']);
+  assert.deepEqual(groupChats(list, now).map((g) => g.label), ['Today', 'Yesterday', 'Older']);
+});
+
+test('bad milk counts as a health question', () => {
+  assert.equal(readChatReply('Check her udder.', 'My cow gives sour milk').health, true);
+  assert.equal(readChatReply('Yes.', 'How do I sell milk?').health, false);
 });

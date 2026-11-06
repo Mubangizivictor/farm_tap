@@ -708,3 +708,21 @@ textarea.input { min-height: calc(var(--z-input) * 2); resize: vertical; }
 .chat-file { display: flex; align-items: center; gap: var(--s-xs); padding: var(--s-xxs) var(--s-sm); border-radius: var(--r-md); background: var(--c-container); }
 .chat-file img { width: var(--z-avatar); height: var(--z-avatar); object-fit: cover; border-radius: var(--r-sm); }
 .chat-about { align-self: flex-start; }
+.chat-top { flex-wrap: nowrap; }
+.chat-title { flex: 1; min-width: 0; text-align: center; font-size: var(--fs-title); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-ai { flex-direction: row; align-items: flex-start; gap: var(--s-md); }
+.chat-avatar { width: var(--z-avatar); height: var(--z-avatar); border-radius: var(--r-pill); flex: none; display: grid; place-items: center; background: var(--c-primary-container); color: var(--c-on-primary-container); }
+.chat-answer { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--s-md); }
+.chat-actions { display: flex; flex-wrap: wrap; gap: var(--s-sm); }
+.chat-sources { display: flex; flex-direction: column; gap: var(--s-xs); }
+.chat-sources .chip { text-decoration: none; max-width: 100%; }
+.chat-suggest { width: 100%; height: var(--z-avatar-lg); border: 0; border-radius: var(--r-md); background: transparent; }
+.chat-bar { display: flex; gap: var(--s-xs); margin-left: calc(var(--s-sm) * -1); }
+.chat-detail code { display: block; margin-top: var(--s-xs); white-space: pre-wrap; word-break: break-word; }
+.chat-follow { gap: var(--s-sm); }
+.chip-btn { border: 0; cursor: pointer; font: inherit; text-align: left; }
+.chat-group { gap: var(--s-xs); }
+.chat-row { display: flex; align-items: center; gap: var(--s-xs); border-radius: var(--r-md); }
+.chat-row.on { background: var(--c-primary-container); }
+.chat-row-open { flex: 1; min-width: 0; text-align: left; border: 0; background: transparent; color: inherit; font: inherit; padding: var(--s-sm) var(--s-md); cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-actions .btn { border-color: var(--c-outline-variant); }

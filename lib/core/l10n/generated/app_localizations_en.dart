@@ -6041,4 +6041,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiChatLookAtThis => 'Please look at what I attached.';
+
+  @override
+  String get aiChatHistory => 'Chats';
+
+  @override
+  String get aiChatHistoryTitle => 'Your chats';
+
+  @override
+  String get aiChatSearch => 'Search your chats';
+
+  @override
+  String get aiChatNoChats => 'Your chats will show here.';
+
+  @override
+  String get aiChatNoMatch => 'No chat matches that.';
+
+  @override
+  String get aiChatSources => 'Sources from Google';
+
+  @override
+  String get aiChatCopy => 'Copy';
+
+  @override
+  String get aiChatCopied => 'Copied';
+
+  @override
+  String get aiChatAgain => 'Ask again';
+
+  @override
+  String get aiChatDetails => 'Details for the FarmTap owner';
+
+  @override
+  String get aiChatStop => 'Stop';
+
+  @override
+  String get aiChatDeleteChat => 'Delete chat';
+
+  @override
+  String get aiChatStopped => 'Stopped.';
+
+  @override
+  String get aiChatStoppedNote => 'You stopped this answer.';
+
+  @override
+  String get aiChatKeptHere => 'Kept on this phone only.';
 }

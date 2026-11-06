@@ -4190,5 +4190,20 @@
   "aiChatFilesNotRead": "Files and photos could not be read.",
   "aiChatOfflineHelp": "I can answer simple questions about your milk, animals, feed and money from your records, even without internet.",
   "aiChatMedsLeftOut": "Some details about medicines were left out. Ask your vet.",
-  "aiChatLookAtThis": "Please look at what I attached."
+  "aiChatLookAtThis": "Please look at what I attached.",
+  "aiChatHistory": "Chats",
+  "aiChatHistoryTitle": "Your chats",
+  "aiChatSearch": "Search your chats",
+  "aiChatNoChats": "Your chats will show here.",
+  "aiChatNoMatch": "No chat matches that.",
+  "aiChatSources": "Sources from Google",
+  "aiChatCopy": "Copy",
+  "aiChatCopied": "Copied",
+  "aiChatAgain": "Ask again",
+  "aiChatDetails": "Details for the FarmTap owner",
+  "aiChatStop": "Stop",
+  "aiChatDeleteChat": "Delete chat",
+  "aiChatStopped": "Stopped.",
+  "aiChatStoppedNote": "You stopped this answer.",
+  "aiChatKeptHere": "Kept on this phone only."
 }

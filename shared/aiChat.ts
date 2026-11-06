@@ -25,6 +25,8 @@ export const CHAT_SYSTEM = [
   'You are FarmTap AI, a helpful assistant for small dairy farmers in Uganda.',
   'Write in short, simple words. Use the language the farmer writes in. Keep answers under 200 words unless asked for more.',
   'You can answer anything: farm questions, a sick animal, feed, money, research, or other topics.',
+  'For general farming, disease, feed, market, weather or research questions, use Google Search and answer from what you find. Prefer Uganda and East Africa sources. Do not describe your search steps.',
+  'Use short paragraphs and, when it helps, a short list. Put the most important thing first.',
   'FARM FACTS come from the farm\'s own records and are correct. Use them. Never invent numbers about the farm.',
   'When a photo, file or video is attached, say what you can see or read in it. If it is unclear, say so and ask for a better one.',
   'For animal health: describe what may be going on and what to watch for, never say you are sure, and never give a drug name, dose or injection. Tell the farmer when to call the vet (now, today or soon).',
@@ -145,7 +147,7 @@ export interface ChatReply {
 }
 
 const HEALTH =
-  /\b(sick|ill|illness|disease|fever|cough\w*|diarrh\w*|limp\w*|lame\w*|swollen|swelling|wound\w*|bleed\w*|mastitis|not eating|doesn'?t eat|won'?t eat|stopped eating|off (her )?feed|symptom\w*|infect\w*|lump\w*|discharge|calving|aborted|bloat\w*|ticks?|worms?|udder|dung|weak|dying|died|dead)\b/i;
+  /\b(sick|ill|illness|disease|fever|cough\w*|diarrh\w*|limp\w*|lame\w*|swollen|swelling|wound\w*|bleed\w*|mastitis|not eating|doesn'?t eat|won'?t eat|stopped eating|off (her )?feed|symptom\w*|infect\w*|lump\w*|discharge|calving|aborted|bloat\w*|ticks?|worms?|udder|dung|weak|dying|died|dead|clots?|clotted|stringy|(sour|bitter|watery|bloody|bad) milk|blood in (the |her )?milk|milk (smells?|tastes?|is bad))\b/i;
 
 const unsafe = (s: string) => sentenceUnsafe(s.replace(/\bgive her\b/gi, 'offer'));
 
@@ -252,4 +254,150 @@ export function chatAssessmentBody(animalId: string, question: string, r: ChatRe
     model,
     at,
   };
+}
+
+// ---------------------------------------------------------------- Conversation sent to the model
+
+export interface HistoryTurn {
+  role: 'user' | 'model';
+  text: string;
+}
+
+/**
+ * The earlier turns sent with a new question. Gemini refuses a conversation
+ * that does not start with the farmer or that has two turns from the same
+ * side in a row, so this keeps the last few turns, drops empty ones, merges
+ * neighbours from the same side and removes a leading model turn.
+ */
+export function chatHistory(turns: HistoryTurn[], keep = 8): HistoryTurn[] {
+  const out: HistoryTurn[] = [];
+  for (const t of turns.slice(-keep)) {
+    const text = t.text.trim();
+    if (!text) continue;
+    const last = out[out.length - 1];
+    if (last && last.role === t.role) last.text = `${last.text}\n${text}`;
+    else out.push({ role: t.role, text });
+  }
+  while (out.length && out[0].role !== 'user') out.shift();
+  return out;
+}
+
+/** A short title for a saved chat, from the first question. */
+export function chatTitle(question: string): string {
+  const t = question.replace(/\s+/g, ' ').trim();
+  if (!t) return 'New chat';
+  return t.length <= 48 ? t : `${t.slice(0, 45).trimEnd()}…`;
+}
+
+// ---------------------------------------------------------------- Google Search sources
+
+export interface ChatSource {
+  title: string;
+  uri: string;
+}
+
+export interface ChatGrounding {
+  /** What the model searched for. */
+  queries: string[];
+  sources: ChatSource[];
+  /** Google's own "Search suggestions" HTML. Must be shown when present. */
+  suggestionsHtml: string | null;
+}
+
+/** Only web links are kept, at most six, no duplicates. */
+export function cleanSources(list: { title?: string | null; uri?: string | null }[]): ChatSource[] {
+  const seen = new Set<string>();
+  const out: ChatSource[] = [];
+  for (const s of list) {
+    const uri = (s.uri ?? '').trim();
+    if (!/^https:\/\//i.test(uri) || seen.has(uri)) continue;
+    seen.add(uri);
+    out.push({ title: (s.title ?? '').trim().slice(0, 80) || new URL(uri).hostname.replace(/^www\./, ''), uri });
+    if (out.length === 6) break;
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------- Buttons under an answer
+
+export interface ChatAction {
+  label: string;
+  href: string;
+}
+
+export interface ChatActionInput {
+  question: string;
+  answer: string;
+  health: boolean;
+  callVet: ChatReply['callVet'];
+  animal: { id: string; name: string } | null;
+}
+
+const MILK = /\b(milk\w*|yield|litres?|liters?|lactation|production|udder|curd\w*|sour)\b/i;
+const FEED = /\b(feed\w*|fodder|silage|napier|hay|grass|concentrate|bran|maize|pasture|water(ing)?)\b/i;
+const MONEY = /\b(money|cost\w*|price\w*|sell\w*|sold|expens\w*|profit|income|paid?|loan|budget)\b/i;
+const BREED = /\b(heat|in heat|serv(e|ed|ice)|pregnan\w*|calv\w*|insemination|bull|breed\w*|due date|gestation)\b/i;
+const VACC = /\b(vaccin\w*|immuni[sz]\w*|dewormer|deworm\w*|dip(ping)?|spray\w*)\b/i;
+
+/**
+ * Where the answer should take the farmer next. A named cow opens that cow;
+ * a health answer opens the Vet Assistant and the vet's number; milk,
+ * feed, money, breeding and vaccination questions open that section. At
+ * most four, most useful first.
+ */
+export function chatActions(i: ChatActionInput): ChatAction[] {
+  const text = `${i.question}\n${i.answer}`;
+  const asked = i.question;
+  const out: ChatAction[] = [];
+  const add = (label: string, href: string) => {
+    if (!out.some((a) => a.href === href)) out.push({ label, href });
+  };
+  if (i.animal) add(`Open ${i.animal.name}`, `/herd/?animal=${encodeURIComponent(i.animal.id)}`);
+  if (i.health || i.callVet) {
+    add('Check with the Vet Assistant', i.animal ? `/ai/vet/?animal=${encodeURIComponent(i.animal.id)}` : '/ai/vet/');
+    add('Call your vet', '/contacts/');
+  }
+  if (MILK.test(asked) || (MILK.test(text) && !i.health)) add('Go to Milk', '/milk/');
+  if (VACC.test(asked)) add('Vaccinations and health', '/health/');
+  if (BREED.test(asked)) add('Go to Breeding', '/breeding/');
+  if (FEED.test(asked)) add('Go to Feeds', '/feeds/');
+  if (MONEY.test(asked)) add('Go to Money', '/money/');
+  return out.slice(0, 4);
+}
+
+/** Up to three questions the farmer can tap to carry on. */
+export function chatFollowUps(i: { question: string; answer: string; health: boolean }): string[] {
+  const t = `${i.question}\n${i.answer}`;
+  if (i.health) return ['What should I watch for?', 'When must I call the vet?', 'How do I stop it spreading to other cows?'];
+  if (MILK.test(t)) return ['Why would milk go down?', 'How can I get more milk?', 'How do I keep milk fresh longer?'];
+  if (BREED.test(t)) return ['How do I know a cow is in heat?', 'When should I call the AI technician?', 'How do I care for a cow before calving?'];
+  if (FEED.test(t)) return ['What is a cheap feed mix?', 'How much water does a milking cow need?', 'How do I store feed so it lasts?'];
+  if (MONEY.test(t)) return ['How can I spend less on feed?', 'What affects the price of milk?'];
+  return ['Tell me more', 'Give me an example', 'What should I do first?'];
+}
+
+// ---------------------------------------------------------------- When Google does not answer
+
+export type ChatFailure = 'network' | 'busy' | 'appCheck' | 'setup' | 'model' | 'blocked' | 'unreadable';
+
+export const CHAT_FAIL: Record<ChatFailure, string> = {
+  network: 'There is no internet right now.',
+  busy: 'Online AI is busy or its free limit is used up. Try again in a minute.',
+  appCheck: 'Google did not accept this app yet (App Check). The FarmTap owner must finish the App Check set-up.',
+  setup: 'Online AI is not fully set up in the Firebase project yet. The FarmTap owner must turn on Firebase AI Logic.',
+  model: 'The AI model chosen in the Admin AI settings is not available. The owner should change it to gemini-3.8-flash.',
+  blocked: 'Google would not answer that. Try asking in different words.',
+  unreadable: 'The answer could not be read. Try asking again.',
+};
+
+/** Sorts the error text from Firebase AI or the network into a plain failure. */
+export function chatFailureOf(message: string): ChatFailure {
+  const m = message.toLowerCase();
+  if (/app.?check|attestation|recaptcha/.test(m)) return 'appCheck';
+  if (/\b404\b|not found|is not supported|no longer available|not available for/.test(m)) return 'model';
+  if (/\b429\b|quota|resource.?exhausted|\b503\b|overload|unavailable|timeout|rate limit/.test(m)) return 'busy';
+  if (/\b403\b|\b401\b|permission|has not been used|disabled|api key|api_key|billing/.test(m)) return 'setup';
+  if (/safety|blocked|prohibited|recitation/.test(m)) return 'blocked';
+  if (/network|failed to fetch|fetch failed|offline|load failed|socket/.test(m)) return 'network';
+  return 'unreadable';
 }
