@@ -1,17 +1,17 @@
 // FarmTap AI engine: Smart Farm Reports (decision 0025). A request in the
 // farmer's own words picks a report and a period; the report is a table made
 // only from the farm's records. Hand port of shared/aiReports.ts.
-import 'ai_access.dart';
-import 'ai_assistant.dart';
-import 'ai_core.dart';
-import 'ai_data.dart';
-import 'ai_herd.dart';
-import 'ai_milk.dart';
-import 'ai_money.dart';
-import 'ai_stock.dart';
+import 'package:farm_tap/core/ai/ai_access.dart';
+import 'package:farm_tap/core/ai/ai_assistant.dart';
+import 'package:farm_tap/core/ai/ai_core.dart';
+import 'package:farm_tap/core/ai/ai_data.dart';
+import 'package:farm_tap/core/ai/ai_herd.dart';
+import 'package:farm_tap/core/ai/ai_milk.dart';
+import 'package:farm_tap/core/ai/ai_money.dart';
+import 'package:farm_tap/core/ai/ai_stock.dart';
 
 class ReportKindInfo {
-  const ReportKindInfo(this.key, this.label, this.words, this.money);
+  const new(this.key, this.label, this.words, this.money);
   final String key;
   final String label;
   final RegExp words;
@@ -22,23 +22,23 @@ final reportKinds = <ReportKindInfo>[
   ReportKindInfo(
     'overall',
     'Overall farm performance',
-    RegExp(r'overall|performance|summary|everything|whole farm|general'),
+    RegExp('overall|performance|summary|everything|whole farm|general'),
     false,
   ),
-  ReportKindInfo('milk', 'Milk production', RegExp(r'milk|production|litre|yield'), false),
-  ReportKindInfo('health', 'Animal health', RegExp(r'health|treat|sick|vaccin|disease'), false),
-  ReportKindInfo('profit', 'Farm profitability', RegExp(r'profit|loss|income|revenue|money|financ'), true),
-  ReportKindInfo('expenses', 'Farm expenses', RegExp(r'expens|spend|spent|cost'), true),
-  ReportKindInfo('feed', 'Feed consumption', RegExp(r'feed|silage|hay|fodder'), false),
-  ReportKindInfo('breeding', 'Breeding performance', RegExp(r'breed|calv|pregnan|heat|insemina'), false),
-  ReportKindInfo('quality', 'Milk quality', RegExp(r'quality|reject|test|expir|batch|cool|temperat'), false),
-  ReportKindInfo('inventory', 'Inventory', RegExp(r'inventor|stock|store|drug'), false),
+  ReportKindInfo('milk', 'Milk production', RegExp('milk|production|litre|yield'), false),
+  ReportKindInfo('health', 'Animal health', RegExp('health|treat|sick|vaccin|disease'), false),
+  ReportKindInfo('profit', 'Farm profitability', RegExp('profit|loss|income|revenue|money|financ'), true),
+  ReportKindInfo('expenses', 'Farm expenses', RegExp('expens|spend|spent|cost'), true),
+  ReportKindInfo('feed', 'Feed consumption', RegExp('feed|silage|hay|fodder'), false),
+  ReportKindInfo('breeding', 'Breeding performance', RegExp('breed|calv|pregnan|heat|insemina'), false),
+  ReportKindInfo('quality', 'Milk quality', RegExp('quality|reject|test|expir|batch|cool|temperat'), false),
+  ReportKindInfo('inventory', 'Inventory', RegExp('inventor|stock|store|drug'), false),
 ];
 
 ReportKindInfo _info(String key) => reportKinds.firstWhere((r) => r.key == key);
 
 class Report {
-  const Report({
+  const new({
     required this.kind,
     required this.title,
     required this.period,
@@ -197,10 +197,10 @@ Report buildReport(String kind, Period period, FarmData d) {
               () {
                 final v = views[en.key];
                 return <Object>[
-                  '${v?.name ?? en.key}',
+                  (v?.name ?? en.key),
                   '${jsNum(round1(en.value))} ${v?.unit ?? ''}'.trim(),
                   round1(en.value / days),
-                  v != null ? '${jsNum(v.left)} ${v.unit}' : '',
+                  if (v != null) '${jsNum(v.left)} ${v.unit}' else '',
                   v?.daysLeft ?? '',
                 ];
               }(),
@@ -221,9 +221,10 @@ Report buildReport(String kind, Period period, FarmData d) {
         return make(
           [
             '${ev.where((e) => e.str('type') == 'ai' || (e.str('type') == 'service' && e.str('kind') != 'heat')).length} services, ${ev.where((e) => e.str('type') == 'calving').length} calvings in the period',
-            ci.avgDays != null
-                ? 'Average calving interval: ${ci.avgDays} days'
-                : 'Calving interval: needs 2 or more recorded intervals',
+            if (ci.avgDays != null)
+              'Average calving interval: ${ci.avgDays} days'
+            else
+              'Calving interval: needs 2 or more recorded intervals',
           ],
           ['Cow', 'State', 'Served', 'Due (estimate)', 'Next heat (estimate)'],
           [
@@ -232,10 +233,10 @@ Report buildReport(String kind, Period period, FarmData d) {
                 final b = breedingState(a.id, d.breeding, day);
                 return <Object>[
                   animalName(a),
-                  b.pregnant ? (b.confirmed ? 'In calf (confirmed)' : 'Served') : 'Open',
-                  b.servedDay != null ? fmtDay(b.servedDay!) : '',
-                  b.due != null ? fmtDay(b.due!) : '',
-                  b.nextHeat != null ? fmtDay(b.nextHeat!) : '',
+                  if (b.pregnant) b.confirmed ? 'In calf (confirmed)' : 'Served' else 'Open',
+                  if (b.servedDay != null) fmtDay(b.servedDay!) else '',
+                  if (b.due != null) fmtDay(b.due!) else '',
+                  if (b.nextHeat != null) fmtDay(b.nextHeat!) else '',
                 ];
               }(),
           ],
@@ -260,7 +261,7 @@ Report buildReport(String kind, Period period, FarmData d) {
                 s16(x.collectedAt.replaceFirst('T', ' ')),
                 x.place,
                 x.litres,
-                x.state == 'closed' ? x.status : x.state,
+                if (x.state == 'closed') x.status else x.state,
                 x.highest ?? 'no reading',
                 x.useBy.replaceFirst('T', ' '),
               ],
@@ -272,7 +273,13 @@ Report buildReport(String kind, Period period, FarmData d) {
         for (final f in feedViews(d))
           <Object>[f.name, 'Feed', '${jsNum(f.left)} ${f.unit}', f.perDay, f.daysLeft ?? ''],
         for (final x in drugViews(d))
-          <Object>[x.name, 'Drug', x.stock == null ? 'not counted' : '${jsNum(x.stock!)} ${x.unit}'.trim(), '', ''],
+          <Object>[
+            x.name,
+            'Drug',
+            if (x.stock == null) 'not counted' else '${jsNum(x.stock!)} ${x.unit}'.trim(),
+            '',
+            '',
+          ],
       ]);
     default:
       {

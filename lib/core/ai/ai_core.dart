@@ -9,16 +9,10 @@ import 'dart:math' as math;
 
 /// One stored record, as both apps write it (the fields the engine needs).
 class Rec {
-  const Rec({required this.id, required this.body, this.isDeleted = false, this.createdAt, this.createdBy});
-
-  final String id;
-  final bool isDeleted;
-  final String? createdAt;
-  final String? createdBy;
-  final Map<String, Object?> body;
+  const new({required this.id, required this.body, this.isDeleted = false, this.createdAt, this.createdBy});
 
   /// Reads a record from the JSON shape used by the parity fixtures.
-  factory Rec.fromJson(Map<String, Object?> j) => Rec(
+  factory fromJson(Map<String, Object?> j) => Rec(
     id: '${j['id']}',
     isDeleted: j['isDeleted'] == true,
     createdAt: j['createdAt'] as String?,
@@ -26,13 +20,19 @@ class Rec {
     body: (j['body'] as Map?)?.cast<String, Object?>() ?? const {},
   );
 
-  String? str(String k) => body[k] is String ? body[k] as String : null;
+  final String id;
+  final bool isDeleted;
+  final String? createdAt;
+  final String? createdBy;
+  final Map<String, Object?> body;
+
+  String? str(String k) => body[k] is String ? body[k]! as String : null;
   double? numOrNull(String k) {
     final v = body[k];
     return v is num ? v.toDouble() : null;
   }
 
-  bool? flag(String k) => body[k] is bool ? body[k] as bool : null;
+  bool? flag(String k) => body[k] is bool ? body[k]! as bool : null;
 }
 
 /// How an answer was made. Shown on every card, so a sum is never called "AI".
@@ -51,7 +51,7 @@ enum Severity { critical, high, medium, low }
 int severityRank(Severity s) => s.index;
 
 class AiModuleInfo {
-  const AiModuleInfo(this.key, this.label, this.hint);
+  const new(this.key, this.label, this.hint);
   final String key;
   final String label;
   final String hint;
@@ -114,7 +114,7 @@ int weekdayOf(String day) => DateTime.fromMillisecondsSinceEpoch(_dayToMs(day), 
 String monthOf(String day) => day.substring(0, 7);
 
 String addMonths(String month, int n) {
-  final d = DateTime.utc(int.parse(month.substring(0, 4)), int.parse(month.substring(5, 7)) + n, 1);
+  final d = DateTime.utc(int.parse(month.substring(0, 4)), int.parse(month.substring(5, 7)) + n);
   return '${d.year.toString().padLeft(4, '0')}-${_pad(d.month)}';
 }
 
@@ -144,7 +144,7 @@ double jsRound(num x) => (x + 0.5).floorToDouble();
 
 // ---------------------------------------------------------------- Statistics
 
-double sum(Iterable<double> xs) => xs.fold(0.0, (t, x) => t + x);
+double sum(Iterable<double> xs) => xs.fold(0, (t, x) => t + x);
 double mean(List<double> xs) => xs.isEmpty ? 0 : sum(xs) / xs.length;
 
 double median(List<double> xs) {
@@ -171,7 +171,7 @@ double? robustZ(double x, List<double> history, {int minPoints = 7}) {
 }
 
 class LineFit {
-  const LineFit(this.slope, this.intercept, this.residualSd, this.r2, this.n);
+  const new(this.slope, this.intercept, this.residualSd, this.r2, this.n);
   final double slope;
   final double intercept;
   final double residualSd;
@@ -222,7 +222,7 @@ double round1(double x) => jsRound(x * 10) / 10;
 // ---------------------------------------------------------------- Insights
 
 class Link {
-  const Link(this.label, this.href);
+  const new(this.label, this.href);
   final String label;
   final String href;
 }
@@ -230,7 +230,7 @@ class Link {
 /// One finding: an alert, a recommendation or an insight. `id` is stable for
 /// the same situation, so an acknowledgement sticks until it changes.
 class Finding {
-  const Finding({
+  const new({
     required this.id,
     required this.module,
     required this.severity,
@@ -300,12 +300,12 @@ String _locale(double x) {
   final neg = x < 0;
   final r = (x.abs() * 1000).round() / 1000;
   final whole = r.floor();
-  var frac = (r - whole).toStringAsFixed(3).substring(2).replaceFirst(RegExp(r'0+$'), '');
+  final frac = (r - whole).toStringAsFixed(3).substring(2).replaceFirst(RegExp(r'0+$'), '');
   return '${neg ? '-' : ''}${_group(whole)}${frac.isEmpty ? '' : '.$frac'}';
 }
 
 String fmtL(double l) => '${_locale(round1(l))} L';
-String fmtUgx(double n) => 'UGX ${_locale(jsRound(n).toDouble())}';
+String fmtUgx(double n) => 'UGX ${_locale(jsRound(n))}';
 
 const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const _wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

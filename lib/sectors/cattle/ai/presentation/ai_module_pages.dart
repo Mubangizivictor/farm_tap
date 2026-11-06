@@ -23,7 +23,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// A page that shows one module: a few summary cards, then its findings.
 class _ModulePage extends StatelessWidget {
-  const _ModulePage({required this.ctx, required this.module, required this.summary});
+  const new({required this.ctx, required this.module, required this.summary});
 
   final AiPageContext ctx;
   final String module;
@@ -59,7 +59,7 @@ String _l(double v) => fmtL(v);
 // ---------------------------------------------------------------- Milk
 
 class AiMilkPage extends StatelessWidget {
-  const AiMilkPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -143,7 +143,7 @@ class AiMilkPage extends StatelessWidget {
 // ---------------------------------------------------------------- Predictions
 
 class AiPredictionsPage extends StatelessWidget {
-  const AiPredictionsPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -235,11 +235,7 @@ class AiPredictionsPage extends StatelessWidget {
               children: [
                 for (final c in cows)
                   RecordTile(
-                    leading: IconBubble(
-                      icon: Symbols.pets_rounded,
-                      tone: FarmTapTone.primary,
-                      size: context.sizes.bubbleMd,
-                    ),
+                    leading: IconBubble(icon: Symbols.pets_rounded, size: context.sizes.bubbleMd),
                     title: c.name,
                     subtitle: l10n.aiConfidence(c.f.confidence),
                     trailingValue: _l(c.f.total7),
@@ -278,7 +274,7 @@ List<Widget> _feedRows(BuildContext context, AppLocalizations l10n, List<FeedVie
 ];
 
 class AiFeedPage extends StatelessWidget {
-  const AiFeedPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -318,7 +314,7 @@ class AiFeedPage extends StatelessWidget {
 }
 
 class AiInventoryPage extends StatelessWidget {
-  const AiInventoryPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -365,7 +361,7 @@ class AiInventoryPage extends StatelessWidget {
 // ---------------------------------------------------------------- Breeding
 
 class AiBreedingPage extends StatelessWidget {
-  const AiBreedingPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -460,7 +456,7 @@ class AiBreedingPage extends StatelessWidget {
 // ---------------------------------------------------------------- Health
 
 class AiHealthPage extends StatelessWidget {
-  const AiHealthPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -541,7 +537,7 @@ class AiHealthPage extends StatelessWidget {
 // ---------------------------------------------------------------- Finance
 
 class AiFinancePage extends StatelessWidget {
-  const AiFinancePage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -622,7 +618,7 @@ class AiFinancePage extends StatelessWidget {
 // ---------------------------------------------------------------- Risks, recommendations, alerts
 
 class AiRisksPage extends StatelessWidget {
-  const AiRisksPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -657,7 +653,7 @@ class AiRisksPage extends StatelessWidget {
 }
 
 class AiRecommendationsPage extends StatelessWidget {
-  const AiRecommendationsPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -672,7 +668,7 @@ class AiRecommendationsPage extends StatelessWidget {
 }
 
 class AiAlertsPage extends StatefulWidget {
-  const AiAlertsPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -722,7 +718,7 @@ class _AiAlertsPageState extends State<AiAlertsPage> {
 // ---------------------------------------------------------------- Milk quality and expiry
 
 class AiQualityPage extends StatelessWidget {
-  const AiQualityPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -889,7 +885,7 @@ double? _num(String s) => double.tryParse(s.trim().replaceAll(',', '.'));
 final _decimal = <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp(r'[0-9.,\-]'))];
 
 class _BatchForm extends StatefulWidget {
-  const _BatchForm({required this.repo, required this.now, required this.onSaved});
+  const new({required this.repo, required this.now, required this.onSaved});
 
   final AiRepository repo;
   final DateTime now;
@@ -951,7 +947,7 @@ class _BatchFormState extends State<_BatchForm> {
 }
 
 class _ReadingForm extends StatefulWidget {
-  const _ReadingForm({required this.repo, required this.batch, required this.onSaved});
+  const new({required this.repo, required this.batch, required this.onSaved});
 
   final AiRepository repo;
   final BatchView batch;
@@ -1008,7 +1004,7 @@ class _ReadingFormState extends State<_ReadingForm> {
 }
 
 class _RuleForm extends StatefulWidget {
-  const _RuleForm({required this.repo, required this.rules, required this.onSaved});
+  const new({required this.repo, required this.rules, required this.onSaved});
 
   final AiRepository repo;
   final List<ShelfRule> rules;

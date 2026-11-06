@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class AiHubPage extends StatelessWidget {
-  const AiHubPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 

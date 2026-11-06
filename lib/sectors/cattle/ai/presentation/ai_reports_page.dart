@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class AiReportsPage extends StatefulWidget {
-  const AiReportsPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 

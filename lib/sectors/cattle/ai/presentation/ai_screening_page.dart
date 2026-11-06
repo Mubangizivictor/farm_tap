@@ -16,7 +16,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class AiScreeningPage extends StatefulWidget {
-  const AiScreeningPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 
@@ -140,7 +140,7 @@ class _AiScreeningPageState extends State<AiScreeningPage> {
                   ),
                   title: t.label,
                   subtitle: '${t.photo}\n${t.note}',
-                  badge: StatusBadge(label: l10n.aiNoModel, tone: FarmTapTone.neutral),
+                  badge: StatusBadge(label: l10n.aiNoModel),
                   showChevron: false,
                 ),
             ],

@@ -5,23 +5,23 @@
 // exactly from the farm's records. Every number comes from those records;
 // when a question does not match, the assistant says so and suggests what it
 // can answer.
-import 'ai_access.dart';
-import 'ai_core.dart';
-import 'ai_data.dart';
-import 'ai_herd.dart';
-import 'ai_milk.dart';
-import 'ai_money.dart';
-import 'ai_risk.dart';
-import 'ai_stock.dart';
+import 'package:farm_tap/core/ai/ai_access.dart';
+import 'package:farm_tap/core/ai/ai_core.dart';
+import 'package:farm_tap/core/ai/ai_data.dart';
+import 'package:farm_tap/core/ai/ai_herd.dart';
+import 'package:farm_tap/core/ai/ai_milk.dart';
+import 'package:farm_tap/core/ai/ai_money.dart';
+import 'package:farm_tap/core/ai/ai_risk.dart';
+import 'package:farm_tap/core/ai/ai_stock.dart';
 
 class Answer {
-  const Answer({
+  const new({
     required this.intent,
     required this.ok,
     required this.text,
+    required this.method,
     this.bullets = const [],
     this.links = const [],
-    required this.method,
   });
   final String intent;
   final bool ok;
@@ -32,7 +32,7 @@ class Answer {
 }
 
 class Period {
-  const Period(this.from, this.to, this.label);
+  const new(this.from, this.to, this.label);
   final String from;
   final String to;
   final String label;
@@ -44,15 +44,17 @@ Period periodOf(String q, String day, [String fallback = 'today']) {
   final n = RegExp(r'(?:last|past)\s+(\d{1,3})\s+days?').firstMatch(s);
   if (n != null) return Period(addDays(day, -(int.parse(n.group(1)!) - 1)), day, 'the last ${n.group(1)} days');
   if (RegExp('yesterday').hasMatch(s)) return Period(addDays(day, -1), addDays(day, -1), 'yesterday');
-  if (RegExp(r'last\s+week|previous\s+week').hasMatch(s))
+  if (RegExp(r'last\s+week|previous\s+week').hasMatch(s)) {
     return Period(addDays(day, -13), addDays(day, -7), 'the week before last 7 days');
+  }
   if (RegExp(r'this\s+week|past\s+week|last\s+7').hasMatch(s)) return Period(addDays(day, -6), day, 'the last 7 days');
   if (RegExp(r'last\s+month|previous\s+month').hasMatch(s)) {
     final m = addMonths(day.substring(0, 7), -1);
     return Period('$m-01', addDays('${day.substring(0, 7)}-01', -1), fmtMonth(m));
   }
-  if (RegExp(r'this\s+month|month').hasMatch(s))
+  if (RegExp(r'this\s+month|month').hasMatch(s)) {
     return Period('${day.substring(0, 7)}-01', day, '${fmtMonth(day.substring(0, 7))} so far');
+  }
   if (RegExp('today|now').hasMatch(s)) return Period(day, day, 'today');
   if (fallback == 'month') return Period('${day.substring(0, 7)}-01', day, '${fmtMonth(day.substring(0, 7))} so far');
   if (fallback == 'week') return Period(addDays(day, -6), day, 'the last 7 days');
@@ -62,7 +64,7 @@ Period periodOf(String q, String day, [String fallback = 'today']) {
 bool _inP(String? day, Period p) => day != null && day.compareTo(p.from) >= 0 && day.compareTo(p.to) <= 0;
 
 class _Ctx {
-  _Ctx(this.d, this.q, this.day, this.role, this._findings);
+  new(this.d, this.q, this.day, this.role, this._findings);
   final FarmData d;
   final String q;
   final String day;
@@ -73,7 +75,7 @@ class _Ctx {
 }
 
 class _Intent {
-  const _Intent(this.key, this.match, this.run, {this.money = false});
+  const new(this.key, this.match, this.run, {this.money = false});
   final String key;
   final List<RegExp> match;
   final bool money;
@@ -91,15 +93,14 @@ Answer _a(
 String _upperFirst(String k) => k.isEmpty ? k : '${k[0].toUpperCase()}${k.substring(1)}';
 
 final _intents = <_Intent>[
-  _Intent('priorities', [RegExp(r"priori|focus|what should (we|i) do|today'?s (plan|work)|most important|urgent")], (
-    c,
-  ) {
+  _Intent('priorities', [RegExp("priori|focus|what should (we|i) do|today'?s (plan|work)|most important|urgent")], (c) {
     final fs = c.findings().where((f) => f.finding.severity != Severity.low).take(6).toList();
-    if (fs.isEmpty)
+    if (fs.isEmpty) {
       return _a(
         'Nothing urgent in your records today.',
         bullets: ['Keep recording milk, feed and treatments so FarmTap can keep watching.'],
       );
+    }
     return _a(
       '${plural(fs.length, 'thing')} to look at first, most serious first:',
       bullets: fs.map((f) => '${f.finding.title}. ${f.finding.action}').toList(),
@@ -108,24 +109,26 @@ final _intents = <_Intent>[
   }),
   _Intent(
     'milkForecast',
-    [RegExp(r'(predict|forecast|expect|next week|tomorrow|will).*milk|milk.*(predict|forecast|next week|tomorrow)')],
+    [RegExp('(predict|forecast|expect|next week|tomorrow|will).*milk|milk.*(predict|forecast|next week|tomorrow)')],
     (c) {
       final f = herdForecast(c.d);
-      if (!f.ok)
+      if (!f.ok) {
         return _a(
           'No forecast yet. ${f.reason}',
           ok: false,
           links: const [Link('Record milk', '/milk/?new=1')],
           method: Method.statistical,
         );
+      }
       final t = f.next7.length > 1 ? f.next7[1] : null;
       return _a(
         'About ${fmtL(f.total7)} over the next 7 days (${f.confidence} confidence).',
         bullets: [
           'Tomorrow: about ${fmtL((t ?? f.next7[0]).litres)} (likely ${fmtL(t?.low ?? 0)} to ${fmtL(t?.high ?? 0)}).',
-          f.trendPerDay == 0
-              ? 'Milk is steady.'
-              : 'Trend: ${f.trendPerDay > 0 ? 'rising' : 'falling'} about ${fmtL(f.trendPerDay.abs())} a day.',
+          if (f.trendPerDay == 0)
+            'Milk is steady.'
+          else
+            'Trend: ${f.trendPerDay > 0 ? 'rising' : 'falling'} about ${fmtL(f.trendPerDay.abs())} a day.',
           if (f.total30 != null) 'Next 30 days: about ${fmtL(f.total30!)}.',
           'Made from ${f.daysUsed} recorded days. ${f.method}.',
         ],
@@ -136,7 +139,7 @@ final _intents = <_Intent>[
   ),
   _Intent(
     'cowsDropping',
-    [RegExp(r'(less|lower|drop|declin|fall|reduc|decreas).*(milk|produc)|(cow|animal)s?.*(less|drop|declin)')],
+    [RegExp('(less|lower|drop|declin|fall|reduc|decreas).*(milk|produc)|(cow|animal)s?.*(less|drop|declin)')],
     (c) {
       final t = cowTrends(c.d);
       if (t.isEmpty) {
@@ -147,8 +150,9 @@ final _intents = <_Intent>[
         );
       }
       final down = t.where((x) => x.changePct <= dropPct).toList();
-      if (down.isEmpty)
+      if (down.isEmpty) {
         return _a('No cow dropped by more than ${-dropPct}% this week (${plural(t.length, 'cow')} compared).');
+      }
       return _a(
         '${plural(down.length, 'cow')} gave clearly less milk this week than the 2 weeks before:',
         bullets: down
@@ -169,18 +173,19 @@ final _intents = <_Intent>[
         .where((x) => x.h.attention.isNotEmpty)
         .take(12)
         .toList();
-    if (list.isEmpty)
+    if (list.isEmpty) {
       return _a(
         'No animal stands out in the records today.',
         bullets: ['Repeat treatments, milk drops, overdue vaccines and calvings are all checked.'],
       );
+    }
     return _a(
       '${plural(list.length, 'animal')} need attention:',
       bullets: list.map((x) => '${x.h.name}: ${x.h.attention.join('; ')}.').toList(),
       links: list.take(6).map((x) => Link(x.h.name, animalHref(x.a.id))).toList(),
     );
   }),
-  _Intent('vaccinations', [RegExp(r'vaccin|jab|injection due')], (c) {
+  _Intent('vaccinations', [RegExp('vaccin|jab|injection due')], (c) {
     final v = vaccinesDue(c.d);
     final animals = {for (final a in alive(c.d.animals)) a.id: a};
     if (v.isEmpty) {
@@ -205,7 +210,7 @@ final _intents = <_Intent>[
   }),
   _Intent(
     'feedSpend',
-    [RegExp(r'(spend|spent|cost|money|pay|paid).*(feed)|feed.*(spend|spent|cost|money)')],
+    [RegExp('(spend|spent|cost|money|pay|paid).*(feed)|feed.*(spend|spent|cost|money)')],
     money: true,
     (c) {
       final p = periodOf(c.q, c.day, 'month');
@@ -228,12 +233,13 @@ final _intents = <_Intent>[
     (c) {
       final p = periodOf(c.q, c.day, 'month');
       final m = monthMoney(c.d, p.from.substring(0, 7));
-      if (m.byCategory.isEmpty)
+      if (m.byCategory.isEmpty) {
         return _a(
           'No expenses are recorded for ${fmtMonth(m.month)}.',
           ok: false,
           links: const [Link('Money', '/money/')],
         );
+      }
       return _a(
         'Biggest costs in ${fmtMonth(m.month)} (${fmtUgx(m.spent)} in all):',
         bullets: m.byCategory
@@ -246,7 +252,7 @@ final _intents = <_Intent>[
       );
     },
   ),
-  _Intent('profit', [RegExp(r'profit|loss|income|earn|revenue|made money|net')], money: true, (c) {
+  _Intent('profit', [RegExp('profit|loss|income|earn|revenue|made money|net')], money: true, (c) {
     final p = periodOf(c.q, c.day, 'month');
     final m = monthMoney(c.d, p.from.substring(0, 7));
     return _a(
@@ -258,7 +264,7 @@ final _intents = <_Intent>[
       links: const [Link('Reports', '/reports/')],
     );
   }),
-  _Intent('costPerLitre', [RegExp(r'cost (per|a|of a) (litre|liter)')], money: true, (c) {
+  _Intent('costPerLitre', [RegExp('cost (per|a|of a) (litre|liter)')], money: true, (c) {
     final m = monthMoney(c.d, periodOf(c.q, c.day, 'month').from.substring(0, 7));
     return m.costPerLitre == null
         ? _a('Not enough records for ${fmtMonth(m.month)}: it needs both expenses and milk.', ok: false)
@@ -268,7 +274,7 @@ final _intents = <_Intent>[
             links: const [Link('Money', '/money/')],
           );
   }),
-  _Intent('expiry', [RegExp(r'expir|spoil|use.?by|batch|cooler|go bad|old milk')], (c) {
+  _Intent('expiry', [RegExp('expir|spoil|use.?by|batch|cooler|go bad|old milk')], (c) {
     final b = batchViews(c.d).where((x) => x.state != 'closed').toList();
     if (b.isEmpty) {
       return _a(
@@ -292,7 +298,7 @@ final _intents = <_Intent>[
       links: const [Link('Milk batches', '/ai/quality/')],
     );
   }),
-  _Intent('pregnant', [RegExp(r'pregnan|in calf|due to calve|calving')], (c) {
+  _Intent('pregnant', [RegExp('pregnan|in calf|due to calve|calving')], (c) {
     final list = stableSort(
       alive(c.d.animals)
           .where((a) => isActive(a) && a.str('sex') != 'male')
@@ -300,8 +306,9 @@ final _intents = <_Intent>[
           .where((x) => x.b.pregnant),
       (x, y) => (x.b.due ?? '').compareTo(y.b.due ?? ''),
     );
-    if (list.isEmpty)
+    if (list.isEmpty) {
       return _a('No animal is recorded as served or pregnant.', links: const [Link('Breeding', '/breeding/')]);
+    }
     return _a(
       '${plural(list.length, 'animal')} served or in calf:',
       bullets: list
@@ -339,14 +346,15 @@ final _intents = <_Intent>[
       links: const [Link('Breeding', '/breeding/')],
     );
   }),
-  _Intent('feedLeft', [RegExp(r'feed|stock|run out|silage|hay|dairy meal|bran')], (c) {
+  _Intent('feedLeft', [RegExp('feed|stock|run out|silage|hay|dairy meal|bran')], (c) {
     final f = feedViews(c.d);
-    if (f.isEmpty)
+    if (f.isEmpty) {
       return _a(
         'No feed purchases, counts or feedings are recorded yet.',
         ok: false,
         links: const [Link('Feeds', '/feeds/')],
       );
+    }
     return _a(
       'Feed in store:',
       bullets: f
@@ -358,7 +366,7 @@ final _intents = <_Intent>[
       links: const [Link('Feeds', '/feeds/')],
     );
   }),
-  _Intent('withdrawal', [RegExp(r'withdraw|treated|medicine|drug|antibiotic')], (c) {
+  _Intent('withdrawal', [RegExp('withdraw|treated|medicine|drug|antibiotic')], (c) {
     final list = alive(c.d.animals)
         .where(isActive)
         .map((a) => animalHealth(c.d, a.id))
@@ -372,13 +380,14 @@ final _intents = <_Intent>[
           )
         : _a('No animal is in a drug withdrawal period today.', links: const [Link('Health', '/health/')]);
   }),
-  _Intent('milkAmount', [RegExp(r'milk|litre|liter|produc')], (c) {
+  _Intent('milkAmount', [RegExp('milk|litre|liter|produc')], (c) {
     final p = periodOf(c.q, c.day);
     final rs = alive(c.d.milk).where((r) => _inP(recDay(r), p)).toList();
     final total = sum(rs.map((r) => num0(r.body['litres'])));
-    if (rs.isEmpty)
+    if (rs.isEmpty) {
       return _a('No milk is recorded for ${p.label}.', ok: false, links: const [Link('Record milk', '/milk/?new=1')]);
-    final days = rs.map((r) => recDay(r)).toSet().length;
+    }
+    final days = rs.map(recDay).toSet().length;
     final s = milkSummary(c.d);
     final morning = sum(rs.where((r) => r.str('session') == 'morning').map((r) => num0(r.body['litres'])));
     final evening = sum(rs.where((r) => r.str('session') == 'evening').map((r) => num0(r.body['litres'])));
@@ -394,7 +403,7 @@ final _intents = <_Intent>[
       links: const [Link('Milk records', '/milk/')],
     );
   }),
-  _Intent('herdSize', [RegExp(r'how many (cows|animals|cattle)|herd size|number of (cows|animals)')], (c) {
+  _Intent('herdSize', [RegExp('how many (cows|animals|cattle)|herd size|number of (cows|animals)')], (c) {
     final a = alive(c.d.animals).where(isActive).toList();
     final by = <String, int>{};
     for (final x in a) {
@@ -429,7 +438,7 @@ Answer ask(String question, FarmData d, {required String role, required AiConfig
   final q = question.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
   final day = today(d);
   final ctx = _Ctx(d, q, day, role, () => allFindings(d, role: role, cfg: cfg, farmAiOn: farmAiOn));
-  if (q.isEmpty)
+  if (q.isEmpty) {
     return Answer(
       intent: 'empty',
       ok: false,
@@ -437,6 +446,7 @@ Answer ask(String question, FarmData d, {required String role, required AiConfig
       bullets: suggestedQuestions.take(4).toList(),
       method: Method.calculated,
     );
+  }
   _Intent? hit;
   for (final i in _intents) {
     if (i.match.any((r) => r.hasMatch(q))) {
@@ -474,4 +484,4 @@ Answer ask(String question, FarmData d, {required String role, required AiConfig
   }
 }
 
-final intentKeys = _intents.map((i) => i.key).toList();
+final List<String> intentKeys = _intents.map((i) => i.key).toList();

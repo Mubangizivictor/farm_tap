@@ -12,7 +12,7 @@ import 'package:farm_tap/sectors/cattle/ai/presentation/ai_widgets.dart';
 import 'package:flutter/material.dart';
 
 class AiInsightsStrip extends StatefulWidget {
-  const AiInsightsStrip({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 

@@ -1,11 +1,11 @@
 // FarmTap AI engine: animal health and breeding (decision 0025). Hand port
 // of shared/aiHerd.ts.
-import 'ai_core.dart';
-import 'ai_data.dart';
-import 'ai_milk.dart';
+import 'package:farm_tap/core/ai/ai_core.dart';
+import 'package:farm_tap/core/ai/ai_data.dart';
+import 'package:farm_tap/core/ai/ai_milk.dart';
 
 class VaccineDue {
-  const VaccineDue({
+  const new({
     required this.vaccine,
     required this.animalIds,
     required this.due,
@@ -60,14 +60,14 @@ List<VaccineDue> vaccinesDue(FarmData d) {
 }
 
 class ConditionCount {
-  const ConditionCount(this.condition, this.times, this.last);
+  const new(this.condition, this.times, this.last);
   final String condition;
   final int times;
   final String last;
 }
 
 class AnimalHealth {
-  const AnimalHealth({
+  const new({
     required this.animalId,
     required this.name,
     required this.treatments90,
@@ -118,7 +118,7 @@ AnimalHealth animalHealth(FarmData d, String animalId) {
     final cur = byCond[c];
     byCond[c] = [
       (cur == null ? 0 : cur[0] as int) + 1,
-      cur != null && (cur[1] as String).compareTo(g) > 0 ? cur[1] : g,
+      if (cur != null && (cur[1] as String).compareTo(g) > 0) cur[1] else g,
     ];
   }
   final last = ts.isEmpty ? null : ts.first;

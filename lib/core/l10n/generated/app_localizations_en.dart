@@ -5425,7 +5425,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiTitle => 'AI Intelligence';
 
   @override
-  String get aiIntro => 'Your farm records, read for you. Every answer says how it was made.';
+  String get aiIntro =>
+      'Your farm records, read for you. Every answer says how it was made.';
 
   @override
   String get aiTodaysInsights => 'Today\'s insights';
@@ -5437,7 +5438,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiNothing => 'Nothing needs attention';
 
   @override
-  String get aiNothingBody => 'FarmTap found nothing to warn you about from your records today.';
+  String get aiNothingBody =>
+      'FarmTap found nothing to warn you about from your records today.';
 
   @override
   String get aiSeen => 'Seen';
@@ -5491,7 +5493,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiNoForecast => 'No forecast yet';
 
   @override
-  String get aiForecastNeeds => 'A forecast needs about two weeks of milk records.';
+  String get aiForecastNeeds =>
+      'A forecast needs about two weeks of milk records.';
 
   @override
   String get aiNext7 => 'Next 7 days';
@@ -5506,7 +5509,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiPerCow => 'Per cow';
 
   @override
-  String get aiForecastNote => 'A forecast is an estimate from your past records. Disease, weather and feed can change it.';
+  String get aiForecastNote =>
+      'A forecast is an estimate from your past records. Disease, weather and feed can change it.';
 
   @override
   String get aiNoUseYet => 'No use recorded yet';
@@ -5515,7 +5519,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiNoFeed => 'No feeds yet';
 
   @override
-  String get aiNoFeedBody => 'Add feeds and record what you use, and FarmTap will tell you when they run out.';
+  String get aiNoFeedBody =>
+      'Add feeds and record what you use, and FarmTap will tell you when they run out.';
 
   @override
   String get aiFeedInStore => 'Feed in the store';
@@ -5554,7 +5559,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiNoHeatRecorded => 'No heat recorded';
 
   @override
-  String get aiBreedingNote => 'Dates come from your breeding records. A vet check confirms pregnancy.';
+  String get aiBreedingNote =>
+      'Dates come from your breeding records. A vet check confirms pregnancy.';
 
   @override
   String get aiNeedAttention => 'Need attention';
@@ -5590,7 +5596,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiFilterNew => 'New';
 
   @override
-  String get aiUseByNote => 'Use-by times follow the farm rule below. Your buyer decides what they accept.';
+  String get aiUseByNote =>
+      'Use-by times follow the farm rule below. Your buyer decides what they accept.';
 
   @override
   String get aiAddBatch => 'Add a batch';
@@ -5599,7 +5606,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiNoBatches => 'No batches yet';
 
   @override
-  String get aiNoBatchesBody => 'Add the milk you keep on the farm to watch how long it stays good.';
+  String get aiNoBatchesBody =>
+      'Add the milk you keep on the farm to watch how long it stays good.';
 
   @override
   String get aiInStorage => 'In storage';
@@ -5656,7 +5664,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiRuleInvalid => 'Check the numbers in the rule';
 
   @override
-  String get aiRuleNote => 'These are starting rules. Check them with your buyer or the Dairy Development Authority.';
+  String get aiRuleNote =>
+      'These are starting rules. Check them with your buyer or the Dairy Development Authority.';
 
   @override
   String get aiCooledHours => 'Hours it keeps when cooled';
@@ -5668,7 +5677,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiMaxTemp => 'Warmest safe temperature (°C)';
 
   @override
-  String get aiAssistantNote => 'Answers come from your own records and are worked out on your phone.';
+  String get aiAssistantNote =>
+      'Answers come from your own records and are worked out on your phone.';
 
   @override
   String get aiAskLabel => 'Ask about your farm';
@@ -5734,13 +5744,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiWhatToDoNow => 'What to do now';
 
   @override
-  String get aiScreeningNote => 'Disease screening from photos is experimental and cannot replace a vet.';
+  String get aiScreeningNote =>
+      'Disease screening from photos is experimental and cannot replace a vet.';
 
   @override
   String get aiPhotoCheckTitle => 'Check a photo';
 
   @override
-  String get aiPhotoCheckBody => 'Check that a photo is clear enough before you send it to a vet.';
+  String get aiPhotoCheckBody =>
+      'Check that a photo is clear enough before you send it to a vet.';
 
   @override
   String get aiPhotoFailed => 'This photo is not clear enough';
@@ -5758,7 +5770,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiNoModel => 'No model yet';
 
   @override
-  String get aiScreeningPromise => 'FarmTap will not guess from a photo until a tested model is added.';
+  String get aiScreeningPromise =>
+      'FarmTap will not guess from a photo until a tested model is added.';
 
   @override
   String get aiReportAsk => 'Ask for a report';
@@ -5767,7 +5780,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiReportAskHint => 'Milk report for last month';
 
   @override
-  String get aiReportNotFound => 'FarmTap could not tell which report you want. Choose one below.';
+  String get aiReportNotFound =>
+      'FarmTap could not tell which report you want. Choose one below.';
 
   @override
   String get aiReportKind => 'Report';

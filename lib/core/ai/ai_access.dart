@@ -1,9 +1,9 @@
 // FarmTap AI engine: who sees what, and the platform switches (decision 0025).
 // Display only: Firestore rules still decide what can be read at all.
 // Hand port of shared/aiAccess.ts.
-import 'ai_core.dart';
+import 'package:farm_tap/core/ai/ai_core.dart';
 
-final _all = aiModules.map((m) => m.key).toList();
+final List<String> _all = aiModules.map((m) => m.key).toList();
 
 /// AI modules each farm role is shown.
 final _byRole = <String, List<String>>{
@@ -34,7 +34,7 @@ bool seesMoney(String role) => role == 'owner' || role == 'manager';
 
 /// platform/config.ai, edited in the AI Control Centre.
 class AiConfig {
-  const AiConfig({
+  const new({
     required this.enabled,
     required this.modules,
     required this.experimental,

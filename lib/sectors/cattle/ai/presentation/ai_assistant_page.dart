@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class AiAssistantPage extends StatefulWidget {
-  const AiAssistantPage({required this.ctx, super.key});
+  const new({required this.ctx, super.key});
 
   final AiPageContext ctx;
 

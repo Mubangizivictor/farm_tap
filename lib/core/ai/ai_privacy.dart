@@ -2,10 +2,10 @@
 // language model (decision 0025). Hand port of shared/aiPrivacy.ts. The
 // phone does not call a model in this release; the redaction rules are
 // kept so a later release sends nothing the web app would not send.
-import 'ai_assistant.dart';
+import 'package:farm_tap/core/ai/ai_assistant.dart';
 
 class NameLabel {
-  const NameLabel(this.value, this.label);
+  const new(this.value, this.label);
   final String value;
   final String label;
 }

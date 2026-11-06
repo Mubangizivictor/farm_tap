@@ -3,13 +3,13 @@
 // of shared/aiMilk.ts.
 import 'dart:math' as math;
 
-import 'ai_core.dart';
-import 'ai_data.dart';
+import 'package:farm_tap/core/ai/ai_core.dart';
+import 'package:farm_tap/core/ai/ai_data.dart';
 
 // ---------------------------------------------------------------- Daily
 
 class MilkSummary {
-  const MilkSummary({
+  const new({
     required this.today,
     required this.yesterday,
     required this.todayRecorded,
@@ -76,7 +76,7 @@ MilkSummary milkSummary(FarmData d) {
 // ---------------------------------------------------------------- Cows
 
 class CowTrend {
-  const CowTrend({
+  const new({
     required this.animalId,
     required this.name,
     required this.recent,
@@ -148,7 +148,7 @@ const dropPct = -15;
 // ---------------------------------------------------------------- Unusual days
 
 class MilkAnomaly {
-  const MilkAnomaly(this.day, this.litres, this.usual, this.z);
+  const new(this.day, this.litres, this.usual, this.z);
   final String day;
   final double litres;
   final double usual;
@@ -173,7 +173,7 @@ List<MilkAnomaly> milkAnomalies(FarmData d) {
 // ---------------------------------------------------------------- Losses
 
 class MilkBalance {
-  const MilkBalance({
+  const new({
     required this.days,
     required this.produced,
     required this.sold,
@@ -223,7 +223,7 @@ MilkBalance milkBalance(FarmData d, [int days = 7]) {
 // ---------------------------------------------------------------- Forecast
 
 class ForecastDay {
-  const ForecastDay(this.day, this.litres, this.low, this.high);
+  const new(this.day, this.litres, this.low, this.high);
   final String day;
   final double litres;
   final double low;
@@ -231,10 +231,10 @@ class ForecastDay {
 }
 
 class Forecast {
-  const Forecast({
+  const new({
     required this.ok,
-    this.reason,
     required this.daysUsed,
+    this.reason,
     this.next7 = const [],
     this.total7 = 0,
     this.total30,
@@ -344,7 +344,7 @@ Forecast cowForecast(FarmData d, String animalId) {
 // ---------------------------------------------------------------- Batches and cooling
 
 class BatchView {
-  const BatchView({
+  const new({
     required this.id,
     required this.litres,
     required this.place,
@@ -418,7 +418,7 @@ BatchView _batchView(Rec b, List<Rec> readings, FarmData d, int now) {
         rp.trim().toLowerCase() == place.trim().toLowerCase();
   }).toList();
   final temps = mine.map((r) => num0(r.body['tempC'])).toList();
-  final double? highest = temps.isEmpty ? null : temps.reduce(math.max);
+  final highest = temps.isEmpty ? null : temps.reduce(math.max);
   final cooled = _truthy(b.body['cooled']);
   final warm = !cooled || (highest != null && highest > rule.maxTempC);
   final hours = warm ? rule.warmHours : rule.cooledHours;
@@ -449,7 +449,7 @@ BatchView _batchView(Rec b, List<Rec> readings, FarmData d, int now) {
 }
 
 class TempBreach {
-  const TempBreach(this.id, this.place, this.tempC, this.at, this.limit);
+  const new(this.id, this.place, this.tempC, this.at, this.limit);
   final String id;
   final String place;
   final double tempC;
@@ -482,7 +482,7 @@ List<TempBreach> temperatureBreaches(FarmData d) {
 // ---------------------------------------------------------------- Centre quality
 
 class FarmerQuality {
-  const FarmerQuality(this.farmerId, this.deliveries, this.rejected, this.rate);
+  const new(this.farmerId, this.deliveries, this.rejected, this.rate);
   final String farmerId;
   final int deliveries;
   final int rejected;
@@ -490,7 +490,7 @@ class FarmerQuality {
 }
 
 class QualitySummary {
-  const QualitySummary({
+  const new({
     required this.deliveries,
     required this.litres,
     required this.rejected,

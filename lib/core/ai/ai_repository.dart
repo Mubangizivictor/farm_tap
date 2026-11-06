@@ -13,7 +13,7 @@ import 'package:farm_tap/core/utils/clock.dart';
 
 /// What the engine reads, loaded once for a screen.
 class AiFarm {
-  const AiFarm({required this.data, required this.states, required this.shelfRules, required this.role});
+  const new({required this.data, required this.states, required this.shelfRules, required this.role});
 
   final FarmData data;
   final Map<String, AlertState> states;
@@ -57,7 +57,7 @@ String aiRoleOf({String? staffRole, String? farmRole}) {
 String stateKey(String alertId) => (alertId.length > 200 ? alertId.substring(0, 200) : alertId).replaceAll('/', '_');
 
 class AiRepository {
-  AiRepository({required this.journal, required this.clock});
+  new({required this.journal, required this.clock});
 
   final RecordJournal journal;
   final Clock clock;
@@ -96,9 +96,9 @@ class AiRepository {
       _load('stockMovements'),
       _load('feedTypes'),
       _load('stockItems'),
-      money ? _load('expenses') : Future.value(const <Rec>[]),
-      money ? _load('income') : Future.value(const <Rec>[]),
-      money ? _load('milkSales') : Future.value(const <Rec>[]),
+      if (money) _load('expenses') else Future.value(const <Rec>[]),
+      if (money) _load('income') else Future.value(const <Rec>[]),
+      if (money) _load('milkSales') else Future.value(const <Rec>[]),
       _load('deliveries'),
       _load('milkBatches'),
       _load('storageReadings'),

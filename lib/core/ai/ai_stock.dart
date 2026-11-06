@@ -2,8 +2,8 @@
 // shared/aiStock.ts.
 import 'dart:math' as math;
 
-import 'ai_core.dart';
-import 'ai_data.dart';
+import 'package:farm_tap/core/ai/ai_core.dart';
+import 'package:farm_tap/core/ai/ai_data.dart';
 
 /// The phone's built-in feeds. Custom feeds use their feedTypes record.
 const builtInFeeds = <String, ({String name, String unit})>{
@@ -18,14 +18,14 @@ const builtInFeeds = <String, ({String name, String unit})>{
 };
 
 class HeavyDay {
-  const HeavyDay(this.day, this.amount, this.usual);
+  const new(this.day, this.amount, this.usual);
   final String day;
   final double amount;
   final double usual;
 }
 
 class FeedView {
-  const FeedView({
+  const new({
     required this.feed,
     required this.name,
     required this.unit,
@@ -98,7 +98,7 @@ List<FeedView> feedViews(FarmData d) {
             .where((e) => e.key.compareTo(addDays(day, -14)) > 0 && e.key.compareTo(day) <= 0)
             .toList();
         final perDay = recent.isNotEmpty ? sum(recent.map((e) => e.value)) / 14 : 0.0;
-        final int? daysLeft = perDay > 0 ? (math.max(0, left) / perDay).floor() : null;
+        final daysLeft = perDay > 0 ? (math.max(0, left) / perDay).floor() : null;
         final from30 = addDays(day, -29);
         final bought = moves
             .where((m) => m.str('kind') == 'purchase' && (recDay(m, 'at') ?? '').compareTo(from30) >= 0)
@@ -134,7 +134,7 @@ List<FeedView> feedViews(FarmData d) {
 }
 
 class FeedEconomics {
-  const FeedEconomics({
+  const new({
     required this.feedSpend30,
     required this.litres30,
     required this.costPerLitre,
@@ -175,7 +175,7 @@ FeedEconomics feedEconomics(FarmData d) {
 }
 
 class DrugView {
-  const DrugView({
+  const new({
     required this.id,
     required this.name,
     required this.stock,
@@ -291,7 +291,7 @@ List<Finding> feedFindings(FarmData d) {
   final last7 = all.sublist(0, all.length - 1).where((x) => x.recorded).map((x) => x.litres).toList();
   if (e.costPerLitre != null && last7.length >= 3) {
     final sale = alive(d.milkSales).where((s) => (recDay(s) ?? '').compareTo(addDays(day, -29)) >= 0).toList();
-    final double? price = sale.isNotEmpty
+    final price = sale.isNotEmpty
         ? sum(sale.map((s) => num0(s.body['litres']) * num0(s.body['pricePerLitre']))) /
               math.max(1, sum(sale.map((s) => num0(s.body['litres']))))
         : null;

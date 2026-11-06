@@ -7,18 +7,10 @@
 // contrast, sharpness) so the photo saved for the vet is usable.
 import 'dart:math' as math;
 
-import 'ai_core.dart';
+import 'package:farm_tap/core/ai/ai_core.dart';
 
 class ScreeningTarget {
-  const ScreeningTarget(
-    this.key,
-    this.label,
-    this.photo,
-    this.status,
-    this.minSensitivity,
-    this.minSpecificity,
-    this.note,
-  );
+  const new(this.key, this.label, this.photo, this.status, this.minSensitivity, this.minSpecificity, this.note);
   final String key;
   final String label;
 
@@ -99,7 +91,7 @@ const screeningTargets = <ScreeningTarget>[
 ];
 
 class PhotoQuality {
-  const PhotoQuality({
+  const new({
     required this.brightness,
     required this.contrast,
     required this.sharpness,

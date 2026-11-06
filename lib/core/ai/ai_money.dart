@@ -1,7 +1,7 @@
 // FarmTap AI engine: money (decision 0025). Every figure is a sum of the
 // farm's own expenses, income and milk sales. Hand port of shared/aiMoney.ts.
-import 'ai_core.dart';
-import 'ai_data.dart';
+import 'package:farm_tap/core/ai/ai_core.dart';
+import 'package:farm_tap/core/ai/ai_data.dart';
 
 const categoryName = <String, String>{
   'feed': 'Feed',
@@ -17,17 +17,17 @@ const categoryName = <String, String>{
 String catLabel(String c) =>
     categoryName[c] ??
     (c.isNotEmpty
-        ? c[0].toUpperCase() + c.substring(1).replaceAllMapped(RegExp(r'([A-Z])'), (m) => ' ${m[1]}').toLowerCase()
+        ? c[0].toUpperCase() + c.substring(1).replaceAllMapped(RegExp('([A-Z])'), (m) => ' ${m[1]}').toLowerCase()
         : 'Other');
 
 class CategoryAmount {
-  const CategoryAmount(this.category, this.amount);
+  const new(this.category, this.amount);
   final String category;
   final double amount;
 }
 
 class MonthMoney {
-  const MonthMoney({
+  const new({
     required this.month,
     required this.spent,
     required this.milkSales,
@@ -88,15 +88,15 @@ List<MonthMoney> monthsBack(FarmData d, int n) {
 bool hasRecords(MonthMoney m) => m.spent > 0 || m.income > 0;
 
 class CashForecast {
-  const CashForecast({
+  const new({
     required this.ok,
-    this.reason,
     required this.month,
     required this.income,
     required this.spent,
     required this.net,
     required this.monthsUsed,
     required this.method,
+    this.reason,
   });
   final bool ok;
   final String? reason;
@@ -143,7 +143,7 @@ CashForecast cashForecast(FarmData d) {
 }
 
 class Unusual {
-  const Unusual(this.id, this.category, this.amount, this.usual, this.at);
+  const new(this.id, this.category, this.amount, this.usual, this.at);
   final String id;
   final String category;
   final double amount;

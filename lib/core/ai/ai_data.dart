@@ -2,17 +2,25 @@
 // (decision 0025). Hand port of shared/aiData.ts. Records are the same bodies
 // the phone and web write; everything is optional so older or half-filled
 // records never break an analysis.
-import 'ai_core.dart';
+import 'package:farm_tap/core/ai/ai_core.dart';
 
 /// Shelf-life rule for a product, set by the farm (settings/aiMilk).
 class ShelfRule {
-  const ShelfRule({
+  const new({
     required this.product,
     required this.label,
     required this.cooledHours,
     required this.warmHours,
     required this.maxTempC,
   });
+
+  factory fromJson(Map<String, Object?> j) => ShelfRule(
+    product: '${j['product']}',
+    label: '${j['label']}',
+    cooledHours: num0(j['cooledHours']),
+    warmHours: num0(j['warmHours']),
+    maxTempC: num0(j['maxTempC']),
+  );
 
   final String product;
   final String label;
@@ -23,14 +31,6 @@ class ShelfRule {
   /// Hours it keeps when not cooled, or after a reading above [maxTempC].
   final double warmHours;
   final double maxTempC;
-
-  factory ShelfRule.fromJson(Map<String, Object?> j) => ShelfRule(
-    product: '${j['product']}',
-    label: '${j['label']}',
-    cooledHours: num0(j['cooledHours']),
-    warmHours: num0(j['warmHours']),
-    maxTempC: num0(j['maxTempC']),
-  );
 }
 
 /// Starting rules, to be checked and changed by each farm: raw milk keeps
@@ -41,7 +41,7 @@ const defaultShelfRules = <ShelfRule>[
 ];
 
 class FarmData {
-  const FarmData({
+  const new({
     required this.now,
     this.animals = const [],
     this.milk = const [],
@@ -61,6 +61,32 @@ class FarmData {
     this.shelfRules,
   });
 
+  factory fromJson(Map<String, Object?> j) {
+    List<Rec> recs(String k) =>
+        ((j[k] as List?) ?? const []).map((e) => Rec.fromJson((e as Map).cast<String, Object?>())).toList();
+    return FarmData(
+      now: j['now']! as String,
+      animals: recs('animals'),
+      milk: recs('milk'),
+      treatments: recs('treatments'),
+      vaccinations: recs('vaccinations'),
+      breeding: recs('breeding'),
+      expenses: recs('expenses'),
+      income: recs('income'),
+      milkSales: recs('milkSales'),
+      feedUses: recs('feedUses'),
+      stockMoves: recs('stockMoves'),
+      feedTypes: recs('feedTypes'),
+      stockItems: recs('stockItems'),
+      deliveries: recs('deliveries'),
+      milkBatches: recs('milkBatches'),
+      storageReadings: recs('storageReadings'),
+      shelfRules: j['shelfRules'] == null
+          ? null
+          : ((j['shelfRules']! as List).map((e) => ShelfRule.fromJson((e as Map).cast<String, Object?>())).toList()),
+    );
+  }
+
   /// Kampala local now, ISO without zone (kampalaNow(clock.now()).iso).
   final String now;
   final List<Rec> animals;
@@ -79,32 +105,6 @@ class FarmData {
   final List<Rec> milkBatches;
   final List<Rec> storageReadings;
   final List<ShelfRule>? shelfRules;
-
-  factory FarmData.fromJson(Map<String, Object?> j) {
-    List<Rec> recs(String k) =>
-        ((j[k] as List?) ?? const []).map((e) => Rec.fromJson((e as Map).cast<String, Object?>())).toList();
-    return FarmData(
-      now: j['now'] as String,
-      animals: recs('animals'),
-      milk: recs('milk'),
-      treatments: recs('treatments'),
-      vaccinations: recs('vaccinations'),
-      breeding: recs('breeding'),
-      expenses: recs('expenses'),
-      income: recs('income'),
-      milkSales: recs('milkSales'),
-      feedUses: recs('feedUses'),
-      stockMoves: recs('stockMoves'),
-      feedTypes: recs('feedTypes'),
-      stockItems: recs('stockItems'),
-      deliveries: recs('deliveries'),
-      milkBatches: recs('milkBatches'),
-      storageReadings: recs('storageReadings'),
-      shelfRules: j['shelfRules'] == null
-          ? null
-          : ((j['shelfRules'] as List).map((e) => ShelfRule.fromJson((e as Map).cast<String, Object?>())).toList()),
-    );
-  }
 }
 
 String today(FarmData d) => d.now.substring(0, 10);
@@ -130,7 +130,7 @@ bool isMilkingCow(Rec a) => isActive(a) && (a.str('dairyStatus') == 'milking' ||
 // ---------------------------------------------------------------- Milk days
 
 class MilkDay {
-  MilkDay(this.day);
+  new(this.day);
   final String day;
   double litres = 0;
   bool recorded = false;
@@ -179,7 +179,7 @@ bool _isService(Rec b) => (b.str('type') == 'ai' || b.str('type') == 'service') 
 bool _isHeat(Rec b) => b.str('type') == 'service' && b.str('kind') == 'heat';
 
 class BreedingState {
-  const BreedingState({
+  const new({
     required this.servedDay,
     required this.confirmed,
     required this.pregnant,
@@ -229,13 +229,13 @@ BreedingState breedingState(String animalId, List<Rec> events, String day) {
   final check = open == null
       ? null
       : firstWhere(all, (e) => e.str('type') == 'pregnancyCheck' && e.str('serviceId') == open.id);
-  final bool? result = check == null ? null : check.flag('pregnant') == true;
+  final result = check == null ? null : check.flag('pregnant') == true;
   final pregnant = open != null && result != false;
   final due = pregnant && servedDay != null ? addDays(servedDay, gestationDays) : null;
   final signs = <String>[
     if (heat != null && dayOf(heat.body['at']) != null) dayOf(heat.body['at'])!,
     if (result == false && servedDay != null) servedDay,
-    if (calvedDay != null) calvedDay,
+    ?calvedDay,
   ]..sort();
   final lastSign = signs.isEmpty ? null : signs.last;
   String? nextHeat;

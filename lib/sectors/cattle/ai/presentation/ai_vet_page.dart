@@ -18,7 +18,7 @@ import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class AiVetPage extends StatefulWidget {
-  const AiVetPage({required this.ctx, super.key, this.animalId});
+  const new({required this.ctx, super.key, this.animalId});
 
   final AiPageContext ctx;
 
@@ -185,7 +185,7 @@ class _AiVetPageState extends State<AiVetPage> {
               label: l10n.aiTempOptional,
               controller: _temp,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
+              inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))],
               error: _tempError,
               helper: l10n.aiTempHelp,
             ),
@@ -226,7 +226,7 @@ class _AiVetPageState extends State<AiVetPage> {
 }
 
 class _VetResultCard extends StatelessWidget {
-  const _VetResultCard({required this.result});
+  const new({required this.result});
 
   final VetResult result;
 

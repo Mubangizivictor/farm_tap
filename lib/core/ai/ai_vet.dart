@@ -7,10 +7,10 @@
 // warning signs. It never names a drug or a dose, and every result says to
 // call the vet. Any change to this table must be checked by a vet before it
 // is released.
-import 'ai_core.dart';
+import 'package:farm_tap/core/ai/ai_core.dart';
 
 class VetSign {
-  const VetSign(this.key, this.label, this.group);
+  const new(this.key, this.label, this.group);
   final String key;
   final String label;
   final String group;
@@ -54,7 +54,7 @@ const signs = <VetSign>[
 ];
 
 class _Condition {
-  const _Condition(
+  const new(
     this.key,
     this.name,
     this.main,
@@ -241,7 +241,7 @@ const _conditions = <_Condition>[
 ];
 
 class VetInput {
-  const VetInput({required this.signs, this.tempC, this.daysSinceCalving, this.days});
+  const new({required this.signs, this.tempC, this.daysSinceCalving, this.days});
 
   final List<String> signs;
 
@@ -256,7 +256,7 @@ class VetInput {
 }
 
 class _Flag {
-  const _Flag(this.text, {this.sign, this.test});
+  const new(this.text, {this.sign, this.test});
   final String text;
   final String? sign;
   final bool Function(VetInput)? test;
@@ -280,7 +280,7 @@ final _redFlags = <_Flag>[
 ];
 
 class PossibleCondition {
-  const PossibleCondition({
+  const new({
     required this.key,
     required this.name,
     required this.matched,
@@ -295,7 +295,7 @@ class PossibleCondition {
 }
 
 class VetResult {
-  const VetResult({
+  const new({
     required this.risk,
     required this.fever,
     required this.redFlags,
@@ -370,8 +370,9 @@ VetResult assess(VetInput input) {
   }
   if (fever == 'high' && severityRank(risk) > severityRank(Severity.high)) risk = Severity.high;
   if (fever == 'fever' && severityRank(risk) > severityRank(Severity.medium)) risk = Severity.medium;
-  if (set.contains('notEating') && (input.days ?? 0) >= 1 && severityRank(risk) > severityRank(Severity.high))
+  if (set.contains('notEating') && (input.days ?? 0) >= 1 && severityRank(risk) > severityRank(Severity.high)) {
     risk = Severity.high;
+  }
   if (scored.isEmpty && set.isNotEmpty && severityRank(risk) > severityRank(Severity.medium)) risk = Severity.medium;
   final callVet = risk == Severity.critical
       ? 'now'

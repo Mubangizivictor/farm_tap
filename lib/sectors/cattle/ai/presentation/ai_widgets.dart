@@ -44,7 +44,7 @@ IconData moduleIcon(String key) => switch (key) {
 
 /// How the answer was made, shown on every card so a sum is never called AI.
 class MethodBadge extends StatelessWidget {
-  const MethodBadge(this.method, {super.key});
+  const new(this.method, {super.key});
 
   final Method method;
 
@@ -57,7 +57,7 @@ class MethodBadge extends StatelessWidget {
 
 /// Loads the farm's records for the engine and rebuilds when asked.
 class AiBody extends StatefulWidget {
-  const AiBody({
+  const new({
     required this.repo,
     required this.role,
     required this.title,
@@ -128,7 +128,7 @@ class _AiBodyState extends State<AiBody> {
 
 /// A short note under a screen: what the numbers are made from.
 class AiNote extends StatelessWidget {
-  const AiNote(this.text, {super.key, this.icon = Symbols.info_rounded, this.tone = FarmTapTone.info});
+  const new(this.text, {super.key, this.icon = Symbols.info_rounded, this.tone = FarmTapTone.info});
 
   final String text;
   final IconData icon;
@@ -141,7 +141,7 @@ class AiNote extends StatelessWidget {
 /// One alert, recommendation or insight: why it was raised, what to do,
 /// how it was made, with Seen / Fixed for the people who may act.
 class FindingCard extends StatelessWidget {
-  const FindingCard({required this.item, required this.onLink, super.key, this.onAcknowledge, this.onResolve});
+  const new({required this.item, required this.onLink, super.key, this.onAcknowledge, this.onResolve});
 
   final FindingWithState item;
   final AiLinkOpener onLink;
@@ -172,8 +172,7 @@ class FindingCard extends StatelessWidget {
                       runSpacing: context.space.xs,
                       children: [
                         StatusBadge(label: severityLabel[f.severity]!, tone: tone),
-                        if (seen)
-                          StatusBadge(label: l10n.aiSeen, tone: FarmTapTone.neutral, icon: Symbols.check_rounded),
+                        if (seen) StatusBadge(label: l10n.aiSeen, icon: Symbols.check_rounded),
                         MethodBadge(f.method),
                       ],
                     ),
@@ -209,7 +208,7 @@ class FindingCard extends StatelessWidget {
 
 /// A list of findings, or a calm "nothing to flag".
 class FindingList extends StatelessWidget {
-  const FindingList({
+  const new({
     required this.items,
     required this.onLink,
     super.key,
@@ -258,7 +257,7 @@ class FindingList extends StatelessWidget {
 
 /// A big number with a caption, in a row of a card.
 class AiStat extends StatelessWidget {
-  const AiStat({required this.label, required this.value, super.key, this.sub});
+  const new({required this.label, required this.value, super.key, this.sub});
 
   final String label;
   final String value;
@@ -278,7 +277,7 @@ class AiStat extends StatelessWidget {
 
 /// A plain table of text cells that scrolls sideways on a narrow phone.
 class AiTable extends StatelessWidget {
-  const AiTable({required this.columns, required this.rows, super.key});
+  const new({required this.columns, required this.rows, super.key});
 
   final List<String> columns;
   final List<List<String>> rows;
@@ -304,7 +303,7 @@ Widget aiSection(BuildContext context, String label, {List<Widget> children = co
 /// What every AI screen needs from the app: the repository, who is looking,
 /// and how to open a finding's link or another AI screen.
 class AiPageContext {
-  const AiPageContext({
+  const new({
     required this.repo,
     required this.role,
     required this.byName,
