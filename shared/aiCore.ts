@@ -34,7 +34,7 @@ export const severityRank: Record<Severity, number> = { critical: 0, high: 1, me
 export const aiModules = [
   { key: 'assistant', label: 'Farm Assistant', hint: 'Ask questions about your farm records' },
   { key: 'vet', label: 'Veterinary Assistant', hint: 'Symptoms, warning signs and when to call the vet' },
-  { key: 'screening', label: 'Disease Screening', hint: 'Photo screening (experimental)' },
+  { key: 'screening', label: 'Photo Check', hint: 'Take a photo, get possible causes' },
   { key: 'milk', label: 'Milk Intelligence', hint: 'Daily milk, cows dropping, unusual days, losses' },
   { key: 'quality', label: 'Milk Quality and Expiry', hint: 'Batches, cooling, temperatures, rejections' },
   { key: 'predictions', label: 'Production Predictions', hint: 'Next 7 and 30 days of milk' },

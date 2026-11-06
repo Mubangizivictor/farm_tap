@@ -5420,4 +5420,550 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get closedRestoreMessage =>
       'Hello FarmTap, I closed my account and want it back.';
+
+  @override
+  String get aiTitle => 'AI Intelligence';
+
+  @override
+  String get aiIntro =>
+      'Your farm records, read for you. Every answer says how it was made.';
+
+  @override
+  String get aiTodaysInsights => 'Today\'s insights';
+
+  @override
+  String get aiTools => 'AI tools';
+
+  @override
+  String get aiNothing => 'Nothing needs attention';
+
+  @override
+  String get aiNothingBody =>
+      'FarmTap found nothing to warn you about from your records today.';
+
+  @override
+  String get aiSeen => 'Seen';
+
+  @override
+  String get aiMarkSeen => 'Mark as seen';
+
+  @override
+  String get aiMarkFixed => 'Mark as fixed';
+
+  @override
+  String get aiFindings => 'Findings';
+
+  @override
+  String get aiToday => 'Today';
+
+  @override
+  String get aiYesterday => 'Yesterday';
+
+  @override
+  String get aiAvg7 => '7-day average';
+
+  @override
+  String get aiNotRecorded => 'Not recorded';
+
+  @override
+  String get aiBalanceTitle => 'Where the milk went';
+
+  @override
+  String get aiProduced => 'Produced';
+
+  @override
+  String get aiSold => 'Sold';
+
+  @override
+  String get aiHomeUse => 'Used at home';
+
+  @override
+  String get aiThrownAway => 'Thrown away';
+
+  @override
+  String get aiNotAccounted => 'Not accounted for';
+
+  @override
+  String get aiNoSalesYet => 'No sales recorded yet';
+
+  @override
+  String get aiCowsDropping => 'Cows giving less milk';
+
+  @override
+  String get aiNoForecast => 'No forecast yet';
+
+  @override
+  String get aiForecastNeeds =>
+      'A forecast needs about two weeks of milk records.';
+
+  @override
+  String get aiNext7 => 'Next 7 days';
+
+  @override
+  String get aiNext30 => 'Next 30 days';
+
+  @override
+  String get aiNextDays => 'Coming days';
+
+  @override
+  String get aiPerCow => 'Per cow';
+
+  @override
+  String get aiForecastNote =>
+      'A forecast is an estimate from your past records. Disease, weather and feed can change it.';
+
+  @override
+  String get aiNoUseYet => 'No use recorded yet';
+
+  @override
+  String get aiNoFeed => 'No feeds yet';
+
+  @override
+  String get aiNoFeedBody =>
+      'Add feeds and record what you use, and FarmTap will tell you when they run out.';
+
+  @override
+  String get aiFeedInStore => 'Feed in the store';
+
+  @override
+  String get aiCostPerLitre => 'Cost per litre';
+
+  @override
+  String get aiLitresPer1000 => 'Litres per 1,000 of feed spend';
+
+  @override
+  String get aiDrugStock => 'Drugs and supplies';
+
+  @override
+  String get aiNotCounted => 'Not counted yet';
+
+  @override
+  String get aiInCalf => 'In calf';
+
+  @override
+  String get aiOpenCows => 'Open cows';
+
+  @override
+  String get aiCalvingInterval => 'Calving interval';
+
+  @override
+  String get aiServedOrInCalf => 'Served or in calf';
+
+  @override
+  String get aiConfirmed => 'Confirmed';
+
+  @override
+  String get aiNotConfirmed => 'Not confirmed';
+
+  @override
+  String get aiNoHeatRecorded => 'No heat recorded';
+
+  @override
+  String get aiBreedingNote =>
+      'Dates come from your breeding records. A vet check confirms pregnancy.';
+
+  @override
+  String get aiNeedAttention => 'Need attention';
+
+  @override
+  String get aiInWithdrawal => 'In withdrawal';
+
+  @override
+  String get aiVaccinesDue => 'Vaccines due';
+
+  @override
+  String get aiLastMonths => 'Last months';
+
+  @override
+  String get aiIncomeShort => 'Income';
+
+  @override
+  String get aiSpentShort => 'Spent';
+
+  @override
+  String get aiNet => 'Net';
+
+  @override
+  String get aiLargeExpenses => 'Unusually large expenses';
+
+  @override
+  String get aiNoRisks => 'No risks found';
+
+  @override
+  String get aiFilterAll => 'All';
+
+  @override
+  String get aiFilterNew => 'New';
+
+  @override
+  String get aiUseByNote =>
+      'Use-by times follow the farm rule below. Your buyer decides what they accept.';
+
+  @override
+  String get aiAddBatch => 'Add a batch';
+
+  @override
+  String get aiNoBatches => 'No batches yet';
+
+  @override
+  String get aiNoBatchesBody =>
+      'Add the milk you keep on the farm to watch how long it stays good.';
+
+  @override
+  String get aiInStorage => 'In storage';
+
+  @override
+  String get aiClosedBatches => 'Finished batches';
+
+  @override
+  String get aiExpired => 'Past use-by';
+
+  @override
+  String get aiUseSoon => 'Use soon';
+
+  @override
+  String get aiFresh => 'Fresh';
+
+  @override
+  String get aiNoReading => 'No temperature yet';
+
+  @override
+  String get aiRecordTemp => 'Record temperature';
+
+  @override
+  String get aiMarkSold => 'Mark as sold';
+
+  @override
+  String get aiMarkUsed => 'Mark as used';
+
+  @override
+  String get aiMarkDiscarded => 'Mark as thrown away';
+
+  @override
+  String get aiLitresNeeded => 'Enter the litres';
+
+  @override
+  String get aiLitres => 'Litres';
+
+  @override
+  String get aiPlaceOptional => 'Where it is kept (optional)';
+
+  @override
+  String get aiPlaceHint => 'Cooler 1, Can A';
+
+  @override
+  String get aiCooledQuestion => 'Is it in a cooler or cooling tank?';
+
+  @override
+  String get aiTempNeeded => 'Enter the temperature';
+
+  @override
+  String get aiTempC => 'Temperature (°C)';
+
+  @override
+  String get aiRuleInvalid => 'Check the numbers in the rule';
+
+  @override
+  String get aiRuleNote =>
+      'These are starting rules. Check them with your buyer or the Dairy Development Authority.';
+
+  @override
+  String get aiCooledHours => 'Hours it keeps when cooled';
+
+  @override
+  String get aiWarmHours => 'Hours it keeps when warm';
+
+  @override
+  String get aiMaxTemp => 'Warmest safe temperature (°C)';
+
+  @override
+  String get aiAssistantNote =>
+      'Answers come from your own records and are worked out on your phone.';
+
+  @override
+  String get aiAskLabel => 'Ask about your farm';
+
+  @override
+  String get aiAskHint => 'How much milk did we get this week?';
+
+  @override
+  String get aiAskButton => 'Ask';
+
+  @override
+  String get aiTryAsking => 'Try asking';
+
+  @override
+  String get aiWhichAnimal => 'Which animal?';
+
+  @override
+  String get aiChooseAnimal => 'Choose an animal';
+
+  @override
+  String get aiTempOptional => 'Temperature (optional)';
+
+  @override
+  String get aiTempHelp => 'Normal for a cow is about 38 to 39.';
+
+  @override
+  String get aiDaysSeen => 'Days she has been unwell';
+
+  @override
+  String get aiCheckNow => 'Check now';
+
+  @override
+  String get aiNoteOptional => 'Note (optional)';
+
+  @override
+  String get aiSavedToHistory => 'Saved to her health history';
+
+  @override
+  String get aiChooseAnimalToSave => 'Choose an animal to save this check';
+
+  @override
+  String get aiSaveToHistory => 'Save to health history';
+
+  @override
+  String get aiCallVetNow => 'Call the vet now';
+
+  @override
+  String get aiCallVetToday => 'Call the vet today';
+
+  @override
+  String get aiCallVetSoon => 'Call the vet soon';
+
+  @override
+  String get aiWarningSigns => 'Warning signs';
+
+  @override
+  String get aiPossibleCauses => 'Possible causes';
+
+  @override
+  String get aiMustReport => 'Report this to the authorities';
+
+  @override
+  String get aiWhatToDoNow => 'What to do now';
+
+  @override
+  String get aiScreeningNote =>
+      'Disease screening from photos is experimental and cannot replace a vet.';
+
+  @override
+  String get aiPhotoCheckTitle => 'Check a photo';
+
+  @override
+  String get aiPhotoCheckBody =>
+      'Check that a photo is clear enough before you send it to a vet.';
+
+  @override
+  String get aiPhotoFailed => 'This photo is not clear enough';
+
+  @override
+  String get aiPhotoGood => 'This photo is clear enough';
+
+  @override
+  String get aiPhotoRetake => 'Take it again in good light, closer and steady.';
+
+  @override
+  String get aiScreeningTargets => 'What screening will look for';
+
+  @override
+  String get aiNoModel => 'No model yet';
+
+  @override
+  String get aiScreeningPromise =>
+      'FarmTap will not guess from a photo until a tested model is added.';
+
+  @override
+  String get aiReportAsk => 'Ask for a report';
+
+  @override
+  String get aiReportAskHint => 'Milk report for last month';
+
+  @override
+  String get aiReportNotFound =>
+      'FarmTap could not tell which report you want. Choose one below.';
+
+  @override
+  String get aiReportKind => 'Report';
+
+  @override
+  String get aiReportPeriod => 'Period';
+
+  @override
+  String get aiShowReport => 'Show report';
+
+  @override
+  String get aiReportEmpty => 'Nothing to show for this period';
+
+  @override
+  String get aiExportReport => 'Export report';
+
+  @override
+  String get aiPeriodLastMonth => 'Last month';
+
+  @override
+  String get aiPeriod7 => 'Last 7 days';
+
+  @override
+  String get aiPeriod30 => 'Last 30 days';
+
+  @override
+  String get aiPeriodThisMonth => 'This month';
+
+  @override
+  String aiSeeAll(int count) {
+    return 'See all $count';
+  }
+
+  @override
+  String aiConfidence(String level) {
+    return '$level confidence';
+  }
+
+  @override
+  String aiMadeFromDays(int count) {
+    return 'Made from $count days of records';
+  }
+
+  @override
+  String aiDaysAtRate(int days, String perDay, String unit) {
+    return '$days days left at $perDay $unit a day';
+  }
+
+  @override
+  String aiReorderAt(String level) {
+    return 'Reorder at $level';
+  }
+
+  @override
+  String aiDaysShort(int count) {
+    return '$count days';
+  }
+
+  @override
+  String aiDueAbout(String date) {
+    return 'Due about $date';
+  }
+
+  @override
+  String aiNextHeatAbout(String date) {
+    return 'Next heat about $date';
+  }
+
+  @override
+  String aiSafeFrom(String date) {
+    return 'Safe from $date';
+  }
+
+  @override
+  String aiOverdueDays(int count) {
+    return '$count days overdue';
+  }
+
+  @override
+  String aiDueOn(String date) {
+    return 'Due $date';
+  }
+
+  @override
+  String aiNextMonth(String month) {
+    return 'Estimate for $month';
+  }
+
+  @override
+  String aiUsually(String amount) {
+    return 'usually $amount';
+  }
+
+  @override
+  String aiShelfRule(String cooledHours, String maxTemp, String warmHours) {
+    return 'Keeps $cooledHours hours at $maxTemp °C or colder, $warmHours hours when warm';
+  }
+
+  @override
+  String aiUseBy(String time) {
+    return 'Use by $time';
+  }
+
+  @override
+  String aiPhotoNumbers(int brightness, int contrast, int sharpness) {
+    return 'Light $brightness, contrast $contrast, sharpness $sharpness';
+  }
+
+  @override
+  String get aiPhotoOffTitle => 'Photo Check is not switched on yet';
+
+  @override
+  String get aiPhotoOffBody => 'The FarmTap team turns this on when it is ready for your farm. You can still choose a check and take a photo.';
+
+  @override
+  String get aiPhotoWhat => 'What do you want to check?';
+
+  @override
+  String get aiPhotoHowTo => 'How to take the photo';
+
+  @override
+  String get aiPhotoAnimalOpt => 'Which animal? (optional)';
+
+  @override
+  String get aiPhotoNoAnimal => 'No animal';
+
+  @override
+  String get aiPhotoNote => 'What have you noticed? (optional)';
+
+  @override
+  String get aiPhotoNoteHint => 'For example: since yesterday, eating less';
+
+  @override
+  String get aiPhotoRun => 'Check this photo';
+
+  @override
+  String get aiPhotoCheckAnyway => 'Check anyway';
+
+  @override
+  String get aiPhotoConsent => 'The photo is sent to Google to be read. It is not saved by FarmTap. Do not include people in the photo.';
+
+  @override
+  String get aiPhotoLimit => 'Your farm has used all photo checks for today. Try again tomorrow, or call your vet.';
+
+  @override
+  String aiPhotoLeft(int count) {
+    return '$count photo checks left today';
+  }
+
+  @override
+  String get aiPhotoErrNetwork => 'No internet. Photo Check needs a connection.';
+
+  @override
+  String get aiPhotoErrBusy => 'Photo Check is busy. Try again in a minute.';
+
+  @override
+  String get aiPhotoErrAppCheck => 'Photo Check could not confirm this is the real FarmTap app.';
+
+  @override
+  String get aiPhotoErrRead => 'The answer could not be read. Take another photo and try again.';
+
+  @override
+  String get aiPhotoSeen => 'What can be seen';
+
+  @override
+  String get aiPhotoQuestions => 'Questions that would help';
+
+  @override
+  String get aiPhotoReport => 'This may need to be reported to the authorities';
+
+  @override
+  String get aiPhotoSaved => 'Saved to the health history';
+
+  @override
+  String get aiPhotoSure => 'Clear in the photo';
+
+  @override
+  String get aiPhotoMaybe => 'Possible';
+
+  @override
+  String get aiPhotoUnsure => 'Not sure';
+
+  @override
+  String get aiPhotoNewCheck => 'Check another photo';
 }

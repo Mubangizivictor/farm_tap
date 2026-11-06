@@ -199,12 +199,13 @@ test('workers never see money findings; a resolved alert disappears, an acknowle
   assert.equal(todaysInsights(ack, 5)[0].state, ack.some((f) => f.state === 'new') ? 'new' : 'acknowledged');
 });
 
-test('switches: platform off, module off, farm off, experimental off', () => {
+test('switches: platform off, module off, farm off; Photo Check is no longer experimental', () => {
   assert.equal(moduleOn('milk', cfg, 'worker'), true);
   assert.equal(moduleOn('finance', cfg, 'worker'), false);
   assert.equal(moduleOn('milk', { ...cfg, enabled: false }, 'owner'), false);
   assert.equal(moduleOn('milk', cfg, 'owner', false), false);
-  assert.equal(moduleOn('screening', { ...cfg, experimental: false }, 'owner'), false);
+  assert.equal(moduleOn('screening', { ...cfg, experimental: false }, 'owner'), true);
+  assert.equal(moduleOn('screening', { ...cfg, modules: { ...cfg.modules, screening: false } }, 'owner'), false);
   const parsed = aiConfigFrom({ enabled: false, modules: { milk: false, junk: true }, llm: { model: 'bad model; rm', timeoutMs: 5 } });
   assert.equal(parsed.enabled, false);
   assert.equal(parsed.modules.milk, false);

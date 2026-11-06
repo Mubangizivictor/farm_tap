@@ -61,6 +61,10 @@ abstract final class AppRoutes {
   static const moreVaccinations = '/more/vaccinations';
   static const moreReminders = '/more/reminders';
 
+  /// Decision 0025: AI Intelligence (hub) and one AI tool by its key.
+  static const moreAi = '/more/ai';
+  static String moreAiModule(String key) => '/more/ai/$key';
+
   /// The feeds store (counts, days left, running low).
   static const feedingStore = '/feeding/store';
   static const collect = '/collect';

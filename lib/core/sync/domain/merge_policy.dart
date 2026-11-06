@@ -48,6 +48,9 @@ class MergePolicy {
     'animalEvents',
     'breedingEvents',
     'auditLog',
+    // Decision 0025: vet-guide results and cooler temperatures never change.
+    'healthAssessments',
+    'storageReadings',
   };
 
   static const defaultSensitive = {

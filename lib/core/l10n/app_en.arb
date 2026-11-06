@@ -3845,5 +3845,308 @@
   },
   "closedBodySoon": "It can be brought back for 90 days. After that it is erased for good.",
   "closedRestore": "Ask FarmTap to bring it back",
-  "closedRestoreMessage": "Hello FarmTap, I closed my account and want it back."
+  "closedRestoreMessage": "Hello FarmTap, I closed my account and want it back.",
+  "aiTitle": "AI Intelligence",
+  "aiIntro": "Your farm records, read for you. Every answer says how it was made.",
+  "aiTodaysInsights": "Today's insights",
+  "aiTools": "AI tools",
+  "aiNothing": "Nothing needs attention",
+  "aiNothingBody": "FarmTap found nothing to warn you about from your records today.",
+  "aiSeen": "Seen",
+  "aiMarkSeen": "Mark as seen",
+  "aiMarkFixed": "Mark as fixed",
+  "aiFindings": "Findings",
+  "aiToday": "Today",
+  "aiYesterday": "Yesterday",
+  "aiAvg7": "7-day average",
+  "aiNotRecorded": "Not recorded",
+  "aiBalanceTitle": "Where the milk went",
+  "aiProduced": "Produced",
+  "aiSold": "Sold",
+  "aiHomeUse": "Used at home",
+  "aiThrownAway": "Thrown away",
+  "aiNotAccounted": "Not accounted for",
+  "aiNoSalesYet": "No sales recorded yet",
+  "aiCowsDropping": "Cows giving less milk",
+  "aiNoForecast": "No forecast yet",
+  "aiForecastNeeds": "A forecast needs about two weeks of milk records.",
+  "aiNext7": "Next 7 days",
+  "aiNext30": "Next 30 days",
+  "aiNextDays": "Coming days",
+  "aiPerCow": "Per cow",
+  "aiForecastNote": "A forecast is an estimate from your past records. Disease, weather and feed can change it.",
+  "aiNoUseYet": "No use recorded yet",
+  "aiNoFeed": "No feeds yet",
+  "aiNoFeedBody": "Add feeds and record what you use, and FarmTap will tell you when they run out.",
+  "aiFeedInStore": "Feed in the store",
+  "aiCostPerLitre": "Cost per litre",
+  "aiLitresPer1000": "Litres per 1,000 of feed spend",
+  "aiDrugStock": "Drugs and supplies",
+  "aiNotCounted": "Not counted yet",
+  "aiInCalf": "In calf",
+  "aiOpenCows": "Open cows",
+  "aiCalvingInterval": "Calving interval",
+  "aiServedOrInCalf": "Served or in calf",
+  "aiConfirmed": "Confirmed",
+  "aiNotConfirmed": "Not confirmed",
+  "aiNoHeatRecorded": "No heat recorded",
+  "aiBreedingNote": "Dates come from your breeding records. A vet check confirms pregnancy.",
+  "aiNeedAttention": "Need attention",
+  "aiInWithdrawal": "In withdrawal",
+  "aiVaccinesDue": "Vaccines due",
+  "aiLastMonths": "Last months",
+  "aiIncomeShort": "Income",
+  "aiSpentShort": "Spent",
+  "aiNet": "Net",
+  "aiLargeExpenses": "Unusually large expenses",
+  "aiNoRisks": "No risks found",
+  "aiFilterAll": "All",
+  "aiFilterNew": "New",
+  "aiUseByNote": "Use-by times follow the farm rule below. Your buyer decides what they accept.",
+  "aiAddBatch": "Add a batch",
+  "aiNoBatches": "No batches yet",
+  "aiNoBatchesBody": "Add the milk you keep on the farm to watch how long it stays good.",
+  "aiInStorage": "In storage",
+  "aiClosedBatches": "Finished batches",
+  "aiExpired": "Past use-by",
+  "aiUseSoon": "Use soon",
+  "aiFresh": "Fresh",
+  "aiNoReading": "No temperature yet",
+  "aiRecordTemp": "Record temperature",
+  "aiMarkSold": "Mark as sold",
+  "aiMarkUsed": "Mark as used",
+  "aiMarkDiscarded": "Mark as thrown away",
+  "aiLitresNeeded": "Enter the litres",
+  "aiLitres": "Litres",
+  "aiPlaceOptional": "Where it is kept (optional)",
+  "aiPlaceHint": "Cooler 1, Can A",
+  "aiCooledQuestion": "Is it in a cooler or cooling tank?",
+  "aiTempNeeded": "Enter the temperature",
+  "aiTempC": "Temperature (°C)",
+  "aiRuleInvalid": "Check the numbers in the rule",
+  "aiRuleNote": "These are starting rules. Check them with your buyer or the Dairy Development Authority.",
+  "aiCooledHours": "Hours it keeps when cooled",
+  "aiWarmHours": "Hours it keeps when warm",
+  "aiMaxTemp": "Warmest safe temperature (°C)",
+  "aiAssistantNote": "Answers come from your own records and are worked out on your phone.",
+  "aiAskLabel": "Ask about your farm",
+  "aiAskHint": "How much milk did we get this week?",
+  "aiAskButton": "Ask",
+  "aiTryAsking": "Try asking",
+  "aiWhichAnimal": "Which animal?",
+  "aiChooseAnimal": "Choose an animal",
+  "aiTempOptional": "Temperature (optional)",
+  "aiTempHelp": "Normal for a cow is about 38 to 39.",
+  "aiDaysSeen": "Days she has been unwell",
+  "aiCheckNow": "Check now",
+  "aiNoteOptional": "Note (optional)",
+  "aiSavedToHistory": "Saved to her health history",
+  "aiChooseAnimalToSave": "Choose an animal to save this check",
+  "aiSaveToHistory": "Save to health history",
+  "aiCallVetNow": "Call the vet now",
+  "aiCallVetToday": "Call the vet today",
+  "aiCallVetSoon": "Call the vet soon",
+  "aiWarningSigns": "Warning signs",
+  "aiPossibleCauses": "Possible causes",
+  "aiMustReport": "Report this to the authorities",
+  "aiWhatToDoNow": "What to do now",
+  "aiScreeningNote": "Disease screening from photos is experimental and cannot replace a vet.",
+  "aiPhotoCheckTitle": "Check a photo",
+  "aiPhotoCheckBody": "Check that a photo is clear enough before you send it to a vet.",
+  "aiPhotoFailed": "This photo is not clear enough",
+  "aiPhotoGood": "This photo is clear enough",
+  "aiPhotoRetake": "Take it again in good light, closer and steady.",
+  "aiScreeningTargets": "What screening will look for",
+  "aiNoModel": "No model yet",
+  "aiScreeningPromise": "FarmTap will not guess from a photo until a tested model is added.",
+  "aiReportAsk": "Ask for a report",
+  "aiReportAskHint": "Milk report for last month",
+  "aiReportNotFound": "FarmTap could not tell which report you want. Choose one below.",
+  "aiReportKind": "Report",
+  "aiReportPeriod": "Period",
+  "aiShowReport": "Show report",
+  "aiReportEmpty": "Nothing to show for this period",
+  "aiExportReport": "Export report",
+  "aiPeriodLastMonth": "Last month",
+  "aiPeriod7": "Last 7 days",
+  "aiPeriod30": "Last 30 days",
+  "aiPeriodThisMonth": "This month",
+  "aiSeeAll": "See all {count}",
+  "@aiSeeAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiConfidence": "{level} confidence",
+  "@aiConfidence": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "aiMadeFromDays": "Made from {count} days of records",
+  "@aiMadeFromDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiDaysAtRate": "{days} days left at {perDay} {unit} a day",
+  "@aiDaysAtRate": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "perDay": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "aiReorderAt": "Reorder at {level}",
+  "@aiReorderAt": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "aiDaysShort": "{count} days",
+  "@aiDaysShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiDueAbout": "Due about {date}",
+  "@aiDueAbout": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "aiNextHeatAbout": "Next heat about {date}",
+  "@aiNextHeatAbout": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSafeFrom": "Safe from {date}",
+  "@aiSafeFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "aiOverdueDays": "{count} days overdue",
+  "@aiOverdueDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiDueOn": "Due {date}",
+  "@aiDueOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "aiNextMonth": "Estimate for {month}",
+  "@aiNextMonth": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "aiUsually": "usually {amount}",
+  "@aiUsually": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "aiShelfRule": "Keeps {cooledHours} hours at {maxTemp} °C or colder, {warmHours} hours when warm",
+  "@aiShelfRule": {
+    "placeholders": {
+      "cooledHours": {
+        "type": "String"
+      },
+      "maxTemp": {
+        "type": "String"
+      },
+      "warmHours": {
+        "type": "String"
+      }
+    }
+  },
+  "aiUseBy": "Use by {time}",
+  "@aiUseBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "aiPhotoNumbers": "Light {brightness}, contrast {contrast}, sharpness {sharpness}",
+  "@aiPhotoNumbers": {
+    "placeholders": {
+      "brightness": {
+        "type": "int"
+      },
+      "contrast": {
+        "type": "int"
+      },
+      "sharpness": {
+        "type": "int"
+      }
+    }
+  },
+  "aiPhotoOffTitle": "Photo Check is not switched on yet",
+  "aiPhotoOffBody": "The FarmTap team turns this on when it is ready for your farm. You can still choose a check and take a photo.",
+  "aiPhotoWhat": "What do you want to check?",
+  "aiPhotoHowTo": "How to take the photo",
+  "aiPhotoAnimalOpt": "Which animal? (optional)",
+  "aiPhotoNoAnimal": "No animal",
+  "aiPhotoNote": "What have you noticed? (optional)",
+  "aiPhotoNoteHint": "For example: since yesterday, eating less",
+  "aiPhotoRun": "Check this photo",
+  "aiPhotoCheckAnyway": "Check anyway",
+  "aiPhotoConsent": "The photo is sent to Google to be read. It is not saved by FarmTap. Do not include people in the photo.",
+  "aiPhotoLimit": "Your farm has used all photo checks for today. Try again tomorrow, or call your vet.",
+  "aiPhotoLeft": "{count} photo checks left today",
+  "@aiPhotoLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiPhotoErrNetwork": "No internet. Photo Check needs a connection.",
+  "aiPhotoErrBusy": "Photo Check is busy. Try again in a minute.",
+  "aiPhotoErrAppCheck": "Photo Check could not confirm this is the real FarmTap app.",
+  "aiPhotoErrRead": "The answer could not be read. Take another photo and try again.",
+  "aiPhotoSeen": "What can be seen",
+  "aiPhotoQuestions": "Questions that would help",
+  "aiPhotoReport": "This may need to be reported to the authorities",
+  "aiPhotoSaved": "Saved to the health history",
+  "aiPhotoSure": "Clear in the photo",
+  "aiPhotoMaybe": "Possible",
+  "aiPhotoUnsure": "Not sure",
+  "aiPhotoNewCheck": "Check another photo"
 }

@@ -23,6 +23,9 @@ enum MoreTarget {
   feedStore,
   vaccinations,
   reminders,
+
+  /// Decision 0025: AI Intelligence.
+  ai,
   workers,
   money,
   reports,
@@ -64,7 +67,7 @@ class MorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    bool shows(MoreTarget t) => visible?.contains(t) ?? t != MoreTarget.me;
+    bool shows(MoreTarget t) => visible?.contains(t) ?? (t != MoreTarget.me && t != MoreTarget.ai);
     QuickActionTile tile(MoreTarget t, IconData icon, String label, FarmTapTone tone) =>
         QuickActionTile(icon: icon, label: label, tone: tone, onTap: () => onOpen(t));
     RecordTile row(MoreTarget t, IconData icon, String title, FarmTapTone tone, {String? subtitle}) => RecordTile(
@@ -109,6 +112,7 @@ class MorePage extends StatelessWidget {
             children: [
               for (final (t, icon, label, tone) in [
                 (MoreTarget.me, Symbols.badge_rounded, l10n.myPageTitle, FarmTapTone.primary),
+                (MoreTarget.ai, Symbols.auto_awesome_rounded, l10n.aiTitle, FarmTapTone.gold),
                 (MoreTarget.feeding, Symbols.grass_rounded, l10n.feeding, FarmTapTone.gold),
                 (MoreTarget.breeding, Symbols.favorite_rounded, l10n.breeding, FarmTapTone.danger),
                 (MoreTarget.vaccinations, Symbols.vaccines_rounded, l10n.opsVaccinations, FarmTapTone.info),
