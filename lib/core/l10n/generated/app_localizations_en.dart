@@ -5894,7 +5894,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiPhotoOffTitle => 'Photo Check is not switched on yet';
 
   @override
-  String get aiPhotoOffBody => 'The FarmTap team turns this on when it is ready for your farm. You can still choose a check and take a photo.';
+  String get aiPhotoOffBody =>
+      'The FarmTap team turns this on when it is ready for your farm. You can still choose a check and take a photo.';
 
   @override
   String get aiPhotoWhat => 'What do you want to check?';
@@ -5921,10 +5922,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiPhotoCheckAnyway => 'Check anyway';
 
   @override
-  String get aiPhotoConsent => 'The photo is sent to Google to be read. It is not saved by FarmTap. Do not include people in the photo.';
+  String get aiPhotoConsent =>
+      'The photo is sent to Google to be read. It is not saved by FarmTap. Do not include people in the photo.';
 
   @override
-  String get aiPhotoLimit => 'Your farm has used all photo checks for today. Try again tomorrow, or call your vet.';
+  String get aiPhotoLimit =>
+      'Your farm has used all photo checks for today. Try again tomorrow, or call your vet.';
 
   @override
   String aiPhotoLeft(int count) {
@@ -5932,16 +5935,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get aiPhotoErrNetwork => 'No internet. Photo Check needs a connection.';
+  String get aiPhotoErrNetwork =>
+      'No internet. Photo Check needs a connection.';
 
   @override
   String get aiPhotoErrBusy => 'Photo Check is busy. Try again in a minute.';
 
   @override
-  String get aiPhotoErrAppCheck => 'Photo Check could not confirm this is the real FarmTap app.';
+  String get aiPhotoErrAppCheck =>
+      'Photo Check could not confirm this is the real FarmTap app.';
 
   @override
-  String get aiPhotoErrRead => 'The answer could not be read. Take another photo and try again.';
+  String get aiPhotoErrRead =>
+      'The answer could not be read. Take another photo and try again.';
 
   @override
   String get aiPhotoSeen => 'What can be seen';
