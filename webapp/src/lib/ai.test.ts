@@ -280,3 +280,15 @@ test('a report request picks the report and the period; money is refused for wor
   assert.equal(rep.rows.length, 1);
   assert.deepEqual(rep.rows[0].slice(1), [50, 0, 50]);
 });
+
+// ---------------------------------------------------------------- Photo quality
+
+test('photo check: flat dark photo fails, sharp bright one passes', async () => {
+  const { photoQuality } = await import('../shared/aiScreening.ts');
+  const w = 64;
+  const q1 = photoQuality(new Array(w * w).fill(20), w, w);
+  assert.equal(q1.ok, false);
+  assert.ok(q1.problems.some((p) => /dark/.test(p)) && q1.problems.some((p) => /Blurred/.test(p)));
+  const sharp = Array.from({ length: w * w }, (_, i) => (((i % w) + Math.floor(i / w)) % 2 ? 200 : 60));
+  assert.equal(photoQuality(sharp, w, w).ok, true);
+});

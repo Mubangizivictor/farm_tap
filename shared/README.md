@@ -18,6 +18,7 @@ fails when a copy is out of date; the web and functions tests run it.
   findings), `aiData` (record shapes, breeding state), `aiMilk`, `aiHerd`,
   `aiStock`, `aiMoney` (the analyses), `aiRisk` (all findings, ranked),
   `aiAccess` (roles and platform switches), `aiAssistant`, `aiVet`,
-  `aiReports`, `aiPrivacy` (what may go to a self-hosted model). Tests:
+  `aiReports`, `aiPrivacy` (what may go to a self-hosted model),
+  `aiScreening` (experimental photo checks; no model installed). Tests:
   `webapp/src/lib/ai.test.ts`. These files import each other with `.ts`
   extensions; functions compile them with `rewriteRelativeImportExtensions`.

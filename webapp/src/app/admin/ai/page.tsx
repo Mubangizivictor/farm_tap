@@ -176,14 +176,14 @@ export default function AiControlCentre() {
       <Anchor id="models" title="Engines and models" hint="What runs, its version and status">
         <AiTable
           label="Engines and models"
-          columns={['Engine', 'Version', 'Where it runs', 'Licence', 'Status']}
+          columns={['Engine', 'Version', 'Licence', 'Status']}
           rows={[
-            ['Farm calculations (milk, health, breeding, feed, money, risks)', 'engine-1', 'Farm’s browser (web); phone next', 'FarmTap code', 'Active'],
-            ['Milk forecast (weighted trend + weekday pattern)', 'forecast-1', 'Farm’s browser', 'FarmTap code', 'Active'],
-            ['Vet guide (signs and warning signs table)', VET_ENGINE, 'Farm’s browser', 'FarmTap code; needs vet review', 'Active'],
-            ['Photo quality check', SCREENING_ENGINE, 'Farm’s browser', 'FarmTap code', ai.experimental ? 'Active (experimental)' : 'Off'],
-            [`Language model (Ollama, ${ai.llm.model})`, '—', 'Self-hosted server', 'Qwen3: Apache-2.0', 'Not connected: no server set up'],
-            ...screeningTargets.map((t) => [`Screening: ${t.label}`, '—', '—', '—', 'No validated model']),
+            ['Farm calculations (milk, health, breeding, feed, money, risks)', 'engine-1', 'FarmTap code', 'Active in the browser'],
+            ['Milk forecast (weighted trend + weekday pattern)', 'forecast-1', 'FarmTap code', 'Active in the browser'],
+            ['Vet guide (signs and warning signs table)', VET_ENGINE, 'FarmTap code (vet review due)', 'Active in the browser'],
+            ['Photo quality check', SCREENING_ENGINE, 'FarmTap code', ai.experimental ? 'Active (experimental)' : 'Off'],
+            [`Language model (Ollama, ${ai.llm.model})`, '—', 'Qwen3: Apache-2.0', 'Not connected (no server)'],
+            ...screeningTargets.map((t) => [`Screening: ${t.label}`, '—', '—', 'No validated model']),
           ]}
         />
         <p className="small muted">
