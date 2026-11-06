@@ -13,6 +13,7 @@ import { ChatText } from '@/components/ChatText';
 import { CaseCard, ChatThinking, CowPicker, TriageCard, type SharePhoto } from '@/components/ChatCards';
 import { Icon, type IconName } from '@/components/Icon';
 import { MethodBadge } from '@/components/ai';
+import { ChatPopup, popupOf, type Popup } from '@/components/popups/ChatPopup';
 import { Dialog, useToast } from '@/components/ui';
 import { AiOff, AiState } from '@/components/ai';
 import { useAiPage } from '@/components/aiPage';
@@ -106,12 +107,14 @@ export default function FarmTapChat() {
   const [live, setLive] = useState('');
   const liveRef = useRef('');
   const [status, setStatus] = useState('');
+  const [popup, setPopup] = useState<Popup | null>(null);
   const [speaking, setSpeaking] = useState<number | null>(null);
   const [caseInfo, setCaseInfo] = useState<CaseAnswers>({});
   const [lang, setLang] = useState('auto');
   const [skipPick, setSkipPick] = useState<Set<number>>(new Set());
   const contacts = useRecords<ContactBody>(farm.id, 'contacts');
   const vet = useMemo(() => aliveRec(contacts.data).find((c) => c.body.kind === 'vet' && (c.body.phone ?? '').replace(/\D/g, '').length >= 9), [contacts.data]);
+  const vetPhone = vet?.body.phone ?? null;
   const pick = useRef<HTMLInputElement>(null);
   const end = useRef<HTMLDivElement>(null);
   const stop = useRef<AbortController | null>(null);
@@ -543,11 +546,25 @@ export default function FarmTapChat() {
                     const dos = chatDoActions({ animal: cow ? { id: cow.id, name: animalName(cow) } : null, triage: t.triage ?? null, day });
                     return acts.length + dos.length > 0 ? (
                       <div className="chat-actions">
-                        {[...dos, ...acts].map((a) => (
-                          <Link key={a.href} className="btn sm ghost" href={a.href}>
-                            {a.label} <Icon name="chevron" />
-                          </Link>
-                        ))}
+                        {[...dos, ...acts].map((a) => {
+                          const pop = popupOf(a.href);
+                          const tel = a.href.startsWith('/contacts') && vetPhone ? `tel:${vetPhone.replace(/[^\d+]/g, '')}` : null;
+                          if (tel)
+                            return (
+                              <a key={a.href} className="btn sm ghost" href={tel}>
+                                {vet?.body.name ? `Call ${vet.body.name}` : a.label} <Icon name="chevron" />
+                              </a>
+                            );
+                          return pop ? (
+                            <button key={a.href} className="btn sm ghost" onClick={() => setPopup(pop)}>
+                              {a.label} <Icon name="chevron" />
+                            </button>
+                          ) : (
+                            <Link key={a.href} className="btn sm ghost" href={a.href}>
+                              {a.label} <Icon name="chevron" />
+                            </Link>
+                          );
+                        })}
                       </div>
                     ) : null;
                   })()}
@@ -712,6 +729,7 @@ export default function FarmTapChat() {
         </div>
         <p className="small muted">FarmTap AI can make mistakes and never replaces your vet. Answers can use Google Search.</p>
       </div>
+      {popup && <ChatPopup popup={popup} onOpen={setPopup} onClose={() => setPopup(null)} />}
       {showChats && (
         <Dialog title="Your chats" subtitle="Kept on this phone or computer only." onClose={() => setShowChats(false)}>
           <div className="stack">
