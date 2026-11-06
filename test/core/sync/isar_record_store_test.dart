@@ -12,19 +12,18 @@ import '../../helpers/isar_core.dart';
 const tenant = 'farm-rwemera';
 final t0 = DateTime(2026, 11, 7, 6, 52);
 
-SyncRecord rec(String collection, String id, {int version = 1, Map<String, Object?>? body, DateTime? at}) =>
-    SyncRecord(
-      collection: collection,
-      id: id,
-      tenantId: tenant,
-      body: body ?? {'litres': 9.5},
-      createdAt: t0,
-      updatedAt: at ?? t0,
-      createdBy: 'staff-amos',
-      updatedBy: 'staff-amos',
-      deviceId: 'phone-a',
-      version: version,
-    );
+SyncRecord rec(String collection, String id, {int version = 1, Map<String, Object?>? body, DateTime? at}) => SyncRecord(
+  collection: collection,
+  id: id,
+  tenantId: tenant,
+  body: body ?? {'litres': 9.5},
+  createdAt: t0,
+  updatedAt: at ?? t0,
+  createdBy: 'staff-amos',
+  updatedBy: 'staff-amos',
+  deviceId: 'phone-a',
+  version: version,
+);
 
 void main() {
   late Directory dir;

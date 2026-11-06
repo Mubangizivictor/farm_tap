@@ -210,7 +210,11 @@ class _AiPhotoPageState extends State<AiPhotoPage> {
       title: aiModuleLabel('screening'),
       builder: (context, farm, reload) {
         final cfg = farm.config;
-        final limit = photoAllowed(farm.photoUsedToday, enabled: cfg.photoEnabled, perFarmPerDay: cfg.photoPerFarmPerDay);
+        final limit = photoAllowed(
+          farm.photoUsedToday,
+          enabled: cfg.photoEnabled,
+          perFarmPerDay: cfg.photoPerFarmPerDay,
+        );
         final animals = alive(farm.data.animals).where(isActive).toList();
         final selected = animals.where((a) => a.id == _animalId).firstOrNull;
         final q = _quality;

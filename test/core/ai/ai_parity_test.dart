@@ -30,7 +30,10 @@ void main() {
   });
 
   test('chat reader, animal finder, prompt and record match the web engine', () {
-    final got = chatSnapshot(expected['chatReplyCases']! as List<Object?>, expected['chatMentionCases']! as List<Object?>);
+    final got = chatSnapshot(
+      expected['chatReplyCases']! as List<Object?>,
+      expected['chatMentionCases']! as List<Object?>,
+    );
     expect(diff(expected['chat'], got).take(30).toList(), isEmpty);
   });
 

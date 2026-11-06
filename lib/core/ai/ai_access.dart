@@ -94,7 +94,9 @@ AiConfig aiConfigFrom(Object? v) {
     insightsCount: count is num && count >= 1 && count <= 10 ? jsRound(count).toInt() : d.insightsCount,
     photoEnabled: ph['enabled'] is bool ? ph['enabled']! as bool : d.photoEnabled,
     photoModel: phModel is String && RegExp(r'^[\w.\-]{3,64}$').hasMatch(phModel) ? phModel : d.photoModel,
-    photoPerFarmPerDay: phLimit is num && phLimit >= 1 && phLimit <= 500 ? jsRound(phLimit).toInt() : d.photoPerFarmPerDay,
+    photoPerFarmPerDay: phLimit is num && phLimit >= 1 && phLimit <= 500
+        ? jsRound(phLimit).toInt()
+        : d.photoPerFarmPerDay,
   );
 }
 

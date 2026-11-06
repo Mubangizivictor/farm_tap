@@ -13,7 +13,7 @@ import 'package:farm_tap/core/ai/ai_chat.dart';
 import 'package:firebase_ai/firebase_ai.dart';
 
 class GeminiChatAnalyzer implements ChatAnalyzer {
-  const GeminiChatAnalyzer();
+  const new();
 
   @override
   Future<ChatAnswer> ask({

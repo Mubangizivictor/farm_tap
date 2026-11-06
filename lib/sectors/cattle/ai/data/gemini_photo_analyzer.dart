@@ -8,7 +8,7 @@ import 'package:farm_tap/core/ai/ai_photo.dart';
 import 'package:firebase_ai/firebase_ai.dart';
 
 class GeminiPhotoAnalyzer implements PhotoAnalyzer {
-  const GeminiPhotoAnalyzer();
+  const new();
 
   @override
   Future<String> analyze({

@@ -69,7 +69,10 @@ Future<Uint8List> buildBillingPdf(BillingDocument d, DocView view, BillingBrand 
               if (logo != null)
                 pw.SizedBox(height: 48, width: 140, child: pw.Image(logo, alignment: pw.Alignment.centerLeft))
               else
-                pw.Text('FarmTap', style: const pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: green)),
+                pw.Text(
+                  'FarmTap',
+                  style: const pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: green),
+                ),
               pw.Spacer(),
               pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.end,
@@ -94,12 +97,16 @@ Future<Uint8List> buildBillingPdf(BillingDocument d, DocView view, BillingBrand 
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text(title, style: const pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold, color: green)),
+                    pw.Text(
+                      title,
+                      style: const pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold, color: green),
+                    ),
                     pw.SizedBox(height: 4),
                     pw.Text('No. ${docNumberFor(d, view)}', style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                     pw.Text('Date: ${_day(d.paidAt)}', style: small),
                     if (view == DocView.invoice) pw.Text('Receipt: ${d.receiptNo}', style: small),
-                    if (view == DocView.refund && d.refundOf != null) pw.Text('Refund of receipt ${d.refundOf}', style: small),
+                    if (view == DocView.refund && d.refundOf != null)
+                      pw.Text('Refund of receipt ${d.refundOf}', style: small),
                   ],
                 ),
               ),
@@ -156,7 +163,11 @@ Future<Uint8List> buildBillingPdf(BillingDocument d, DocView view, BillingBrand 
             ].join('   ·   '),
             style: small,
           ),
-          if (d.note.isNotEmpty) pw.Padding(padding: const pw.EdgeInsets.only(top: 4), child: pw.Text(d.note, style: small)),
+          if (d.note.isNotEmpty)
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(top: 4),
+              child: pw.Text(d.note, style: small),
+            ),
           pw.SizedBox(height: 24),
           pw.Row(
             crossAxisAlignment: pw.CrossAxisAlignment.end,
@@ -188,10 +199,7 @@ Future<Uint8List> buildBillingPdf(BillingDocument d, DocView view, BillingBrand 
                     pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        pw.SizedBox(
-                          height: 50,
-                          child: signature == null ? pw.SizedBox() : pw.Image(signature),
-                        ),
+                        pw.SizedBox(height: 50, child: signature == null ? pw.SizedBox() : pw.Image(signature)),
                         pw.Container(height: 1, color: PdfColors.black),
                         pw.SizedBox(height: 4),
                         pw.Text(brand.signatoryName, style: const pw.TextStyle(fontWeight: pw.FontWeight.bold)),
@@ -202,7 +210,10 @@ Future<Uint8List> buildBillingPdf(BillingDocument d, DocView view, BillingBrand 
                       pw.Positioned(
                         right: -10,
                         top: -10,
-                        child: pw.Opacity(opacity: 0.85, child: pw.SizedBox(width: 90, height: 90, child: pw.Image(stamp))),
+                        child: pw.Opacity(
+                          opacity: 0.85,
+                          child: pw.SizedBox(width: 90, height: 90, child: pw.Image(stamp)),
+                        ),
                       ),
                   ],
                 ),

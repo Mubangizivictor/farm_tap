@@ -13,7 +13,7 @@ import 'package:farm_tap/core/utils/clock.dart';
 
 /// What the engine reads, loaded once for a screen.
 class AiFarm {
-  AiFarm({
+  new({
     required this.data,
     required this.states,
     required this.shelfRules,

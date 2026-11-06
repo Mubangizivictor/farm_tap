@@ -206,7 +206,8 @@ const photoSystem =
     'Write in short, simple English that a farmer can read on a phone. No medical jargon without a plain word beside it. '
     'Reply with JSON only, with exactly these fields and nothing else.';
 
-const _replyShape = '''{
+const _replyShape = '''
+{
   "imageUsable": true or false,
   "summary": "one or two plain sentences: what you can see (max 60 words)",
   "signs": [ { "what": "a visible sign", "where": "where on the animal or item", "certainty": "clear" or "possible" or "unsure" } ],
@@ -233,7 +234,7 @@ String buildPhotoPrompt(PhotoCheck check, {String? note, String? animal, int? da
     lines.add('The animal is a ${a.length > 20 ? a.substring(0, 20) : a}.');
   }
   if (daysSinceCalving != null && daysSinceCalving >= 0) {
-    lines.add('She calved ${daysSinceCalving.round()} days ago.');
+    lines.add('She calved $daysSinceCalving days ago.');
   }
   var n = (note ?? '').replaceAll(RegExp(r'\s+'), ' ').trim();
   if (n.length > 400) n = n.substring(0, 400);
@@ -249,7 +250,7 @@ const photoMime = <String>['image/jpeg', 'image/png', 'image/webp'];
 
 /// Photos are shrunk before sending: the long side in pixels and the largest file in bytes.
 const photoMaxSide = 1280;
-const photoMaxBytes = 4 * 1024 * 1024;
+const int photoMaxBytes = 4 * 1024 * 1024;
 
 class PhotoSign {
   const new(this.what, this.where, this.certainty);
@@ -469,8 +470,9 @@ PhotoResult? readPhotoReply(String text, PhotoCheck check) {
     if (report) 'This could be a disease the law says must be reported. Tell the District Veterinary Officer.',
   ];
   final safeSteps = <String>[...base, ...steps];
-  if (check.kind == PhotoKind.health && usable)
+  if (check.kind == PhotoKind.health && usable) {
     safeSteps.add('Do not sell her milk or meat until the vet says it is safe.');
+  }
 
   return PhotoResult(
     usable: usable,

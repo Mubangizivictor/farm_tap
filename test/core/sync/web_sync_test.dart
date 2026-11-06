@@ -121,7 +121,13 @@ void main() {
     test('a task saved on the web is pulled within seconds, not at the next 15-minute pull', () async {
       await engine.start();
       remote.serverWrite(
-        web('tasks', 'k1', {'title': 'Fix the fence', 'staffId': 'staff-ta', 'due': '2026-11-06T18:00:00.000', 'when': '', 'doneAt': null}),
+        web('tasks', 'k1', {
+          'title': 'Fix the fence',
+          'staffId': 'staff-ta',
+          'due': '2026-11-06T18:00:00.000',
+          'when': '',
+          'doneAt': null,
+        }),
       );
       await Future<void>.delayed(const Duration(milliseconds: 60));
       await engine.idle();
@@ -129,7 +135,13 @@ void main() {
     });
 
     test('edited and removed on the web: the phone list follows', () async {
-      final body = {'title': 'Fix the fence', 'staffId': 'staff-ta', 'due': '2026-11-06T18:00:00.000', 'when': '', 'doneAt': null};
+      final body = {
+        'title': 'Fix the fence',
+        'staffId': 'staff-ta',
+        'due': '2026-11-06T18:00:00.000',
+        'when': '',
+        'doneAt': null,
+      };
       remote.serverWrite(web('tasks', 'k1', body));
       await engine.sync();
       await workers.restore();

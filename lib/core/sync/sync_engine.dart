@@ -159,10 +159,7 @@ class SyncEngine implements SyncService {
     if (open.isEmpty) return;
     final streams = [for (final t in open) remote.changes(t, collections)];
     final merged = StreamController<void>();
-    final subs = [
-      for (final s in streams)
-        s.listen(merged.add, onError: (Object _) {}, onDone: () {}),
-    ];
+    final subs = [for (final s in streams) s.listen(merged.add, onError: (Object _) {}, onDone: () {})];
     merged.onCancel = () async {
       for (final s in subs) {
         await s.cancel();

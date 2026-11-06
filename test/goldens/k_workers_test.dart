@@ -52,12 +52,7 @@ void main() {
   screenGoldens('K03_assign_card', (_) {
     repo();
     return inShell(
-      AssignCardPage(
-        directory: staff,
-        staffId: 'staff-np',
-        farmName: 'Rwemera Dairy Farm',
-        onDone: () {},
-      ),
+      AssignCardPage(directory: staff, staffId: 'staff-np', farmName: 'Rwemera Dairy Farm', onDone: () {}),
       current: '/workers',
       parent: '/workers',
     );

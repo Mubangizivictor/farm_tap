@@ -5999,7 +5999,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get aiChatDisclaimer => 'FarmTap AI can make mistakes and never replaces your vet.';
+  String get aiChatDisclaimer =>
+      'FarmTap AI can make mistakes and never replaces your vet.';
 
   @override
   String get aiChatHint => 'Ask anything…';
@@ -6017,7 +6018,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiChatRecord => 'Record a video';
 
   @override
-  String get aiChatTooBig => 'Those files are too big together. Remove one or use a shorter video.';
+  String get aiChatTooBig =>
+      'Those files are too big together. Remove one or use a shorter video.';
 
   @override
   String aiChatFileLimit(int count) {
@@ -6028,16 +6030,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiChatNotOn => 'Online AI is not switched on for FarmTap yet.';
 
   @override
-  String get aiChatOffLimit => 'Your farm has used all online AI answers for today.';
+  String get aiChatOffLimit =>
+      'Your farm has used all online AI answers for today.';
 
   @override
   String get aiChatFilesNotRead => 'Files and photos could not be read.';
 
   @override
-  String get aiChatOfflineHelp => 'I can answer simple questions about your milk, animals, feed and money from your records, even without internet.';
+  String get aiChatOfflineHelp =>
+      'I can answer simple questions about your milk, animals, feed and money from your records, even without internet.';
 
   @override
-  String get aiChatMedsLeftOut => 'Some details about medicines were left out. Ask your vet.';
+  String get aiChatMedsLeftOut =>
+      'Some details about medicines were left out. Ask your vet.';
 
   @override
   String get aiChatLookAtThis => 'Please look at what I attached.';

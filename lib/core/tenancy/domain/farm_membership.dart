@@ -45,7 +45,7 @@ class Subscription extends Equatable {
     final paid = paidUntil;
     if (paid != null) {
       if (t.isBefore(_day(paid))) return SubscriptionState.active;
-      if (t.isBefore(_day(paid).add(const Duration(days: graceDays)))) return SubscriptionState.grace;
+      if (t.isBefore(_day(paid).add(const Duration()))) return SubscriptionState.grace;
       return SubscriptionState.readOnly;
     }
     final trial = trialEndsAt;
@@ -59,7 +59,7 @@ class Subscription extends Equatable {
 
   /// Days left before an overdue farm turns read-only.
   int graceDaysLeft(DateTime today) =>
-      paidUntil == null ? 0 : _daysBetween(today, _day(paidUntil!).add(const Duration(days: graceDays)));
+      paidUntil == null ? 0 : _daysBetween(today, _day(paidUntil!).add(const Duration()));
 
   /// Trial length in days and how many are used ("5 of 7").
   int get trialLength => trialStartedAt == null || trialEndsAt == null

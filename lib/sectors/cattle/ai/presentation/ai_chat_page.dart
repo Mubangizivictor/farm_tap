@@ -6,7 +6,6 @@
 // Photos and videos are held in memory for the one question and never stored.
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:farm_tap/core/ai/ai_assistant.dart';
 import 'package:farm_tap/core/ai/ai_chat.dart';
@@ -52,7 +51,7 @@ class _Turn {
     this.grounding,
   });
 
-  factory _Turn.fromJson(Map<String, dynamic> j) => _Turn(
+  factory fromJson(Map<String, dynamic> j) => _Turn(
     fromUser: j['fromUser'] == true,
     text: '${j['text'] ?? ''}',
     method: Method.values.where((m) => m.name == j['method']).firstOrNull,
@@ -69,7 +68,9 @@ class _Turn {
     grounding: j['grounding'] == null
         ? null
         : ChatGrounding(
-            queries: [for (final dynamic q in ((j['grounding'] as Map<String, dynamic>)['queries'] as List<dynamic>)) '$q'],
+            queries: [
+              for (final dynamic q in ((j['grounding'] as Map<String, dynamic>)['queries'] as List<dynamic>)) '$q',
+            ],
             sources: [
               for (final dynamic s in ((j['grounding'] as Map<String, dynamic>)['sources'] as List<dynamic>))
                 ChatSource('${(s as Map<String, dynamic>)['title']}', '${s['uri']}'),
@@ -125,12 +126,13 @@ class _Turn {
 class _SavedChat {
   const new({required this.id, required this.title, required this.updatedAt, required this.turns});
 
-  factory _SavedChat.fromJson(Map<String, dynamic> j) => _SavedChat(
+  factory fromJson(Map<String, dynamic> j) => _SavedChat(
     id: '${j['id']}',
     title: '${j['title']}',
     updatedAt: (j['updatedAt'] as num?)?.toInt() ?? 0,
     turns: [
-      for (final dynamic t in (j['turns'] as List<dynamic>? ?? const <dynamic>[])) _Turn.fromJson(t as Map<String, dynamic>),
+      for (final dynamic t in (j['turns'] as List<dynamic>? ?? const <dynamic>[]))
+        _Turn.fromJson(t as Map<String, dynamic>),
     ],
   );
 
@@ -261,13 +263,7 @@ class _AiChatPageState extends State<AiChatPage> {
   void _toEnd() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) {
-        unawaited(
-          _scroll.animateTo(
-            _scroll.position.maxScrollExtent,
-            duration: context.motion.normal,
-            curve: Curves.easeOut,
-          ),
-        );
+        _scroll.jumpTo(_scroll.position.maxScrollExtent);
       }
     });
   }
@@ -302,9 +298,7 @@ class _AiChatPageState extends State<AiChatPage> {
           );
           if (x != null) picked.add(x);
         case 'gallery':
-          picked.addAll(
-            await picker.pickMultiImage(maxWidth: photoMaxSide.toDouble(), imageQuality: 82),
-          );
+          picked.addAll(await picker.pickMultiImage(maxWidth: photoMaxSide.toDouble(), imageQuality: 82));
         case 'video':
           video = true;
           final x = await picker.pickVideo(source: ImageSource.gallery);
@@ -459,7 +453,11 @@ class _AiChatPageState extends State<AiChatPage> {
       );
     }
 
-    final limit = photoAllowed(farm.chatUsedToday, enabled: farm.config.photoEnabled, perFarmPerDay: farm.config.photoPerFarmPerDay);
+    final limit = photoAllowed(
+      farm.chatUsedToday,
+      enabled: farm.config.photoEnabled,
+      perFarmPerDay: farm.config.photoPerFarmPerDay,
+    );
     final analyzer = ctx.chat;
     if (analyzer == null || !farm.config.photoEnabled || !limit.ok) {
       final why = !farm.config.photoEnabled || analyzer == null ? l10n.aiChatNotOn : l10n.aiChatOffLimit;
@@ -567,7 +565,8 @@ class _AiChatPageState extends State<AiChatPage> {
           final words = find.toLowerCase().split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
           final shown = [
             for (final c in _chats)
-              if (words.every((w) => '${c.title}\n${c.turns.map((t) => t.text).join('\n')}'.toLowerCase().contains(w))) c,
+              if (words.every((w) => '${c.title}\n${c.turns.map((t) => t.text).join('\n')}'.toLowerCase().contains(w)))
+                c,
           ];
           return Column(
             mainAxisSize: MainAxisSize.min,
@@ -651,11 +650,7 @@ class _AiChatPageState extends State<AiChatPage> {
           onPressed: () => unawaited(_chatsSheet(l10n)),
         ),
         if (_turns.isNotEmpty)
-          IconButton(
-            tooltip: l10n.aiChatNew,
-            icon: const Icon(Symbols.edit_square_rounded),
-            onPressed: _newChat,
-          ),
+          IconButton(tooltip: l10n.aiChatNew, icon: const Icon(Symbols.edit_square_rounded), onPressed: _newChat),
         IconButton(
           tooltip: l10n.aiChatTools,
           icon: const Icon(Symbols.apps_rounded),
@@ -673,11 +668,7 @@ class _AiChatPageState extends State<AiChatPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconBubble(
-                            icon: Symbols.auto_awesome_rounded,
-                            tone: FarmTapTone.primary,
-                            size: context.sizes.bubbleMd,
-                          ),
+                          IconBubble(icon: Symbols.auto_awesome_rounded, size: context.sizes.bubbleMd),
                           context.space.gapMd,
                           Text(l10n.aiChatEmpty, style: context.text.titleLarge, textAlign: TextAlign.center),
                         ],
@@ -823,10 +814,7 @@ class _Bubble extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.8),
           child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: context.colors.primaryContainer,
-              borderRadius: context.radii.card,
-            ),
+            decoration: BoxDecoration(color: context.colors.primaryContainer, borderRadius: context.radii.card),
             child: Padding(
               padding: context.space.card,
               child: Column(
@@ -875,7 +863,8 @@ class _Bubble extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             if (t.method != null) MethodBadge(t.method!),
-            if (t.saved) AiNote(l10n.aiChatSavedTo(t.about ?? ''), icon: Symbols.check_circle_rounded, tone: FarmTapTone.success),
+            if (t.saved)
+              AiNote(l10n.aiChatSavedTo(t.about ?? ''), icon: Symbols.check_circle_rounded, tone: FarmTapTone.success),
             if (t.note != null)
               Text(t.note!, style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant)),
           ],
@@ -897,10 +886,7 @@ class _Bubble extends StatelessWidget {
         ],
         if (t.grounding != null && t.grounding!.sources.isNotEmpty) ...[
           context.space.gapSm,
-          Text(
-            l10n.aiChatSources,
-            style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
-          ),
+          Text(l10n.aiChatSources, style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant)),
           Wrap(
             spacing: context.space.sm,
             runSpacing: context.space.xs,
@@ -925,11 +911,7 @@ class _Bubble extends StatelessWidget {
           ),
         Row(
           children: [
-            IconButton(
-              tooltip: l10n.aiChatCopy,
-              icon: const Icon(Symbols.content_copy_rounded),
-              onPressed: onCopy,
-            ),
+            IconButton(tooltip: l10n.aiChatCopy, icon: const Icon(Symbols.content_copy_rounded), onPressed: onCopy),
             if (t.asked != null)
               IconButton(
                 tooltip: l10n.aiChatAgain,
@@ -990,7 +972,10 @@ class _ChatText extends StatelessWidget {
           child: Text.rich(
             TextSpan(
               style: context.text.bodyLarge?.copyWith(fontWeight: head != null ? FarmTapWeights.semiBold : null),
-              children: [if (lead != null) TextSpan(text: lead), ..._inline(context, body)],
+              children: [
+                if (lead != null) TextSpan(text: lead),
+                ..._inline(context, body),
+              ],
             ),
           ),
         ),
