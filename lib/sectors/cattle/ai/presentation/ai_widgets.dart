@@ -73,7 +73,7 @@ class AiBody extends StatefulWidget {
   final List<Widget> actions;
   final Widget? fab;
 
-  /// Builds the page body from loaded records; [reload] reads them again.
+  /// Builds the page body from loaded records; `reload` reads them again.
   final Widget Function(BuildContext context, AiFarm farm, Future<void> Function() reload) builder;
 
   @override

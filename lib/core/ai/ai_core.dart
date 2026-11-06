@@ -255,11 +255,11 @@ class Finding {
 /// Stable sort (Dart's List.sort is not stable; JavaScript's is).
 List<T> stableSort<T>(Iterable<T> xs, int Function(T a, T b) cmp) {
   final l = xs.toList();
-  final idx = List<int>.generate(l.length, (i) => i);
-  idx.sort((a, b) {
-    final c = cmp(l[a], l[b]);
-    return c != 0 ? c : a - b;
-  });
+  final idx = List<int>.generate(l.length, (i) => i)
+    ..sort((a, b) {
+      final c = cmp(l[a], l[b]);
+      return c != 0 ? c : a - b;
+    });
   return [for (final i in idx) l[i]];
 }
 

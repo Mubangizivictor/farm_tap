@@ -149,8 +149,9 @@ List<MilkDay> milkDays(FarmData d, int days) {
     final day = recDay(r);
     final slot = day == null ? null : out[day];
     if (slot == null) continue;
-    slot.litres += num0(r.body['litres']);
-    slot.recorded = true;
+    slot
+      ..litres += num0(r.body['litres'])
+      ..recorded = true;
   }
   return out.values.toList();
 }

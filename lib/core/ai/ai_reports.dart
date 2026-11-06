@@ -11,6 +11,8 @@ import 'package:farm_tap/core/ai/ai_money.dart';
 import 'package:farm_tap/core/ai/ai_stock.dart';
 
 class ReportKindInfo {
+  // Built once in a fixed list, so positional reads best here.
+  // ignore: avoid_positional_boolean_parameters
   const new(this.key, this.label, this.words, this.money);
   final String key;
   final String label;
@@ -233,7 +235,7 @@ Report buildReport(String kind, Period period, FarmData d) {
                 final b = breedingState(a.id, d.breeding, day);
                 return <Object>[
                   animalName(a),
-                  if (b.pregnant) b.confirmed ? 'In calf (confirmed)' : 'Served' else 'Open',
+                  if (b.pregnant && b.confirmed) 'In calf (confirmed)' else if (b.pregnant) 'Served' else 'Open',
                   if (b.servedDay != null) fmtDay(b.servedDay!) else '',
                   if (b.due != null) fmtDay(b.due!) else '',
                   if (b.nextHeat != null) fmtDay(b.nextHeat!) else '',
