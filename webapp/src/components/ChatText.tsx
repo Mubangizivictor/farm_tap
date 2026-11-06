@@ -7,13 +7,16 @@ function inline(t: string): ReactNode[] {
   return t.split(/(\*\*[^*]+\*\*)/g).map((p, i) => (p.startsWith('**') && p.endsWith('**') && p.length > 4 ? <strong key={i}>{p.slice(2, -2)}</strong> : p));
 }
 
-export function ChatText({ text }: { text: string }) {
+/** A closing "call the vet" style line: shown as a callout so it is not missed. */
+const CALLOUT = /^(if|when|call|see|get|contact|tell|report)\b.*\b(vet|veterinar|dvo)\b/i;
+
+export function ChatText({ text, streaming = false }: { text: string; streaming?: boolean }) {
   const blocks: ReactNode[] = [];
   let list: { ordered: boolean; items: string[] } | null = null;
   const flush = () => {
     if (!list) return;
     const items = list.items.map((x, i) => <li key={i}>{inline(x)}</li>);
-    blocks.push(list.ordered ? <ol key={blocks.length}>{items}</ol> : <ul key={blocks.length}>{items}</ul>);
+    blocks.push(list.ordered ? <ol key={blocks.length} className="chat-points">{items}</ol> : <ul key={blocks.length} className="chat-points">{items}</ul>);
     list = null;
   };
   for (const raw of text.split('\n')) {
@@ -32,8 +35,12 @@ export function ChatText({ text }: { text: string }) {
     flush();
     if (!line) continue;
     const head = /^#{1,4}\s+(.*)$/.exec(line);
-    blocks.push(head ? <p key={blocks.length}><strong>{inline(head[1])}</strong></p> : <p key={blocks.length}>{inline(line)}</p>);
+    const key = blocks.length;
+    if (head) blocks.push(<p key={key} className="chat-label">{inline(head[1])}</p>);
+    else if (line.length <= 48 && line.endsWith(':')) blocks.push(<p key={key} className="chat-label">{inline(line.slice(0, -1))}</p>);
+    else if (key > 0 && CALLOUT.test(line.replace(/\*\*/g, ''))) blocks.push(<p key={key} className="chat-callout">{inline(line)}</p>);
+    else blocks.push(<p key={key} className={key === 0 ? 'chat-lead' : undefined}>{inline(line)}</p>);
   }
   flush();
-  return <div className="chat-text">{blocks}</div>;
+  return <div className={`chat-text${streaming ? ' streaming' : ''}`}>{blocks}</div>;
 }

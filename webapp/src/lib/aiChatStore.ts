@@ -29,6 +29,8 @@ export interface SavedTurn {
   hadMedia?: boolean;
   /** Which model answered. */
   model?: string;
+  /** The farmer's thumbs up or down on this answer. */
+  vote?: 'up' | 'down';
 }
 
 export interface SavedChat {

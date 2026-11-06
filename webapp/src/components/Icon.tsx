@@ -63,6 +63,10 @@ const paths: Record<string, string> = {
   trash: 'M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 11v6M14 11v6',
   up: 'M12 19V5M5 12l7-7 7 7',
   stop: 'M6 6h12v12H6z',
+  thumbUp: 'M7 10v11H3V10zM7 10l4-8a2 2 0 0 1 2 2v4h6a2 2 0 0 1 2 2.3l-1.3 7a2 2 0 0 1-2 1.7H7',
+  thumbDown: 'M17 14V3h4v11zM17 14l-4 8a2 2 0 0 1-2-2v-4H5a2 2 0 0 1-2-2.3l1.3-7A2 2 0 0 1 6.3 5H17',
+  volume: 'M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14',
+  share: 'M4 12v8h16v-8M16 6l-4-4-4 4M12 2v13',
   link: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1',
 };
 

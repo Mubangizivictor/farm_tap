@@ -10,7 +10,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState, type ClipboardEvent, type DragEvent, type KeyboardEvent } from 'react';
 import { ChatText } from '@/components/ChatText';
-import { CaseCard, CowPicker, TriageCard, type SharePhoto } from '@/components/ChatCards';
+import { CaseCard, ChatThinking, CowPicker, TriageCard, type SharePhoto } from '@/components/ChatCards';
 import { Icon, type IconName } from '@/components/Icon';
 import { MethodBadge } from '@/components/ai';
 import { Dialog, useToast } from '@/components/ui';
@@ -71,6 +71,8 @@ interface Attached {
 }
 type Turn = SavedTurn;
 
+const IDEAS = ['My cow has a swollen udder', 'How do I stop mastitis?', 'How much milk did we collect this week?', 'What should I feed when milk drops?'];
+
 const ICON: Record<Kind, IconName> = { photo: 'camera', video: 'play', audio: 'play', pdf: 'list', text: 'list' };
 
 const guessMime = (f: File) => {
@@ -102,6 +104,9 @@ export default function FarmTapChat() {
   const [problem, setProblem] = useState('');
   const [animalId, setAnimalId] = useState<string | null>(null);
   const [live, setLive] = useState('');
+  const liveRef = useRef('');
+  const [status, setStatus] = useState('');
+  const [speaking, setSpeaking] = useState<number | null>(null);
   const [caseInfo, setCaseInfo] = useState<CaseAnswers>({});
   const [lang, setLang] = useState('auto');
   const [skipPick, setSkipPick] = useState<Set<number>>(new Set());
@@ -155,8 +160,21 @@ export default function FarmTapChat() {
     } catch {
       /* not kept */
     }
-    end.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    // A new answer is shown from its first line; a new question from the bottom.
+    const last = turns[turns.length - 1];
+    const el = last?.who === 'ai' ? document.getElementById(`t${last.id}`) : null;
+    (el ?? end.current)?.scrollIntoView({ block: el ? 'start' : 'end', behavior: 'smooth' });
   }, [turns, chatId, farm.id]);
+
+  useEffect(() => {
+    if (live) end.current?.scrollIntoView({ block: 'end' });
+  }, [live]);
+  useEffect(
+    () => () => {
+      if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
+    },
+    [],
+  );
 
   const newChat = useCallback(() => {
     stop.current?.abort();
@@ -237,6 +255,8 @@ export default function FarmTapChat() {
     if (!user) return;
     const t0 = performance.now();
     setBusy(true);
+    setStatus('');
+    liveRef.current = '';
     const aiId = meId + 1;
     const cows = animals.map((a) => ({ id: a.id, name: a.body.name ?? null, tag: a.body.tagNumber ?? null }));
     const named = findAnimalMention(question, cows) ?? animalId;
@@ -266,9 +286,10 @@ export default function FarmTapChat() {
     try {
       const facts = cow ? animalFacts(animalHealth(ai.data, cow.id), cow.body, day) : [];
       const media = sent.some((f) => f.kind === 'photo' || f.kind === 'video');
-      const prompt = buildChatPrompt({ message: redact(question, names), facts, calculated: calcText ? redact(calcText, names) : null, files: sent.map((f) => ({ kind: f.kind })), search: needsSearch(question, { calculated: calc.ok, animal: !!cow }), language: lang });
+      const search = needsSearch(question, { calculated: calc.ok, animal: !!cow });
+      const prompt = buildChatPrompt({ message: redact(question, names), facts, calculated: calcText ? redact(calcText, names) : null, files: sent.map((f) => ({ kind: f.kind })), search, language: lang });
       const history = chatHistory(before.filter((t) => t.text).map((t) => ({ role: t.who === 'me' ? ('user' as const) : ('model' as const), text: redact(t.text, names) })));
-      const got = await askGemini({ system: CHAT_SYSTEM, history, prompt, files: sent.map((f) => ({ mime: f.mime, base64: f.base64 })), models: chatModels(cfg.ai.photo.model, media), signal: ctl.signal, onText: (t) => setLive(partialChatText(t)) });
+      const got = await askGemini({ system: CHAT_SYSTEM, history, prompt, files: sent.map((f) => ({ mime: f.mime, base64: f.base64 })), models: chatModels(cfg.ai.photo.model, media), search, signal: ctl.signal, onStatus: setStatus, onText: (t) => { liveRef.current = partialChatText(t); setLive(liveRef.current); } });
       const reply = readChatReply(got.text, question);
       const shown = restore(reply.text, names);
       logAi(farm.id, 'chat', true, performance.now() - t0, 'model');
@@ -299,7 +320,8 @@ export default function FarmTapChat() {
       });
     } catch (e) {
       if ((e as Error)?.name === 'AbortError') {
-        setTurns((ts) => [...ts, { id: aiId, who: 'ai', asked: question, text: 'Stopped.', note: 'You stopped this answer.' }]);
+        const part = restore(liveRef.current, names).trim();
+        setTurns((ts) => [...ts, { id: aiId, who: 'ai', asked: question, text: part || 'Stopped.', note: part ? 'You stopped this answer early.' : 'You stopped this answer.' }]);
         return;
       }
       logAi(farm.id, 'chat', false, performance.now() - t0, 'model');
@@ -308,6 +330,7 @@ export default function FarmTapChat() {
     } finally {
       stop.current = null;
       setLive('');
+      setStatus('');
       setBusy(false);
     }
   };
@@ -336,6 +359,38 @@ export default function FarmTapChat() {
     setTurns(turns.slice(0, i));
     void answer(me.text, sentFiles.current.get(me.id) ?? [], before, me.id);
   };
+
+  /** Puts a question back in the box so it can be changed and sent again. */
+  const edit = (t: Turn) => {
+    if (busy) return;
+    const i = turns.findIndex((x) => x.id === t.id);
+    if (i < 0) return;
+    setText(t.text);
+    setFiles(sentFiles.current.get(t.id) ?? []);
+    setTurns(turns.slice(0, i));
+    document.querySelector<HTMLTextAreaElement>('.chat-box textarea')?.focus();
+  };
+  const vote = (t: Turn, v: 'up' | 'down') => {
+    setTurns((ts) => ts.map((x) => (x.id === t.id ? { ...x, vote: x.vote === v ? undefined : v } : x)));
+    toast(t.vote === v ? 'Feedback removed' : v === 'up' ? 'Marked as helpful' : 'Marked as not helpful');
+  };
+  const speak = (t: Turn) => {
+    const synth = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
+    if (!synth) return;
+    if (speaking === t.id) {
+      synth.cancel();
+      setSpeaking(null);
+      return;
+    }
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(t.text.replace(/[*#]/g, ''));
+    u.onend = () => setSpeaking(null);
+    u.onerror = () => setSpeaking(null);
+    setSpeaking(t.id);
+    synth.speak(u);
+  };
+  const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  const clock = (id: number) => new Date(id).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   const copy = async (t: string) => {
     try {
@@ -426,11 +481,20 @@ export default function FarmTapChat() {
                 <Icon name="spark" />
               </span>
               <h2>How can I help on your farm today?</h2>
+              <p className="muted">Ask about a sick animal, milk, feed or money. Add a photo and I will look at it.</p>
+              <div className="chips chat-ideas">
+                {IDEAS.map((q) => (
+                  <button key={q} className="chip chip-btn" onClick={() => send(q)}>
+                    {q}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           {turns.map((t) =>
             t.who === 'me' ? (
-              <div key={t.id} className="chat-me">
+              <div key={t.id} className="chat-me-wrap">
+              <div className="chat-me">
                 {t.files && t.files.length > 0 && (
                   <div className="chat-files">
                     {t.files.map((f, i) => (
@@ -443,8 +507,18 @@ export default function FarmTapChat() {
                 )}
                 <p>{t.text}</p>
               </div>
+              <div className="chat-bar end">
+                <span className="small muted chat-time">{clock(t.id)}</span>
+                <button className="icon-btn" aria-label="Copy your message" title="Copy" onClick={() => void copy(t.text)}>
+                  <Icon name="copy" />
+                </button>
+                <button className="icon-btn" aria-label="Edit your message" title="Edit and ask again" disabled={busy} onClick={() => edit(t)}>
+                  <Icon name="edit" />
+                </button>
+              </div>
+              </div>
             ) : (
-              <div key={t.id} className="chat-ai" role="article">
+              <div key={t.id} id={`t${t.id}`} className={`chat-ai${t === lastAi ? ' last' : ''}`} role="article">
                 <span className="chat-avatar" aria-hidden>
                   <Icon name="spark" />
                 </span>
@@ -463,7 +537,6 @@ export default function FarmTapChat() {
                   {t.method === 'model' && !t.animalId && (t.triage || t.hadMedia) && !skipPick.has(t.id) && (
                     <CowPicker animals={animals.map((a) => ({ id: a.id, label: `${animalName(a)}${a.body.name && a.body.tagNumber ? ` (${a.body.tagNumber})` : ''}` }))} onPick={(id) => void pickCow(t, id)} onSkip={() => setSkipPick(new Set(skipPick).add(t.id))} />
                   )}
-                  {t === lastAi && t.triage && !busy && <CaseCard answers={caseInfo} animalKnown={!!t.animalId} onAnswer={answerCase} busy={busy} onSend={() => send(`More details about this animal. ${caseText(caseInfo)}.`)} />}
                   {(() => {
                     const cow = cowOf(t);
                     const acts = t.method === 'model' ? chatActions({ question: t.asked ?? '', answer: t.text, health: !!t.triage, callVet: t.triage?.level ?? null, animal: cow ? { id: cow.id, name: animalName(cow) } : null }) : (t.actions ?? []);
@@ -478,9 +551,12 @@ export default function FarmTapChat() {
                       </div>
                     ) : null;
                   })()}
+                  {t === lastAi && t.triage && !busy && <CaseCard answers={caseInfo} animalKnown={!!t.animalId} onAnswer={answerCase} busy={busy} onSend={() => send(`More details about this animal. ${caseText(caseInfo)}.`)} />}
                   {t.grounding && t.grounding.sources.length > 0 && (
                     <div className="chat-sources">
-                      <span className="small muted">Sources from Google{t.grounding.queries.length > 0 ? ` · searched: ${t.grounding.queries.join(', ')}` : ''}</span>
+                      <span className="small muted" title={t.grounding.queries.length > 0 ? `Searched: ${t.grounding.queries.join(', ')}` : undefined}>
+                        Sources from Google
+                      </span>
                       <div className="chips">
                         {t.grounding.sources.map((s) => (
                           <a key={s.uri} className="chip" href={s.uri} target="_blank" rel="noopener noreferrer">
@@ -491,15 +567,16 @@ export default function FarmTapChat() {
                     </div>
                   )}
                   {t.grounding?.suggestionsHtml && <iframe className="chat-suggest" title="Google Search suggestions" sandbox="allow-popups allow-popups-to-escape-sandbox" srcDoc={t.grounding.suggestionsHtml} />}
-                  <div className="chat-meta">
-                    {t.method && <MethodBadge method={t.method} />}
-                    {t.saved && (
-                      <span className="chip ok">
-                        <Icon name="check" /> Saved to {t.aboutAnimal ?? 'the animal'}’s history
-                      </span>
-                    )}
-                    {t.note && <span className="small muted">{t.note}</span>}
-                  </div>
+                  {(t.saved || t.note) && (
+                    <div className="chat-meta">
+                      {t.saved && (
+                        <span className="chip ok">
+                          <Icon name="check" /> Saved to {t.aboutAnimal ?? 'the animal'}’s history
+                        </span>
+                      )}
+                      {t.note && <span className="small muted">{t.note}</span>}
+                    </div>
+                  )}
                   {t.detail && (
                     <details className="chat-detail small muted">
                       <summary>Details for the FarmTap owner</summary>
@@ -510,11 +587,27 @@ export default function FarmTapChat() {
                     <button className="icon-btn" aria-label="Copy answer" title="Copy" onClick={() => void copy(t.text)}>
                       <Icon name="copy" />
                     </button>
+                    {t.method === 'model' && (
+                      <>
+                        <button className={`icon-btn${t.vote === 'up' ? ' on' : ''}`} aria-label="Good answer" aria-pressed={t.vote === 'up'} title="Good answer" onClick={() => vote(t, 'up')}>
+                          <Icon name="thumbUp" />
+                        </button>
+                        <button className={`icon-btn${t.vote === 'down' ? ' on' : ''}`} aria-label="Bad answer" aria-pressed={t.vote === 'down'} title="Bad answer" onClick={() => vote(t, 'down')}>
+                          <Icon name="thumbDown" />
+                        </button>
+                      </>
+                    )}
+                    {canSpeak && (
+                      <button className={`icon-btn${speaking === t.id ? ' on' : ''}`} aria-label={speaking === t.id ? 'Stop reading aloud' : 'Read aloud'} title={speaking === t.id ? 'Stop reading' : 'Read aloud'} onClick={() => speak(t)}>
+                        <Icon name={speaking === t.id ? 'stop' : 'volume'} />
+                      </button>
+                    )}
                     {t.asked && (
                       <button className="icon-btn" aria-label="Ask again" title="Ask again" disabled={busy} onClick={() => again(t)}>
                         <Icon name="refresh" />
                       </button>
                     )}
+                    {t.method && <MethodBadge method={t.method} />}
                   </div>
                   {t === lastAi && !busy && t.followUps && t.followUps.length > 0 && (
                     <div className="chips chat-follow">
@@ -530,11 +623,14 @@ export default function FarmTapChat() {
             ),
           )}
           {busy && (
-            <div className="chat-ai muted" role="status">
-              <span className="chat-avatar" aria-hidden>
+            <div className="chat-ai">
+              <span className="chat-avatar working" aria-hidden>
                 <Icon name="spark" />
               </span>
-              <div className="chat-answer">{live ? <ChatText text={live} /> : <span className="row">Thinking and searching…</span>}</div>
+              <div className="chat-answer">
+                {live && <ChatText text={live} streaming />}
+                <ChatThinking status={status} hasText={!!live} />
+              </div>
             </div>
           )}
           <div ref={end} />

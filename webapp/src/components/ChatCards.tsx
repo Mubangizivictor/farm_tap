@@ -3,7 +3,7 @@
 // The cards under a chat answer (decision 0027): the urgency card with the
 // message for the vet, the vet's questions, and "which cow is this?".
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icon } from '@/components/Icon';
 import { cleanTemp, openCaseQuestions, type CaseAnswers, type CaseId, type Triage } from '@/shared/aiChat';
 
@@ -38,6 +38,7 @@ export function TriageCard({
   toast: (t: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [all, setAll] = useState(false);
   const share = async () => {
     try {
       const files = photos.slice(0, 3).map((p) => new File([toBlob(p.base64, p.mime)], p.name || 'photo.jpg', { type: p.mime }));
@@ -67,10 +68,15 @@ export function TriageCard({
       </div>
       <p className="small muted">While you wait for the vet:</p>
       <ul>
-        {triage.doNow.map((d) => (
+        {(all ? triage.doNow : triage.doNow.slice(0, 3)).map((d) => (
           <li key={d}>{d}</li>
         ))}
       </ul>
+      {triage.doNow.length > 3 && (
+        <button className="link-btn small" onClick={() => setAll(!all)} aria-expanded={all}>
+          {all ? 'Show fewer' : `Show all ${triage.doNow.length} steps`}
+        </button>
+      )}
       <div className="triage-actions">
         <a className="btn sm" href={whatsapp} target="_blank" rel="noopener noreferrer">
           <Icon name="whatsapp" /> {vetName ? `WhatsApp ${vetName}` : 'Send to my vet on WhatsApp'}
@@ -111,9 +117,16 @@ export function CaseCard({
   busy: boolean;
 }) {
   const [temp, setTemp] = useState('');
+  const [shown, setShown] = useState(false);
   const open = openCaseQuestions(answers, animalKnown);
   const given = Object.keys(answers).length;
   if (!open.length && !given) return null;
+  if (!shown)
+    return (
+      <button className="btn sm ghost case-open" onClick={() => setShown(true)}>
+        <Icon name="list" /> Add what you know for the vet{given > 0 ? ` (${given})` : ''}
+      </button>
+    );
   return (
     <section className="case" aria-label="Questions the vet will ask">
       <strong>Help the vet help you</strong>
@@ -163,7 +176,6 @@ export function CowPicker({ animals, onPick, onSkip }: { animals: { id: string; 
   return (
     <section className="case" aria-label="Which cow is this?">
       <strong>Which cow is this?</strong>
-      <p className="small muted">Choose it to save this answer in that cow’s history.</p>
       <div className="row">
         <select className="input" value={id} onChange={(e) => setId(e.target.value)} aria-label="Choose the cow">
           <option value="">Choose a cow…</option>
@@ -181,5 +193,37 @@ export function CowPicker({ animals, onPick, onSkip }: { animals: { id: string; 
         </button>
       </div>
     </section>
+  );
+}
+
+const STAGES = ['Reading your question…', 'Checking the facts…', 'Writing the answer…'];
+
+/** Shown while the answer is on its way: what is happening, how long it has taken, and a placeholder. */
+export function ChatThinking({ status, hasText }: { status: string; hasText: boolean }) {
+  const [secs, setSecs] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setSecs((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const what = status || STAGES[Math.min(STAGES.length - 1, Math.floor(secs / 4))];
+  return (
+    <div className="think" role="status">
+      <div className="think-row">
+        <span className="dots" aria-hidden>
+          <i />
+          <i />
+          <i />
+        </span>
+        <span>{hasText ? 'Writing…' : what}</span>
+        {secs >= 6 && !hasText && <span className="small muted">{secs}s{secs >= 20 ? ' · taking longer than usual. You can press Stop.' : ''}</span>}
+      </div>
+      {!hasText && (
+        <div className="think-lines" aria-hidden>
+          <span className="skel" />
+          <span className="skel" />
+          <span className="skel" />
+        </div>
+      )}
+    </div>
   );
 }
