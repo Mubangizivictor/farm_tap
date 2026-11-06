@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:farm_tap/core/ai/ai_core.dart';
+import 'package:farm_tap/core/ai/ai_photo.dart';
 import 'package:farm_tap/core/ai/ai_repository.dart';
 import 'package:farm_tap/core/ai/ai_risk.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
@@ -310,6 +311,7 @@ class AiPageContext {
     required this.farmName,
     required this.onLink,
     required this.onModule,
+    this.photo,
   });
 
   final AiRepository repo;
@@ -324,6 +326,9 @@ class AiPageContext {
   final String farmName;
   final AiLinkOpener onLink;
   final AiModuleOpener onModule;
+
+  /// Sends a photo to the model (decision 0026); null where there is no model.
+  final PhotoAnalyzer? photo;
 
   bool get manages => role == 'owner' || role == 'manager';
 }

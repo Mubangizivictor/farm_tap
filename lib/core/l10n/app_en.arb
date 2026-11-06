@@ -4116,5 +4116,37 @@
         "type": "int"
       }
     }
-  }
+  },
+  "aiPhotoOffTitle": "Photo Check is not switched on yet",
+  "aiPhotoOffBody": "The FarmTap team turns this on when it is ready for your farm. You can still choose a check and take a photo.",
+  "aiPhotoWhat": "What do you want to check?",
+  "aiPhotoHowTo": "How to take the photo",
+  "aiPhotoAnimalOpt": "Which animal? (optional)",
+  "aiPhotoNoAnimal": "No animal",
+  "aiPhotoNote": "What have you noticed? (optional)",
+  "aiPhotoNoteHint": "For example: since yesterday, eating less",
+  "aiPhotoRun": "Check this photo",
+  "aiPhotoCheckAnyway": "Check anyway",
+  "aiPhotoConsent": "The photo is sent to Google to be read. It is not saved by FarmTap. Do not include people in the photo.",
+  "aiPhotoLimit": "Your farm has used all photo checks for today. Try again tomorrow, or call your vet.",
+  "aiPhotoLeft": "{count} photo checks left today",
+  "@aiPhotoLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiPhotoErrNetwork": "No internet. Photo Check needs a connection.",
+  "aiPhotoErrBusy": "Photo Check is busy. Try again in a minute.",
+  "aiPhotoErrAppCheck": "Photo Check could not confirm this is the real FarmTap app.",
+  "aiPhotoErrRead": "The answer could not be read. Take another photo and try again.",
+  "aiPhotoSeen": "What can be seen",
+  "aiPhotoQuestions": "Questions that would help",
+  "aiPhotoReport": "This may need to be reported to the authorities",
+  "aiPhotoSaved": "Saved to the health history",
+  "aiPhotoSure": "Clear in the photo",
+  "aiPhotoMaybe": "Possible",
+  "aiPhotoUnsure": "Not sure",
+  "aiPhotoNewCheck": "Check another photo"
 }

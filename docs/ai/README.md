@@ -56,3 +56,8 @@ collections (`milkBatches`, `storageReadings`, `healthAssessments`,
 `aiAlertStates`, `aiLog`) added to its sync. This was not done in the cloud
 session because Flutter could not be installed there; it runs fully offline
 once built, since everything is worked out on the phone.
+
+
+## Photo Check (decision 0026)
+
+Phone and web send one photo to Google Gemini through Firebase AI Logic. Switch, model and daily limit live in `platform/config.ai.photo` (Admin > AI Control Centre, default off). Shared rules: `shared/aiPhoto.ts` (synced to webapp and functions), Dart port `lib/core/ai/ai_photo.dart`, parity fixtures in `test/core/ai/fixtures/expected.json`. Before switching on: enable Firebase AI Logic, register and enforce App Check, set quotas.

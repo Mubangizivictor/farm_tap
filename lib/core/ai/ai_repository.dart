@@ -13,7 +13,14 @@ import 'package:farm_tap/core/utils/clock.dart';
 
 /// What the engine reads, loaded once for a screen.
 class AiFarm {
-  const new({required this.data, required this.states, required this.shelfRules, required this.role});
+  AiFarm({
+    required this.data,
+    required this.states,
+    required this.shelfRules,
+    required this.role,
+    AiConfig? config,
+    this.photoUsedToday = 0,
+  }) : config = config ?? defaultAiConfig;
 
   final FarmData data;
   final Map<String, AlertState> states;
@@ -22,7 +29,11 @@ class AiFarm {
   /// owner, manager, clerk or worker (see [aiRoleOf]).
   final String role;
 
-  AiConfig get config => defaultAiConfig;
+  /// Platform switches from platform/config.ai (the defaults when offline).
+  final AiConfig config;
+
+  /// Photo checks this farm has saved today (the soft daily limit).
+  final int photoUsedToday;
 
   bool get seesMoneyNow => seesMoney(role);
 
@@ -57,10 +68,34 @@ String aiRoleOf({String? staffRole, String? farmRole}) {
 String stateKey(String alertId) => (alertId.length > 200 ? alertId.substring(0, 200) : alertId).replaceAll('/', '_');
 
 class AiRepository {
-  new({required this.journal, required this.clock});
+  new({required this.journal, required this.clock, this.platformAi});
 
   final RecordJournal journal;
   final Clock clock;
+
+  /// Reads platform/config.ai (online); null or a failure means the defaults.
+  final Future<Object?> Function()? platformAi;
+
+  AiConfig? _cfg;
+  DateTime? _cfgAt;
+
+  /// The platform AI switches, asked at most every 5 minutes. Offline or
+  /// slow: the last known value, else the defaults.
+  Future<AiConfig> platformConfig() async {
+    final at = _cfgAt;
+    final known = _cfg;
+    if (known != null && at != null && clock.now().difference(at) < const Duration(minutes: 5)) return known;
+    final f = platformAi;
+    if (f != null) {
+      try {
+        _cfg = aiConfigFrom(await f().timeout(const Duration(seconds: 4)));
+        _cfgAt = clock.now();
+      } on Object {
+        // Keep the last known value.
+      }
+    }
+    return _cfg ?? defaultAiConfig;
+  }
 
   String _iso(DateTime d) {
     final k = d.isUtc ? d.add(const Duration(hours: 3)) : d;
@@ -104,7 +139,11 @@ class AiRepository {
       _load('storageReadings'),
       _load('aiAlertStates'),
       _load('settings'),
+      _load('healthAssessments'),
     ]);
+    final cfg = await platformConfig();
+    final today = nowIso.substring(0, 10);
+    final photoToday = r[17].where((x) => x.body['kind'] == 'photo' && '${x.body['at']}'.startsWith(today)).length;
     final shelf = shelfRulesFrom(r[16].where((x) => x.id == 'aiMilk').firstOrNull?.body['rules']);
     final data = FarmData(
       now: nowIso,
@@ -132,7 +171,7 @@ class AiRepository {
         states[s.id] = AlertState(status: st!, note: s.str('note'), byName: s.str('byName'), at: s.str('at'));
       }
     }
-    return AiFarm(data: data, states: states, shelfRules: shelf, role: role);
+    return AiFarm(data: data, states: states, shelfRules: shelf, role: role, config: cfg, photoUsedToday: photoToday);
   }
 
   // ------------------------------------------------------------ Writes
@@ -190,6 +229,10 @@ class AiRepository {
 
   /// A vet-guide or screening result, kept for the vet (append-only).
   Future<void> saveAssessment(Map<String, Object?> body) => journal.add('healthAssessments', {...body, 'at': nowIso});
+
+  /// A saved photo check (append-only). Holds the words of the result, never
+  /// the picture.
+  Future<void> savePhotoAssessment(Map<String, Object?> body) => journal.add('healthAssessments', body);
 
   /// One line in the AI use log: which feature, whether it worked, how long
   /// and how the answer was made. Never the question, answer or any figure.

@@ -60,7 +60,7 @@ class AiModuleInfo {
 const aiModules = <AiModuleInfo>[
   AiModuleInfo('assistant', 'Farm Assistant', 'Ask questions about your farm records'),
   AiModuleInfo('vet', 'Veterinary Assistant', 'Symptoms, warning signs and when to call the vet'),
-  AiModuleInfo('screening', 'Disease Screening', 'Photo screening (experimental)'),
+  AiModuleInfo('screening', 'Photo Check', 'Take a photo, get possible causes'),
   AiModuleInfo('milk', 'Milk Intelligence', 'Daily milk, cows dropping, unusual days, losses'),
   AiModuleInfo('quality', 'Milk Quality and Expiry', 'Batches, cooling, temperatures, rejections'),
   AiModuleInfo('predictions', 'Production Predictions', 'Next 7 and 30 days of milk'),

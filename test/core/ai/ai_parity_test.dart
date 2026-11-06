@@ -28,4 +28,10 @@ void main() {
     final problems = diff(expected['vet'], vetSnapshot(expected['vetCases']! as List<Object?>));
     expect(problems.take(30).toList(), isEmpty);
   });
+
+  test('photo reader, catalog and prompts match the web engine', () {
+    expect(diff(expected['photo'], photoSnapshot(expected['photoCases']! as List<Object?>)).take(30).toList(), isEmpty);
+    expect(diff(expected['photoChecks'], photoCatalog()).take(30).toList(), isEmpty);
+    expect(diff(expected['photoPrompt'], photoPrompts()).take(30).toList(), isEmpty);
+  });
 }

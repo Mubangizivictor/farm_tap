@@ -16,6 +16,7 @@ import { PageHead, Stat } from '@/components/ui';
 import { aiModules, methodLabel, type Method } from '@/shared/aiCore';
 import { defaultAiConfig, experimentalModules, type AiConfig } from '@/shared/aiAccess';
 import { screeningTargets, SCREENING_ENGINE } from '@/shared/aiScreening';
+import { PHOTO_ENGINE } from '@/shared/aiPhoto';
 import { VET_ENGINE } from '@/shared/aiVet';
 import { adminChange, loadAllFarms, loadConfig, setOp, updateOp, type AdminFarm } from '@/lib/admin';
 import { useAdmin } from '@/lib/adminSession';
@@ -181,14 +182,15 @@ export default function AiControlCentre() {
             ['Farm calculations (milk, health, breeding, feed, money, risks)', 'engine-1', 'FarmTap code', 'Active in the browser'],
             ['Milk forecast (weighted trend + weekday pattern)', 'forecast-1', 'FarmTap code', 'Active in the browser'],
             ['Vet guide (signs and warning signs table)', VET_ENGINE, 'FarmTap code (vet review due)', 'Active in the browser'],
-            ['Photo quality check', SCREENING_ENGINE, 'FarmTap code', ai.experimental ? 'Active (experimental)' : 'Off'],
+            ['Photo quality check', SCREENING_ENGINE, 'FarmTap code', 'Active in the browser'],
+            [`Photo Check (Google Gemini, ${ai.photo.model})`, PHOTO_ENGINE, 'Google service, free tier; photo leaves the farm', ai.photo.enabled ? 'On' : 'Off'],
             [`Language model (Ollama, ${ai.llm.model})`, '—', 'Qwen3: Apache-2.0', 'Not connected (no server)'],
             ...screeningTargets.map((t) => [`Screening: ${t.label}`, '—', '—', 'No validated model']),
           ]}
         />
         <p className="small muted">
-          A photo-screening model can be installed only after it passes the evaluation in <code>tools/ai_eval/</code> on labelled photos, with the sensitivity and specificity
-          shown on the farm’s Disease Screening page. Evaluation results: none yet.
+          Photo Check describes what Google Gemini can see and lists possible causes. It never diagnoses, never names a drug or dose, and always says to call the vet (decision 0026).
+          It has not been tested on labelled East African photos: treat it as a helper, not a result. Vet review of the wording is still due.
         </p>
       </Anchor>
 
@@ -196,16 +198,39 @@ export default function AiControlCentre() {
         <Fit kind="cards" cols={[1, 2, 2, 2]}>
           <section className="card stack">
             <Toggle label={ai.enabled ? 'AI Intelligence is on' : 'AI Intelligence is off'} hint="Off hides the AI menu, insights and AI cards on every farm." checked={ai.enabled} disabled={disabled} onChange={(enabled) => setAi({ ...ai, enabled })} />
-            <Toggle
-              label="Experimental features"
-              hint={`Shows ${experimentalModules.map((k) => aiModules.find((m) => m.key === k)?.label).join(', ')}, clearly marked experimental.`}
-              checked={ai.experimental}
-              disabled={disabled}
-              onChange={(experimental) => setAi({ ...ai, experimental })}
-            />
             <label className="field">
               <span>Insights on Home</span>
               <input className="input" type="number" min={1} max={10} value={ai.insightsCount} disabled={disabled} onChange={(e) => setAi({ ...ai, insightsCount: Math.min(10, Math.max(1, Number(e.target.value) || 5)) })} />
+            </label>
+          </section>
+          <section className="card stack">
+            <h2>Photo Check (Google Gemini)</h2>
+            <p className="small muted">
+              Sends one photo at a time to Google through Firebase AI Logic. Turn it on only after App Check is enforced in the Firebase console and the billing plan is checked
+              (decision 0026). The photo leaves the farm; farmers are told before each check.
+            </p>
+            <Toggle
+              label={ai.photo.enabled ? 'Photo Check is on' : 'Photo Check is off'}
+              hint="Off stops every photo check on phone and web straight away."
+              checked={ai.photo.enabled}
+              disabled={disabled}
+              onChange={(enabled) => setAi({ ...ai, photo: { ...ai.photo, enabled } })}
+            />
+            <label className="field">
+              <span>Model name</span>
+              <input className="input" value={ai.photo.model} disabled={disabled} onChange={(e) => setAi({ ...ai, photo: { ...ai.photo, model: e.target.value.trim() } })} />
+            </label>
+            <label className="field">
+              <span>Photo checks per farm per day</span>
+              <input
+                className="input"
+                type="number"
+                min={1}
+                max={500}
+                value={ai.photo.perFarmPerDay}
+                disabled={disabled}
+                onChange={(e) => setAi({ ...ai, photo: { ...ai.photo, perFarmPerDay: Math.min(500, Math.max(1, Math.round(Number(e.target.value)) || 20)) } })}
+              />
             </label>
           </section>
           <section className="card stack">

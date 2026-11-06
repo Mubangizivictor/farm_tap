@@ -53,12 +53,13 @@ import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/formats.dart';
+import 'package:farm_tap/sectors/cattle/ai/data/gemini_photo_analyzer.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_assistant_page.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_hub_page.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_insights_strip.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_module_pages.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_reports_page.dart';
-import 'package:farm_tap/sectors/cattle/ai/presentation/ai_screening_page.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_photo_page.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_vet_page.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_widgets.dart';
 import 'package:farm_tap/sectors/cattle/breeding/presentation/pages/breeding_pages.dart';
@@ -153,6 +154,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         if (route != null) unawaited(context.push(route));
       },
       onModule: (key) => unawaited(context.push(AppRoutes.moreAiModule(key))),
+      photo: const GeminiPhotoAnalyzer(),
     );
   }
 
@@ -953,7 +955,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
               return switch (key) {
                 'assistant' => AiAssistantPage(ctx: ctx),
                 'vet' => AiVetPage(ctx: ctx, animalId: state.uri.queryParameters['animal']),
-                'screening' => AiScreeningPage(ctx: ctx),
+                'screening' => AiPhotoPage(ctx: ctx, animalId: state.uri.queryParameters['animal']),
                 'milk' => AiMilkPage(ctx: ctx),
                 'quality' => AiQualityPage(ctx: ctx),
                 'predictions' => AiPredictionsPage(ctx: ctx),

@@ -10161,6 +10161,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Light {brightness}, contrast {contrast}, sharpness {sharpness}'**
   String aiPhotoNumbers(int brightness, int contrast, int sharpness);
+
+  /// No description provided for @aiPhotoOffTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo Check is not switched on yet'**
+  String get aiPhotoOffTitle;
+
+  /// No description provided for @aiPhotoOffBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The FarmTap team turns this on when it is ready for your farm. You can still choose a check and take a photo.'**
+  String get aiPhotoOffBody;
+
+  /// No description provided for @aiPhotoWhat.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you want to check?'**
+  String get aiPhotoWhat;
+
+  /// No description provided for @aiPhotoHowTo.
+  ///
+  /// In en, this message translates to:
+  /// **'How to take the photo'**
+  String get aiPhotoHowTo;
+
+  /// No description provided for @aiPhotoAnimalOpt.
+  ///
+  /// In en, this message translates to:
+  /// **'Which animal? (optional)'**
+  String get aiPhotoAnimalOpt;
+
+  /// No description provided for @aiPhotoNoAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'No animal'**
+  String get aiPhotoNoAnimal;
+
+  /// No description provided for @aiPhotoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'What have you noticed? (optional)'**
+  String get aiPhotoNote;
+
+  /// No description provided for @aiPhotoNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example: since yesterday, eating less'**
+  String get aiPhotoNoteHint;
+
+  /// No description provided for @aiPhotoRun.
+  ///
+  /// In en, this message translates to:
+  /// **'Check this photo'**
+  String get aiPhotoRun;
+
+  /// No description provided for @aiPhotoCheckAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Check anyway'**
+  String get aiPhotoCheckAnyway;
+
+  /// No description provided for @aiPhotoConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'The photo is sent to Google to be read. It is not saved by FarmTap. Do not include people in the photo.'**
+  String get aiPhotoConsent;
+
+  /// No description provided for @aiPhotoLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Your farm has used all photo checks for today. Try again tomorrow, or call your vet.'**
+  String get aiPhotoLimit;
+
+  /// No description provided for @aiPhotoLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} photo checks left today'**
+  String aiPhotoLeft(int count);
+
+  /// No description provided for @aiPhotoErrNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet. Photo Check needs a connection.'**
+  String get aiPhotoErrNetwork;
+
+  /// No description provided for @aiPhotoErrBusy.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo Check is busy. Try again in a minute.'**
+  String get aiPhotoErrBusy;
+
+  /// No description provided for @aiPhotoErrAppCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo Check could not confirm this is the real FarmTap app.'**
+  String get aiPhotoErrAppCheck;
+
+  /// No description provided for @aiPhotoErrRead.
+  ///
+  /// In en, this message translates to:
+  /// **'The answer could not be read. Take another photo and try again.'**
+  String get aiPhotoErrRead;
+
+  /// No description provided for @aiPhotoSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'What can be seen'**
+  String get aiPhotoSeen;
+
+  /// No description provided for @aiPhotoQuestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Questions that would help'**
+  String get aiPhotoQuestions;
+
+  /// No description provided for @aiPhotoReport.
+  ///
+  /// In en, this message translates to:
+  /// **'This may need to be reported to the authorities'**
+  String get aiPhotoReport;
+
+  /// No description provided for @aiPhotoSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to the health history'**
+  String get aiPhotoSaved;
+
+  /// No description provided for @aiPhotoSure.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear in the photo'**
+  String get aiPhotoSure;
+
+  /// No description provided for @aiPhotoMaybe.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible'**
+  String get aiPhotoMaybe;
+
+  /// No description provided for @aiPhotoUnsure.
+  ///
+  /// In en, this message translates to:
+  /// **'Not sure'**
+  String get aiPhotoUnsure;
+
+  /// No description provided for @aiPhotoNewCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check another photo'**
+  String get aiPhotoNewCheck;
 }
 
 class _AppLocalizationsDelegate

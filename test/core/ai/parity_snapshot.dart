@@ -8,6 +8,7 @@ import 'package:farm_tap/core/ai/ai_data.dart';
 import 'package:farm_tap/core/ai/ai_herd.dart';
 import 'package:farm_tap/core/ai/ai_milk.dart';
 import 'package:farm_tap/core/ai/ai_money.dart';
+import 'package:farm_tap/core/ai/ai_photo.dart';
 import 'package:farm_tap/core/ai/ai_reports.dart';
 import 'package:farm_tap/core/ai/ai_risk.dart';
 import 'package:farm_tap/core/ai/ai_stock.dart';
@@ -335,6 +336,46 @@ List<Json> vetSnapshot(List<Object?> cases) {
   }
   return out;
 }
+
+Json? _photo(PhotoResult? r) => r == null
+    ? null
+    : {
+        'usable': r.usable,
+        'summary': r.summary,
+        'signs': [
+          for (final s in r.signs) {'what': s.what, 'where': s.where, 'certainty': s.certainty},
+        ],
+        'possible': [
+          for (final c in r.possible) {'name': c.name, 'why': c.why},
+        ],
+        'risk': r.risk.name,
+        'callVet': r.callVet,
+        'report': r.report,
+        'steps': r.steps,
+        'retake': r.retake,
+        'questions': r.questions,
+        'removed': r.removed,
+        'disclaimer': r.disclaimer,
+      };
+
+/// The photo reader on the same model replies as the web engine.
+List<Json?> photoSnapshot(List<Object?> cases) {
+  final out = <Json?>[];
+  for (final raw in cases) {
+    final c = (raw! as Map).cast<String, Object?>();
+    out.add(_photo(readPhotoReply(c['reply']! as String, photoCheckByKey(c['check']! as String)!)));
+  }
+  return out;
+}
+
+/// The catalog and the prompts, in the same shape as the web engine.
+List<List<Object?>> photoCatalog() => [
+  for (final c in photoChecks) [c.key, c.label, c.kind.name, c.how, c.focus],
+];
+
+List<String> photoPrompts() => [
+  for (final c in photoChecks) buildPhotoPrompt(c, note: ' Is it  serious?\n', animal: 'cow', daysSinceCalving: 12),
+];
 
 // ---------------------------------------------------------------- Compare
 

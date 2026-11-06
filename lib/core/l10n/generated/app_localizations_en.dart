@@ -5889,4 +5889,81 @@ class AppLocalizationsEn extends AppLocalizations {
   String aiPhotoNumbers(int brightness, int contrast, int sharpness) {
     return 'Light $brightness, contrast $contrast, sharpness $sharpness';
   }
+
+  @override
+  String get aiPhotoOffTitle => 'Photo Check is not switched on yet';
+
+  @override
+  String get aiPhotoOffBody => 'The FarmTap team turns this on when it is ready for your farm. You can still choose a check and take a photo.';
+
+  @override
+  String get aiPhotoWhat => 'What do you want to check?';
+
+  @override
+  String get aiPhotoHowTo => 'How to take the photo';
+
+  @override
+  String get aiPhotoAnimalOpt => 'Which animal? (optional)';
+
+  @override
+  String get aiPhotoNoAnimal => 'No animal';
+
+  @override
+  String get aiPhotoNote => 'What have you noticed? (optional)';
+
+  @override
+  String get aiPhotoNoteHint => 'For example: since yesterday, eating less';
+
+  @override
+  String get aiPhotoRun => 'Check this photo';
+
+  @override
+  String get aiPhotoCheckAnyway => 'Check anyway';
+
+  @override
+  String get aiPhotoConsent => 'The photo is sent to Google to be read. It is not saved by FarmTap. Do not include people in the photo.';
+
+  @override
+  String get aiPhotoLimit => 'Your farm has used all photo checks for today. Try again tomorrow, or call your vet.';
+
+  @override
+  String aiPhotoLeft(int count) {
+    return '$count photo checks left today';
+  }
+
+  @override
+  String get aiPhotoErrNetwork => 'No internet. Photo Check needs a connection.';
+
+  @override
+  String get aiPhotoErrBusy => 'Photo Check is busy. Try again in a minute.';
+
+  @override
+  String get aiPhotoErrAppCheck => 'Photo Check could not confirm this is the real FarmTap app.';
+
+  @override
+  String get aiPhotoErrRead => 'The answer could not be read. Take another photo and try again.';
+
+  @override
+  String get aiPhotoSeen => 'What can be seen';
+
+  @override
+  String get aiPhotoQuestions => 'Questions that would help';
+
+  @override
+  String get aiPhotoReport => 'This may need to be reported to the authorities';
+
+  @override
+  String get aiPhotoSaved => 'Saved to the health history';
+
+  @override
+  String get aiPhotoSure => 'Clear in the photo';
+
+  @override
+  String get aiPhotoMaybe => 'Possible';
+
+  @override
+  String get aiPhotoUnsure => 'Not sure';
+
+  @override
+  String get aiPhotoNewCheck => 'Check another photo';
 }

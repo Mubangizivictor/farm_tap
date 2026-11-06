@@ -45,6 +45,22 @@ export const signs = [
   { key: 'badDischarge', label: 'Bad-smelling discharge after calving', group: 'Calving' },
   { key: 'coldEars', label: 'Cold ears, wobbly, soon after calving', group: 'Calving' },
   { key: 'otherDied', label: 'Another animal died suddenly', group: 'Herd' },
+  { key: 'abortion', label: 'Aborted (lost a calf before time)', group: 'Calving' },
+  { key: 'prolapse', label: 'Womb or vagina pushed out', group: 'Calving' },
+  { key: 'hairLoss', label: 'Patches of hair loss or scabs', group: 'Skin' },
+  { key: 'itching', label: 'Rubbing and scratching a lot', group: 'Skin' },
+  { key: 'ringLesions', label: 'Round grey-white crusty patches on the skin', group: 'Skin' },
+  { key: 'staggering', label: 'Staggering or trembling, often on lush green grass', group: 'Body' },
+  { key: 'weakRough', label: 'Weak, thin, rough coat, fever that comes and goes', group: 'Body' },
+  { key: 'swollenBrisket', label: 'Swelling of the brisket or under the belly or throat', group: 'Body' },
+  { key: 'sunkenEyes', label: 'Sunken eyes, skin stays up when pinched (dehydration)', group: 'Body' },
+  { key: 'grainOverload', label: 'Ate a lot of grain, maize or bran, now dull with loose dung', group: 'Feeding' },
+  { key: 'eatingStrange', label: 'Chewing wood, bones or soil', group: 'Feeding' },
+  { key: 'swollenJoint', label: 'Swollen, hot or painful joint', group: 'Legs' },
+  { key: 'dungWorms', label: 'Worms or white segments seen in the dung', group: 'Dung' },
+  { key: 'navelSwollen', label: 'Calf: swollen, wet or smelly navel', group: 'Calves' },
+  { key: 'calfScours', label: 'Calf: watery dung and weak', group: 'Calves' },
+  { key: 'calfNotSuckling', label: 'Calf: not suckling, cold or cannot stand', group: 'Calves' },
 ] as const;
 export type SignKey = (typeof signs)[number]['key'];
 
@@ -81,6 +97,19 @@ const conditions: Condition[] = [
   { key: 'blackquarter', name: 'Blackquarter', main: ['legMuscleSwollen'], other: ['lame', 'otherDied', 'notEating'], fever: true, urgency: 'critical', advice: 'Emergency, often fatal in young cattle. Call the vet now about the rest of the herd.' },
   { key: 'anthrax', name: 'Anthrax (sudden death disease)', main: ['bloodOpenings', 'otherDied'], other: ['breathingHard'], fever: true, notifiable: true, urgency: 'critical', advice: 'Do not open, skin or eat a dead animal, and keep people and dogs away. Report to the District Veterinary Officer at once.' },
   { key: 'rabies', name: 'Rabies or another brain disease', main: ['strangeBehaviour'], other: ['drooling', 'notEating'], notifiable: true, urgency: 'critical', advice: 'Do not put a hand in her mouth. Keep people away and report to the District Veterinary Officer.' },
+  { key: 'brucellosis', name: 'Brucellosis (can cause abortion, can spread to people)', main: ['abortion'], other: ['afterbirthStuck', 'swollenJoint', 'badDischarge'], notifiable: true, urgency: 'high', advice: 'Keep the aborted calf and afterbirth away from people and dogs, wear gloves, do not drink raw milk from her, and report to the District Veterinary Officer.' },
+  { key: 'trypano', name: 'Trypanosomiasis (nagana, spread by tsetse flies)', main: ['weakRough'], other: ['paleGums', 'weightLoss', 'eatingLess', 'lymphSwollen', 'milkDrop'], fever: true, urgency: 'high', advice: 'Keep her in shade with water. Tell the vet if you have seen tsetse flies in the area.' },
+  { key: 'heartwater', name: 'Heartwater (tick-borne, affects the nerves and chest)', main: ['swollenBrisket', 'strangeBehaviour'], other: ['breathingHard', 'ticksMany', 'diarrhoea', 'notEating'], fever: true, urgency: 'high', advice: 'Keep her calm and in shade, and check the herd for ticks. Treatment works only if given early.' },
+  { key: 'tetany', name: 'Grass tetany (low magnesium)', main: ['staggering'], other: ['strangeBehaviour', 'downCannotRise', 'notEating'], urgency: 'critical', advice: 'Emergency. Keep her calm, do not chase her, and call the vet now. Tell the vet what pasture she was on.' },
+  { key: 'acidosis', name: 'Grain overload (rumen acidosis)', main: ['grainOverload'], other: ['diarrhoea', 'eatingLess', 'lame', 'breathingHard', 'notEating'], urgency: 'high', advice: 'Stop all grain and concentrate feed, give hay or dry grass and clean water, and call the vet today.' },
+  { key: 'ringworm', name: 'Ringworm (a skin fungus)', main: ['ringLesions'], other: ['hairLoss', 'itching'], urgency: 'low', advice: 'Keep her apart from calves and from people with skin problems, and wash your hands after touching her.' },
+  { key: 'mange', name: 'Mange or lice (skin parasites)', main: ['itching'], other: ['hairLoss', 'ticksMany', 'weightLoss'], urgency: 'medium', advice: 'Keep her apart from the herd, and ask the vet which parasite it is before using any product.' },
+  { key: 'calfScours', name: 'Calf scours (diarrhoea in a young calf)', main: ['calfScours'], other: ['sunkenEyes', 'calfNotSuckling', 'notEating'], urgency: 'high', advice: 'Calves lose water fast. Keep her warm, dry and clean, keep her drinking, and call the vet today.' },
+  { key: 'navelIll', name: 'Navel or joint ill in a calf', main: ['navelSwollen'], other: ['swollenJoint', 'calfNotSuckling', 'lame'], fever: true, urgency: 'high', advice: 'Keep the calf clean and dry and away from others, and call the vet today.' },
+  { key: 'prolapse', name: 'Prolapse (womb or vagina pushed out)', main: ['prolapse'], other: ['calvingStraining'], urgency: 'critical', advice: 'Emergency. Keep the tissue clean and moist, stop her lying on it, and call the vet now. Do not try to push it back yourself.' },
+  { key: 'mineral', name: 'Mineral shortage', main: ['eatingStrange'], other: ['weightLoss', 'milkDrop', 'eatingLess'], urgency: 'low', advice: 'Ask the vet or your extension officer about a mineral lick and the quality of her feed.' },
+  { key: 'jointInfection', name: 'Joint infection or injury', main: ['swollenJoint'], other: ['lame', 'woundBleeding'], urgency: 'medium', advice: 'Keep her on soft, dry ground and rest her. See the vet if the joint stays swollen.' },
+  { key: 'dehydration', name: 'Dehydration (needs water urgently)', main: ['sunkenEyes'], other: ['diarrhoea', 'notEating', 'weightLoss'], urgency: 'high', advice: 'Give her clean water to drink slowly, keep her in shade, and call the vet today.' },
   { key: 'wound', name: 'Wound or injury', main: ['wound'], other: ['lame', 'woundBleeding'], urgency: 'medium', advice: 'Clean it with clean water and keep flies off.' },
 ];
 
@@ -94,6 +123,10 @@ const redFlags: { sign?: SignKey; test?: (i: VetInput) => boolean; text: string 
   { sign: 'strangeBehaviour', text: 'Strange behaviour or fits' },
   { sign: 'otherDied', text: 'Another animal died suddenly' },
   { sign: 'legMuscleSwollen', text: 'Crackling swollen muscle' },
+  { sign: 'prolapse', text: 'Womb or vagina pushed out' },
+  { sign: 'staggering', text: 'Staggering or trembling' },
+  { sign: 'sunkenEyes', text: 'Sunken eyes (dehydration)' },
+  { sign: 'calfNotSuckling', text: 'Calf cold, not suckling or cannot stand' },
   { test: (i) => i.tempC != null && i.tempC >= 41, text: 'Very high temperature (41 °C or more)' },
   { test: (i) => i.tempC != null && i.tempC < 37.5, text: 'Low temperature (below 37.5 °C)' },
   { test: (i) => i.signs.includes('breathingHard') && i.signs.includes('notEating'), text: 'Hard breathing and not eating' },
@@ -195,4 +228,4 @@ export interface HealthAssessmentBody {
   at: string;
 }
 
-export const VET_ENGINE = 'vet-guide-1';
+export const VET_ENGINE = 'vet-guide-2';

@@ -42,6 +42,9 @@ class AiConfig {
     required this.llmModel,
     required this.llmTimeoutMs,
     required this.insightsCount,
+    this.photoEnabled = false,
+    this.photoModel = 'gemini-3.8-flash',
+    this.photoPerFarmPerDay = 20,
   });
   final bool enabled;
   final Map<String, bool> modules;
@@ -50,6 +53,12 @@ class AiConfig {
   final String llmModel;
   final int llmTimeoutMs;
   final int insightsCount;
+
+  /// Photo analysis with Google Gemini through Firebase AI Logic (decision 0026).
+  /// Off until a Super Admin turns it on.
+  final bool photoEnabled;
+  final String photoModel;
+  final int photoPerFarmPerDay;
 }
 
 final defaultAiConfig = AiConfig(
@@ -72,6 +81,9 @@ AiConfig aiConfigFrom(Object? v) {
   final model = l['model'];
   final timeout = l['timeoutMs'];
   final count = o['insightsCount'];
+  final ph = _obj(o['photo']);
+  final phModel = ph['model'];
+  final phLimit = ph['perFarmPerDay'];
   return AiConfig(
     enabled: o['enabled'] is bool ? o['enabled']! as bool : d.enabled,
     modules: {for (final x in aiModules) x.key: m[x.key] is bool ? m[x.key]! as bool : d.modules[x.key]!},
@@ -80,10 +92,13 @@ AiConfig aiConfigFrom(Object? v) {
     llmModel: model is String && RegExp(r'^[\w.:\-/]{1,64}$').hasMatch(model) ? model : d.llmModel,
     llmTimeoutMs: timeout is num && timeout >= 1000 && timeout <= 120000 ? timeout.toInt() : d.llmTimeoutMs,
     insightsCount: count is num && count >= 1 && count <= 10 ? jsRound(count).toInt() : d.insightsCount,
+    photoEnabled: ph['enabled'] is bool ? ph['enabled']! as bool : d.photoEnabled,
+    photoModel: phModel is String && RegExp(r'^[\w.\-]{3,64}$').hasMatch(phModel) ? phModel : d.photoModel,
+    photoPerFarmPerDay: phLimit is num && phLimit >= 1 && phLimit <= 500 ? jsRound(phLimit).toInt() : d.photoPerFarmPerDay,
   );
 }
 
-const experimentalModules = ['screening'];
+const experimentalModules = <String>[];
 
 /// Whether a person on a farm sees one module: platform switch, farm switch, role.
 bool moduleOn(String key, AiConfig cfg, String role, {bool farmAiOn = true}) {

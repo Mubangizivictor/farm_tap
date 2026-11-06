@@ -22,6 +22,7 @@ const assistant = await sh('aiAssistant.ts');
 const reports = await sh('aiReports.ts');
 const vet = await sh('aiVet.ts');
 const data = await sh('aiData.ts');
+const photo = await sh('aiPhoto.ts');
 
 const finding = (f) => ({ id: f.id, module: f.module, severity: f.severity, title: f.title, why: f.why, action: f.action, method: f.method, links: f.links.map((l) => [l.label, l.href]), subjects: f.subjects, state: f.state ?? null });
 const answer = (a) => ({ intent: a.intent, ok: a.ok, text: a.text, bullets: a.bullets, links: a.links.map((l) => [l.label, l.href]), method: a.method });
@@ -83,14 +84,47 @@ export const vetCases = [
   { signs: ['bloodOpenings', 'otherDied'], tempC: 41 },
   { signs: ['lame'] },
   { signs: ['afterbirthStuck', 'badDischarge'], daysSinceCalving: 2, tempC: 40 },
+  { signs: ['abortion', 'afterbirthStuck'], daysSinceCalving: 1 },
+  { signs: ['weakRough', 'paleGums', 'weightLoss'], tempC: 40.1 },
+  { signs: ['swollenBrisket', 'strangeBehaviour', 'ticksMany'], tempC: 41.5 },
+  { signs: ['staggering', 'notEating'] },
+  { signs: ['grainOverload', 'diarrhoea', 'lame'], days: 1 },
+  { signs: ['ringLesions', 'hairLoss'] },
+  { signs: ['itching', 'hairLoss', 'ticksMany'] },
+  { signs: ['calfScours', 'sunkenEyes', 'calfNotSuckling'], tempC: 37 },
+  { signs: ['navelSwollen', 'swollenJoint'], tempC: 40 },
+  { signs: ['prolapse', 'calvingStraining'], daysSinceCalving: 0 },
+  { signs: ['eatingStrange', 'weightLoss'] },
+  { signs: ['swollenJoint', 'lame'] },
+  { signs: ['sunkenEyes', 'diarrhoea', 'notEating'], days: 2 },
 ];
+const goodPhoto = JSON.stringify({ imageUsable: true, summary: 'Several firm round lumps on the side and neck.', signs: [{ what: 'Firm round lumps on the skin', where: 'side and neck', certainty: 'clear' }], possibleCauses: [{ name: 'Lumpy skin disease', why: 'Many firm round nodules on the skin.' }], urgency: 'soon', reportToAuthorities: false, whatToDoNow: ['Keep her apart from the herd.', 'Control flies and ticks.'], retakeAdvice: null, questionsForFarmer: ['Do other animals have lumps?'] });
+export const photoCases = [
+  { check: 'skin', reply: goodPhoto },
+  { check: 'skin', reply: '```json\n' + goodPhoto + '\n```' },
+  { check: 'skin', reply: 'Here is the answer: ' + goodPhoto + ' Hope it helps.' },
+  { check: 'udder', reply: JSON.stringify({ imageUsable: true, summary: 'Looks like mastitis. Give 10 ml of oxytetracycline daily. The udder is swollen.', signs: [{ what: 'Swollen rear left quarter', where: 'udder', certainty: 'possible' }], possibleCauses: [{ name: 'Mastitis', why: 'Swollen quarter. Treat with antibiotics.' }], urgency: 'soon', whatToDoNow: ['Inject penicillin into the muscle.', 'Keep her in shade.', 'She has foot and mouth disease for sure.', 'Dose at 5 mg per kg.', 'Milk her last.'], questionsForFarmer: ['Is the milk clotted?'] }) },
+  { check: 'bcs', reply: JSON.stringify({ imageUsable: true, summary: 'The cow cannot get up and her left side is swollen (bloat).', signs: [], possibleCauses: [], urgency: 'routine', whatToDoNow: [] }) },
+  { check: 'skin', reply: JSON.stringify({ imageUsable: true, summary: 'Healthy-looking skin.', signs: [], possibleCauses: [], urgency: 'none', whatToDoNow: [], retakeAdvice: null }) },
+  { check: 'feed', reply: JSON.stringify({ imageUsable: true, summary: 'Clean dry feed.', signs: [], possibleCauses: [], urgency: 'none', whatToDoNow: [] }) },
+  { check: 'feed', reply: JSON.stringify({ imageUsable: true, summary: 'Grey-green mould on wet maize bran.', signs: [{ what: 'Mould on the feed', where: 'bottom of the heap', certainty: 'clear' }], possibleCauses: [{ name: 'Wet storage', why: 'Feed looks damp.' }], urgency: 'routine', whatToDoNow: ['Throw the mouldy feed away.', 'Store it dry, off the floor.'] }) },
+  { check: 'skin', reply: JSON.stringify({ imageUsable: false, summary: 'Too dark.', signs: [], possibleCauses: [], urgency: 'none' }) },
+  { check: 'mouth', reply: JSON.stringify({ imageUsable: true, summary: 'Blisters on the tongue and a lot of drool.', signs: [{ what: 'Blisters on the tongue', where: 'mouth', certainty: 'clear' }, { what: 'Drooling', where: 'mouth', certainty: 'weird' }], possibleCauses: [{ name: 'Foot and mouth disease', why: 'Blisters and drooling together.' }, { name: 'Dipping with acaricide', why: 'x' }], urgency: 'routine', reportToAuthorities: false, whatToDoNow: ['Keep the herd in.', 'Do not move animals.'], retakeAdvice: 'Open the mouth a little wider.' }) },
+  { check: 'dung', reply: 'I cannot help with that' },
+  { check: 'dung', reply: '' },
+  { check: 'dung', reply: '[]' },
+  { check: 'calf', reply: JSON.stringify({ imageUsable: true, summary: 'Wet swollen navel. The calf looks weak.', signs: Array.from({ length: 9 }, (_, i) => ({ what: `sign ${i}`, where: 'x', certainty: 'possible' })), possibleCauses: Array.from({ length: 6 }, (_, i) => ({ name: `cause ${i}`, why: 'y' })), urgency: 'soon', whatToDoNow: Array.from({ length: 9 }, (_, i) => `step ${i}.`), questionsForFarmer: ['a', 'b', 'c', 'd', 'e'] }) },
+];
+export function photoSnapshot() {
+  return photoCases.map((c) => JSON.parse(JSON.stringify(photo.readPhotoReply(c.reply, photo.photoCheckByKey(c.check)), (k, v) => (v === undefined ? null : v))));
+}
 export function vetSnapshot() {
   return vetCases.map((c) => JSON.parse(JSON.stringify(vet.assess(c), (k, v) => (v === undefined ? null : v))));
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const farms = JSON.parse(readFileSync(join(root, 'test', 'core', 'ai', 'fixtures', 'farms.json'), 'utf8'));
-  const expected = { farms: farms.map((f) => snapshot(f)), vet: vetSnapshot(), vetCases };
+  const expected = { farms: farms.map((f) => snapshot(f)), vet: vetSnapshot(), vetCases, photo: photoSnapshot(), photoCases, photoChecks: photo.photoChecks.map((c) => [c.key, c.label, c.kind, c.how, c.focus]), photoPrompt: photo.photoChecks.map((c) => photo.buildPhotoPrompt({ check: c, note: ' Is it  serious?\n', animal: 'cow', daysSinceCalving: 12 })) };
   writeFileSync(join(root, 'test', 'core', 'ai', 'fixtures', 'expected.json'), JSON.stringify(expected));
   console.log(`wrote expected.json for ${farms.length} farms`);
 }

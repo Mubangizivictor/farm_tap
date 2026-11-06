@@ -80,7 +80,9 @@ import 'package:farm_tap/sectors/cattle/owner_reports/data/fake/fake_daily_repor
 import 'package:farm_tap/sectors/cattle/owner_reports/domain/daily_report.dart';
 import 'package:farm_tap/sectors/cattle/workers/data/fake/fake_workers_repository.dart';
 import 'package:farm_tap/sectors/cattle/workers/domain/workers_repository.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -144,6 +146,7 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
   } else {
     // Backend phase (decision 0014): Firebase project farm-tap-1dd15.
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await _activateAppCheck();
     final db = FirebaseFirestore.instance;
     FirestoreRemoteStore.configure(db);
     final prefs = await SharedPreferences.getInstance();
@@ -310,7 +313,13 @@ Future<void> configureDependencies(Flavor flavor, {bool demo = demoBuild}) async
       () => OperationsRepository(journal: getIt<RecordJournal>(), clock: getIt<Clock>()),
     )
     // Decision 0025: AI Intelligence on the phone (the engine runs here, offline).
-    ..registerLazySingleton<AiRepository>(() => AiRepository(journal: getIt<RecordJournal>(), clock: getIt<Clock>()))
+    ..registerLazySingleton<AiRepository>(() => AiRepository(
+        journal: getIt<RecordJournal>(),
+        clock: getIt<Clock>(),
+        // platform/config is readable by anyone (the admin panel writes it).
+        platformAi: () async => (await FirebaseFirestore.instance.doc('platform/config').get()).data()?['ai'],
+      ),
+    )
     ..registerLazySingleton<FarmReminders>(
       () => FarmReminders(
         journal: getIt<RecordJournal>(),
@@ -602,5 +611,21 @@ Future<void> _uploadWaitingPhotos() async {
     }
   } on Object catch (e, s) {
     getIt<AppLogger>().e('photo upload failed', e, s);
+  }
+}
+
+/// App Check proves a request comes from the real FarmTap app. Firebase AI
+/// Logic (photo checks, decision 0026) refuses requests without it. In debug
+/// builds the debug provider prints a token that must be added once under
+/// Firebase console > App Check > Apps > Manage debug tokens. It must never
+/// stop the app from opening.
+Future<void> _activateAppCheck() async {
+  try {
+    await FirebaseAppCheck.instance.activate(
+      providerAndroid: kDebugMode ? const AndroidDebugProvider() : const AndroidPlayIntegrityProvider(),
+      providerApple: kDebugMode ? const AppleDebugProvider() : const AppleAppAttestWithDeviceCheckFallbackProvider(),
+    );
+  } on Object {
+    // Photo checks will say the phone could not be verified; everything else works.
   }
 }

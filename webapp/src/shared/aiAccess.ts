@@ -30,6 +30,13 @@ export interface AiConfig {
   experimental: boolean;
   /** Optional self-hosted language model (Ollama) used only to phrase answers. */
   llm: { enabled: boolean; model: string; timeoutMs: number };
+  /**
+   * Photo analysis with Google Gemini through Firebase AI Logic (decision
+   * 0026). Off until the Firebase steps are done and a Super Admin turns it
+   * on. [perFarmPerDay] is a soft limit counted from the farm's own saved
+   * photo checks; the Google free tier has its own limits as well.
+   */
+  photo: { enabled: boolean; model: string; perFarmPerDay: number };
   /** How many alerts "Today's insights" shows. */
   insightsCount: number;
 }
@@ -39,6 +46,7 @@ export const defaultAiConfig: AiConfig = {
   modules: Object.fromEntries(aiModules.map((m) => [m.key, true])) as Record<AiModule, boolean>,
   experimental: true,
   llm: { enabled: false, model: 'qwen3:4b', timeoutMs: 20000 },
+  photo: { enabled: false, model: 'gemini-3.8-flash', perFarmPerDay: 20 },
   insightsCount: 5,
 };
 
@@ -48,6 +56,7 @@ export function aiConfigFrom(v: unknown): AiConfig {
   const o = obj(v);
   const m = obj(o.modules);
   const l = obj(o.llm);
+  const ph = obj(o.photo);
   const D = defaultAiConfig;
   return {
     enabled: typeof o.enabled === 'boolean' ? o.enabled : D.enabled,
@@ -58,11 +67,16 @@ export function aiConfigFrom(v: unknown): AiConfig {
       model: typeof l.model === 'string' && /^[\w.:\-/]{1,64}$/.test(l.model) ? l.model : D.llm.model,
       timeoutMs: typeof l.timeoutMs === 'number' && l.timeoutMs >= 1000 && l.timeoutMs <= 120000 ? l.timeoutMs : D.llm.timeoutMs,
     },
+    photo: {
+      enabled: typeof ph.enabled === 'boolean' ? ph.enabled : D.photo.enabled,
+      model: typeof ph.model === 'string' && /^[\w.\-]{3,64}$/.test(ph.model) ? ph.model : D.photo.model,
+      perFarmPerDay: typeof ph.perFarmPerDay === 'number' && ph.perFarmPerDay >= 1 && ph.perFarmPerDay <= 500 ? Math.round(ph.perFarmPerDay) : D.photo.perFarmPerDay,
+    },
     insightsCount: typeof o.insightsCount === 'number' && o.insightsCount >= 1 && o.insightsCount <= 10 ? Math.round(o.insightsCount) : D.insightsCount,
   };
 }
 
-export const experimentalModules: AiModule[] = ['screening'];
+export const experimentalModules: AiModule[] = [];
 
 /** Whether a person on a farm sees one module: platform switch, farm switch, role. */
 export function moduleOn(key: AiModule, cfg: AiConfig, role: FarmRole, farmAiOn = true): boolean {
