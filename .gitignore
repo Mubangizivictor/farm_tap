@@ -52,3 +52,4 @@ docs/design/animation_posters/
 test/goldens/compare/
 test/goldens/failures/
 .vscode/
+.firebase/
