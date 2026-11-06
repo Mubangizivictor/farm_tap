@@ -7,7 +7,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:farm_tap/core/ai/ai_assistant.dart';
 import 'package:farm_tap/core/ai/ai_chat.dart';
 import 'package:farm_tap/core/ai/ai_core.dart';
 import 'package:farm_tap/core/ai/ai_data.dart';
@@ -488,7 +487,14 @@ class _AiChatPageState extends State<AiChatPage> {
     final named = findAnimalMention(question, cows) ?? _animalId;
     final cow = animals.where((a) => a.id == named).firstOrNull;
     if (mounted) setState(() => _animalId = named);
-    final route = classify(question, farm.data, role: ctx.role, cfg: farm.config, files: sent.length, maxChars: asst.maxChars);
+    final route = classify(
+      question,
+      farm.data,
+      role: ctx.role,
+      cfg: farm.config,
+      files: sent.length,
+      maxChars: asst.maxChars,
+    );
     final calc = route.answer;
     final calcText = calc != null && calc.ok ? [calc.text, ...calc.bullets.map((b) => '- $b')].join('\n') : null;
     final animalRef = cow == null ? null : (id: cow.id, name: animalName(cow));
@@ -508,9 +514,7 @@ class _AiChatPageState extends State<AiChatPage> {
     // Layers 1 and 2 (and the fallback when the AI does not answer).
     void builtIn({AiErrorKind? error, String? note}) {
       unawaited(ctx.repo.log('assistant', ok: calc?.ok ?? false, ms: ms(), method: calc?.method ?? Method.calculated));
-      final body = calc == null
-          ? l10n.aiChatOfflineHelp
-          : [calc.text, ...calc.bullets.map((b) => '- $b')].join('\n');
+      final body = calc == null ? l10n.aiChatOfflineHelp : [calc.text, ...calc.bullets.map((b) => '- $b')].join('\n');
       final actions = chatActions(question: question, answer: body, health: false, callVet: null, animal: animalRef);
       if (actions.isEmpty && calc != null && calc.links.isNotEmpty) {
         actions.add(ChatAction('Go to ${calc.links.first.label}', calc.links.first.href));
@@ -716,7 +720,10 @@ class _AiChatPageState extends State<AiChatPage> {
     final sources = g['sources'];
     final queries = g['queries'];
     return ChatGrounding(
-      queries: [if (queries is List) for (final q in queries) '$q'],
+      queries: [
+        if (queries is List)
+          for (final q in queries) '$q',
+      ],
       sources: [
         if (sources is List)
           for (final s in sources)

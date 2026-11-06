@@ -127,7 +127,8 @@ List<Finding> insightFindings(FarmData d) {
         title: 'Milk down ${jsNum(c.changePct.abs())}% on the previous recording',
         why:
             '${fmtL(c.latest.litres)} on ${fmtDay(c.latest.day)} against ${fmtL(c.previous.litres)} on ${fmtDay(c.previous.day)}.',
-        action: '$herdDropAction A health problem is only a possibility: ask your vet to check any cow that looks unwell.',
+        action:
+            '$herdDropAction A health problem is only a possibility: ask your vet to check any cow that looks unwell.',
         method: Method.calculated,
         links: const [Link('Milk records', '/milk/')],
       ),
@@ -177,7 +178,7 @@ final _milkChange = RegExp(
   r'((milk|production|yield).*(declin|drop|fall|fell|down|change|compar|previous|differ|trend|up\b|increase))|((declin|drop|fall|compar|change|trend).*(milk|production|yield))',
 );
 final _records = RegExp(
-  r'(incomplete|missing|complete).*(record|detail|info)|(record|detail|info).*(incomplete|missing|complete)',
+  '(incomplete|missing|complete).*(record|detail|info)|(record|detail|info).*(incomplete|missing|complete)',
 );
 final _spend = RegExp(r'\b(spend|spent|spending|expenses?|costs)\b');
 final _summary = RegExp(r'\b(summary|summari[sz]e|overview|how is (the|my|our) farm|farm (doing|performance))\b');
@@ -231,7 +232,11 @@ InsightAnswer? askInsight(String question, FarmData d, {required bool seesMoney}
   }
   if (!q.contains('feed') && !RegExp('most|biggest|top|expensive').hasMatch(q) && _spend.hasMatch(q)) {
     if (!seesMoney) {
-      return const InsightAnswer(intent: 'spending', ok: false, text: 'Money questions are for the farm owner and managers.');
+      return const InsightAnswer(
+        intent: 'spending',
+        ok: false,
+        text: 'Money questions are for the farm owner and managers.',
+      );
     }
     final month = RegExp('last month|previous month').hasMatch(q)
         ? addDays('${day.substring(0, 7)}-01', -1).substring(0, 7)

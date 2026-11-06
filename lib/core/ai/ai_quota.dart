@@ -125,8 +125,7 @@ UsageView usageView(int used, int limit, int warnPct) {
     case UsageLevel.out:
       return (
         title: 'Your daily AI allowance has been reached.',
-        message:
-            'AI-powered responses will be available again after the daily reset at midnight. You can still ask about your records, production, money and alerts: those answers are unlimited.',
+        message: 'AI-powered responses will be available again after the daily reset at midnight. You can still ask about your records, production, money and alerts: those answers are unlimited.',
       );
     case UsageLevel.ok:
       return null;
@@ -156,20 +155,17 @@ AiErrorKind? aiErrorKindOf(Object? v) {
     case AiErrorKind.unavailable:
       return (
         title: 'AI temporarily unavailable',
-        message:
-            'Our AI assistant is temporarily unavailable. You can still access your farm records, reports, calculations and automated insights. Please try again later.',
+        message: 'Our AI assistant is temporarily unavailable. You can still access your farm records, reports, calculations and automated insights. Please try again later.',
       );
     case AiErrorKind.network:
       return (
         title: 'Connection problem',
-        message:
-            "We couldn't connect to the AI service. Check your internet connection and try again. Your AI allowance has not been consumed.",
+        message: "We couldn't connect to the AI service. Check your internet connection and try again. Your AI allowance has not been consumed.",
       );
     case AiErrorKind.timeout:
       return (
         title: 'Request timed out',
-        message:
-            'The AI assistant took too long to respond. Please try again. Your request allowance has not been consumed.',
+        message: 'The AI assistant took too long to respond. Please try again. Your request allowance has not been consumed.',
       );
     case AiErrorKind.disabled:
       return (
@@ -181,14 +177,12 @@ AiErrorKind? aiErrorKindOf(Object? v) {
     case AiErrorKind.capacity:
       return (
         title: 'AI service capacity reached',
-        message:
-            'Our AI service has temporarily reached its available capacity. Please try again later. Your farm-management tools and built-in intelligence remain available.',
+        message: 'Our AI service has temporarily reached its available capacity. Please try again later. Your farm-management tools and built-in intelligence remain available.',
       );
     case AiErrorKind.tooFast:
       return (
         title: 'Too many questions at once',
-        message:
-            'Please wait a minute before asking the AI again. Your AI allowance has not been consumed, and built-in answers stay available.',
+        message: 'Please wait a minute before asking the AI again. Your AI allowance has not been consumed, and built-in answers stay available.',
       );
   }
 }
@@ -197,7 +191,9 @@ AiErrorKind? aiErrorKindOf(Object? v) {
 AiErrorKind chatFailureKind(String failure, [String detail = '']) {
   if (failure == 'network') return AiErrorKind.network;
   if (failure == 'busy') {
-    return RegExp('timeout|timed out', caseSensitive: false).hasMatch(detail) ? AiErrorKind.timeout : AiErrorKind.capacity;
+    return RegExp('timeout|timed out', caseSensitive: false).hasMatch(detail)
+        ? AiErrorKind.timeout
+        : AiErrorKind.capacity;
   }
   if (failure == 'blocked') return AiErrorKind.invalid;
   return AiErrorKind.unavailable;
@@ -236,8 +232,12 @@ class ServerAsk {
     'message': message,
     'facts': facts,
     'calculated': calculated,
-    'history': [for (final h in history) {'role': h.role, 'text': h.text}],
-    'files': [for (final f in files) {'mime': f.mime, 'base64': f.base64}],
+    'history': [
+      for (final h in history) {'role': h.role, 'text': h.text},
+    ],
+    'files': [
+      for (final f in files) {'mime': f.mime, 'base64': f.base64},
+    ],
     'language': language,
     'search': search,
   };

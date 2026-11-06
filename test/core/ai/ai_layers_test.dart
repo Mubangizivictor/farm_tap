@@ -66,7 +66,11 @@ void main() {
       'Recommend improvements to my feeding system': Layer.ai,
     };
     for (final e in want.entries) {
-      expect(classify(e.key, d, role: 'owner', cfg: cfg).layer, e.value, reason: e.key);
+      expect(
+        classify(e.key, d, role: 'owner', cfg: cfg).layer,
+        e.value,
+        reason: e.key,
+      );
     }
   });
 
@@ -109,9 +113,24 @@ void main() {
     expect(assistantConfigFrom(null).dailyLimit, 10);
     expect(assistantConfigFrom(null).warnPct, 80);
     expect(assistantConfigFrom(null).timezone, 'Africa/Kampala');
-    expect(assistantConfigFrom({'photo': {'enabled': true}}).enabled, isTrue);
-    expect(assistantConfigFrom({'assistant': {'dailyLimit': 25, 'route': 'server'}}).dailyLimit, 25);
-    expect(aiConfigFrom({'assistant': {'route': 'server'}}).assistant.route, 'server');
+    expect(
+      assistantConfigFrom({
+        'photo': {'enabled': true},
+      }).enabled,
+      isTrue,
+    );
+    expect(
+      assistantConfigFrom({
+        'assistant': {'dailyLimit': 25, 'route': 'server'},
+      }).dailyLimit,
+      25,
+    );
+    expect(
+      aiConfigFrom({
+        'assistant': {'route': 'server'},
+      }).assistant.route,
+      'server',
+    );
   });
 
   test('usage: 80% warning and 100% message', () {
@@ -133,6 +152,6 @@ void main() {
     expect(kindOfCallError('INTERNAL', null), AiErrorKind.unavailable);
     final u = UsageView.fromJson({'used': 10, 'limit': 10, 'remaining': 0, 'level': 'out', 'resetAt': 0})!;
     expect(u.level, UsageLevel.out);
-    expect(aiErrorText(AiErrorKind.limit, limit: 10).message, contains('all 10 AI-powered responses'));
+    expect(aiErrorText(AiErrorKind.limit).message, contains('all 10 AI-powered responses'));
   });
 }
