@@ -20,6 +20,7 @@ class AiFarm {
     required this.role,
     AiConfig? config,
     this.photoUsedToday = 0,
+    this.chatUsedToday = 0,
   }) : config = config ?? defaultAiConfig;
 
   final FarmData data;
@@ -34,6 +35,9 @@ class AiFarm {
 
   /// Photo checks this farm has saved today (the soft daily limit).
   final int photoUsedToday;
+
+  /// Online chat answers this farm has had today (the soft daily limit).
+  final int chatUsedToday;
 
   bool get seesMoneyNow => seesMoney(role);
 
@@ -140,10 +144,14 @@ class AiRepository {
       _load('aiAlertStates'),
       _load('settings'),
       _load('healthAssessments'),
+      _load('aiLog'),
     ]);
     final cfg = await platformConfig();
     final today = nowIso.substring(0, 10);
     final photoToday = r[17].where((x) => x.body['kind'] == 'photo' && '${x.body['at']}'.startsWith(today)).length;
+    final chatToday = r[18]
+        .where((x) => x.body['feature'] == 'chat' && x.body['ok'] == true && '${x.body['at']}'.startsWith(today))
+        .length;
     final shelf = shelfRulesFrom(r[16].where((x) => x.id == 'aiMilk').firstOrNull?.body['rules']);
     final data = FarmData(
       now: nowIso,
@@ -171,7 +179,15 @@ class AiRepository {
         states[s.id] = AlertState(status: st!, note: s.str('note'), byName: s.str('byName'), at: s.str('at'));
       }
     }
-    return AiFarm(data: data, states: states, shelfRules: shelf, role: role, config: cfg, photoUsedToday: photoToday);
+    return AiFarm(
+      data: data,
+      states: states,
+      shelfRules: shelf,
+      role: role,
+      config: cfg,
+      photoUsedToday: photoToday,
+      chatUsedToday: chatToday,
+    );
   }
 
   // ------------------------------------------------------------ Writes

@@ -10311,6 +10311,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Check another photo'**
   String get aiPhotoNewCheck;
+
+  /// No description provided for @aiChatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap AI'**
+  String get aiChatTitle;
+
+  /// No description provided for @aiChatNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New chat'**
+  String get aiChatNew;
+
+  /// No description provided for @aiChatTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Insights and tools'**
+  String get aiChatTools;
+
+  /// No description provided for @aiChatEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'How can I help on your farm today?'**
+  String get aiChatEmpty;
+
+  /// No description provided for @aiChatThinking.
+  ///
+  /// In en, this message translates to:
+  /// **'Thinking…'**
+  String get aiChatThinking;
+
+  /// No description provided for @aiChatAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About {name}'**
+  String aiChatAbout(String name);
+
+  /// No description provided for @aiChatSavedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {name}’s history'**
+  String aiChatSavedTo(String name);
+
+  /// No description provided for @aiChatDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'FarmTap AI can make mistakes and never replaces your vet.'**
+  String get aiChatDisclaimer;
+
+  /// No description provided for @aiChatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask anything…'**
+  String get aiChatHint;
+
+  /// No description provided for @aiChatSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get aiChatSend;
+
+  /// No description provided for @aiChatAttach.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach'**
+  String get aiChatAttach;
+
+  /// No description provided for @aiChatVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a video'**
+  String get aiChatVideo;
+
+  /// No description provided for @aiChatRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a video'**
+  String get aiChatRecord;
+
+  /// No description provided for @aiChatTooBig.
+  ///
+  /// In en, this message translates to:
+  /// **'Those files are too big together. Remove one or use a shorter video.'**
+  String get aiChatTooBig;
+
+  /// No description provided for @aiChatFileLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You can attach up to {count} files at a time.'**
+  String aiChatFileLimit(int count);
+
+  /// No description provided for @aiChatNotOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Online AI is not switched on for FarmTap yet.'**
+  String get aiChatNotOn;
+
+  /// No description provided for @aiChatOffLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Your farm has used all online AI answers for today.'**
+  String get aiChatOffLimit;
+
+  /// No description provided for @aiChatFilesNotRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Files and photos could not be read.'**
+  String get aiChatFilesNotRead;
+
+  /// No description provided for @aiChatOfflineHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'I can answer simple questions about your milk, animals, feed and money from your records, even without internet.'**
+  String get aiChatOfflineHelp;
+
+  /// No description provided for @aiChatMedsLeftOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Some details about medicines were left out. Ask your vet.'**
+  String get aiChatMedsLeftOut;
+
+  /// No description provided for @aiChatLookAtThis.
+  ///
+  /// In en, this message translates to:
+  /// **'Please look at what I attached.'**
+  String get aiChatLookAtThis;
 }
 
 class _AppLocalizationsDelegate

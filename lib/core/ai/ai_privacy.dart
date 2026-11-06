@@ -44,6 +44,18 @@ List<NameLabel> nameLabels({
   return out;
 }
 
+/// Put the real names back into the model's reply, on the farm's own device.
+String restore(String text, List<NameLabel> names) {
+  var out = text;
+  final seen = <String>{};
+  for (final n in names) {
+    if (seen.contains(n.label) || n.label == '[place]') continue;
+    seen.add(n.label);
+    out = out.replaceAll(RegExp('\\b${RegExp.escape(n.label)}\\b'), n.value);
+  }
+  return out;
+}
+
 /// Numbers in a model's reply that were not in the calculated answer.
 List<String> inventedNumbers(String reply, Answer a) {
   final re = RegExp(r'\d[\d,]*(\.\d+)?');

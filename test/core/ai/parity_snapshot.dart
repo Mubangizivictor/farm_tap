@@ -3,6 +3,7 @@
 // (decision 0025). Pure Dart, so it also runs without Flutter.
 import 'package:farm_tap/core/ai/ai_access.dart';
 import 'package:farm_tap/core/ai/ai_assistant.dart';
+import 'package:farm_tap/core/ai/ai_chat.dart';
 import 'package:farm_tap/core/ai/ai_core.dart';
 import 'package:farm_tap/core/ai/ai_data.dart';
 import 'package:farm_tap/core/ai/ai_herd.dart';
@@ -184,6 +185,19 @@ Json snapshot(FarmData d) {
     'monthToDate': s.monthToDate,
     'lastMonthSameDays': s.lastMonthSameDays,
   };
+  out['chatFacts'] = [
+    for (final a in d.animals)
+      [
+        a.id,
+        animalFacts(
+          animalHealth(d, a.id),
+          sex: a.str('sex'),
+          dairyStatus: a.str('dairyStatus'),
+          dateOfBirth: a.str('dateOfBirth'),
+          day: today(d),
+        ),
+      ],
+  ];
   out['herdForecast'] = _forecast(herdForecast(d));
   out['cowForecasts'] = [
     for (final a in d.animals) [a.id, _forecast(cowForecast(d, a.id))],
@@ -366,6 +380,50 @@ List<Json?> photoSnapshot(List<Object?> cases) {
     out.add(_photo(readPhotoReply(c['reply']! as String, photoCheckByKey(c['check']! as String)!)));
   }
   return out;
+}
+
+/// The chat reader, animal finder, prompt and saved record, on the web engine's cases.
+Json chatSnapshot(List<Object?> replyCases, List<Object?> mentionCases) {
+  final replies = <Json>[];
+  for (final raw in replyCases) {
+    final c = (raw! as Map).cast<String, Object?>();
+    final r = readChatReply(c['text']! as String, c['asked']! as String);
+    replies.add({
+      'text': r.text,
+      'removed': r.removed,
+      'health': r.health,
+      'risk': r.risk.name,
+      'callVet': r.callVet,
+      'report': r.report,
+    });
+  }
+  final mentions = <Object?>[];
+  for (final raw in mentionCases) {
+    final c = (raw! as Map).cast<String, Object?>();
+    final animals = [
+      for (final a in c['animals']! as List)
+        Mentionable((a as List)[0]! as String, name: a[1] as String?, tag: a[2] as String?),
+    ];
+    mentions.add(findAnimalMention(c['message']! as String, animals));
+  }
+  return {
+    'replies': replies,
+    'mentions': mentions,
+    'prompt': buildChatPrompt(
+      message: ' Animal 1  is not\neating ',
+      facts: ['A.', 'B.'],
+      calculated: 'Milk today: 40 L',
+      fileKinds: ['photo', 'pdf'],
+    ),
+    'body': chatAssessmentBody(
+      'bella',
+      ' is she  ok? ',
+      readChatReply('Watch her closely.', 'is she ok?'),
+      ['photo'],
+      'm',
+      '2026-11-06T09:00:00',
+    ),
+  };
 }
 
 /// The catalog and the prompts, in the same shape as the web engine.

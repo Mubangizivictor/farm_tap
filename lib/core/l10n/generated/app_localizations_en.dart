@@ -5972,4 +5972,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiPhotoNewCheck => 'Check another photo';
+
+  @override
+  String get aiChatTitle => 'FarmTap AI';
+
+  @override
+  String get aiChatNew => 'New chat';
+
+  @override
+  String get aiChatTools => 'Insights and tools';
+
+  @override
+  String get aiChatEmpty => 'How can I help on your farm today?';
+
+  @override
+  String get aiChatThinking => 'Thinking…';
+
+  @override
+  String aiChatAbout(String name) {
+    return 'About $name';
+  }
+
+  @override
+  String aiChatSavedTo(String name) {
+    return 'Saved to $name’s history';
+  }
+
+  @override
+  String get aiChatDisclaimer => 'FarmTap AI can make mistakes and never replaces your vet.';
+
+  @override
+  String get aiChatHint => 'Ask anything…';
+
+  @override
+  String get aiChatSend => 'Send';
+
+  @override
+  String get aiChatAttach => 'Attach';
+
+  @override
+  String get aiChatVideo => 'Choose a video';
+
+  @override
+  String get aiChatRecord => 'Record a video';
+
+  @override
+  String get aiChatTooBig => 'Those files are too big together. Remove one or use a shorter video.';
+
+  @override
+  String aiChatFileLimit(int count) {
+    return 'You can attach up to $count files at a time.';
+  }
+
+  @override
+  String get aiChatNotOn => 'Online AI is not switched on for FarmTap yet.';
+
+  @override
+  String get aiChatOffLimit => 'Your farm has used all online AI answers for today.';
+
+  @override
+  String get aiChatFilesNotRead => 'Files and photos could not be read.';
+
+  @override
+  String get aiChatOfflineHelp => 'I can answer simple questions about your milk, animals, feed and money from your records, even without internet.';
+
+  @override
+  String get aiChatMedsLeftOut => 'Some details about medicines were left out. Ask your vet.';
+
+  @override
+  String get aiChatLookAtThis => 'Please look at what I attached.';
 }

@@ -324,6 +324,13 @@ final _emergency = RegExp(
   caseSensitive: false,
 );
 
+/// True when a sentence names a drug, an amount or sounds like a diagnosis.
+bool sentenceUnsafe(String s) => _drugs.hasMatch(s) || _amount.hasMatch(s) || _overclaim.hasMatch(s);
+
+bool isNotifiable(String s) => _notifiable.hasMatch(s);
+
+bool isEmergency(String s) => _emergency.hasMatch(s);
+
 /// Splits text into sentences; a sentence that mentions a drug, an amount or
 /// sounds like a diagnosis is removed. Returns the kept text and how many
 /// sentences were removed.

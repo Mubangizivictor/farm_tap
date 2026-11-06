@@ -53,8 +53,10 @@ import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/gallery/ui_gallery_page.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/formats.dart';
+import 'package:farm_tap/sectors/cattle/ai/data/gemini_chat_analyzer.dart';
 import 'package:farm_tap/sectors/cattle/ai/data/gemini_photo_analyzer.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_assistant_page.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_chat_page.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_hub_page.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_insights_strip.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_module_pages.dart';
@@ -155,6 +157,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       },
       onModule: (key) => unawaited(context.push(AppRoutes.moreAiModule(key))),
       photo: const GeminiPhotoAnalyzer(),
+      chat: const GeminiChatAnalyzer(),
     );
   }
 
@@ -942,7 +945,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
         builder: (context, state) {
           final ctx = aiContext(context);
           if (ctx == null) return const PendingSection(path: AppRoutes.moreAi);
-          return AiHubPage(ctx: ctx);
+          return AiChatPage(ctx: ctx, animalId: state.uri.queryParameters['animal']);
         },
         routes: [
           page(
@@ -953,6 +956,7 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
               final key = state.pathParameters['module'] ?? '';
               if (ctx == null) return const PendingSection(path: AppRoutes.moreAi);
               return switch (key) {
+                'tools' => AiHubPage(ctx: ctx),
                 'assistant' => AiAssistantPage(ctx: ctx),
                 'vet' => AiVetPage(ctx: ctx, animalId: state.uri.queryParameters['animal']),
                 'screening' => AiPhotoPage(ctx: ctx, animalId: state.uri.queryParameters['animal']),

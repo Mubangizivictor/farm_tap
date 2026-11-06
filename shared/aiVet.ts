@@ -209,17 +209,20 @@ export function assess(input: VetInput): VetResult {
 /** healthAssessments body (append-only, decision 0025). */
 export interface HealthAssessmentBody {
   animalId: string;
-  kind: 'vet' | 'screening';
+  kind: 'vet' | 'screening' | 'chat';
   signs: SignKey[];
   tempC: number | null;
   daysSinceCalving: number | null;
   days: number | null;
   note: string | null;
   photo: string | null;
+  /** Chat only: what the farmer asked, and the start of the answer. */
+  question?: string;
+  summary?: string;
   risk: Severity;
   possible: string[];
   redFlags: string[];
-  callVet: VetResult['callVet'];
+  callVet: VetResult['callVet'] | null;
   /** The engine version that made it, so old results can be re-read later. */
   engine: string;
   /** Screening only: the model used, or null when none is installed. */

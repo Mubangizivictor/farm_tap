@@ -257,7 +257,7 @@ export default function VetAssistant() {
                     <SeverityChip severity={h.body.risk} />
                     <span className="grow">
                       <strong>{h.body.at.replace('T', ' ').slice(0, 16)}</strong>
-                      <span className="small muted"> {h.body.possible.join(', ') || 'No clear cause'}{h.body.kind === 'screening' ? ' (photo screening)' : ''}</span>
+                      <span className="small muted"> {h.body.kind === 'chat' ? `Asked: ${h.body.question ?? ''} — ${h.body.summary ?? ''}` : `${h.body.possible.join(', ') || 'No clear cause'}${h.body.kind === 'screening' ? ' (photo screening)' : ''}`}</span>
                     </span>
                   </li>
                 ))}

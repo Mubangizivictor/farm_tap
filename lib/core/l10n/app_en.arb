@@ -4148,5 +4148,47 @@
   "aiPhotoSure": "Clear in the photo",
   "aiPhotoMaybe": "Possible",
   "aiPhotoUnsure": "Not sure",
-  "aiPhotoNewCheck": "Check another photo"
+  "aiPhotoNewCheck": "Check another photo",
+  "aiChatTitle": "FarmTap AI",
+  "aiChatNew": "New chat",
+  "aiChatTools": "Insights and tools",
+  "aiChatEmpty": "How can I help on your farm today?",
+  "aiChatThinking": "Thinking…",
+  "aiChatAbout": "About {name}",
+  "@aiChatAbout": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "aiChatSavedTo": "Saved to {name}’s history",
+  "@aiChatSavedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "aiChatDisclaimer": "FarmTap AI can make mistakes and never replaces your vet.",
+  "aiChatHint": "Ask anything…",
+  "aiChatSend": "Send",
+  "aiChatAttach": "Attach",
+  "aiChatVideo": "Choose a video",
+  "aiChatRecord": "Record a video",
+  "aiChatTooBig": "Those files are too big together. Remove one or use a shorter video.",
+  "aiChatFileLimit": "You can attach up to {count} files at a time.",
+  "@aiChatFileLimit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiChatNotOn": "Online AI is not switched on for FarmTap yet.",
+  "aiChatOffLimit": "Your farm has used all online AI answers for today.",
+  "aiChatFilesNotRead": "Files and photos could not be read.",
+  "aiChatOfflineHelp": "I can answer simple questions about your milk, animals, feed and money from your records, even without internet.",
+  "aiChatMedsLeftOut": "Some details about medicines were left out. Ask your vet.",
+  "aiChatLookAtThis": "Please look at what I attached."
 }

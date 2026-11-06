@@ -1,6 +1,7 @@
 // Shared pieces of the AI screens (decision 0025, phone phase 2).
 import 'dart:async';
 
+import 'package:farm_tap/core/ai/ai_chat.dart';
 import 'package:farm_tap/core/ai/ai_core.dart';
 import 'package:farm_tap/core/ai/ai_photo.dart';
 import 'package:farm_tap/core/ai/ai_repository.dart';
@@ -312,6 +313,7 @@ class AiPageContext {
     required this.onLink,
     required this.onModule,
     this.photo,
+    this.chat,
   });
 
   final AiRepository repo;
@@ -329,6 +331,9 @@ class AiPageContext {
 
   /// Sends a photo to the model (decision 0026); null where there is no model.
   final PhotoAnalyzer? photo;
+
+  /// Sends a chat message to the model (decision 0027); null where there is no model.
+  final ChatAnalyzer? chat;
 
   bool get manages => role == 'owner' || role == 'manager';
 }

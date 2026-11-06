@@ -685,3 +685,26 @@ textarea.input { min-height: calc(var(--z-input) * 2); resize: vertical; }
 .ai-signs label:has(input:checked) { border-color: var(--c-primary); background: var(--c-primary-container); color: var(--c-on-primary-container); }
 .ai-table-wrap { overflow-x: auto; }
 .ai-photo { max-width: 100%; max-height: var(--z-photo); border-radius: var(--r-md); object-fit: contain; background: var(--c-container); }
+
+/* ---- AI chat (decision 0027): one box, like a chat app ---- */
+.chat { display: flex; flex-direction: column; gap: var(--s-lg); min-height: calc(100dvh - var(--z-topbar) - var(--s-xxl) * 2); }
+.chat-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s-md); flex-wrap: wrap; }
+.chat-top h1 { margin: 0; }
+.chat-scroll { flex: 1; display: flex; flex-direction: column; gap: var(--s-xl); }
+.chat-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: var(--s-md); padding: var(--s-xxxl) 0; }
+.chat-me { align-self: flex-end; max-width: 80%; padding: var(--s-md) var(--s-lg); border-radius: var(--r-xl); background: var(--c-primary-container); color: var(--c-on-primary-container); display: flex; flex-direction: column; gap: var(--s-sm); }
+.chat-me p { margin: 0; white-space: pre-wrap; }
+.chat-ai { align-self: stretch; display: flex; flex-direction: column; gap: var(--s-sm); }
+.chat-text { display: flex; flex-direction: column; gap: var(--s-sm); }
+.chat-text p, .chat-text ul, .chat-text ol { margin: 0; }
+.chat-text ul, .chat-text ol { padding-left: var(--s-xl); display: flex; flex-direction: column; gap: var(--s-xs); }
+.chat-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-sm); }
+.chat-composer { position: sticky; bottom: 0; background: var(--c-surface); padding: var(--s-sm) 0 var(--s-md); display: flex; flex-direction: column; gap: var(--s-xs); }
+.chat-box { border: var(--z-border) solid var(--c-outline); border-radius: var(--r-xl); background: var(--c-card); padding: var(--s-sm) var(--s-md); display: flex; flex-direction: column; gap: var(--s-sm); }
+.chat-box:focus-within { border-color: var(--c-primary); }
+.chat-box textarea { border: 0; background: transparent; resize: none; width: 100%; color: inherit; font: inherit; outline: none; padding: var(--s-xs) 0; }
+.chat-tools { display: flex; align-items: center; gap: var(--s-sm); }
+.chat-files { display: flex; flex-wrap: wrap; gap: var(--s-sm); }
+.chat-file { display: flex; align-items: center; gap: var(--s-xs); padding: var(--s-xxs) var(--s-sm); border-radius: var(--r-md); background: var(--c-container); }
+.chat-file img { width: var(--z-avatar); height: var(--z-avatar); object-fit: cover; border-radius: var(--r-sm); }
+.chat-about { align-self: flex-start; }

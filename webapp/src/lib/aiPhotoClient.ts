@@ -14,7 +14,7 @@ import { firebase } from './firebase.ts';
 export type PhotoFailure = 'network' | 'busy' | 'appCheck' | 'unreadable';
 
 let appCheckDone = false;
-function startAppCheck() {
+export function startAppCheck() {
   if (appCheckDone) return;
   appCheckDone = true;
   const key = process.env.NEXT_PUBLIC_APPCHECK_SITE_KEY;

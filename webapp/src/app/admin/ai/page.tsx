@@ -16,6 +16,7 @@ import { PageHead, Stat } from '@/components/ui';
 import { aiModules, methodLabel, type Method } from '@/shared/aiCore';
 import { defaultAiConfig, experimentalModules, type AiConfig } from '@/shared/aiAccess';
 import { screeningTargets, SCREENING_ENGINE } from '@/shared/aiScreening';
+import { CHAT_ENGINE } from '@/shared/aiChat';
 import { PHOTO_ENGINE } from '@/shared/aiPhoto';
 import { VET_ENGINE } from '@/shared/aiVet';
 import { adminChange, loadAllFarms, loadConfig, setOp, updateOp, type AdminFarm } from '@/lib/admin';
@@ -183,7 +184,7 @@ export default function AiControlCentre() {
             ['Milk forecast (weighted trend + weekday pattern)', 'forecast-1', 'FarmTap code', 'Active in the browser'],
             ['Vet guide (signs and warning signs table)', VET_ENGINE, 'FarmTap code (vet review due)', 'Active in the browser'],
             ['Photo quality check', SCREENING_ENGINE, 'FarmTap code', 'Active in the browser'],
-            [`Photo Check (Google Gemini, ${ai.photo.model})`, PHOTO_ENGINE, 'Google service, free tier; photo leaves the farm', ai.photo.enabled ? 'On' : 'Off'],
+            [`Chat and Photo Check (Google Gemini, ${ai.photo.model})`, `${PHOTO_ENGINE}, ${CHAT_ENGINE}`, 'Google service, free tier; photo leaves the farm', ai.photo.enabled ? 'On' : 'Off'],
             [`Language model (Ollama, ${ai.llm.model})`, '—', 'Qwen3: Apache-2.0', 'Not connected (no server)'],
             ...screeningTargets.map((t) => [`Screening: ${t.label}`, '—', '—', 'No validated model']),
           ]}
@@ -204,14 +205,14 @@ export default function AiControlCentre() {
             </label>
           </section>
           <section className="card stack">
-            <h2>Photo Check (Google Gemini)</h2>
+            <h2>Online AI (Google Gemini): chat and Photo Check</h2>
             <p className="small muted">
-              Sends one photo at a time to Google through Firebase AI Logic. Turn it on only after App Check is enforced in the Firebase console and the billing plan is checked
+              Sends the farmer’s question, and any photo, PDF, file or video they attach, to Google through Firebase AI Logic. Names are replaced before sending; photos and files leave the farm. Turn it on only after App Check is enforced in the Firebase console and the billing plan is checked
               (decision 0026). The photo leaves the farm; farmers are told before each check.
             </p>
             <Toggle
-              label={ai.photo.enabled ? 'Photo Check is on' : 'Photo Check is off'}
-              hint="Off stops every photo check on phone and web straight away."
+              label={ai.photo.enabled ? 'Online AI is on' : 'Online AI is off'}
+              hint="Off stops every online answer on phone and web straight away. The chat then answers simple questions from the records."
               checked={ai.photo.enabled}
               disabled={disabled}
               onChange={(enabled) => setAi({ ...ai, photo: { ...ai.photo, enabled } })}
@@ -221,7 +222,7 @@ export default function AiControlCentre() {
               <input className="input" value={ai.photo.model} disabled={disabled} onChange={(e) => setAi({ ...ai, photo: { ...ai.photo, model: e.target.value.trim() } })} />
             </label>
             <label className="field">
-              <span>Photo checks per farm per day</span>
+              <span>Online answers per farm per day</span>
               <input
                 className="input"
                 type="number"
