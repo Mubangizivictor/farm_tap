@@ -99,7 +99,10 @@ void main() {
     expect(caseText({'since': 'Today', 'temp': '40.5'}), 'Since: Today. Temperature: 40.5 °C');
     final m = vetSummary(
       farm: 'Mbarara farm',
-      animal: (label: 'Bella (FT-001)', facts: ['This question is about one animal on the farm.', 'Calved 40 days ago.']),
+      animal: (
+        label: 'Bella (FT-001)',
+        facts: ['This question is about one animal on the farm.', 'Calved 40 days ago.'],
+      ),
       question: 'Bella gives sour milk',
       answer: 'Her udder is hot. Check the milk. Call your vet today.',
       answers: {'temp': '40.5'},
@@ -119,6 +122,9 @@ void main() {
     expect(nextDay('2026-11-30'), '2026-12-01');
     final tr = triageOf(readChatReply('Her udder is hot.', 'sour milk'));
     final a = chatDoActions(animal: (id: 'b1', name: 'Bella'), triage: tr, day: '2026-11-06');
-    expect([for (final x in a) x.href], ['/health/?new=1&animal=b1', '/tasks/?new=1&title=Recheck%20Bella&due=2026-11-07']);
+    expect(
+      [for (final x in a) x.href],
+      ['/health/?new=1&animal=b1', '/tasks/?new=1&title=Recheck%20Bella&due=2026-11-07'],
+    );
   });
 }

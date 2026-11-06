@@ -37,8 +37,9 @@ const _textMime = ['text/plain', 'text/csv', 'text/markdown', 'text/html', 'appl
 /// photo, video, audio, pdf or text; null when Gemini cannot read the type.
 String? chatFileKind(String mime) {
   final m = mime.toLowerCase();
-  if (m == 'image/jpeg' || m == 'image/png' || m == 'image/webp' || m == 'image/heic' || m == 'image/heif')
+  if (m == 'image/jpeg' || m == 'image/png' || m == 'image/webp' || m == 'image/heic' || m == 'image/heif') {
     return 'photo';
+  }
   if (m.startsWith('video/')) return 'video';
   if (m.startsWith('audio/')) return 'audio';
   if (m == 'application/pdf') return 'pdf';
@@ -220,7 +221,8 @@ ChatReply readChatReply(String text, String asked) {
         .where((x) => !RegExp('vaccin|immuni[sz]', caseSensitive: false).hasMatch(x))
         .join(' '),
   );
-  final emergency = isEmergency(both) ||
+  final emergency =
+      isEmergency(both) ||
       RegExp(r'\bcall (your|the|a) vet (now|at once|immediately|right away)\b', caseSensitive: false).hasMatch(body);
   final today = RegExp(r'\bcall (your|the|a) vet today\b', caseSensitive: false).hasMatch(body);
   var risk = Severity.low;
@@ -461,10 +463,12 @@ List<ChatAction> chatActions({
 /// Up to three questions the farmer can tap to carry on.
 List<String> chatFollowUps({required String question, required String answer, required bool health}) {
   final t = '$question\n$answer';
-  if (health)
+  if (health) {
     return ['What should I watch for?', 'When must I call the vet?', 'How do I stop it spreading to other cows?'];
-  if (_milk.hasMatch(t))
+  }
+  if (_milk.hasMatch(t)) {
     return ['Why would milk go down?', 'How can I get more milk?', 'How do I keep milk fresh longer?'];
+  }
   if (_breed.hasMatch(t)) {
     return [
       'How do I know a cow is in heat?',
@@ -502,8 +506,9 @@ ChatFailure chatFailureOf(String message) {
   bool has(String re) => RegExp(re).hasMatch(m);
   if (has('app.?check|attestation|recaptcha')) return ChatFailure.appCheck;
   if (has(r'\b404\b|not found|is not supported|no longer available|not available for')) return ChatFailure.model;
-  if (has(r'\b429\b|quota|resource.?exhausted|\b503\b|overload|unavailable|timeout|rate limit'))
+  if (has(r'\b429\b|quota|resource.?exhausted|\b503\b|overload|unavailable|timeout|rate limit')) {
     return ChatFailure.busy;
+  }
   if (has(r'\b403\b|\b401\b|permission|has not been used|disabled|api key|api_key|billing')) return ChatFailure.setup;
   if (has('safety|blocked|prohibited|recitation')) return ChatFailure.blocked;
   if (has('network|failed to fetch|fetch failed|offline|load failed|socket')) return ChatFailure.network;
@@ -598,7 +603,8 @@ Triage? triageOf(ChatReply r, {String question = ''}) {
       'Tell the District Veterinary Officer. Do not move or sell animals, milk or hides until they say it is safe.',
     'Keep this animal apart from the rest of the herd.',
     'Give clean water and keep it in the shade.',
-    if (_milky.hasMatch('$question\n${r.text}')) 'Do not sell or drink this animal’s milk until the vet says it is safe.',
+    if (_milky.hasMatch('$question\n${r.text}'))
+      'Do not sell or drink this animal’s milk until the vet says it is safe.',
     'Do not give any medicine or herbs until the vet says so.',
     'Take the temperature if you can, and take clear photos from the side and close up.',
     'Wash your hands and keep buckets and tools for this animal separate.',
@@ -622,11 +628,7 @@ const caseQuestions = <CaseQuestion>[
   CaseQuestion(id: 'since', label: 'Since when?', options: ['Today', '2 to 3 days', 'About a week', 'Longer']),
   CaseQuestion(id: 'temp', label: 'Temperature', options: [], unit: '°C'),
   CaseQuestion(id: 'count', label: 'How many animals look sick?', options: ['Only this one', '2 to 5', 'More than 5']),
-  CaseQuestion(
-    id: 'age',
-    label: 'How old is it?',
-    options: ['Calf (under 1 year)', 'Young (1 to 2 years)', 'Adult'],
-  ),
+  CaseQuestion(id: 'age', label: 'How old is it?', options: ['Calf (under 1 year)', 'Young (1 to 2 years)', 'Adult']),
   CaseQuestion(id: 'vaccinated', label: 'Vaccinated this year?', options: ['Yes', 'No', 'I do not know']),
 ];
 
@@ -664,10 +666,10 @@ String _firstSentences(String t, int max) {
   final lines = t.split('\n').where((l) {
     final x = l.trim();
     return x.isNotEmpty &&
-        !RegExp(r'^(call your vet|if a cow has|important)', caseSensitive: false).hasMatch(x) &&
+        !RegExp('^(call your vet|if a cow has|important)', caseSensitive: false).hasMatch(x) &&
         !RegExp(r'^[-*•\d]').hasMatch(x);
   });
-  final out = RegExp(r'[^.!?]+[.!?]+').allMatches(lines.join(' ')).take(2).map((m) => m[0]!).join(' ').trim();
+  final out = RegExp('[^.!?]+[.!?]+').allMatches(lines.join(' ')).take(2).map((m) => m[0]!).join(' ').trim();
   return out.length > max ? out.substring(0, max) : out;
 }
 

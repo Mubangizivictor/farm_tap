@@ -6114,7 +6114,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiChatWhichCow => 'Which cow is this?';
 
   @override
-  String get aiChatWhichCowHint => 'Choose it to save this answer in that cow’s history.';
+  String get aiChatWhichCowHint =>
+      'Choose it to save this answer in that cow’s history.';
 
   @override
   String get aiChatChooseCow => 'Choose a cow';
@@ -6129,7 +6130,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiChatVetHelp => 'Help the vet help you';
 
   @override
-  String get aiChatVetHelpHint => 'Tap what you know. It goes into your message for the vet.';
+  String get aiChatVetHelpHint =>
+      'Tap what you know. It goes into your message for the vet.';
 
   @override
   String get aiChatUpdateAdvice => 'Update the advice with these';
