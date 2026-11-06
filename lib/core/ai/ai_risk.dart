@@ -5,6 +5,7 @@ import 'package:farm_tap/core/ai/ai_access.dart';
 import 'package:farm_tap/core/ai/ai_core.dart';
 import 'package:farm_tap/core/ai/ai_data.dart';
 import 'package:farm_tap/core/ai/ai_herd.dart';
+import 'package:farm_tap/core/ai/ai_insights.dart';
 import 'package:farm_tap/core/ai/ai_milk.dart';
 import 'package:farm_tap/core/ai/ai_money.dart';
 import 'package:farm_tap/core/ai/ai_stock.dart';
@@ -53,6 +54,8 @@ List<FindingWithState> allFindings(
   if (on('feed') || on('inventory')) safe(() => feedFindings(d));
   if (on('inventory')) safe(() => drugFindings(d));
   if (on('finance') && seesMoney(role)) safe(() => financeFindings(d));
+  // Decision 0028: milk against the previous recording, incomplete animal records.
+  safe(() => insightFindings(d).where((f) => on(f.module)).toList());
   final visible = fs.where((f) => !(f.module == 'finance') || seesMoney(role)).toList();
   return [
     for (final f in rankFindings(visible))

@@ -5,7 +5,7 @@
 // id in shared/aiQuota.ts AI_PROVIDERS, not a rewrite. Only Gemini is
 // implemented; nothing here signs up for or pays for anything new.
 //
-// The key is read from platformSecrets/geminiApiKey (pasted in the panel,
+// The key is read from platformSecrets/gemini_api_key (pasted in the panel,
 // never readable by an app) or, if set, the GEMINI_API_KEY environment
 // variable. It never leaves this server.
 
@@ -97,7 +97,7 @@ export class GeminiProvider implements AiProvider {
   ) {}
 
   async generate(req: AiRequest): Promise<AiResult> {
-    if (!this.key) throw new AiProviderError('unavailable', 0, 'No Gemini API key: paste it in Admin > APIs and keys as geminiApiKey.');
+    if (!this.key) throw new AiProviderError('unavailable', 0, 'No Gemini API key: paste it in Admin > APIs and keys as gemini_api_key.');
     const body = {
       systemInstruction: { parts: [{ text: req.system }] },
       contents: [

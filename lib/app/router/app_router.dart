@@ -55,6 +55,7 @@ import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/formats.dart';
 import 'package:farm_tap/sectors/cattle/ai/data/gemini_chat_analyzer.dart';
 import 'package:farm_tap/sectors/cattle/ai/data/gemini_photo_analyzer.dart';
+import 'package:farm_tap/sectors/cattle/ai/data/server_chat_client.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_assistant_page.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_chat_page.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_hub_page.dart';
@@ -158,6 +159,8 @@ GoRouter buildRouter(AppDependencies deps, {String? initialLocation}) {
       onModule: (key) => unawaited(context.push(AppRoutes.moreAiModule(key))),
       photo: const GeminiPhotoAnalyzer(),
       chat: const GeminiChatAnalyzer(),
+      server: const ServerChatClient(),
+      tenantId: session.farm?.tenantId ?? '',
     );
   }
 

@@ -290,7 +290,7 @@ export default function AiControlCentre() {
           <Icon name="shield" />
           <span className="grow">
             {a.route === 'server'
-              ? 'Secure server route: every AI answer goes through the FarmTap server, which checks the farm and enforces the daily allowance. Needs the aiAssistant function deployed (Blaze plan) and the Gemini key saved as geminiApiKey in APIs and keys.'
+              ? 'Secure server route: every AI answer goes through the FarmTap server, which checks the farm and enforces the daily allowance. Needs the aiAssistant function deployed (Blaze plan) and the Gemini key saved as gemini_api_key in APIs and keys.'
               : 'Pilot route: the apps call Gemini themselves and count the allowance on the device. Anyone determined could go past the limit. Switch to the server route once Blaze is on and aiAssistant is deployed (decision 0028).'}
           </span>
         </div>

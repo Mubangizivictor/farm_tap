@@ -14,12 +14,15 @@ import 'package:farm_tap/core/ai/ai_data.dart';
 import 'package:farm_tap/core/ai/ai_herd.dart';
 import 'package:farm_tap/core/ai/ai_photo.dart';
 import 'package:farm_tap/core/ai/ai_privacy.dart';
+import 'package:farm_tap/core/ai/ai_quota.dart';
 import 'package:farm_tap/core/ai/ai_repository.dart';
+import 'package:farm_tap/core/ai/ai_route.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_chat_cards.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_usage_widgets.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -54,6 +57,8 @@ class _Turn {
     this.triage,
     this.animalId,
     this.hadMedia = false,
+    this.layer,
+    this.errorKind,
   });
 
   factory fromJson(Map<String, dynamic> j) => _Turn(
@@ -72,6 +77,8 @@ class _Turn {
     followUps: [for (final dynamic f in (j['followUps'] as List<dynamic>? ?? const <dynamic>[])) '$f'],
     animalId: j['animalId'] as String?,
     hadMedia: j['hadMedia'] == true,
+    layer: Layer.values.where((x) => x.name == j['layer']).firstOrNull,
+    errorKind: aiErrorKindOf(j['errorKind']),
     triage: j['triage'] == null
         ? null
         : Triage(
@@ -120,6 +127,12 @@ class _Turn {
   /// A photo or video was sent with the question.
   final bool hadMedia;
 
+  /// Which layer answered (decision 0028): records and insight are calculated, ai is a model.
+  final Layer? layer;
+
+  /// Why the AI did not answer (a banner above the built-in answer).
+  final AiErrorKind? errorKind;
+
   /// Files are never saved.
   Map<String, dynamic> toJson() => {
     'fromUser': fromUser,
@@ -136,6 +149,8 @@ class _Turn {
     'followUps': followUps,
     'animalId': animalId,
     'hadMedia': hadMedia,
+    'layer': layer?.name,
+    'errorKind': errorKind?.name,
     'triage': triage == null
         ? null
         : {'level': triage!.level, 'label': triage!.label, 'doNow': triage!.doNow, 'report': triage!.report},
@@ -201,6 +216,12 @@ class _AiChatPageState extends State<AiChatPage> {
   late String? _animalId = widget.animalId;
   AiFarm? _farm;
   bool _busy = false;
+
+  /// What the busy row says ("Checking your farm records...", "Preparing your AI response...").
+  String _working = '';
+
+  /// The server's count of today's AI answers (server route only).
+  UsageView? _serverUsage;
   String? _problem;
   String _chatId = '';
   List<_SavedChat> _chats = [];
@@ -212,8 +233,25 @@ class _AiChatPageState extends State<AiChatPage> {
   @override
   void initState() {
     super.initState();
-    unawaited(_reload());
+    unawaited(_reload().then((_) => _loadUsage()));
     unawaited(_loadChats());
+  }
+
+  Future<void> _loadUsage() async {
+    final server = widget.ctx.server;
+    if (server == null || widget.ctx.tenantId.isEmpty) return;
+    final a = _farm?.config.assistant;
+    if (a == null || a.route != 'server' || !a.enabled) return;
+    final u = await server.usage(widget.ctx.tenantId);
+    if (mounted && u != null) setState(() => _serverUsage = u);
+  }
+
+  /// Today's allowance: the server's own count on the server route, else counted from this farm's AI log.
+  UsageView? _usage(AiFarm? farm) {
+    if (farm == null) return null;
+    final a = farm.config.assistant;
+    if (!a.enabled) return null;
+    return a.route == 'server' ? _serverUsage : usageView(farm.chatUsedToday, a.dailyLimit, a.warnPct);
   }
 
   Future<void> _loadChats() async {
@@ -435,23 +473,24 @@ class _AiChatPageState extends State<AiChatPage> {
   }
 
   /// Answers one question. [before] is every turn that came before it.
+  /// Decision 0028: the question is classified first. Records and built-in
+  /// insights answer at once (no AI, no allowance used); only questions that
+  /// need reasoning, or carry a file, go to the AI.
   Future<void> _answer(AppLocalizations l10n, String question, List<_Attached> sent, List<_Turn> before) async {
     final started = context.clock.now();
+    if (mounted) setState(() => _working = workingText(Layer.records));
     final farm = await _reload();
     if (!mounted) return;
     final ctx = widget.ctx;
+    final asst = farm.config.assistant;
     final animals = alive(farm.data.animals).where(isActive).toList();
     final cows = [for (final a in animals) Mentionable(a.id, name: a.str('name'), tag: a.str('tagNumber'))];
     final named = findAnimalMention(question, cows) ?? _animalId;
     final cow = animals.where((a) => a.id == named).firstOrNull;
     if (mounted) setState(() => _animalId = named);
-    final names = nameLabels(
-      animals: [for (final a in animals) (name: a.str('name'), tagNumber: a.str('tagNumber'))],
-      people: [ctx.byName],
-      places: [ctx.farmName],
-    );
-    final calc = ask(question, farm.data, role: ctx.role, cfg: farm.config);
-    final calcText = calc.ok ? [calc.text, ...calc.bullets.map((b) => '- $b')].join('\n') : null;
+    final route = classify(question, farm.data, role: ctx.role, cfg: farm.config, files: sent.length, maxChars: asst.maxChars);
+    final calc = route.answer;
+    final calcText = calc != null && calc.ok ? [calc.text, ...calc.bullets.map((b) => '- $b')].join('\n') : null;
     final animalRef = cow == null ? null : (id: cow.id, name: animalName(cow));
     int ms() => context.clock.now().difference(started).inMilliseconds;
 
@@ -460,45 +499,73 @@ class _AiChatPageState extends State<AiChatPage> {
       setState(() {
         _turns.add(t);
         _busy = false;
+        _working = '';
       });
       _saveChat();
       _toEnd();
     }
 
-    void offline(String note, {String? detail}) {
-      unawaited(ctx.repo.log('assistant', ok: calc.ok, ms: ms(), method: calc.method));
-      final shown = calc.ok ? calc.text : '$note\n\n${l10n.aiChatOfflineHelp}';
-      final bullets = calc.ok ? calc.bullets.map((b) => '- $b').toList() : <String>[];
-      final body = [shown, ...bullets].join('\n');
+    // Layers 1 and 2 (and the fallback when the AI does not answer).
+    void builtIn({AiErrorKind? error, String? note}) {
+      unawaited(ctx.repo.log('assistant', ok: calc?.ok ?? false, ms: ms(), method: calc?.method ?? Method.calculated));
+      final body = calc == null
+          ? l10n.aiChatOfflineHelp
+          : [calc.text, ...calc.bullets.map((b) => '- $b')].join('\n');
       final actions = chatActions(question: question, answer: body, health: false, callVet: null, animal: animalRef);
-      if (actions.isEmpty && calc.links.isNotEmpty) {
+      if (actions.isEmpty && calc != null && calc.links.isNotEmpty) {
         actions.add(ChatAction('Go to ${calc.links.first.label}', calc.links.first.href));
       }
       finish(
         _Turn(
           fromUser: false,
           text: body,
-          method: calc.method,
+          method: calc?.method ?? Method.calculated,
           about: cow == null ? null : animalName(cow),
-          note: calc.ok ? note : null,
+          note: note,
           asked: question,
-          detail: detail,
           actions: actions,
+          layer: route.layer == Layer.records ? Layer.records : Layer.insight,
+          errorKind: error,
         ),
       );
     }
 
-    final limit = photoAllowed(
-      farm.chatUsedToday,
-      enabled: farm.config.photoEnabled,
-      perFarmPerDay: farm.config.photoPerFarmPerDay,
-    );
-    final analyzer = ctx.chat;
-    if (analyzer == null || !farm.config.photoEnabled || !limit.ok) {
-      final why = !farm.config.photoEnabled || analyzer == null ? l10n.aiChatNotOn : l10n.aiChatOffLimit;
-      offline(sent.isEmpty ? why : '$why ${l10n.aiChatFilesNotRead}');
+    if (route.reason == RouteReason.tooLong) {
+      finish(
+        _Turn(
+          fromUser: false,
+          text: 'Keep your question under ${asst.maxChars} characters.',
+          method: Method.calculated,
+          asked: question,
+          layer: Layer.insight,
+          errorKind: AiErrorKind.invalid,
+        ),
+      );
       return;
     }
+    if (route.layer != Layer.ai) {
+      builtIn();
+      return;
+    }
+    final lost = sent.isEmpty ? null : l10n.aiChatFilesNotRead;
+    final usage = _usage(farm);
+    final server = asst.route == 'server' ? ctx.server : null;
+    final analyzer = ctx.chat;
+    final blocked = !asst.enabled || (asst.route == 'server' ? server == null : analyzer == null)
+        ? AiErrorKind.disabled
+        : usage != null && usage.level == UsageLevel.out
+        ? AiErrorKind.limit
+        : null;
+    if (blocked != null) {
+      builtIn(error: blocked, note: lost);
+      return;
+    }
+    if (mounted) setState(() => _working = workingText(Layer.ai, model: true));
+    final names = nameLabels(
+      animals: [for (final a in animals) (name: a.str('name'), tagNumber: a.str('tagNumber'))],
+      people: [ctx.byName],
+      places: [ctx.farmName],
+    );
     try {
       final facts = cow == null
           ? <String>[]
@@ -509,30 +576,58 @@ class _AiChatPageState extends State<AiChatPage> {
               dateOfBirth: cow.str('dateOfBirth'),
               day: today(farm.data),
             );
-      final prompt = buildChatPrompt(
-        message: redact(question, names),
-        facts: facts,
-        calculated: calcText == null ? null : redact(calcText, names),
-        fileKinds: [for (final f in sent) f.kind],
-        search: needsSearch(question, calculated: calc.ok),
-        language: _lang,
-      );
+      final search = needsSearch(question, calculated: calc?.ok ?? false);
+      final message = redact(question, names);
+      final calculated = calcText == null ? null : redact(calcText, names);
       final media = sent.any((f) => f.kind == 'photo' || f.kind == 'video');
       final history = [
         for (final h in chatHistory([
           for (final t in before)
-            if (t.text.isNotEmpty) (fromUser: t.fromUser, text: redact(t.text, names)),
+            if (t.text.isNotEmpty && t.errorKind == null) (fromUser: t.fromUser, text: redact(t.text, names)),
         ]))
           ChatTurn(fromUser: h.fromUser, text: h.text),
       ];
-      final got = await analyzer.ask(
-        system: chatSystem,
-        history: history,
-        prompt: prompt,
-        files: [for (final f in sent) ChatPart(f.mime, f.bytes)],
-        models: chatModels(farm.config.photoModel, hasMedia: media),
-      );
-      final reply = readChatReply(got.text, question);
+      final String text;
+      final ChatGrounding? grounding;
+      final String model;
+      if (server != null) {
+        final r = await server.ask(
+          ServerAsk(
+            tenantId: ctx.tenantId,
+            message: message,
+            facts: facts,
+            calculated: calculated,
+            history: [for (final h in history) (role: h.fromUser ? 'user' : 'model', text: h.text)],
+            files: [for (final f in sent) (mime: f.mime, base64: base64Encode(f.bytes))],
+            language: _lang == 'auto' ? null : _lang,
+            search: search,
+          ),
+          timeout: Duration(milliseconds: asst.timeoutMs), // theme-guard: ignore
+        );
+        if (mounted && r.usage != null) setState(() => _serverUsage = r.usage);
+        text = r.text;
+        model = r.model;
+        grounding = _groundingFrom(r.grounding);
+      } else {
+        final got = await analyzer!.ask(
+          system: chatSystem,
+          history: history,
+          prompt: buildChatPrompt(
+            message: message,
+            facts: facts,
+            calculated: calculated,
+            fileKinds: [for (final f in sent) f.kind],
+            search: search,
+            language: _lang,
+          ),
+          files: [for (final f in sent) ChatPart(f.mime, f.bytes)],
+          models: chatModels(asst.model, hasMedia: media),
+        );
+        text = got.text;
+        model = asst.model;
+        grounding = got.grounding;
+      }
+      final reply = readChatReply(text, question);
       final shown = restore(reply.text, names);
       unawaited(ctx.repo.log('chat', ok: true, ms: ms(), method: Method.model));
       var saved = false;
@@ -551,7 +646,7 @@ class _AiChatPageState extends State<AiChatPage> {
                 report: reply.report,
               ),
               {for (final f in sent) f.kind}.toList(),
-              farm.config.photoModel,
+              model,
               ctx.repo.nowIso,
             ),
           );
@@ -565,6 +660,7 @@ class _AiChatPageState extends State<AiChatPage> {
           fromUser: false,
           text: shown,
           method: Method.model,
+          layer: Layer.ai,
           about: cow == null ? null : animalName(cow),
           saved: saved,
           note: reply.removed > 0 ? l10n.aiChatMedsLeftOut : null,
@@ -590,21 +686,44 @@ class _AiChatPageState extends State<AiChatPage> {
           ),
           animalId: cow?.id,
           hadMedia: media,
-          grounding: got.grounding == null
+          grounding: grounding == null
               ? null
               : ChatGrounding(
-                  queries: [for (final q in got.grounding!.queries) restore(q, names)],
-                  sources: got.grounding!.sources,
-                  suggestionsHtml: got.grounding!.suggestionsHtml,
+                  queries: [for (final q in grounding.queries) restore(q, names)],
+                  sources: grounding.sources,
+                  suggestionsHtml: grounding.suggestionsHtml,
                 ),
         ),
       );
     } on Object catch (e) {
       unawaited(ctx.repo.log('chat', ok: false, ms: ms(), method: Method.model));
-      final err = e is ChatException ? e : ChatException(chatFailureOf('$e'), '$e');
-      final why = chatFail[err.failure] ?? chatFail[ChatFailure.unreadable]!;
-      offline(sent.isEmpty ? why : '$why ${l10n.aiChatFilesNotRead}', detail: err.detail);
+      var kind = AiErrorKind.unavailable;
+      if (e is AiRequestException) {
+        kind = e.kind;
+        if (mounted && e.usage != null) setState(() => _serverUsage = e.usage);
+      } else if (e is ChatException) {
+        kind = chatFailureKind(e.failure.name, e.detail);
+        // For the FarmTap owner in the debug log only; farmers see the plain banner.
+        debugPrint('[FarmTap AI] ${e.failure.name}: ${e.detail}');
+      }
+      builtIn(error: kind, note: lost);
     }
+  }
+
+  /// Google Search sources from the server's answer.
+  ChatGrounding? _groundingFrom(Map<String, Object?>? g) {
+    if (g == null) return null;
+    final sources = g['sources'];
+    final queries = g['queries'];
+    return ChatGrounding(
+      queries: [if (queries is List) for (final q in queries) '$q'],
+      sources: [
+        if (sources is List)
+          for (final s in sources)
+            if (s is Map) ChatSource('${s['title'] ?? ''}', '${s['uri'] ?? ''}'),
+      ],
+      suggestionsHtml: g['suggestionsHtml'] as String?,
+    );
   }
 
   Rec? _cowOf(_Turn t, List<Rec> animals) => animals.where((a) => a.id == t.animalId).firstOrNull;
@@ -854,12 +973,36 @@ class _AiChatPageState extends State<AiChatPage> {
     final farm = _farm;
     final animals = farm == null ? <Rec>[] : alive(farm.data.animals).where(isActive).toList();
     final about = animals.where((a) => a.id == _animalId).firstOrNull;
+    final usage = _usage(farm);
+    final trusted = farm?.config.assistant.route == 'server';
     return AdaptiveScaffold(
       title: l10n.aiChatTitle,
       showBack: true,
       padBody: false,
       scrollable: false,
       actions: [
+        if (usage != null)
+          Tooltip(
+            message: aiUsageTitle,
+            child: ActionChip(
+              avatar: const Icon(Symbols.auto_awesome_rounded),
+              label: Text('${usage.used}/${usage.limit}'),
+              onPressed: () => unawaited(
+                showAdaptiveSheet<void>(
+                  context,
+                  builder: (sheet) => Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AiUsageMeter(view: usage, trusted: trusted),
+                      sheet.space.gapMd,
+                      Text(aiUsageFree, style: sheet.text.bodySmall),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         PopupMenuButton<String>(
           tooltip: l10n.aiChatLanguage,
           icon: const Icon(Symbols.translate_rounded),
@@ -897,6 +1040,7 @@ class _AiChatPageState extends State<AiChatPage> {
                           IconBubble(icon: Symbols.auto_awesome_rounded, size: context.sizes.bubbleMd),
                           context.space.gapMd,
                           Text(l10n.aiChatEmpty, style: context.text.titleLarge, textAlign: TextAlign.center),
+                          if (usage != null) ...[context.space.gapLg, AiUsageMeter(view: usage, trusted: trusted)],
                         ],
                       ),
                     ),
@@ -918,6 +1062,7 @@ class _AiChatPageState extends State<AiChatPage> {
                           onFollow: (q) => unawaited(_send(l10n, say: q)),
                           cards: _cardsFor(t, l10n, animals),
                           acts: _actsFor(t, animals),
+                          aiLimit: usage?.limit ?? farm?.config.assistant.dailyLimit ?? 10,
                         ),
                         context.space.gapLg,
                       ],
@@ -927,7 +1072,7 @@ class _AiChatPageState extends State<AiChatPage> {
                             Icon(Symbols.auto_awesome_rounded, color: context.colors.primary),
                             context.space.gapSm,
                             Text(
-                              l10n.aiChatThinking,
+                              _working.isEmpty ? l10n.aiChatThinking : _working,
                               style: context.text.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                             ),
                           ],
@@ -949,6 +1094,10 @@ class _AiChatPageState extends State<AiChatPage> {
                       onDeleted: () => setState(() => _animalId = null),
                     ),
                   ),
+                if (usage != null && usage.level != UsageLevel.ok) ...[
+                  AiUsageWarning(view: usage),
+                  context.space.gapXs,
+                ],
                 if (_problem != null) ...[
                   AiNote(_problem!, icon: Symbols.warning_rounded, tone: FarmTapTone.warning),
                   context.space.gapXs,
@@ -1023,6 +1172,7 @@ class _Bubble extends StatelessWidget {
     required this.onFollow,
     required this.cards,
     required this.acts,
+    this.aiLimit = 10,
   });
 
   final _Turn turn;
@@ -1034,6 +1184,9 @@ class _Bubble extends StatelessWidget {
   final VoidCallback onCopy;
   final VoidCallback onAgain;
   final void Function(String question) onFollow;
+
+  /// Today's AI allowance, for the "limit reached" banner.
+  final int aiLimit;
 
   /// Triage, which-cow and vet-question cards for this answer.
   final List<Widget> cards;
@@ -1091,6 +1244,7 @@ class _Bubble extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (t.errorKind != null) ...[AiErrorBanner(kind: t.errorKind!, limit: aiLimit), context.space.gapSm],
         _ChatText(t.text),
         for (final c in cards) ...[context.space.gapSm, c],
         context.space.gapSm,
@@ -1100,6 +1254,11 @@ class _Bubble extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             if (t.method != null) MethodBadge(t.method!),
+            if (t.layer != null)
+              Text(
+                layerLabel(t.layer!),
+                style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+              ),
             if (t.saved)
               AiNote(l10n.aiChatSavedTo(t.about ?? ''), icon: Symbols.check_circle_rounded, tone: FarmTapTone.success),
             if (t.note != null)
@@ -1137,15 +1296,6 @@ class _Bubble extends StatelessWidget {
             ],
           ),
         ],
-        if (t.detail != null)
-          ExpansionTile(
-            tilePadding: EdgeInsets.zero,
-            title: Text(
-              l10n.aiChatDetails,
-              style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
-            ),
-            children: [SelectableText(t.detail!, style: context.text.bodySmall)],
-          ),
         Row(
           children: [
             IconButton(tooltip: l10n.aiChatCopy, icon: const Icon(Symbols.content_copy_rounded), onPressed: onCopy),

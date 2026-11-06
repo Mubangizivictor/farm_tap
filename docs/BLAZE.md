@@ -32,6 +32,7 @@ written and tested. It stays off until you run one command.
 | Card payments | Flutterwave secret key, webhook hash | Flutterwave dashboard: webhook URL `https://europe-west1-farm-tap-1dd15.cloudfunctions.net/paymentWebhook` |
 | Automatic SMS | Africa's Talking username + API key (or Twilio) | Admin > Integrations: SMS company, sender name |
 | Automatic WhatsApp | WhatsApp token | Admin > Integrations > WhatsApp: phone number id, approved template name, language |
+| AI assistant, server route (decision 0028) | Google Gemini API key as `gemini_api_key` | Deploy `aiAssistant` and `aiUsageNow`, then Admin > AI Control Centre > AI assistant > Route: Secure server |
 | Refunds through the provider | MTN disbursement key, user, API key (Airtel / Flutterwave use the payment keys) | Admin > Receipts and refunds |
 
 Without keys, payments are taken by hand (farmer sends the transaction ID,

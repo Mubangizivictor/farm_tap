@@ -8,7 +8,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Icon } from '@/components/Icon';
 import { MethodBadge, ModuleHead } from '@/components/ai';
 import { AiGate, useAiPage } from '@/components/aiPage';
-import { ask, suggestedQuestions, type Answer } from '@/shared/aiAssistant';
+import { suggestedQuestions, type Answer } from '@/shared/aiAssistant';
+import { answerInternally } from '@/shared/aiRoute';
 import { seesMoney } from '@/shared/aiAccess';
 import { logAi } from '@/lib/ai';
 
@@ -49,7 +50,7 @@ export default function Assistant() {
     const question = text.trim();
     if (!question || ai.loading) return;
     const t0 = performance.now();
-    const a = ask(question, ai.data, { role: farm.role, cfg: cfg.ai, farmAiOn: true });
+    const a = answerInternally(question, ai.data, { role: farm.role, cfg: cfg.ai, farmAiOn: true });
     logAi(farm.id, 'assistant', a.ok, performance.now() - t0, a.method);
     setTurns((ts) => [...ts, { id: Date.now(), q: question, a, at: new Date().toISOString() }]);
     setQ('');

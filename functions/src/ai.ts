@@ -89,7 +89,7 @@ const firestoreStore: AiStore = {
     await db().collection('aiErrors').add({ ...e, at: FieldValue.serverTimestamp(), expireAt: Timestamp.fromMillis(Date.now() + 30 * 86400_000) });
   },
   async geminiKey() {
-    return process.env.GEMINI_API_KEY?.trim() || (await secret('geminiApiKey'));
+    return process.env.GEMINI_API_KEY?.trim() || (await secret('gemini_api_key'));
   },
 };
 

@@ -432,6 +432,7 @@ export const secretList = [
   { key: 'mtn_disbursement_key', group: 'Refunds', label: 'MTN MoMo Disbursement subscription key (Ocp-Apim)' },
   { key: 'mtn_disbursement_user', group: 'Refunds', label: 'MTN MoMo Disbursement API user (UUID)' },
   { key: 'mtn_disbursement_api_key', group: 'Refunds', label: 'MTN MoMo Disbursement API key' },
+  { key: 'gemini_api_key', group: 'AI assistant', label: 'Google Gemini API key (AI Studio), used only by the server AI assistant (decision 0028)' },
 ] as const;
 
 /** "sk_live_abcd1234" -> "••••1234". Never shows more than four characters. */
