@@ -1,0 +1,185 @@
+'use client';
+
+// The cards under a chat answer (decision 0027): the urgency card with the
+// message for the vet, the vet's questions, and "which cow is this?".
+
+import { useState } from 'react';
+import { Icon } from '@/components/Icon';
+import { cleanTemp, openCaseQuestions, type CaseAnswers, type CaseId, type Triage } from '@/shared/aiChat';
+
+const toBlob = (b64: string, mime: string) => {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+};
+
+export interface SharePhoto {
+  name: string;
+  mime: string;
+  base64: string;
+}
+
+/** Urgency badge, the "do now" list and the buttons that send the vet a message. */
+export function TriageCard({
+  triage,
+  message,
+  whatsapp,
+  vetName,
+  photos,
+  toast,
+}: {
+  triage: Triage;
+  message: string;
+  /** wa.me link for the farm's vet (or WhatsApp's own picker when no vet is saved). */
+  whatsapp: string;
+  vetName: string | null;
+  photos: SharePhoto[];
+  toast: (t: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const share = async () => {
+    try {
+      const files = photos.slice(0, 3).map((p) => new File([toBlob(p.base64, p.mime)], p.name || 'photo.jpg', { type: p.mime }));
+      if (files.length && navigator.canShare?.({ files })) await navigator.share({ files, text: message });
+      else if (navigator.share) await navigator.share({ text: message });
+      else {
+        await navigator.clipboard.writeText(message);
+        toast('Message copied. Paste it in WhatsApp.');
+      }
+    } catch {
+      /* the farmer closed the share sheet */
+    }
+  };
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(message);
+      toast('Message copied');
+    } catch {
+      toast('Could not copy');
+    }
+  };
+  return (
+    <section className={`triage ${triage.level}`} aria-label="What to do now">
+      <div className="triage-head">
+        <Icon name="alert" />
+        <strong>{triage.label}</strong>
+      </div>
+      <p className="small muted">While you wait for the vet:</p>
+      <ul>
+        {triage.doNow.map((d) => (
+          <li key={d}>{d}</li>
+        ))}
+      </ul>
+      <div className="triage-actions">
+        <a className="btn sm" href={whatsapp} target="_blank" rel="noopener noreferrer">
+          <Icon name="whatsapp" /> {vetName ? `WhatsApp ${vetName}` : 'Send to my vet on WhatsApp'}
+        </a>
+        {photos.length > 0 && (
+          <button className="btn sm ghost" onClick={() => void share()}>
+            <Icon name="camera" /> Share with photo
+          </button>
+        )}
+        <button className="btn sm ghost" onClick={() => setOpen(!open)} aria-expanded={open}>
+          <Icon name="list" /> {open ? 'Hide message' : 'See the message'}
+        </button>
+      </div>
+      {open && (
+        <div className="stack">
+          <pre className="triage-msg">{message}</pre>
+          <button className="btn sm ghost" onClick={() => void copy()}>
+            <Icon name="copy" /> Copy message
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** The questions a vet asks first. Tapping an answer fills the vet message; the button sends them to the AI. */
+export function CaseCard({
+  answers,
+  animalKnown,
+  onAnswer,
+  onSend,
+  busy,
+}: {
+  answers: CaseAnswers;
+  animalKnown: boolean;
+  onAnswer: (id: CaseId, value: string) => void;
+  onSend: () => void;
+  busy: boolean;
+}) {
+  const [temp, setTemp] = useState('');
+  const open = openCaseQuestions(answers, animalKnown);
+  const given = Object.keys(answers).length;
+  if (!open.length && !given) return null;
+  return (
+    <section className="case" aria-label="Questions the vet will ask">
+      <strong>Help the vet help you</strong>
+      <p className="small muted">Tap what you know. It goes into your message for the vet.</p>
+      {open.map((q) => (
+        <div key={q.id} className="case-q">
+          <span className="small">{q.label}</span>
+          {q.options.length > 0 ? (
+            <div className="chips">
+              {q.options.map((o) => (
+                <button key={o} className="chip chip-btn" onClick={() => onAnswer(q.id, o)}>
+                  {o}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="row">
+              <input className="input case-temp" inputMode="decimal" placeholder="e.g. 40.5" value={temp} onChange={(e) => setTemp(e.target.value)} aria-label="Temperature in degrees" />
+              <button
+                className="btn sm ghost"
+                disabled={cleanTemp(temp) == null}
+                onClick={() => {
+                  const t = cleanTemp(temp);
+                  if (t) onAnswer(q.id, t);
+                  setTemp('');
+                }}
+              >
+                Add
+              </button>
+            </div>
+          )}
+        </div>
+      ))}
+      {given > 0 && (
+        <button className="btn sm" disabled={busy} onClick={onSend}>
+          <Icon name="spark" /> Update the advice with these
+        </button>
+      )}
+    </section>
+  );
+}
+
+/** "Which cow is this?" after a photo or a health answer, so the answer is saved to that cow. */
+export function CowPicker({ animals, onPick, onSkip }: { animals: { id: string; label: string }[]; onPick: (id: string) => void; onSkip: () => void }) {
+  const [id, setId] = useState('');
+  if (!animals.length) return null;
+  return (
+    <section className="case" aria-label="Which cow is this?">
+      <strong>Which cow is this?</strong>
+      <p className="small muted">Choose it to save this answer in that cow’s history.</p>
+      <div className="row">
+        <select className="input" value={id} onChange={(e) => setId(e.target.value)} aria-label="Choose the cow">
+          <option value="">Choose a cow…</option>
+          {animals.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.label}
+            </option>
+          ))}
+        </select>
+        <button className="btn sm" disabled={!id} onClick={() => onPick(id)}>
+          Save
+        </button>
+        <button className="btn sm ghost" onClick={onSkip}>
+          Not now
+        </button>
+      </div>
+    </section>
+  );
+}

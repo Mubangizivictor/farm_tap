@@ -4205,5 +4205,31 @@
   "aiChatDeleteChat": "Delete chat",
   "aiChatStopped": "Stopped.",
   "aiChatStoppedNote": "You stopped this answer.",
-  "aiChatKeptHere": "Kept on this phone only."
+  "aiChatKeptHere": "Kept on this phone only.",
+  "aiChatWhatsapp": "Send to my vet on WhatsApp",
+  "aiChatSharePhoto": "Share with photo",
+  "aiChatSeeMessage": "See the message",
+  "aiChatHideMessage": "Hide message",
+  "aiChatCopyMessage": "Copy message",
+  "aiChatWhileWaiting": "While you wait for the vet:",
+  "aiChatWhichCow": "Which cow is this?",
+  "aiChatWhichCowHint": "Choose it to save this answer in that cow’s history.",
+  "aiChatChooseCow": "Choose a cow",
+  "aiChatSave": "Save",
+  "aiChatNotNow": "Not now",
+  "aiChatVetHelp": "Help the vet help you",
+  "aiChatVetHelpHint": "Tap what you know. It goes into your message for the vet.",
+  "aiChatUpdateAdvice": "Update the advice with these",
+  "aiChatTempHint": "e.g. 40.5",
+  "aiChatAdd": "Add",
+  "aiChatLanguage": "Reply language",
+  "aiChatMessageCopied": "Message copied",
+  "aiChatWhatsappName": "WhatsApp {name}",
+  "@aiChatWhatsappName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

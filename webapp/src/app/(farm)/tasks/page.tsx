@@ -15,6 +15,9 @@ import { useFarm, useSession } from '@/lib/session';
 import { useOpenFromUrl } from '@/lib/useOpen';
 
 /** The phone saves a task as due at 18:00 on its day (workers_pages.dart). */
+/** A value the AI chat put in the link, e.g. /tasks/?new=1&title=Recheck%20Bella&due=2026-11-07. */
+const fromUrl = (k: string) => (typeof window === 'undefined' ? null : new URL(window.location.href).searchParams.get(k));
+
 const dueAt = (day: Date) => new Date(day.getFullYear(), day.getMonth(), day.getDate(), 18);
 
 function TaskForm({ t, staff, onClose }: { t?: FarmRecord<TaskBody>; staff: FarmRecord<StaffBody>[]; onClose: () => void }) {
@@ -23,9 +26,9 @@ function TaskForm({ t, staff, onClose }: { t?: FarmRecord<TaskBody>; staff: Farm
   const toast = useToast();
   const v = t ? taskView(t.body) : null;
   const [f, setF] = useState({
-    title: v?.title ?? '',
+    title: v?.title ?? fromUrl('title') ?? '',
     staffId: v?.staffId && staff.some((s) => s.id === v.staffId) ? v.staffId : staff.length === 1 ? staff[0].id : '',
-    due: dayKey(v?.due ?? new Date()),
+    due: dayKey(v?.due ?? (/^\d{4}-\d{2}-\d{2}$/.test(fromUrl('due') ?? '') ? new Date(`${fromUrl('due')}T12:00:00`) : new Date())),
     when: v?.when ?? '',
     priority: v?.priority ?? 'normal',
     note: v?.note ?? '',

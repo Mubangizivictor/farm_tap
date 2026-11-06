@@ -122,6 +122,10 @@ export interface ChatPromptInput {
   /** FarmTap's own calculated answer to the same question, if it had one (already through redact()). */
   calculated?: string | null;
   files: ChatFile[];
+  /** Ask the model to search Google first. */
+  search?: boolean;
+  /** Reply language id from CHAT_LANGUAGES; 'auto' or empty = the language the farmer writes in. */
+  language?: string | null;
 }
 
 /** The text sent with the question and any files. Contains no animal name, tag, farm name or place. */
@@ -130,6 +134,9 @@ export function buildChatPrompt(i: ChatPromptInput): string {
   if (i.facts.length) lines.push(`FARM FACTS:\n${i.facts.map((f) => `- ${f}`).join('\n')}`);
   if (i.calculated) lines.push(`FARMTAP'S OWN CALCULATED ANSWER (use these numbers):\n${i.calculated}`);
   if (i.files.length) lines.push(`ATTACHED: ${i.files.map((f) => f.kind).join(', ')}.`);
+  if (i.search) lines.push('SEARCH GOOGLE FIRST for this question and answer from what you find.');
+  const lang = languageLine(i.language);
+  if (lang) lines.push(lang);
   lines.push(`QUESTION: ${i.message.replace(/\s+/g, ' ').trim().slice(0, 2000)}`);
   return lines.join('\n\n');
 }
@@ -155,13 +162,8 @@ const unsafe = (s: string) => sentenceUnsafe(s.replace(/\bgive her\b/gi, 'offer'
 export const CHAT_VET_LINE = 'Call your vet if she does not improve soon, or at once if she is very weak. FarmTap AI cannot diagnose.';
 export const CHAT_NOW_LINE = 'Call your vet now.';
 
-/**
- * Turns the model's text into a safe answer. Never throws. Every sentence
- * naming a drug, an amount or a sure-sounding diagnosis is removed; line
- * breaks and lists are kept. Health answers always point to the vet;
- * emergencies say "now"; reportable diseases are flagged.
- */
-export function readChatReply(text: string, asked: string): ChatReply {
+/** Removes every unsafe sentence from model text, keeping line breaks and lists. Used while an answer streams in and again on the finished answer. */
+export function filterChatText(text: string): { text: string; removed: number } {
   let removed = 0;
   const lines: string[] = [];
   for (const raw of text.replace(/\r/g, '').split('\n')) {
@@ -181,12 +183,31 @@ export function readChatReply(text: string, asked: string): ChatReply {
     const joined = kept.join(' ').trim();
     if (joined) lines.push(joined);
   }
-  let body = lines.join('\n').replace(/\n{3,}/g, '\n\n').trim().slice(0, 4000);
+  return { text: lines.join('\n').replace(/\n{3,}/g, '\n\n').trim(), removed };
+}
+
+/** The part of a half-written answer that is safe to show: up to the last finished sentence, with unsafe sentences removed. */
+export function partialChatText(text: string): string {
+  const cut = Math.max(text.lastIndexOf('. '), text.lastIndexOf('.\n'), text.lastIndexOf('!'), text.lastIndexOf('?'), text.lastIndexOf('\n'));
+  return cut < 0 ? '' : filterChatText(text.slice(0, cut + 1)).text;
+}
+
+/**
+ * Turns the model's text into a safe answer. Never throws. Every sentence
+ * naming a drug, an amount or a sure-sounding diagnosis is removed; line
+ * breaks and lists are kept. Health answers always point to the vet;
+ * emergencies say "now"; reportable diseases are flagged.
+ */
+export function readChatReply(text: string, asked: string): ChatReply {
+  const f = filterChatText(text);
+  const removed = f.removed;
+  let body = f.text.slice(0, 4000);
   const both = `${asked}\n${body}`;
   const health = HEALTH.test(both);
   // A sentence about vaccination is not a case of the disease.
   const report = isNotifiable(both.split(/(?<=[.!?\n])/).filter((x) => !/vaccin|immuni[sz]/i.test(x)).join(' '));
-  const emergency = isEmergency(both);
+  const emergency = isEmergency(both) || /\bcall (your|the|a) vet (now|at once|immediately|right away)\b/i.test(body);
+  const today = /\bcall (your|the|a) vet today\b/i.test(body);
   let risk: Severity = 'low';
   let callVet: ChatReply['callVet'] = null;
   if (health) {
@@ -195,6 +216,10 @@ export function readChatReply(text: string, asked: string): ChatReply {
   }
   if (report) {
     risk = 'high';
+    callVet = 'today';
+  }
+  if (today && !report) {
+    risk = risk === 'low' || risk === 'medium' ? 'high' : risk;
     callVet = 'today';
   }
   if (emergency) {
@@ -401,4 +426,176 @@ export function chatFailureOf(message: string): ChatFailure {
   if (/safety|blocked|prohibited|recitation/.test(m)) return 'blocked';
   if (/network|failed to fetch|fetch failed|offline|load failed|socket/.test(m)) return 'network';
   return 'unreadable';
+}
+
+// ---------------------------------------------------------------- Reply language
+
+export const CHAT_LANGUAGES = [
+  { id: 'auto', label: 'Same as I write' },
+  { id: 'en', label: 'English' },
+  { id: 'lg', label: 'Luganda' },
+  { id: 'nyn', label: 'Runyankole / Rukiga' },
+  { id: 'sw', label: 'Kiswahili' },
+  { id: 'ach', label: 'Luo (Acholi / Lango)' },
+] as const;
+
+const LANGUAGE_NAME: Record<string, string> = { en: 'English', lg: 'Luganda', nyn: 'Runyankole (Rukiga is close)', sw: 'Kiswahili', ach: 'Luo (Acholi or Lango)' };
+
+/** The instruction line for a chosen reply language, or null for "same as the farmer writes". */
+export function languageLine(id: string | null | undefined): string | null {
+  const name = id ? LANGUAGE_NAME[id] : undefined;
+  if (!name) return null;
+  return `REPLY LANGUAGE: ${name}. Use simple everyday words. If you are not sure of a word, add the English word in brackets. Still never name a drug, a dose or an injection in any language.`;
+}
+
+/** Whether Google Search should be asked for: a general question that FarmTap's own records could not answer. */
+export function needsSearch(question: string, has: { calculated: boolean; animal: boolean }): boolean {
+  if (has.calculated) return false;
+  const q = question.trim();
+  if (q.length < 8 || /^(hi|hello|hey|thanks?|thank you|ok|okay)\b/i.test(q)) return false;
+  return true;
+}
+
+/** Models to try in order. Photos and videos start with the stronger model; every list ends with a model that has its own quota. */
+export function chatModels(configured: string, hasMedia: boolean): string[] {
+  const strong = 'gemini-3.8-flash';
+  const light = 'gemini-3.5-flash-lite';
+  const list = hasMedia ? [strong, configured, light] : [configured, light, strong];
+  return list.filter((m, i) => m && list.indexOf(m) === i).slice(0, 3);
+}
+
+// ---------------------------------------------------------------- Triage card
+
+export interface Triage {
+  level: 'now' | 'today' | 'soon';
+  label: string;
+  /** Safe things to do while waiting for the vet. Fixed text, never written by the model. */
+  doNow: string[];
+  report: boolean;
+}
+
+const MILKY = /\b(milk\w*|udder|mastitis|teat\w*)\b/i;
+
+/** The urgency badge and "do now" list for a health answer; null when the answer is not about an animal's health. */
+export function triageOf(r: ChatReply, question = ''): Triage | null {
+  if (!r.health && !r.callVet) return null;
+  const level = r.callVet === 'now' ? 'now' : r.callVet === 'today' ? 'today' : 'soon';
+  const label = level === 'now' ? 'Emergency: call the vet now' : level === 'today' ? 'Urgent: call the vet today' : 'See the vet soon';
+  const doNow: string[] = [];
+  if (level === 'now') doNow.push('Call your vet now and keep the animal calm and still.');
+  if (r.report) doNow.push('Tell the District Veterinary Officer. Do not move or sell animals, milk or hides until they say it is safe.');
+  doNow.push('Keep this animal apart from the rest of the herd.');
+  doNow.push('Give clean water and keep it in the shade.');
+  if (MILKY.test(`${question}\n${r.text}`)) doNow.push('Do not sell or drink this animal’s milk until the vet says it is safe.');
+  doNow.push('Do not give any medicine or herbs until the vet says so.');
+  doNow.push('Take the temperature if you can, and take clear photos from the side and close up.');
+  doNow.push('Wash your hands and keep buckets and tools for this animal separate.');
+  return { level, label, doNow: doNow.slice(0, 7), report: r.report };
+}
+
+// ---------------------------------------------------------------- The vet's questions
+
+export type CaseId = 'since' | 'temp' | 'count' | 'age' | 'vaccinated';
+
+export interface CaseQuestion {
+  id: CaseId;
+  label: string;
+  /** Tap choices; empty for a number. */
+  options: string[];
+  unit?: string;
+}
+
+export const CASE_QUESTIONS: CaseQuestion[] = [
+  { id: 'since', label: 'Since when?', options: ['Today', '2 to 3 days', 'About a week', 'Longer'] },
+  { id: 'temp', label: 'Temperature', options: [], unit: '°C' },
+  { id: 'count', label: 'How many animals look sick?', options: ['Only this one', '2 to 5', 'More than 5'] },
+  { id: 'age', label: 'How old is it?', options: ['Calf (under 1 year)', 'Young (1 to 2 years)', 'Adult'] },
+  { id: 'vaccinated', label: 'Vaccinated this year?', options: ['Yes', 'No', 'I do not know'] },
+];
+
+export type CaseAnswers = Partial<Record<CaseId, string>>;
+
+/** The questions still worth asking: not answered yet, and not the age when the cow is known. */
+export function openCaseQuestions(answers: CaseAnswers, animalKnown: boolean): CaseQuestion[] {
+  return CASE_QUESTIONS.filter((q) => !answers[q.id] && !(q.id === 'age' && animalKnown));
+}
+
+/** A temperature typed by the farmer, kept only when it is a real cow temperature (35 to 43). */
+export function cleanTemp(v: string): string | null {
+  const n = Number(v.replace(',', '.').trim());
+  return Number.isFinite(n) && n >= 35 && n <= 43 ? String(Math.round(n * 10) / 10) : null;
+}
+
+const CASE_LABEL: Record<CaseId, string> = { since: 'Since', temp: 'Temperature', count: 'Animals sick', age: 'Age', vaccinated: 'Vaccinated this year' };
+
+/** The answers as one line, sent to the model and put in the vet message. */
+export function caseText(a: CaseAnswers): string {
+  const parts = CASE_QUESTIONS.filter((q) => a[q.id]).map((q) => `${CASE_LABEL[q.id]}: ${a[q.id]}${q.id === 'temp' ? ' °C' : ''}`);
+  return parts.join('. ');
+}
+
+// ---------------------------------------------------------------- Message for the vet
+
+export interface VetSummaryInput {
+  farm: string;
+  /** Null when the farmer has not said which animal. */
+  animal: { label: string; facts: string[] } | null;
+  question: string;
+  answer: string;
+  answers: CaseAnswers;
+  triage: Triage | null;
+  hasPhoto: boolean;
+  day: string;
+}
+
+const firstSentences = (t: string, max: number) => {
+  const lines = t.split('\n').filter((l) => l.trim() && !/^(call your vet|if a cow has|important)/i.test(l.trim()) && !/^[-*•\d]/.test(l.trim()));
+  const out = (lines.join(' ').match(/[^.!?]+[.!?]+/g) ?? []).slice(0, 2).join(' ').trim();
+  return out.slice(0, max);
+};
+
+/** A short plain message the farmer can send the vet. Facts only: no diagnosis. */
+export function vetSummary(i: VetSummaryInput): string {
+  const lines = ['*Message from FarmTap*', `Farm: ${i.farm}`, `Date: ${i.day}`];
+  lines.push(`Animal: ${i.animal?.label ?? 'not chosen yet'}`);
+  if (i.triage) lines.push(`How urgent: ${i.triage.label}`);
+  lines.push(`Problem (farmer): ${i.question.replace(/\s+/g, ' ').trim().slice(0, 300)}`);
+  const seen = firstSentences(i.answer, 350);
+  if (seen) lines.push(`What FarmTap AI noticed (not a diagnosis): ${seen}`);
+  const details = caseText(i.answers);
+  if (details) lines.push(`Details: ${details}`);
+  const facts = (i.animal?.facts ?? []).filter((f) => !/^This question/.test(f)).slice(0, 6);
+  if (facts.length) lines.push(`From the farm records:\n${facts.map((f) => `- ${f}`).join('\n')}`);
+  if (i.hasPhoto) lines.push('A photo is attached.');
+  if (i.triage?.report) lines.push('Possible reportable disease. Please advise on telling the DVO.');
+  return lines.join('\n');
+}
+
+/** wa.me link for a Uganda or international number; null when the number is too short. Without a number it opens WhatsApp's own contact picker. */
+export function whatsappLink(phone: string | null | undefined, text: string): string | null {
+  const q = `text=${encodeURIComponent(text)}`;
+  if (!phone) return `https://wa.me/?${q}`;
+  let d = phone.replace(/\D/g, '');
+  if (d.startsWith('0')) d = `256${d.slice(1)}`;
+  return d.length >= 9 ? `https://wa.me/${d}?${q}` : null;
+}
+
+// ---------------------------------------------------------------- One-tap actions
+
+/** Date key for tomorrow from a YYYY-MM-DD day. */
+export function nextDay(day: string): string {
+  const d = new Date(`${day}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Buttons that do something: record a treatment, set a reminder. Paths are web paths; the phone maps them. */
+export function chatDoActions(i: { animal: { id: string; name: string } | null; triage: Triage | null; day: string }): ChatAction[] {
+  if (!i.triage) return [];
+  const out: ChatAction[] = [];
+  const id = i.animal ? `&animal=${encodeURIComponent(i.animal.id)}` : '';
+  out.push({ label: 'Record treatment', href: `/health/?new=1${id}` });
+  const what = i.animal ? `Recheck ${i.animal.name}` : 'Recheck the sick animal';
+  out.push({ label: 'Remind me tomorrow', href: `/tasks/?new=1&title=${encodeURIComponent(what)}&due=${nextDay(i.day)}` });
+  return out;
 }

@@ -19,11 +19,13 @@ import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/theme/theme.dart';
 import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/clock.dart';
+import 'package:farm_tap/sectors/cattle/ai/presentation/ai_chat_cards.dart';
 import 'package:farm_tap/sectors/cattle/ai/presentation/ai_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -49,6 +51,9 @@ class _Turn {
     this.actions = const [],
     this.followUps = const [],
     this.grounding,
+    this.triage,
+    this.animalId,
+    this.hadMedia = false,
   });
 
   factory fromJson(Map<String, dynamic> j) => _Turn(
@@ -65,6 +70,16 @@ class _Turn {
         ChatAction('${(a as Map<String, dynamic>)['label']}', '${a['href']}'),
     ],
     followUps: [for (final dynamic f in (j['followUps'] as List<dynamic>? ?? const <dynamic>[])) '$f'],
+    animalId: j['animalId'] as String?,
+    hadMedia: j['hadMedia'] == true,
+    triage: j['triage'] == null
+        ? null
+        : Triage(
+            level: '${(j['triage'] as Map<String, dynamic>)['level']}',
+            label: '${(j['triage'] as Map<String, dynamic>)['label']}',
+            doNow: [for (final dynamic d in ((j['triage'] as Map<String, dynamic>)['doNow'] as List<dynamic>)) '$d'],
+            report: (j['triage'] as Map<String, dynamic>)['report'] == true,
+          ),
     grounding: j['grounding'] == null
         ? null
         : ChatGrounding(
@@ -96,6 +111,15 @@ class _Turn {
   final List<String> followUps;
   final ChatGrounding? grounding;
 
+  /// Urgency card for a sick-animal answer.
+  final Triage? triage;
+
+  /// The animal this answer is about.
+  final String? animalId;
+
+  /// A photo or video was sent with the question.
+  final bool hadMedia;
+
   /// Files are never saved.
   Map<String, dynamic> toJson() => {
     'fromUser': fromUser,
@@ -110,6 +134,11 @@ class _Turn {
       for (final a in actions) {'label': a.label, 'href': a.href},
     ],
     'followUps': followUps,
+    'animalId': animalId,
+    'hadMedia': hadMedia,
+    'triage': triage == null
+        ? null
+        : {'level': triage!.level, 'label': triage!.label, 'doNow': triage!.doNow, 'report': triage!.report},
     'grounding': grounding == null
         ? null
         : {
@@ -176,6 +205,9 @@ class _AiChatPageState extends State<AiChatPage> {
   String _chatId = '';
   List<_SavedChat> _chats = [];
   SharedPreferences? _prefs;
+  Map<String, String> _case = {};
+  String _lang = 'auto';
+  final _skipPick = <_Turn>{};
 
   @override
   void initState() {
@@ -188,6 +220,7 @@ class _AiChatPageState extends State<AiChatPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       _prefs = prefs;
+      _lang = prefs.getString('farmtap.ai.lang') ?? 'auto';
       final raw = prefs.getString(_chatsKey);
       if (raw == null) return;
       final list = [
@@ -226,6 +259,7 @@ class _AiChatPageState extends State<AiChatPage> {
       _problem = null;
       _busy = false;
       _chatId = '';
+      _case = {};
     });
   }
 
@@ -237,6 +271,7 @@ class _AiChatPageState extends State<AiChatPage> {
       _files.clear();
       _problem = null;
       _chatId = c.id;
+      _case = {};
     });
     _toEnd();
   }
@@ -479,7 +514,10 @@ class _AiChatPageState extends State<AiChatPage> {
         facts: facts,
         calculated: calcText == null ? null : redact(calcText, names),
         fileKinds: [for (final f in sent) f.kind],
+        search: needsSearch(question, calculated: calc.ok),
+        language: _lang,
       );
+      final media = sent.any((f) => f.kind == 'photo' || f.kind == 'video');
       final history = [
         for (final h in chatHistory([
           for (final t in before)
@@ -492,7 +530,7 @@ class _AiChatPageState extends State<AiChatPage> {
         history: history,
         prompt: prompt,
         files: [for (final f in sent) ChatPart(f.mime, f.bytes)],
-        model: farm.config.photoModel,
+        models: chatModels(farm.config.photoModel, hasMedia: media),
       );
       final reply = readChatReply(got.text, question);
       final shown = restore(reply.text, names);
@@ -539,6 +577,19 @@ class _AiChatPageState extends State<AiChatPage> {
             animal: animalRef,
           ),
           followUps: chatFollowUps(question: question, answer: shown, health: reply.health),
+          triage: triageOf(
+            ChatReply(
+              text: shown,
+              removed: reply.removed,
+              health: reply.health,
+              risk: reply.risk,
+              callVet: reply.callVet,
+              report: reply.report,
+            ),
+            question: question,
+          ),
+          animalId: cow?.id,
+          hadMedia: media,
           grounding: got.grounding == null
               ? null
               : ChatGrounding(
@@ -554,6 +605,168 @@ class _AiChatPageState extends State<AiChatPage> {
       final why = chatFail[err.failure] ?? chatFail[ChatFailure.unreadable]!;
       offline(sent.isEmpty ? why : '$why ${l10n.aiChatFilesNotRead}', detail: err.detail);
     }
+  }
+
+  Rec? _cowOf(_Turn t, List<Rec> animals) => animals.where((a) => a.id == t.animalId).firstOrNull;
+
+  ({String id, String name})? _cowRef(_Turn t, List<Rec> animals) {
+    final c = _cowOf(t, animals);
+    return c == null ? null : (id: c.id, name: animalName(c));
+  }
+
+  String _today() => (_farm == null ? context.clock.now().toIso8601String() : today(_farm!.data)).substring(0, 10);
+
+  List<ChatAction> _actsFor(_Turn t, List<Rec> animals) {
+    if (t.method != Method.model) return t.actions;
+    final cow = _cowRef(t, animals);
+    return [
+      ...chatDoActions(animal: cow, triage: t.triage, day: _today()),
+      ...chatActions(
+        question: t.asked ?? '',
+        answer: t.text,
+        health: t.triage != null,
+        callVet: t.triage?.level,
+        animal: cow,
+      ),
+    ];
+  }
+
+  String _messageOf(_Turn t, List<Rec> animals) {
+    final cow = _cowOf(t, animals);
+    final farm = _farm;
+    final label = cow == null
+        ? null
+        : '${animalName(cow)}${cow.str('name') != null && cow.str('tagNumber') != null ? ' (${cow.str('tagNumber')})' : ''}';
+    return vetSummary(
+      farm: widget.ctx.farmName,
+      animal: cow == null || farm == null
+          ? null
+          : (
+              label: label!,
+              facts: animalFacts(
+                animalHealth(farm.data, cow.id),
+                sex: cow.str('sex'),
+                dairyStatus: cow.str('dairyStatus'),
+                dateOfBirth: cow.str('dateOfBirth'),
+                day: today(farm.data),
+              ),
+            ),
+      question: t.asked ?? '',
+      answer: t.text,
+      answers: _case,
+      triage: t.triage,
+      hasPhoto: t.hadMedia,
+      day: _today(),
+    );
+  }
+
+  List<Widget> _cardsFor(_Turn t, AppLocalizations l10n, List<Rec> animals) {
+    if (t.fromUser || t.method != Method.model) return const [];
+    final isLast = identical(t, _turns.where((x) => !x.fromUser).lastOrNull);
+    final i = _turns.indexOf(t);
+    final photos = i > 0 ? _turns[i - 1].files.where((f) => f.kind == 'photo').toList() : const <_Attached>[];
+    return [
+      if (t.triage != null)
+        TriageCard(
+          triage: t.triage!,
+          message: _messageOf(t, animals),
+          vetName: null,
+          onWhatsapp: () => unawaited(_whatsapp(null, _messageOf(t, animals))),
+          onSharePhoto: photos.isEmpty ? null : () => unawaited(_sharePhotos(photos, _messageOf(t, animals))),
+        ),
+      if (t.animalId == null && (t.triage != null || t.hadMedia) && !_skipPick.contains(t))
+        CowPicker(
+          animals: [
+            for (final a in animals)
+              (
+                id: a.id,
+                label: '${animalName(a)}${a.str('name') != null && a.str('tagNumber') != null ? ' (${a.str('tagNumber')})' : ''}',
+              ),
+          ],
+          onPick: (id) => unawaited(_pickCow(t, id, animals, l10n)),
+          onSkip: () => setState(() => _skipPick.add(t)),
+        ),
+      if (isLast && t.triage != null && !_busy)
+        CaseCard(
+          answers: _case,
+          animalKnown: t.animalId != null,
+          busy: _busy,
+          onAnswer: (id, v) => setState(() => _case = {..._case, id: v}),
+          onSend: () => unawaited(_send(l10n, say: 'More details about this animal. ${caseText(_case)}.')),
+        ),
+    ];
+  }
+
+  Future<void> _sharePhotos(List<_Attached> photos, String message) async {
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          text: message,
+          files: [for (final p in photos.take(3)) XFile.fromData(p.bytes, mimeType: p.mime, name: p.name)],
+        ),
+      );
+    } on Object {
+      // The farmer closed the share sheet.
+    }
+  }
+
+  Future<void> _whatsapp(String? phone, String message) async {
+    final link = whatsappLink(phone, message) ?? whatsappLink(null, message)!;
+    await _open(link);
+  }
+
+  Future<void> _pickCow(_Turn t, String id, List<Rec> animals, AppLocalizations l10n) async {
+    final cow = animals.where((a) => a.id == id).firstOrNull;
+    if (cow == null) return;
+    var saved = false;
+    try {
+      final i = _turns.indexOf(t);
+      final me = i > 0 ? _turns[i - 1] : null;
+      final tr = t.triage;
+      await widget.ctx.repo.savePhotoAssessment(
+        chatAssessmentBody(
+          id,
+          t.asked ?? '',
+          ChatReply(
+            text: t.text,
+            removed: 0,
+            health: tr != null,
+            risk: tr?.level == 'now' ? Severity.critical : (tr?.level == 'today' ? Severity.high : (tr != null ? Severity.medium : Severity.low)),
+            callVet: tr?.level,
+            report: tr?.report ?? false,
+          ),
+          {for (final f in me?.files ?? const <_Attached>[]) f.kind}.toList(),
+          _farm?.config.photoModel ?? '',
+          widget.ctx.repo.nowIso,
+        ),
+      );
+      saved = true;
+    } on Object {
+      saved = false;
+    }
+    if (!mounted) return;
+    setState(() {
+      final i = _turns.indexOf(t);
+      if (i >= 0) {
+        _turns[i] = _Turn(
+          fromUser: false,
+          text: t.text,
+          method: t.method,
+          about: animalName(cow),
+          saved: saved,
+          note: t.note,
+          asked: t.asked,
+          detail: t.detail,
+          actions: t.actions,
+          followUps: t.followUps,
+          grounding: t.grounding,
+          triage: t.triage,
+          animalId: id,
+          hadMedia: t.hadMedia,
+        );
+      }
+    });
+    _saveChat();
   }
 
   Future<void> _chatsSheet(AppLocalizations l10n) async {
@@ -644,6 +857,16 @@ class _AiChatPageState extends State<AiChatPage> {
       padBody: false,
       scrollable: false,
       actions: [
+        PopupMenuButton<String>(
+          tooltip: l10n.aiChatLanguage,
+          icon: const Icon(Symbols.translate_rounded),
+          initialValue: _lang,
+          onSelected: (v) {
+            setState(() => _lang = v);
+            unawaited(_prefs?.setString('farmtap.ai.lang', v) ?? Future<bool>.value(false));
+          },
+          itemBuilder: (_) => [for (final l in chatLanguages) PopupMenuItem(value: l.id, child: Text(l.label))],
+        ),
         IconButton(
           tooltip: l10n.aiChatHistory,
           icon: const Icon(Symbols.history_rounded),
@@ -690,6 +913,8 @@ class _AiChatPageState extends State<AiChatPage> {
                           onCopy: () => unawaited(_copy(l10n, t.text)),
                           onAgain: () => unawaited(_again(l10n, t)),
                           onFollow: (q) => unawaited(_send(l10n, say: q)),
+                          cards: _cardsFor(t, l10n, animals),
+                          acts: _actsFor(t, animals),
                         ),
                         context.space.gapLg,
                       ],
@@ -793,6 +1018,8 @@ class _Bubble extends StatelessWidget {
     required this.onCopy,
     required this.onAgain,
     required this.onFollow,
+    required this.cards,
+    required this.acts,
   });
 
   final _Turn turn;
@@ -804,6 +1031,12 @@ class _Bubble extends StatelessWidget {
   final VoidCallback onCopy;
   final VoidCallback onAgain;
   final void Function(String question) onFollow;
+
+  /// Triage, which-cow and vet-question cards for this answer.
+  final List<Widget> cards;
+
+  /// Buttons to other parts of FarmTap.
+  final List<ChatAction> acts;
 
   @override
   Widget build(BuildContext context) {
@@ -856,6 +1089,7 @@ class _Bubble extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _ChatText(t.text),
+        for (final c in cards) ...[context.space.gapSm, c],
         context.space.gapSm,
         Wrap(
           spacing: context.space.sm,
@@ -869,13 +1103,13 @@ class _Bubble extends StatelessWidget {
               Text(t.note!, style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant)),
           ],
         ),
-        if (t.actions.isNotEmpty) ...[
+        if (acts.isNotEmpty) ...[
           context.space.gapSm,
           Wrap(
             spacing: context.space.sm,
             runSpacing: context.space.xs,
             children: [
-              for (final a in t.actions)
+              for (final a in acts)
                 ActionChip(
                   avatar: const Icon(Symbols.arrow_forward_rounded),
                   label: Text(a.label),

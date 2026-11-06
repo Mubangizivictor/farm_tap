@@ -120,6 +120,8 @@ String buildChatPrompt({
   required List<String> facts,
   required List<String> fileKinds,
   String? calculated,
+  bool search = false,
+  String? language,
 }) {
   final lines = <String>[];
   if (facts.isNotEmpty) lines.add('FARM FACTS:\n${facts.map((f) => '- $f').join('\n')}');
@@ -127,6 +129,9 @@ String buildChatPrompt({
     lines.add("FARMTAP'S OWN CALCULATED ANSWER (use these numbers):\n$calculated");
   }
   if (fileKinds.isNotEmpty) lines.add('ATTACHED: ${fileKinds.join(', ')}.');
+  if (search) lines.add('SEARCH GOOGLE FIRST for this question and answer from what you find.');
+  final lang = languageLine(language);
+  if (lang != null) lines.add(lang);
   final q = message.replaceAll(RegExp(r'\s+'), ' ').trim();
   lines.add('QUESTION: ${q.length > 2000 ? q.substring(0, 2000) : q}');
   return lines.join('\n\n');
@@ -163,7 +168,9 @@ const chatVetLine =
 const chatNowLine = 'Call your vet now.';
 
 /// Turns the model's text into a safe answer. Never throws.
-ChatReply readChatReply(String text, String asked) {
+/// Removes every unsafe sentence from model text, keeping line breaks and lists. Used while an answer
+/// streams in and again on the finished answer.
+({String text, int removed}) filterChatText(String text) {
   var removed = 0;
   final lines = <String>[];
   for (final raw in text.replaceAll('\r', '').split('\n')) {
@@ -184,7 +191,25 @@ ChatReply readChatReply(String text, String asked) {
     final joined = kept.join(' ').trim();
     if (joined.isNotEmpty) lines.add(joined);
   }
-  var body = lines.join('\n').replaceAll(RegExp(r'\n{3,}'), '\n\n').trim();
+  return (text: lines.join('\n').replaceAll(RegExp(r'\n{3,}'), '\n\n').trim(), removed: removed);
+}
+
+/// The part of a half-written answer that is safe to show: up to the last finished sentence.
+String partialChatText(String text) {
+  final cut = [
+    text.lastIndexOf('. '),
+    text.lastIndexOf('.\n'),
+    text.lastIndexOf('!'),
+    text.lastIndexOf('?'),
+    text.lastIndexOf('\n'),
+  ].reduce((a, b) => a > b ? a : b);
+  return cut < 0 ? '' : filterChatText(text.substring(0, cut + 1)).text;
+}
+
+ChatReply readChatReply(String text, String asked) {
+  final f = filterChatText(text);
+  final removed = f.removed;
+  var body = f.text;
   if (body.length > 4000) body = body.substring(0, 4000);
   final both = '$asked\n$body';
   final health = _health.hasMatch(both);
@@ -195,7 +220,9 @@ ChatReply readChatReply(String text, String asked) {
         .where((x) => !RegExp('vaccin|immuni[sz]', caseSensitive: false).hasMatch(x))
         .join(' '),
   );
-  final emergency = isEmergency(both);
+  final emergency = isEmergency(both) ||
+      RegExp(r'\bcall (your|the|a) vet (now|at once|immediately|right away)\b', caseSensitive: false).hasMatch(body);
+  final today = RegExp(r'\bcall (your|the|a) vet today\b', caseSensitive: false).hasMatch(body);
   var risk = Severity.low;
   String? callVet;
   if (health) {
@@ -204,6 +231,10 @@ ChatReply readChatReply(String text, String asked) {
   }
   if (report) {
     risk = Severity.high;
+    callVet = 'today';
+  }
+  if (today && !report) {
+    if (risk == Severity.low || risk == Severity.medium) risk = Severity.high;
     callVet = 'today';
   }
   if (emergency) {
@@ -289,7 +320,7 @@ abstract interface class ChatAnalyzer {
     required List<ChatTurn> history,
     required String prompt,
     required List<ChatPart> files,
-    required String model,
+    required List<String> models,
   });
 }
 
@@ -487,4 +518,219 @@ class ChatException implements Exception {
 
   @override
   String toString() => 'ChatException($failure, $detail)';
+}
+
+// ---------------------------------------------------------------- Reply language
+
+const chatLanguages = <({String id, String label})>[
+  (id: 'auto', label: 'Same as I write'),
+  (id: 'en', label: 'English'),
+  (id: 'lg', label: 'Luganda'),
+  (id: 'nyn', label: 'Runyankole / Rukiga'),
+  (id: 'sw', label: 'Kiswahili'),
+  (id: 'ach', label: 'Luo (Acholi / Lango)'),
+];
+
+const _languageName = <String, String>{
+  'en': 'English',
+  'lg': 'Luganda',
+  'nyn': 'Runyankole (Rukiga is close)',
+  'sw': 'Kiswahili',
+  'ach': 'Luo (Acholi or Lango)',
+};
+
+/// The instruction line for a chosen reply language, or null for "same as the farmer writes".
+String? languageLine(String? id) {
+  final name = id == null ? null : _languageName[id];
+  if (name == null) return null;
+  return 'REPLY LANGUAGE: $name. Use simple everyday words. If you are not sure of a word, add the English word in brackets. '
+      'Still never name a drug, a dose or an injection in any language.';
+}
+
+/// Whether Google Search should be asked for: a general question FarmTap's own records could not answer.
+bool needsSearch(String question, {required bool calculated}) {
+  if (calculated) return false;
+  final q = question.trim();
+  if (q.length < 8 || RegExp(r'^(hi|hello|hey|thanks?|thank you|ok|okay)\b', caseSensitive: false).hasMatch(q)) {
+    return false;
+  }
+  return true;
+}
+
+/// Models to try in order. Photos and videos start with the stronger model; every list ends with a model with its own quota.
+List<String> chatModels(String configured, {required bool hasMedia}) {
+  const strong = 'gemini-3.8-flash';
+  const light = 'gemini-3.5-flash-lite';
+  final list = hasMedia ? [strong, configured, light] : [configured, light, strong];
+  final out = <String>[];
+  for (final m in list) {
+    if (m.isNotEmpty && !out.contains(m)) out.add(m);
+  }
+  return out.take(3).toList();
+}
+
+// ---------------------------------------------------------------- Triage card
+
+class Triage {
+  const new({required this.level, required this.label, required this.doNow, required this.report});
+
+  /// now, today or soon.
+  final String level;
+  final String label;
+
+  /// Safe things to do while waiting for the vet. Fixed text, never written by the model.
+  final List<String> doNow;
+  final bool report;
+}
+
+final _milky = RegExp(r'\b(milk\w*|udder|mastitis|teat\w*)\b', caseSensitive: false);
+
+/// The urgency badge and "do now" list for a health answer; null when the answer is not about an animal's health.
+Triage? triageOf(ChatReply r, {String question = ''}) {
+  if (!r.health && r.callVet == null) return null;
+  final level = r.callVet == 'now' ? 'now' : (r.callVet == 'today' ? 'today' : 'soon');
+  final label = level == 'now'
+      ? 'Emergency: call the vet now'
+      : (level == 'today' ? 'Urgent: call the vet today' : 'See the vet soon');
+  final doNow = <String>[
+    if (level == 'now') 'Call your vet now and keep the animal calm and still.',
+    if (r.report)
+      'Tell the District Veterinary Officer. Do not move or sell animals, milk or hides until they say it is safe.',
+    'Keep this animal apart from the rest of the herd.',
+    'Give clean water and keep it in the shade.',
+    if (_milky.hasMatch('$question\n${r.text}')) 'Do not sell or drink this animal’s milk until the vet says it is safe.',
+    'Do not give any medicine or herbs until the vet says so.',
+    'Take the temperature if you can, and take clear photos from the side and close up.',
+    'Wash your hands and keep buckets and tools for this animal separate.',
+  ];
+  return Triage(level: level, label: label, doNow: doNow.take(7).toList(), report: r.report);
+}
+
+// ---------------------------------------------------------------- The vet's questions
+
+class CaseQuestion {
+  const new({required this.id, required this.label, required this.options, this.unit});
+  final String id;
+  final String label;
+
+  /// Tap choices; empty for a number.
+  final List<String> options;
+  final String? unit;
+}
+
+const caseQuestions = <CaseQuestion>[
+  CaseQuestion(id: 'since', label: 'Since when?', options: ['Today', '2 to 3 days', 'About a week', 'Longer']),
+  CaseQuestion(id: 'temp', label: 'Temperature', options: [], unit: '°C'),
+  CaseQuestion(id: 'count', label: 'How many animals look sick?', options: ['Only this one', '2 to 5', 'More than 5']),
+  CaseQuestion(
+    id: 'age',
+    label: 'How old is it?',
+    options: ['Calf (under 1 year)', 'Young (1 to 2 years)', 'Adult'],
+  ),
+  CaseQuestion(id: 'vaccinated', label: 'Vaccinated this year?', options: ['Yes', 'No', 'I do not know']),
+];
+
+/// The questions still worth asking: not answered yet, and not the age when the cow is known.
+List<CaseQuestion> openCaseQuestions(Map<String, String> answers, {required bool animalKnown}) => [
+  for (final q in caseQuestions)
+    if (answers[q.id] == null && !(q.id == 'age' && animalKnown)) q,
+];
+
+/// A temperature typed by the farmer, kept only when it is a real cow temperature (35 to 43).
+String? cleanTemp(String v) {
+  final n = double.tryParse(v.replaceAll(',', '.').trim());
+  if (n == null || n < 35 || n > 43) return null;
+  final r = (n * 10).round() / 10;
+  return r == r.truncateToDouble() ? r.toInt().toString() : r.toString();
+}
+
+const _caseLabel = <String, String>{
+  'since': 'Since',
+  'temp': 'Temperature',
+  'count': 'Animals sick',
+  'age': 'Age',
+  'vaccinated': 'Vaccinated this year',
+};
+
+/// The answers as one line, sent to the model and put in the vet message.
+String caseText(Map<String, String> a) => [
+  for (final q in caseQuestions)
+    if (a[q.id] != null) '${_caseLabel[q.id]}: ${a[q.id]}${q.id == 'temp' ? ' °C' : ''}',
+].join('. ');
+
+// ---------------------------------------------------------------- Message for the vet
+
+String _firstSentences(String t, int max) {
+  final lines = t.split('\n').where((l) {
+    final x = l.trim();
+    return x.isNotEmpty &&
+        !RegExp(r'^(call your vet|if a cow has|important)', caseSensitive: false).hasMatch(x) &&
+        !RegExp(r'^[-*•\d]').hasMatch(x);
+  });
+  final out = RegExp(r'[^.!?]+[.!?]+').allMatches(lines.join(' ')).take(2).map((m) => m[0]!).join(' ').trim();
+  return out.length > max ? out.substring(0, max) : out;
+}
+
+/// A short plain message the farmer can send the vet. Facts only: no diagnosis.
+String vetSummary({
+  required String farm,
+  required ({String label, List<String> facts})? animal,
+  required String question,
+  required String answer,
+  required Map<String, String> answers,
+  required Triage? triage,
+  required bool hasPhoto,
+  required String day,
+}) {
+  final q = question.replaceAll(RegExp(r'\s+'), ' ').trim();
+  final lines = <String>[
+    '*Message from FarmTap*',
+    'Farm: $farm',
+    'Date: $day',
+    'Animal: ${animal?.label ?? 'not chosen yet'}',
+    if (triage != null) 'How urgent: ${triage.label}',
+    'Problem (farmer): ${q.length > 300 ? q.substring(0, 300) : q}',
+  ];
+  final seen = _firstSentences(answer, 350);
+  if (seen.isNotEmpty) lines.add('What FarmTap AI noticed (not a diagnosis): $seen');
+  final details = caseText(answers);
+  if (details.isNotEmpty) lines.add('Details: $details');
+  final facts = (animal?.facts ?? const <String>[]).where((f) => !f.startsWith('This question')).take(6).toList();
+  if (facts.isNotEmpty) lines.add('From the farm records:\n${facts.map((f) => '- $f').join('\n')}');
+  if (hasPhoto) lines.add('A photo is attached.');
+  if (triage != null && triage.report) lines.add('Possible reportable disease. Please advise on telling the DVO.');
+  return lines.join('\n');
+}
+
+/// wa.me link for a Uganda or international number; null when the number is too short.
+/// Without a number it opens WhatsApp's own contact picker.
+String? whatsappLink(String? phone, String text) {
+  final q = 'text=${Uri.encodeComponent(text)}';
+  if (phone == null || phone.isEmpty) return 'https://wa.me/?$q';
+  var d = phone.replaceAll(RegExp(r'\D'), '');
+  if (d.startsWith('0')) d = '256${d.substring(1)}';
+  return d.length >= 9 ? 'https://wa.me/$d?$q' : null;
+}
+
+// ---------------------------------------------------------------- One-tap actions
+
+/// Date key for tomorrow from a YYYY-MM-DD day.
+String nextDay(String day) {
+  final d = DateTime.parse('${day}T12:00:00Z').add(const Duration(days: 1));
+  return d.toIso8601String().substring(0, 10);
+}
+
+/// Buttons that do something: record a treatment, set a reminder. Web paths; the phone maps them.
+List<ChatAction> chatDoActions({
+  required ({String id, String name})? animal,
+  required Triage? triage,
+  required String day,
+}) {
+  if (triage == null) return const [];
+  final id = animal == null ? '' : '&animal=${Uri.encodeComponent(animal.id)}';
+  final what = animal == null ? 'Recheck the sick animal' : 'Recheck ${animal.name}';
+  return [
+    ChatAction('Record treatment', '/health/?new=1$id'),
+    ChatAction('Remind me tomorrow', '/tasks/?new=1&title=${Uri.encodeComponent(what)}&due=${nextDay(day)}'),
+  ];
 }

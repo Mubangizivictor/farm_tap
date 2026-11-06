@@ -2,7 +2,7 @@
 // the browser only, per farm, never sent anywhere. Pure helpers first so they
 // can be tested; the load/save at the bottom never throws.
 
-import type { ChatAction, ChatGrounding } from '../shared/aiChat.ts';
+import type { ChatAction, ChatGrounding, Triage } from '../shared/aiChat.ts';
 import type { Method } from '../shared/aiCore.ts';
 
 export interface SavedTurn {
@@ -21,6 +21,14 @@ export interface SavedTurn {
   grounding?: ChatGrounding | null;
   /** The question this answer replied to. */
   asked?: string;
+  /** Urgency card for a sick-animal answer. */
+  triage?: Triage | null;
+  /** The animal this answer is about (Firestore id). */
+  animalId?: string;
+  /** A photo or video was sent with the question. */
+  hadMedia?: boolean;
+  /** Which model answered. */
+  model?: string;
 }
 
 export interface SavedChat {

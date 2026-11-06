@@ -10,6 +10,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState, type ClipboardEvent, type DragEvent, type KeyboardEvent } from 'react';
 import { ChatText } from '@/components/ChatText';
+import { CaseCard, CowPicker, TriageCard, type SharePhoto } from '@/components/ChatCards';
 import { Icon, type IconName } from '@/components/Icon';
 import { MethodBadge } from '@/components/ai';
 import { Dialog, useToast } from '@/components/ui';
@@ -25,7 +26,19 @@ import {
   animalFacts,
   buildChatPrompt,
   CHAT_FAIL,
+  CHAT_LANGUAGES,
+  caseText,
   chatActions,
+  chatDoActions,
+  chatModels,
+  needsSearch,
+  partialChatText,
+  triageOf,
+  vetSummary,
+  whatsappLink,
+  type CaseAnswers,
+  type CaseId,
+  type ChatReply,
   chatFollowUps,
   chatHistory,
   chatTitle,
@@ -42,6 +55,7 @@ import { farmAiOn, logAi } from '@/lib/ai';
 import { askGemini, ChatError } from '@/lib/aiChatClient';
 import { groupChats, loadChats, searchChats, storeChats, upsertChat, type SavedChat, type SavedTurn } from '@/lib/aiChatStore';
 import { addRecord, useRecords } from '@/lib/data';
+import { alive as aliveRec, type ContactBody } from '@/lib/domain';
 import { firebase } from '@/lib/firebase';
 import { shrinkImage } from '@/lib/images';
 import { useSession } from '@/lib/session';
@@ -87,6 +101,12 @@ export default function FarmTapChat() {
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState('');
   const [animalId, setAnimalId] = useState<string | null>(null);
+  const [live, setLive] = useState('');
+  const [caseInfo, setCaseInfo] = useState<CaseAnswers>({});
+  const [lang, setLang] = useState('auto');
+  const [skipPick, setSkipPick] = useState<Set<number>>(new Set());
+  const contacts = useRecords<ContactBody>(farm.id, 'contacts');
+  const vet = useMemo(() => aliveRec(contacts.data).find((c) => c.body.kind === 'vet' && (c.body.phone ?? '').replace(/\D/g, '').length >= 9), [contacts.data]);
   const pick = useRef<HTMLInputElement>(null);
   const end = useRef<HTMLDivElement>(null);
   const stop = useRef<AbortController | null>(null);
@@ -102,6 +122,11 @@ export default function FarmTapChat() {
   useEffect(() => {
     const id = new URL(window.location.href).searchParams.get('animal');
     if (id) setAnimalId(id);
+    try {
+      setLang(window.localStorage.getItem('farmtap.ai.lang') ?? 'auto');
+    } catch {
+      /* default */
+    }
     const saved = loadChats(farm.id);
     setChats(saved);
     // Pick up the chat that was open last time on this device.
@@ -136,6 +161,7 @@ export default function FarmTapChat() {
   const newChat = useCallback(() => {
     stop.current?.abort();
     setTurns([]);
+    setCaseInfo({});
     setChatId(String(Date.now()));
     setFiles([]);
     setProblem('');
@@ -151,6 +177,7 @@ export default function FarmTapChat() {
     stop.current?.abort();
     setChatId(c.id);
     setTurns(c.turns);
+    setCaseInfo({});
     setShowChats(false);
   };
   const removeChat = (id: string) => {
@@ -238,16 +265,17 @@ export default function FarmTapChat() {
     stop.current = ctl;
     try {
       const facts = cow ? animalFacts(animalHealth(ai.data, cow.id), cow.body, day) : [];
-      const prompt = buildChatPrompt({ message: redact(question, names), facts, calculated: calcText ? redact(calcText, names) : null, files: sent.map((f) => ({ kind: f.kind })) });
+      const media = sent.some((f) => f.kind === 'photo' || f.kind === 'video');
+      const prompt = buildChatPrompt({ message: redact(question, names), facts, calculated: calcText ? redact(calcText, names) : null, files: sent.map((f) => ({ kind: f.kind })), search: needsSearch(question, { calculated: calc.ok, animal: !!cow }), language: lang });
       const history = chatHistory(before.filter((t) => t.text).map((t) => ({ role: t.who === 'me' ? ('user' as const) : ('model' as const), text: redact(t.text, names) })));
-      const got = await askGemini({ system: CHAT_SYSTEM, history, prompt, files: sent.map((f) => ({ mime: f.mime, base64: f.base64 })), model: cfg.ai.photo.model, signal: ctl.signal });
+      const got = await askGemini({ system: CHAT_SYSTEM, history, prompt, files: sent.map((f) => ({ mime: f.mime, base64: f.base64 })), models: chatModels(cfg.ai.photo.model, media), signal: ctl.signal, onText: (t) => setLive(partialChatText(t)) });
       const reply = readChatReply(got.text, question);
       const shown = restore(reply.text, names);
       logAi(farm.id, 'chat', true, performance.now() - t0, 'model');
       let saved = false;
       if (cow && canSave) {
         try {
-          const body = chatAssessmentBody(cow.id, question, { ...reply, text: shown }, [...new Set(sent.map((f) => f.kind))], cfg.ai.photo.model, kampalaNow(new Date()).iso);
+          const body = chatAssessmentBody(cow.id, question, { ...reply, text: shown }, [...new Set(sent.map((f) => f.kind))], got.model, kampalaNow(new Date()).iso);
           await addRecord(firebase().db, farm.id, 'healthAssessments', user.uid, body as unknown as Record<string, unknown>);
           saved = true;
         } catch {
@@ -264,6 +292,10 @@ export default function FarmTapChat() {
         actions: chatActions({ question, answer: shown, health: reply.health, callVet: reply.callVet, animal: cowRef }),
         followUps: chatFollowUps({ question, answer: shown, health: reply.health }),
         grounding,
+        triage: triageOf({ ...reply, text: shown }, question),
+        animalId: cow?.id,
+        hadMedia: media,
+        model: got.model,
       });
     } catch (e) {
       if ((e as Error)?.name === 'AbortError') {
@@ -275,6 +307,7 @@ export default function FarmTapChat() {
       offlineAnswer(`${CHAT_FAIL[err.failure]}${sent.length ? ' Files and photos could not be read.' : ''}`, err.detail);
     } finally {
       stop.current = null;
+      setLive('');
       setBusy(false);
     }
   };
@@ -312,6 +345,48 @@ export default function FarmTapChat() {
       toast('Could not copy');
     }
   };
+
+  const cowOf = (t: Turn) => animals.find((a) => a.id === t.animalId);
+  const photosOf = (t: Turn): SharePhoto[] => {
+    const me = turns[turns.findIndex((x) => x.id === t.id) - 1];
+    return (me ? (sentFiles.current.get(me.id) ?? []) : []).filter((f) => f.kind === 'photo').map((f) => ({ name: f.name, mime: f.mime, base64: f.base64 }));
+  };
+  const messageOf = (t: Turn) => {
+    const cow = cowOf(t);
+    const label = cow ? `${animalName(cow)}${cow.body.name && cow.body.tagNumber ? ` (${cow.body.tagNumber})` : ''}` : '';
+    return vetSummary({
+      farm: farm.name,
+      animal: cow ? { label, facts: animalFacts(animalHealth(ai.data, cow.id), cow.body, day) } : null,
+      question: t.asked ?? '',
+      answer: t.text,
+      answers: caseInfo,
+      triage: t.triage ?? null,
+      hasPhoto: photosOf(t).length > 0 || !!t.hadMedia,
+      day,
+    });
+  };
+  const pickCow = async (t: Turn, id: string) => {
+    const cow = animals.find((a) => a.id === id);
+    if (!cow || !user) return;
+    setAnimalId(id);
+    let saved = false;
+    if (canSave) {
+      try {
+        const me = turns[turns.findIndex((x) => x.id === t.id) - 1];
+        const kinds = [...new Set((me?.files ?? []).map((f) => f.kind))];
+        const tr = t.triage;
+        const risk: ChatReply['risk'] = tr?.level === 'now' ? 'critical' : tr?.level === 'today' ? 'high' : tr ? 'medium' : 'low';
+        const body = chatAssessmentBody(id, t.asked ?? '', { text: t.text, removed: 0, health: !!tr, risk, callVet: tr?.level ?? null, report: !!tr?.report }, kinds, t.model ?? cfg.ai.photo.model, kampalaNow(new Date()).iso);
+        await addRecord(firebase().db, farm.id, 'healthAssessments', user.uid, body as unknown as Record<string, unknown>);
+        saved = true;
+      } catch {
+        saved = false;
+      }
+    }
+    setTurns((ts) => ts.map((x) => (x.id === t.id ? { ...x, animalId: id, aboutAnimal: animalName(cow), saved } : x)));
+    toast(saved ? `Saved to ${animalName(cow)}’s history` : 'Could not save to the history');
+  };
+  const answerCase = (id: CaseId, v: string) => setCaseInfo((a) => ({ ...a, [id]: v }));
 
   const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
@@ -375,18 +450,37 @@ export default function FarmTapChat() {
                 </span>
                 <div className="chat-answer">
                   <ChatText text={t.text} />
-                  {t.actions && t.actions.length > 0 && (
-                    <div className="chat-actions">
-                      {t.actions.map((a) => (
-                        <Link key={a.href} className="btn sm ghost" href={a.href}>
-                          {a.label} <Icon name="chevron" />
-                        </Link>
-                      ))}
-                    </div>
+                  {t.triage && (
+                    <TriageCard
+                      triage={t.triage}
+                      message={messageOf(t)}
+                      whatsapp={whatsappLink(vet?.body.phone, messageOf(t)) ?? whatsappLink(null, messageOf(t))!}
+                      vetName={vet?.body.name ?? null}
+                      photos={photosOf(t)}
+                      toast={toast}
+                    />
                   )}
+                  {t.method === 'model' && !t.animalId && (t.triage || t.hadMedia) && !skipPick.has(t.id) && (
+                    <CowPicker animals={animals.map((a) => ({ id: a.id, label: `${animalName(a)}${a.body.name && a.body.tagNumber ? ` (${a.body.tagNumber})` : ''}` }))} onPick={(id) => void pickCow(t, id)} onSkip={() => setSkipPick(new Set(skipPick).add(t.id))} />
+                  )}
+                  {t === lastAi && t.triage && !busy && <CaseCard answers={caseInfo} animalKnown={!!t.animalId} onAnswer={answerCase} busy={busy} onSend={() => send(`More details about this animal. ${caseText(caseInfo)}.`)} />}
+                  {(() => {
+                    const cow = cowOf(t);
+                    const acts = t.method === 'model' ? chatActions({ question: t.asked ?? '', answer: t.text, health: !!t.triage, callVet: t.triage?.level ?? null, animal: cow ? { id: cow.id, name: animalName(cow) } : null }) : (t.actions ?? []);
+                    const dos = chatDoActions({ animal: cow ? { id: cow.id, name: animalName(cow) } : null, triage: t.triage ?? null, day });
+                    return acts.length + dos.length > 0 ? (
+                      <div className="chat-actions">
+                        {[...dos, ...acts].map((a) => (
+                          <Link key={a.href} className="btn sm ghost" href={a.href}>
+                            {a.label} <Icon name="chevron" />
+                          </Link>
+                        ))}
+                      </div>
+                    ) : null;
+                  })()}
                   {t.grounding && t.grounding.sources.length > 0 && (
                     <div className="chat-sources">
-                      <span className="small muted">Sources from Google</span>
+                      <span className="small muted">Sources from Google{t.grounding.queries.length > 0 ? ` · searched: ${t.grounding.queries.join(', ')}` : ''}</span>
                       <div className="chips">
                         {t.grounding.sources.map((s) => (
                           <a key={s.uri} className="chip" href={s.uri} target="_blank" rel="noopener noreferrer">
@@ -440,7 +534,7 @@ export default function FarmTapChat() {
               <span className="chat-avatar" aria-hidden>
                 <Icon name="spark" />
               </span>
-              <span className="row chat-answer">Thinking and searching…</span>
+              <div className="chat-answer">{live ? <ChatText text={live} /> : <span className="row">Thinking and searching…</span>}</div>
             </div>
           )}
           <div ref={end} />
@@ -488,6 +582,26 @@ export default function FarmTapChat() {
             <button className="icon-btn" aria-label="Attach photos, PDFs, files or video" title="Attach photos, PDFs, files or video" disabled={busy} onClick={() => pick.current?.click()}>
               <Icon name="plus" />
             </button>
+            <select
+              className="chat-lang"
+              aria-label="Reply language"
+              title="Reply language"
+              value={lang}
+              onChange={(e) => {
+                setLang(e.target.value);
+                try {
+                  window.localStorage.setItem('farmtap.ai.lang', e.target.value);
+                } catch {
+                  /* not kept */
+                }
+              }}
+            >
+              {CHAT_LANGUAGES.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.id === 'auto' ? 'Language: auto' : l.label}
+                </option>
+              ))}
+            </select>
             <span className="grow" />
             {busy ? (
               <button className="btn sm" aria-label="Stop" onClick={() => stop.current?.abort()}>

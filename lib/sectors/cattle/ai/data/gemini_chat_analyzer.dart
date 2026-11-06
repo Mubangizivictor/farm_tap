@@ -21,14 +21,14 @@ class GeminiChatAnalyzer implements ChatAnalyzer {
     required List<ChatTurn> history,
     required String prompt,
     required List<ChatPart> files,
-    required String model,
+    required List<String> models,
   }) async {
     final contents = <Content>[
       for (final h in history)
         if (h.fromUser) Content('user', [TextPart(h.text)]) else Content.model([TextPart(h.text)]),
       Content('user', [TextPart(prompt), for (final f in files) InlineDataPart(f.mime, f.bytes)]),
     ];
-    Future<GenerateContentResponse> run({required bool search}) {
+    Future<GenerateContentResponse> run(String model, {required bool search}) {
       final m = FirebaseAI.googleAI().generativeModel(
         model: model,
         systemInstruction: Content.system(system),
@@ -38,33 +38,39 @@ class GeminiChatAnalyzer implements ChatAnalyzer {
       return m.generateContent(contents).timeout(const Duration(seconds: 90));
     }
 
-    try {
-      var searched = true;
-      GenerateContentResponse res;
-      try {
-        res = await run(search: true);
-      } on Object catch (e) {
-        final f = chatFailureOf('$e');
-        if (f == ChatFailure.network || f == ChatFailure.appCheck || f == ChatFailure.busy) rethrow;
-        searched = false;
-        res = await run(search: false);
+    Object? last;
+    var tries = 0;
+    for (final model in models) {
+      for (final search in [true, false]) {
+        if (tries >= 4) break;
+        tries++;
+        try {
+          final res = await run(model, search: search);
+          String? text;
+          try {
+            text = res.text;
+          } on Object catch (e) {
+            throw ChatException(ChatFailure.blocked, '$e');
+          }
+          if (text == null || text.trim().isEmpty) {
+            throw const ChatException(ChatFailure.unreadable, 'The model sent an empty answer.');
+          }
+          return ChatAnswer(text, search ? _grounding(res) : null);
+        } on Object catch (e) {
+          last = e;
+          final f = e is ChatException ? e.failure : chatFailureOf('$e');
+          // These fail the same way on any model.
+          if (f == ChatFailure.network || f == ChatFailure.appCheck || (f == ChatFailure.setup && !search)) {
+            if (e is ChatException) rethrow;
+            final msg = '$e';
+            throw ChatException(f, msg.length > 600 ? msg.substring(0, 600) : msg);
+          }
+        }
       }
-      String? text;
-      try {
-        text = res.text;
-      } on Object catch (e) {
-        throw ChatException(ChatFailure.blocked, '$e');
-      }
-      if (text == null || text.trim().isEmpty) {
-        throw const ChatException(ChatFailure.unreadable, 'The model sent an empty answer.');
-      }
-      return ChatAnswer(text, searched ? _grounding(res) : null);
-    } on ChatException {
-      rethrow;
-    } on Object catch (e) {
-      final msg = '$e';
-      throw ChatException(chatFailureOf(msg), msg.length > 600 ? msg.substring(0, 600) : msg);
     }
+    if (last is ChatException) throw last;
+    final msg = '$last';
+    throw ChatException(chatFailureOf(msg), msg.length > 600 ? msg.substring(0, 600) : msg);
   }
 
   ChatGrounding? _grounding(GenerateContentResponse res) {

@@ -5,7 +5,7 @@ import { animalHealth } from '../shared/aiHerd.ts';
 import type { FarmData, MilkIn } from '../shared/aiData.ts';
 import type { Rec } from '../shared/aiCore.ts';
 import { addDays } from '../shared/aiCore.ts';
-import { animalFacts, buildChatPrompt, chatActions, chatAssessmentBody, chatFailureOf, chatFileKind, chatFollowUps, chatHistory, chatTitle, cleanSources, findAnimalMention, readChatReply } from '../shared/aiChat.ts';
+import { animalFacts, buildChatPrompt, chatActions, caseText, chatAssessmentBody, chatDoActions, chatFailureOf, chatModels, cleanTemp, filterChatText, languageLine, needsSearch, nextDay, openCaseQuestions, partialChatText, triageOf, vetSummary, whatsappLink, chatFileKind, chatFollowUps, chatHistory, chatTitle, cleanSources, findAnimalMention, readChatReply } from '../shared/aiChat.ts';
 
 const TODAY = '2026-11-06';
 const NOW = `${TODAY}T09:00:00`;
@@ -169,4 +169,70 @@ test('saved chats: newest first, searchable, grouped by day', async () => {
 test('bad milk counts as a health question', () => {
   assert.equal(readChatReply('Check her udder.', 'My cow gives sour milk').health, true);
   assert.equal(readChatReply('Yes.', 'How do I sell milk?').health, false);
+});
+
+test('streaming text is cut at a finished sentence and unsafe sentences never show', () => {
+  assert.equal(partialChatText('Keep her clean. Give 20 ml of oxytetracycline. Watch for'), 'Keep her clean.');
+  assert.equal(partialChatText('Half a sen'), '');
+  assert.equal(filterChatText('Keep her clean.\nGive 20 ml of oxytetracycline.').removed, 1);
+});
+
+test('photos start with the stronger model and every list has a second model', () => {
+  assert.deepEqual(chatModels('gemini-3.5-flash-lite', true), ['gemini-3.8-flash', 'gemini-3.5-flash-lite']);
+  assert.deepEqual(chatModels('gemini-3.5-flash-lite', false), ['gemini-3.5-flash-lite', 'gemini-3.8-flash']);
+  assert.equal(chatModels('gemini-3.8-flash', false).length, 2);
+});
+
+test('language and search lines reach the prompt', () => {
+  assert.equal(languageLine('auto'), null);
+  assert.match(languageLine('lg') ?? '', /Luganda/);
+  const p = buildChatPrompt({ message: 'hello there friend', facts: [], files: [], search: true, language: 'sw' });
+  assert.match(p, /SEARCH GOOGLE FIRST/);
+  assert.match(p, /Kiswahili/);
+  assert.equal(needsSearch('How do I stop mastitis?', { calculated: false, animal: false }), true);
+  assert.equal(needsSearch('milk this week', { calculated: true, animal: false }), false);
+  assert.equal(needsSearch('hi', { calculated: false, animal: false }), false);
+});
+
+test('triage card: urgency, safe steps, milk and reportable disease', () => {
+  const sick = readChatReply('Her udder is hot. Check the milk.', 'Bella gives sour milk');
+  const t = triageOf(sick, 'sour milk')!;
+  assert.equal(t.level, 'soon');
+  assert.ok(t.doNow.some((x) => /milk/i.test(x)));
+  assert.ok(t.doNow.every((x) => !/\b(mg|ml)\b/i.test(x)));
+  const lsd = readChatReply('This could be lumpy skin disease. She cannot get up.', 'lumps on skin');
+  const t2 = triageOf(lsd)!;
+  assert.equal(t2.level, 'now');
+  assert.equal(t2.report, true);
+  assert.match(t2.doNow[0], /Call your vet now/);
+  assert.equal(triageOf(readChatReply('Dry hay is fine.', 'what feed')), null);
+});
+
+test('the vet questions, temperature check and message', () => {
+  assert.equal(cleanTemp('40,5'), '40.5');
+  assert.equal(cleanTemp('140'), null);
+  assert.equal(openCaseQuestions({ since: 'Today' }, true).some((q) => q.id === 'age' || q.id === 'since'), false);
+  assert.equal(caseText({ since: 'Today', temp: '40.5' }), 'Since: Today. Temperature: 40.5 °C');
+  const triage = triageOf(readChatReply('Her udder is hot.', 'sour milk'), 'sour milk');
+  const m = vetSummary({ farm: 'Mbarara farm', animal: { label: 'Bella (FT-001)', facts: ['This question is about one animal on the farm.', 'Calved 40 days ago.'] }, question: 'Bella gives sour milk', answer: 'Her udder is hot. Check the milk. Call your vet today.', answers: { temp: '40.5' }, triage, hasPhoto: true, day: TODAY });
+  assert.match(m, /Animal: Bella \(FT-001\)/);
+  assert.match(m, /Temperature: 40.5 °C/);
+  assert.match(m, /Calved 40 days ago/);
+  assert.match(m, /photo is attached/);
+  assert.doesNotMatch(m, /This question is about/);
+});
+
+test('WhatsApp link uses the Uganda country code', () => {
+  assert.equal(whatsappLink('0772 123 456', 'Hi'), 'https://wa.me/256772123456?text=Hi');
+  assert.equal(whatsappLink('+256772123456', 'a b'), 'https://wa.me/256772123456?text=a%20b');
+  assert.equal(whatsappLink('12', 'x'), null);
+  assert.equal(whatsappLink(null, 'x'), 'https://wa.me/?text=x');
+});
+
+test('record treatment and reminder buttons', () => {
+  assert.equal(nextDay('2026-11-30'), '2026-12-01');
+  const t = triageOf(readChatReply('Her udder is hot.', 'sour milk'));
+  const a = chatDoActions({ animal: { id: 'b1', name: 'Bella' }, triage: t, day: TODAY });
+  assert.deepEqual(a.map((x) => x.href), ['/health/?new=1&animal=b1', '/tasks/?new=1&title=Recheck%20Bella&due=2026-11-07']);
+  assert.deepEqual(chatDoActions({ animal: null, triage: null, day: TODAY }), []);
 });

@@ -10527,6 +10527,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Kept on this phone only.'**
   String get aiChatKeptHere;
+
+  /// No description provided for @aiChatWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to my vet on WhatsApp'**
+  String get aiChatWhatsapp;
+
+  /// No description provided for @aiChatSharePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Share with photo'**
+  String get aiChatSharePhoto;
+
+  /// No description provided for @aiChatSeeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'See the message'**
+  String get aiChatSeeMessage;
+
+  /// No description provided for @aiChatHideMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide message'**
+  String get aiChatHideMessage;
+
+  /// No description provided for @aiChatCopyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy message'**
+  String get aiChatCopyMessage;
+
+  /// No description provided for @aiChatWhileWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'While you wait for the vet:'**
+  String get aiChatWhileWaiting;
+
+  /// No description provided for @aiChatWhichCow.
+  ///
+  /// In en, this message translates to:
+  /// **'Which cow is this?'**
+  String get aiChatWhichCow;
+
+  /// No description provided for @aiChatWhichCowHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose it to save this answer in that cow’s history.'**
+  String get aiChatWhichCowHint;
+
+  /// No description provided for @aiChatChooseCow.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a cow'**
+  String get aiChatChooseCow;
+
+  /// No description provided for @aiChatSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get aiChatSave;
+
+  /// No description provided for @aiChatNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get aiChatNotNow;
+
+  /// No description provided for @aiChatVetHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Help the vet help you'**
+  String get aiChatVetHelp;
+
+  /// No description provided for @aiChatVetHelpHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap what you know. It goes into your message for the vet.'**
+  String get aiChatVetHelpHint;
+
+  /// No description provided for @aiChatUpdateAdvice.
+  ///
+  /// In en, this message translates to:
+  /// **'Update the advice with these'**
+  String get aiChatUpdateAdvice;
+
+  /// No description provided for @aiChatTempHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 40.5'**
+  String get aiChatTempHint;
+
+  /// No description provided for @aiChatAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get aiChatAdd;
+
+  /// No description provided for @aiChatLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply language'**
+  String get aiChatLanguage;
+
+  /// No description provided for @aiChatMessageCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Message copied'**
+  String get aiChatMessageCopied;
+
+  /// No description provided for @aiChatWhatsappName.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp {name}'**
+  String aiChatWhatsappName(String name);
 }
 
 class _AppLocalizationsDelegate

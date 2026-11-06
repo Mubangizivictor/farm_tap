@@ -65,4 +65,60 @@ void main() {
     expect(chatFailureOf('TypeError: Failed to fetch'), ChatFailure.network);
     expect(chatFailureOf('weird'), ChatFailure.unreadable);
   });
+
+  test('streaming text is cut at a finished sentence', () {
+    expect(partialChatText('Keep her clean. Give 20 ml of oxytetracycline. Watch for'), 'Keep her clean.');
+    expect(partialChatText('Half a sen'), '');
+    expect(filterChatText('Keep her clean.\nGive 20 ml of oxytetracycline.').removed, 1);
+  });
+
+  test('photos start with the stronger model', () {
+    expect(chatModels('gemini-3.5-flash-lite', hasMedia: true), ['gemini-3.8-flash', 'gemini-3.5-flash-lite']);
+    expect(chatModels('gemini-3.5-flash-lite', hasMedia: false), ['gemini-3.5-flash-lite', 'gemini-3.8-flash']);
+  });
+
+  test('language and search lines reach the prompt', () {
+    expect(languageLine('auto'), isNull);
+    expect(languageLine('lg'), contains('Luganda'));
+    final p = buildChatPrompt(message: 'hello there friend', facts: [], fileKinds: [], search: true, language: 'sw');
+    expect(p, contains('SEARCH GOOGLE FIRST'));
+    expect(p, contains('Kiswahili'));
+    expect(needsSearch('How do I stop mastitis?', calculated: false), isTrue);
+    expect(needsSearch('milk this week', calculated: true), isFalse);
+  });
+
+  test('triage card, vet questions and message', () {
+    final lsd = readChatReply('This could be lumpy skin disease. She cannot get up.', 'lumps on skin');
+    final t = triageOf(lsd)!;
+    expect(t.level, 'now');
+    expect(t.report, isTrue);
+    expect(t.doNow.first, startsWith('Call your vet now'));
+    expect(triageOf(readChatReply('Dry hay is fine.', 'what feed')), isNull);
+    expect(cleanTemp('40,5'), '40.5');
+    expect(cleanTemp('140'), isNull);
+    expect(caseText({'since': 'Today', 'temp': '40.5'}), 'Since: Today. Temperature: 40.5 °C');
+    final m = vetSummary(
+      farm: 'Mbarara farm',
+      animal: (label: 'Bella (FT-001)', facts: ['This question is about one animal on the farm.', 'Calved 40 days ago.']),
+      question: 'Bella gives sour milk',
+      answer: 'Her udder is hot. Check the milk. Call your vet today.',
+      answers: {'temp': '40.5'},
+      triage: triageOf(readChatReply('Her udder is hot.', 'sour milk'), question: 'sour milk'),
+      hasPhoto: true,
+      day: '2026-11-06',
+    );
+    expect(m, contains('Animal: Bella (FT-001)'));
+    expect(m, contains('Temperature: 40.5 °C'));
+    expect(m, isNot(contains('This question is about')));
+  });
+
+  test('WhatsApp link and one-tap buttons', () {
+    expect(whatsappLink('0772 123 456', 'Hi'), 'https://wa.me/256772123456?text=Hi');
+    expect(whatsappLink('12', 'x'), isNull);
+    expect(whatsappLink(null, 'x'), 'https://wa.me/?text=x');
+    expect(nextDay('2026-11-30'), '2026-12-01');
+    final tr = triageOf(readChatReply('Her udder is hot.', 'sour milk'));
+    final a = chatDoActions(animal: (id: 'b1', name: 'Bella'), triage: tr, day: '2026-11-06');
+    expect([for (final x in a) x.href], ['/health/?new=1&animal=b1', '/tasks/?new=1&title=Recheck%20Bella&due=2026-11-07']);
+  });
 }

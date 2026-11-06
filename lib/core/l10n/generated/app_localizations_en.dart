@@ -6091,4 +6091,63 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiChatKeptHere => 'Kept on this phone only.';
+
+  @override
+  String get aiChatWhatsapp => 'Send to my vet on WhatsApp';
+
+  @override
+  String get aiChatSharePhoto => 'Share with photo';
+
+  @override
+  String get aiChatSeeMessage => 'See the message';
+
+  @override
+  String get aiChatHideMessage => 'Hide message';
+
+  @override
+  String get aiChatCopyMessage => 'Copy message';
+
+  @override
+  String get aiChatWhileWaiting => 'While you wait for the vet:';
+
+  @override
+  String get aiChatWhichCow => 'Which cow is this?';
+
+  @override
+  String get aiChatWhichCowHint => 'Choose it to save this answer in that cow’s history.';
+
+  @override
+  String get aiChatChooseCow => 'Choose a cow';
+
+  @override
+  String get aiChatSave => 'Save';
+
+  @override
+  String get aiChatNotNow => 'Not now';
+
+  @override
+  String get aiChatVetHelp => 'Help the vet help you';
+
+  @override
+  String get aiChatVetHelpHint => 'Tap what you know. It goes into your message for the vet.';
+
+  @override
+  String get aiChatUpdateAdvice => 'Update the advice with these';
+
+  @override
+  String get aiChatTempHint => 'e.g. 40.5';
+
+  @override
+  String get aiChatAdd => 'Add';
+
+  @override
+  String get aiChatLanguage => 'Reply language';
+
+  @override
+  String get aiChatMessageCopied => 'Message copied';
+
+  @override
+  String aiChatWhatsappName(String name) {
+    return 'WhatsApp $name';
+  }
 }

@@ -726,3 +726,17 @@ textarea.input { min-height: calc(var(--z-input) * 2); resize: vertical; }
 .chat-row.on { background: var(--c-primary-container); }
 .chat-row-open { flex: 1; min-width: 0; text-align: left; border: 0; background: transparent; color: inherit; font: inherit; padding: var(--s-sm) var(--s-md); cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chat-actions .btn { border-color: var(--c-outline-variant); }
+.triage, .case { border: var(--z-border) solid var(--c-outline-variant); border-radius: var(--r-card); padding: var(--s-lg); display: flex; flex-direction: column; gap: var(--s-sm); background: var(--c-card); }
+.triage ul { margin: 0; padding-left: var(--s-xl); display: flex; flex-direction: column; gap: var(--s-xs); }
+.triage p { margin: 0; }
+.triage.now { background: var(--c-danger-container); color: var(--c-on-danger-container); border-color: transparent; }
+.triage.today { background: var(--c-warning-container); color: var(--c-on-warning-container); border-color: transparent; }
+.triage.soon { background: var(--c-secondary-container); color: var(--c-on-secondary-container); border-color: transparent; }
+.triage .muted { color: inherit; opacity: 0.8; }
+.triage-head { display: flex; align-items: center; gap: var(--s-sm); }
+.triage-actions { display: flex; flex-wrap: wrap; gap: var(--s-sm); }
+.triage-msg { margin: 0; white-space: pre-wrap; word-break: break-word; font: inherit; padding: var(--s-md); border-radius: var(--r-md); background: var(--c-card); color: var(--c-on-surface); }
+.case-q { display: flex; flex-direction: column; gap: var(--s-xs); }
+.case-temp { max-width: var(--z-menu); }
+.chat-lang { border: 0; background: transparent; color: var(--c-on-surface-variant); font: inherit; font-size: var(--fs-label); max-width: var(--z-menu); cursor: pointer; }
+.chat-lang:focus-visible { outline: var(--z-focus) solid var(--c-primary); }
