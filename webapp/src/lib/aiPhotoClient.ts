@@ -7,7 +7,7 @@
 // through readPhotoReply() (shared/aiPhoto.ts) before anyone reads it.
 
 import { getApp } from 'firebase/app';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
 import { getAI, getGenerativeModel, GoogleAIBackend } from 'firebase/ai';
 import { firebase } from './firebase.ts';
 
@@ -20,7 +20,7 @@ export function startAppCheck() {
   const key = process.env.NEXT_PUBLIC_APPCHECK_SITE_KEY;
   if (!key) return;
   try {
-    initializeAppCheck(getApp(), { provider: new ReCaptchaV3Provider(key), isTokenAutoRefreshEnabled: true });
+    initializeAppCheck(getApp(), { provider: new ReCaptchaEnterpriseProvider(key), isTokenAutoRefreshEnabled: true });
   } catch {
     /* already started */
   }
