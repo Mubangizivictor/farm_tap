@@ -1,53 +1,61 @@
 'use client';
 
-// FarmTap AI chat (decision 0027): one box. Type a question, attach photos,
-// PDFs, files or a short video with the plus, and get an answer. Online,
-// Google Gemini answers with FarmTap's facts about the cow that was named;
-// offline (or when it is switched off) the built-in assistant answers simple
-// farm questions from the records. An answer about a named cow is saved to
-// that cow's health history. Safety rules: shared/aiChat.ts.
+// FarmTap AI chat (decision 0027): one box. Type, talk, or attach photos, PDFs, files or a short
+// video, and get an answer. Online, Google Gemini answers with FarmTap's facts about the cow that
+// was named; offline (or when it is switched off) the built-in assistant answers simple farm
+// questions from the records. An answer about a named cow is saved to that cow's health history.
+// Safety rules: shared/aiChat.ts. The look: styles/chat.css (design pack farmtap-ai-design).
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useRef, useState, type ClipboardEvent, type DragEvent, type KeyboardEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
 import { ChatText } from '@/components/ChatText';
 import { CaseCard, ChatRefs, ChatThinking, CowPicker, TriageCard, type SharePhoto } from '@/components/ChatCards';
-import { Icon, type IconName } from '@/components/Icon';
+import { Composer, type Attached } from '@/components/chat/Composer';
+import { History } from '@/components/chat/History';
+import { Lightbox, type LightPhoto } from '@/components/chat/Lightbox';
+import { CowCard, PhotoPins, ReplyBar, Sources, UserMsg } from '@/components/chat/Messages';
+import { Welcome } from '@/components/chat/Welcome';
+import { Icon } from '@/components/Icon';
 import { MethodBadge } from '@/components/ai';
 import { ChatPopup, popupOf, type Popup } from '@/components/popups/ChatPopup';
 import { Dialog, useToast } from '@/components/ui';
 import { AiOff, AiState } from '@/components/ai';
 import { useAiPage } from '@/components/aiPage';
-import { alive, kampalaNow, type Method } from '@/shared/aiCore';
+import { alive, kampalaNow } from '@/shared/aiCore';
 import { animalName, isActive } from '@/shared/aiData';
 import { animalHealth } from '@/shared/aiHerd';
 import { nameLabels, redact, restore } from '@/shared/aiPrivacy';
+import { contextFacts, cowSpark, farmToday, type ContextKind } from '@/shared/aiToday';
 import {
   animalFacts,
   buildChatPrompt,
-  CHAT_LANGUAGES,
+  CHAT_MAX_BYTES,
+  CHAT_MAX_FILES,
+  CHAT_SYSTEM,
+  CHAT_UNSUPPORTED,
   caseText,
   chatActions,
+  chatAssessmentBody,
+  chatCategory,
   chatDoActions,
+  chatFileKind,
+  chatFollowUps,
+  chatHistory,
   chatModels,
+  chatTitle,
+  findAnimalMention,
   needsSearch,
   partialChatText,
+  readChatReply,
+  readHeard,
+  readPins,
   triageOf,
   vetSummary,
   whatsappLink,
   type CaseAnswers,
   type CaseId,
+  type ChatGrounding,
   type ChatReply,
-  chatFollowUps,
-  chatHistory,
-  chatTitle,
-  CHAT_MAX_BYTES,
-  CHAT_MAX_FILES,
-  CHAT_SYSTEM,
-  CHAT_UNSUPPORTED,
-  chatAssessmentBody,
-  chatFileKind,
-  findAnimalMention,
-  readChatReply,
 } from '@/shared/aiChat';
 import { farmAiOn, logAi } from '@/lib/ai';
 import { askGemini, ChatError } from '@/lib/aiChatClient';
@@ -55,28 +63,16 @@ import { askServer, AiRequestError, serverUsage as fetchServerUsage } from '@/li
 import { AiErrorCard, AiUsageMeter } from '@/components/AiUsage';
 import { classify, layerLabel, workingText } from '@/shared/aiRoute';
 import { chatFailureKind, usageView, usageWarning, type AiErrorKind, type UsageView } from '@/shared/aiQuota';
-import type { ChatGrounding } from '@/shared/aiChat';
-import { groupChats, loadChats, searchChats, storeChats, upsertChat, type SavedChat, type SavedTurn } from '@/lib/aiChatStore';
+import { chatAsText, printReport } from '@/lib/aiChatExport';
+import { loadChats, storeChats, upsertChat, type SavedChat, type SavedTurn } from '@/lib/aiChatStore';
 import { addRecord, useRecords } from '@/lib/data';
 import { alive as aliveRec, type ContactBody } from '@/lib/domain';
 import { firebase } from '@/lib/firebase';
 import { shrinkImage } from '@/lib/images';
 import { useSession } from '@/lib/session';
+import { useRecorder } from '@/lib/useRecorder';
 
-type Kind = 'photo' | 'video' | 'audio' | 'pdf' | 'text';
-interface Attached {
-  name: string;
-  mime: string;
-  kind: Kind;
-  base64: string;
-  /** Small picture for photos only. */
-  thumb?: string;
-}
 type Turn = SavedTurn;
-
-const IDEAS = ['My cow has a swollen udder', 'How do I stop mastitis?', 'How much milk did we collect this week?', 'What should I feed when milk drops?'];
-
-const ICON: Record<Kind, IconName> = { photo: 'camera', video: 'play', audio: 'play', pdf: 'list', text: 'list' };
 
 const guessMime = (f: File) => {
   if (f.type) return f.type;
@@ -90,6 +86,22 @@ const readBase64 = (f: Blob) =>
     r.onerror = () => no(new Error('Could not read that file.'));
     r.readAsDataURL(f);
   });
+const keep = (k: string, v: string) => {
+  try {
+    window.localStorage.setItem(k, v);
+  } catch {
+    /* not kept */
+  }
+};
+const recall = (k: string) => {
+  try {
+    return window.localStorage.getItem(k);
+  } catch {
+    return null;
+  }
+};
+const VOICE_Q = 'Please listen to my voice note.';
+const URG = { now: 3, today: 2, soon: 1 } as const;
 
 export default function FarmTapChat() {
   const page = useAiPage('assistant');
@@ -102,7 +114,7 @@ export default function FarmTapChat() {
   const [chatId, setChatId] = useState(() => String(Date.now()));
   const [chats, setChats] = useState<SavedChat[]>([]);
   const [showChats, setShowChats] = useState(false);
-  const [find, setFind] = useState('');
+  const [menu, setMenu] = useState(false);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState('');
   const [animalId, setAnimalId] = useState<string | null>(null);
@@ -110,23 +122,27 @@ export default function FarmTapChat() {
   const liveRef = useRef('');
   const [status, setStatus] = useState('');
   const [popup, setPopup] = useState<Popup | null>(null);
+  const [light, setLight] = useState<{ photos: LightPhoto[]; start: number; turn: number } | null>(null);
   const [speaking, setSpeaking] = useState<number | null>(null);
   const [caseInfo, setCaseInfo] = useState<CaseAnswers>({});
   const [lang, setLang] = useState('auto');
+  const [searchOn, setSearchOn] = useState(true);
+  const [fast, setFast] = useState(false);
+  const [context, setContext] = useState<ContextKind[]>([]);
+  const [online, setOnline] = useState(true);
   const [skipPick, setSkipPick] = useState<Set<number>>(new Set());
   const contacts = useRecords<ContactBody>(farm.id, 'contacts');
   const vet = useMemo(() => aliveRec(contacts.data).find((c) => c.body.kind === 'vet' && (c.body.phone ?? '').replace(/\D/g, '').length >= 9), [contacts.data]);
   const vetPhone = vet?.body.phone ?? null;
-  const pick = useRef<HTMLInputElement>(null);
   const end = useRef<HTMLDivElement>(null);
   const stop = useRef<AbortController | null>(null);
-  /** Files of questions asked in this visit, so "Try again" can send them again. They are never saved. */
+  /** Files of questions asked in this visit, so "Try again" and the photo viewer can use them. They are never saved. */
   const sentFiles = useRef(new Map<number, Attached[]>());
   const day = kampalaNow(new Date()).iso.slice(0, 10);
   const logs = useRecords<{ feature?: string; ok?: boolean }>(farm.id, 'aiLog', day);
   const usedToday = logs.data.filter((l) => l.body.feature === 'chat' && l.body.ok).length;
   const assistant = cfg.ai.assistant;
-  /** Server route: the server's own count (aiUsageNow and every answer). Client route: counted from this farm's AI log. */
+  /** Server route: the server's own count. Client route: counted from this farm's AI log. */
   const [serverUsage, setServerUsage] = useState<UsageView | null>(null);
   const [showUsage, setShowUsage] = useState(false);
   useEffect(() => {
@@ -142,43 +158,55 @@ export default function FarmTapChat() {
   const usage: UsageView | null = !assistant.enabled ? null : assistant.route === 'server' ? serverUsage : usageView(usedToday, assistant.dailyLimit, assistant.warnPct, 0);
   const animals = useMemo(() => alive(ai.data.animals).filter(isActive), [ai.data.animals]);
   const about = animals.find((a) => a.id === animalId);
+  const today = useMemo(() => (ai.loading ? null : farmToday(ai.data)), [ai.data, ai.loading]);
+  const rec = useRecorder();
 
   useEffect(() => {
     const id = new URL(window.location.href).searchParams.get('animal');
     if (id) setAnimalId(id);
-    try {
-      setLang(window.localStorage.getItem('farmtap.ai.lang') ?? 'auto');
-    } catch {
-      /* default */
-    }
+    setLang(recall('farmtap.ai.lang') ?? 'auto');
+    setSearchOn(recall('farmtap.ai.search') !== 'off');
+    setFast(recall('farmtap.ai.fast') === 'on');
     const saved = loadChats(farm.id);
     setChats(saved);
     // Pick up the chat that was open last time on this device.
-    try {
-      const last = window.localStorage.getItem(`farmtap.ai.open.${farm.id}`);
-      const c = saved.find((x) => x.id === last);
-      if (c && !id) {
-        setChatId(c.id);
-        setTurns(c.turns);
-      }
-    } catch {
-      /* start empty */
+    const c = saved.find((x) => x.id === recall(`farmtap.ai.open.${farm.id}`));
+    if (c && !id) {
+      setChatId(c.id);
+      setTurns(c.turns);
     }
   }, [farm.id]);
+  useEffect(() => {
+    const set = () => setOnline(navigator.onLine);
+    set();
+    window.addEventListener('online', set);
+    window.addEventListener('offline', set);
+    return () => {
+      window.removeEventListener('online', set);
+      window.removeEventListener('offline', set);
+    };
+  }, []);
 
   useEffect(() => {
     if (!turns.length) return;
     const first = turns.find((t) => t.who === 'me');
+    const hadMedia = turns.some((t) => t.hadMedia || t.files?.some((f) => f.kind === 'photo' || f.kind === 'video'));
+    const worst = turns.reduce<'now' | 'today' | 'soon' | undefined>((w, t) => (t.triage && (!w || URG[t.triage.level] > URG[w]) ? t.triage.level : w), undefined);
+    const cow = [...turns].reverse().find((t) => t.aboutAnimal)?.aboutAnimal;
     setChats((list) => {
-      const next = upsertChat(list, { id: chatId, title: chatTitle(first?.text ?? ''), updatedAt: Date.now(), turns: turns.map((t) => ({ ...t, files: t.files?.map((f) => ({ name: f.name, kind: f.kind })) })) });
+      const next = upsertChat(list, {
+        id: chatId,
+        title: chatTitle(first?.text ?? ''),
+        updatedAt: Date.now(),
+        cat: chatCategory({ question: first?.text ?? '', hadMedia, health: !!worst }),
+        urg: worst,
+        cow,
+        turns: turns.map((t) => ({ ...t, files: t.files?.map((f) => ({ name: f.name, kind: f.kind })) })),
+      });
       storeChats(farm.id, next);
       return next;
     });
-    try {
-      window.localStorage.setItem(`farmtap.ai.open.${farm.id}`, chatId);
-    } catch {
-      /* not kept */
-    }
+    keep(`farmtap.ai.open.${farm.id}`, chatId);
     // A new answer is shown from its first line; a new question from the bottom.
     const last = turns[turns.length - 1];
     const el = last?.who === 'ai' ? document.getElementById(`t${last.id}`) : null;
@@ -197,19 +225,22 @@ export default function FarmTapChat() {
 
   const newChat = useCallback(() => {
     stop.current?.abort();
+    rec.cancel();
     setTurns([]);
     setCaseInfo({});
     setChatId(String(Date.now()));
     setFiles([]);
     setProblem('');
     setText('');
+    setContext([]);
     setShowChats(false);
+    setMenu(false);
     try {
       window.localStorage.removeItem(`farmtap.ai.open.${farm.id}`);
     } catch {
       /* ok */
     }
-  }, [farm.id]);
+  }, [farm.id, rec]);
   const openChat = (c: SavedChat) => {
     stop.current?.abort();
     setChatId(c.id);
@@ -222,6 +253,13 @@ export default function FarmTapChat() {
     setChats(next);
     storeChats(farm.id, next);
     if (id === chatId) newChat();
+  };
+  const pinChat = (id: string) => {
+    setChats((list) => {
+      const next = list.map((c) => (c.id === id ? { ...c, pinned: !c.pinned } : c));
+      storeChats(farm.id, next);
+      return next;
+    });
   };
 
   const add = async (list: File[]) => {
@@ -256,14 +294,6 @@ export default function FarmTapChat() {
     }
     setFiles(next);
   };
-
-  const onPaste = (e: ClipboardEvent) => {
-    const fs = [...e.clipboardData.files];
-    if (fs.length) {
-      e.preventDefault();
-      void add(fs);
-    }
-  };
   const onDrop = (e: DragEvent) => {
     e.preventDefault();
     if (e.dataTransfer.files.length) void add([...e.dataTransfer.files]);
@@ -271,11 +301,10 @@ export default function FarmTapChat() {
 
   /**
    * Answers one question. `before` is every turn that came before it.
-   * Decision 0028: the question is classified first. Records and built-in
-   * insights answer at once (no AI, no allowance used); only questions that
-   * need reasoning, or carry a file, go to the AI.
+   * Decision 0028: the question is classified first. Records and built-in insights answer at once
+   * (no AI, no allowance used); only questions that need reasoning, or carry a file, go to the AI.
    */
-  const answer = async (question: string, sent: Attached[], before: Turn[], meId: number) => {
+  const answer = async (question: string, sent: Attached[], before: Turn[], meId: number, ctx: ContextKind[]) => {
     if (!user) return;
     const t0 = performance.now();
     const aiId = meId + 1;
@@ -320,13 +349,13 @@ export default function FarmTapChat() {
     stop.current = ctl;
     const names = nameLabels({ animals: animals.map((a) => a.body), people: [user.displayName ?? ''], places: [farm.name] });
     const onText = (t: string) => {
-      liveRef.current = partialChatText(t);
+      liveRef.current = readHeard(partialChatText(t)).text;
       setLive(liveRef.current);
     };
     try {
-      const facts = cow ? animalFacts(animalHealth(ai.data, cow.id), cow.body, day) : [];
+      const facts = [...(cow ? animalFacts(animalHealth(ai.data, cow.id), cow.body, day) : []), ...ctx.flatMap((k) => contextFacts(k, ai.data))];
       const media = sent.some((f) => f.kind === 'photo' || f.kind === 'video');
-      const search = needsSearch(question, { calculated: !!calc?.ok, animal: !!cow });
+      const search = searchOn && needsSearch(question, { calculated: !!calc?.ok, animal: !!cow });
       const message = redact(question, names);
       const calculated = calcText ? redact(calcText, names) : null;
       const history = chatHistory(before.filter((t) => t.text && !t.errorKind).map((t) => ({ role: t.who === 'me' ? ('user' as const) : ('model' as const), text: redact(t.text, names) })));
@@ -338,9 +367,14 @@ export default function FarmTapChat() {
         got = r;
       } else {
         const prompt = buildChatPrompt({ message, facts, calculated, files: sent.map((f) => ({ kind: f.kind })), search, language: lang });
-        got = await askGemini({ system: CHAT_SYSTEM, history, prompt, files: parts, models: chatModels(assistant.model, media), search, signal: ctl.signal, onStatus: setStatus, onText });
+        let models = chatModels(assistant.model, media);
+        const lite = models.find((m) => /lite/i.test(m));
+        if (fast && lite) models = [lite, ...models.filter((m) => m !== lite)];
+        got = await askGemini({ system: CHAT_SYSTEM, history, prompt, files: parts, models, search, signal: ctl.signal, onStatus: setStatus, onText });
       }
-      const reply = readChatReply(got.text, question);
+      const heard = readHeard(got.text);
+      const pinned = readPins(heard.text);
+      const reply = readChatReply(pinned.text, question);
       const shown = restore(reply.text, names);
       logAi(farm.id, 'chat', true, performance.now() - t0, 'model');
       let saved = false;
@@ -354,6 +388,7 @@ export default function FarmTapChat() {
         }
       }
       const grounding = got.grounding ? { ...got.grounding, queries: got.grounding.queries.map((q) => restore(q, names)) } : null;
+      const hasPhoto = sent.some((f) => f.kind === 'photo');
       finish({
         text: shown,
         method: 'model',
@@ -368,6 +403,8 @@ export default function FarmTapChat() {
         animalId: cow?.id,
         hadMedia: media,
         model: got.model,
+        heard: heard.heard ? restore(heard.heard, names) : undefined,
+        pins: hasPhoto && pinned.pins.length ? pinned.pins.map((p) => ({ ...p, label: restore(p.label, names) })) : undefined,
       });
     } catch (e) {
       if ((e as Error)?.name === 'AbortError') {
@@ -394,19 +431,35 @@ export default function FarmTapChat() {
     }
   };
 
-  const send = (override?: string) => {
-    const q = (override ?? text).trim();
-    if ((!q && !files.length) || busy || ai.loading || !user) return;
-    const question = q || 'Please look at what I attached.';
-    const sent = override ? [] : files;
-    const me: Turn = { id: Date.now(), who: 'me', text: question, files: sent.map((f) => ({ name: f.name, kind: f.kind, thumb: f.thumb })) };
+  const submit = (question: string, sent: Attached[], voiceSeconds?: number) => {
+    const ctx = context;
+    const me: Turn = { id: Date.now(), who: 'me', text: question, files: sent.map((f) => ({ name: f.name, kind: f.kind })), voice: voiceSeconds };
     sentFiles.current.set(me.id, sent);
     setText('');
     setFiles([]);
     setProblem('');
+    setContext([]);
     const before = turns.map((t) => (t.followUps ? { ...t, followUps: undefined } : t));
     setTurns([...before, me]);
-    void answer(question, sent, before, me.id);
+    void answer(question, sent, before, me.id, ctx);
+  };
+  const send = (override?: string) => {
+    const q = (override ?? text).trim();
+    if ((!q && !files.length) || busy || ai.loading || !user) return;
+    const sent = override ? [] : files;
+    const voice = sent.find((f) => f.kind === 'audio');
+    submit(q || (voice ? VOICE_Q : 'Please look at what I attached.'), sent, voice?.seconds);
+  };
+
+  const sendVoice = async () => {
+    const note = await rec.stop();
+    if (!note) return;
+    const f: Attached = { name: 'Voice note', mime: 'audio/wav', kind: 'audio', base64: note.base64, seconds: note.seconds };
+    if (busy || !user) {
+      setFiles([...files, f]);
+      return;
+    }
+    submit(text.trim() || VOICE_Q, [...files, f], note.seconds);
   };
 
   const again = (aiTurn: Turn) => {
@@ -416,7 +469,7 @@ export default function FarmTapChat() {
     if (i < 1 || me?.who !== 'me') return;
     const before = turns.slice(0, i - 1);
     setTurns(turns.slice(0, i));
-    void answer(me.text, sentFiles.current.get(me.id) ?? [], before, me.id);
+    void answer(me.text, sentFiles.current.get(me.id) ?? [], before, me.id, []);
   };
 
   /** Puts a question back in the box so it can be changed and sent again. */
@@ -424,10 +477,10 @@ export default function FarmTapChat() {
     if (busy) return;
     const i = turns.findIndex((x) => x.id === t.id);
     if (i < 0) return;
-    setText(t.text);
+    setText(t.text === VOICE_Q ? '' : t.text);
     setFiles(sentFiles.current.get(t.id) ?? []);
     setTurns(turns.slice(0, i));
-    document.querySelector<HTMLTextAreaElement>('.chat-box textarea')?.focus();
+    document.querySelector<HTMLTextAreaElement>('.ct-ta')?.focus();
   };
   const vote = (t: Turn, v: 'up' | 'down') => {
     setTurns((ts) => ts.map((x) => (x.id === t.id ? { ...x, vote: x.vote === v ? undefined : v } : x)));
@@ -449,8 +502,6 @@ export default function FarmTapChat() {
     synth.speak(u);
   };
   const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window;
-  const clock = (id: number) => new Date(id).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
   const copy = async (t: string) => {
     try {
       await navigator.clipboard.writeText(t);
@@ -459,10 +510,19 @@ export default function FarmTapChat() {
       toast('Could not copy');
     }
   };
+  const share = async (t: string) => {
+    try {
+      if (navigator.share) await navigator.share({ text: t });
+      else await copy(t);
+    } catch {
+      /* the farmer closed the share sheet */
+    }
+  };
 
   const cowOf = (t: Turn) => animals.find((a) => a.id === t.animalId);
+  const meOf = (t: Turn) => turns[turns.findIndex((x) => x.id === t.id) - 1];
   const photosOf = (t: Turn): SharePhoto[] => {
-    const me = turns[turns.findIndex((x) => x.id === t.id) - 1];
+    const me = meOf(t);
     return (me ? (sentFiles.current.get(me.id) ?? []) : []).filter((f) => f.kind === 'photo').map((f) => ({ name: f.name, mime: f.mime, base64: f.base64 }));
   };
   const messageOf = (t: Turn) => {
@@ -486,7 +546,7 @@ export default function FarmTapChat() {
     let saved = false;
     if (canSave) {
       try {
-        const me = turns[turns.findIndex((x) => x.id === t.id) - 1];
+        const me = meOf(t);
         const kinds = [...new Set((me?.files ?? []).map((f) => f.kind))];
         const tr = t.triage;
         const risk: ChatReply['risk'] = tr?.level === 'now' ? 'critical' : tr?.level === 'today' ? 'high' : tr ? 'medium' : 'low';
@@ -501,198 +561,163 @@ export default function FarmTapChat() {
     toast(saved ? `Saved to ${animalName(cow)}’s history` : 'Could not save to the history');
   };
   const answerCase = (id: CaseId, v: string) => setCaseInfo((a) => ({ ...a, [id]: v }));
-
-  const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
-      e.preventDefault();
-      send();
-    }
+  const openPhotos = (t: Turn, start: number) => {
+    const me = t.who === 'me' ? t : meOf(t);
+    const ph = (me ? (sentFiles.current.get(me.id) ?? []) : []).filter((f) => f.thumb).map((f) => ({ src: f.thumb!, name: f.name }));
+    if (ph.length) setLight({ photos: ph, start, turn: t.who === 'me' ? t.id + 1 : t.id });
+  };
+  const openDraftPhoto = (i: number) => {
+    const ph = files.filter((f) => f.thumb).map((f) => ({ src: f.thumb!, name: f.name }));
+    const at = ph.findIndex((p) => p.src === files[i]?.thumb);
+    if (ph.length) setLight({ photos: ph, start: Math.max(0, at), turn: -1 });
   };
 
-  const shownChats = useMemo(() => searchChats(chats, find), [chats, find]);
   const title = chats.find((c) => c.id === chatId)?.title;
+  const open = chats.find((c) => c.id === chatId);
   const lastAi = [...turns].reverse().find((t) => t.who === 'ai');
+  const lightPins = turns.find((t) => t.id === light?.turn)?.pins ?? [];
+  const spoken = (k: string, v: string) => keep(`farmtap.ai.${k}`, v);
 
   if (!farmAiOn(farm, cfg)) return <AiOff reason="AI Intelligence is switched off for this farm. Contact FarmTap support to turn it on." />;
   if (!page.allowed) return <AiOff reason="This part of AI Intelligence is not available to your role or has been switched off." />;
 
+  const canSend = !!text.trim() || files.length > 0;
   return (
-    <div className="chat" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
-      <div className="chat-top">
-        <button className="btn sm ghost" onClick={() => setShowChats(true)} aria-label="Open your chats">
-          <Icon name="clock" /> Chats
+    <div className="ct" onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
+      <header className="ct-top">
+        <button className="ct-ib" aria-label="Your chats" title="Your chats" onClick={() => setShowChats(true)}>
+          <Icon name="clock" />
         </button>
-        <h1 className="chat-title">{title ?? 'FarmTap AI'}</h1>
-        <div className="row">
-          {usage && (
-            <button className={`chip chip-btn${usage.level === 'out' ? ' bad' : usage.level === 'warn' ? ' warn' : ''}`} onClick={() => setShowUsage(true)} aria-label={`AI requests used: ${usage.used} of ${usage.limit}. Open AI usage`} title="AI assistant usage">
-              <Icon name="spark" /> {usage.used}/{usage.limit}
-            </button>
-          )}
-          <button className="icon-btn" aria-label="New chat" title="New chat" onClick={newChat}>
-            <Icon name="edit" />
+        <h1 className="ct-title">
+          <span className="ct-pill"><span className="live" aria-hidden /> {title ?? 'FarmTap AI'}</span>
+          {open?.pinned && <Icon name="pinFill" />}
+        </h1>
+        {usage && (
+          <button className={`ct-chip${usage.level === 'out' ? ' bad' : usage.level === 'warn' ? ' gold' : ' line'}`} onClick={() => setShowUsage(true)} aria-label={`AI requests used: ${usage.used} of ${usage.limit}. Open AI usage`} title="AI assistant usage">
+            <Icon name="spark" /> {usage.used}/{usage.limit}
           </button>
-          <Link className="icon-btn" aria-label="Insights and tools" title="Insights and tools" href="/ai/tools/">
+        )}
+        <button className="ct-ib" aria-label="New chat" title="New chat" onClick={newChat}>
+          <Icon name="edit" />
+        </button>
+        <span className="ct-menuwrap">
+          <button className={`ct-ib${menu ? ' on' : ''}`} aria-label="More" aria-expanded={menu} title="More" onClick={() => setMenu(!menu)}>
             <Icon name="more" />
-          </Link>
-        </div>
-      </div>
-      <AiState ai={ai} skeleton={1}>
-        <div className="chat-scroll" aria-live="polite">
-          {turns.length === 0 && (
-            <div className="chat-empty">
-              <span className="icon-chip ai-chip" aria-hidden>
-                <Icon name="spark" />
-              </span>
-              <h2>How can I help on your farm today?</h2>
-              <p className="muted">Ask about a sick animal, milk, feed or money. Add a photo and I will look at it.</p>
-              {usage && (
-                <div className="chat-usage">
-                  <AiUsageMeter view={usage} trusted={assistant.route === 'server'} />
-                </div>
-              )}
-              <div className="chips chat-ideas">
-                {IDEAS.map((q) => (
-                  <button key={q} className="chip chip-btn" onClick={() => send(q)}>
-                    {q}
-                  </button>
-                ))}
+          </button>
+          {menu && (
+            <>
+              <button className="ct-scrim clear" aria-label="Close menu" onClick={() => setMenu(false)} />
+              <div className="ct-dropdown" role="menu">
+                <button role="menuitem" disabled={!open} onClick={() => { if (open) pinChat(open.id); setMenu(false); }}><Icon name={open?.pinned ? 'pinFill' : 'pin'} /> {open?.pinned ? 'Unpin this chat' : 'Pin this chat'}</button>
+                <button role="menuitem" disabled={!open} onClick={() => { if (open) void copy(chatAsText(open)); setMenu(false); }}><Icon name="copy" /> Copy the whole chat</button>
+                <button
+                  role="menuitem"
+                  disabled={!lastAi?.triage}
+                  onClick={() => {
+                    if (lastAi && !printReport('FarmTap — message for the vet', messageOf(lastAi))) toast('Allow pop-ups to print');
+                    setMenu(false);
+                  }}
+                >
+                  <Icon name="print" /> Print the vet report
+                </button>
+                <Link role="menuitem" href="/ai/tools/"><Icon name="chart" /> Insights and tools</Link>
+                <button role="menuitem" className="bad" disabled={!open} onClick={() => { if (open) removeChat(open.id); setMenu(false); }}><Icon name="trash" /> Delete this chat</button>
               </div>
-            </div>
+            </>
           )}
-          {turns.map((t) =>
-            t.who === 'me' ? (
-              <div key={t.id} className="chat-me-wrap">
-              <div className="chat-me">
-                {t.files && t.files.length > 0 && (
-                  <div className="chat-files">
-                    {t.files.map((f, i) => (
-                      <span key={i} className="chat-file">
-                        {'thumb' in f && f.thumb ? <img src={String(f.thumb)} alt="" /> : <Icon name={ICON[f.kind as Kind] ?? 'list'} />}
-                        <span className="small">{f.name}</span>
-                      </span>
-                    ))}
+        </span>
+      </header>
+      <AiState ai={ai} skeleton={1}>
+        <div className="ct-col ct-msgs" aria-live="polite">
+          {turns.length === 0 && (
+            <Welcome
+              today={today}
+              name={(user?.displayName ?? '').split(' ')[0]}
+              onAsk={(q) => send(q)}
+              onPhoto={() => document.querySelector<HTMLButtonElement>('.ct-tools .ct-ib')?.click()}
+              onVoice={() => void rec.start()}
+              canVoice={rec.supported}
+              usage={usage ? <AiUsageMeter view={usage} trusted={assistant.route === 'server'} /> : null}
+            />
+          )}
+          {turns.map((t) => {
+            if (t.who === 'me') return <UserMsg key={t.id} t={t} full={sentFiles.current.get(t.id) ?? []} busy={busy} onOpen={(i) => openPhotos(t, i)} onCopy={() => void copy(t.text)} onEdit={() => edit(t)} />;
+            const cow = cowOf(t);
+            const photo = (sentFiles.current.get(meOf(t)?.id ?? 0) ?? []).find((f) => f.thumb);
+            const acts = t.method === 'model' ? chatActions({ question: t.asked ?? '', answer: t.text, health: !!t.triage, callVet: t.triage?.level ?? null, animal: cow ? { id: cow.id, name: animalName(cow) } : null }) : (t.actions ?? []);
+            const dos = chatDoActions({ animal: cow ? { id: cow.id, name: animalName(cow) } : null, triage: t.triage ?? null, day });
+            return (
+              <div key={t.id} id={`t${t.id}`} className={`ct-ai${t === lastAi ? ' last' : ''}`} role="article">
+                <span className="ct-av" aria-hidden><Icon name="spark" /></span>
+                <div className="ct-body">
+                  <div className="ct-meta">
+                    <b>FarmTap AI</b>
+                    {cow && <span className="ct-chip gold"><Icon name="cow" /> {animalName(cow)}</span>}
+                    {t.layer && <span className="small muted">{layerLabel(t.layer)}</span>}
+                    {t.method && <MethodBadge method={t.method} detail={t.layer ? layerLabel(t.layer) : undefined} />}
                   </div>
-                )}
-                <p>{t.text}</p>
-              </div>
-              <div className="chat-bar end">
-                <span className="small muted chat-time">{clock(t.id)}</span>
-                <button className="icon-btn" aria-label="Copy your message" title="Copy" onClick={() => void copy(t.text)}>
-                  <Icon name="copy" />
-                </button>
-                <button className="icon-btn" aria-label="Edit your message" title="Edit and ask again" disabled={busy} onClick={() => edit(t)}>
-                  <Icon name="edit" />
-                </button>
-              </div>
-              </div>
-            ) : (
-              <div key={t.id} id={`t${t.id}`} className={`chat-ai${t === lastAi ? ' last' : ''}`} role="article">
-                <span className="chat-avatar" aria-hidden>
-                  <Icon name="spark" />
-                </span>
-                <div className="chat-answer">
+                  {t.heard && (
+                    <div className="ct-heard">
+                      <Icon name="mic" />
+                      <span><small>I heard</small>“{t.heard}”</span>
+                    </div>
+                  )}
+                  {photo && t.pins && t.pins.length > 0 && <PhotoPins src={photo.thumb!} pins={t.pins} onOpen={() => openPhotos(t, 0)} />}
                   {t.errorKind && <AiErrorCard kind={t.errorKind} limit={usage?.limit ?? assistant.dailyLimit} />}
                   <ChatText text={t.text} />
                   {t.triage && (
-                    <TriageCard
-                      triage={t.triage}
-                      message={messageOf(t)}
-                      whatsapp={whatsappLink(vet?.body.phone, messageOf(t)) ?? whatsappLink(null, messageOf(t))!}
-                      vetName={vet?.body.name ?? null}
-                      photos={photosOf(t)}
-                      toast={toast}
-                    />
+                    <TriageCard triage={t.triage} message={messageOf(t)} whatsapp={whatsappLink(vet?.body.phone, messageOf(t)) ?? whatsappLink(null, messageOf(t))!} vetName={vet?.body.name ?? null} photos={photosOf(t)} toast={toast} />
                   )}
+                  {cow && t.method === 'model' && <CowCard name={animalName(cow)} spark={cowSpark(ai.data, cow.id, 7)} onOpen={() => setPopup({ kind: 'animal', id: cow.id })} />}
                   {t.method === 'model' && !t.animalId && (t.triage || t.hadMedia) && !skipPick.has(t.id) && (
                     <CowPicker animals={animals.map((a) => ({ id: a.id, label: `${animalName(a)}${a.body.name && a.body.tagNumber ? ` (${a.body.tagNumber})` : ''}` }))} onPick={(id) => void pickCow(t, id)} onSkip={() => setSkipPick(new Set(skipPick).add(t.id))} />
                   )}
-                  {(() => {
-                    const cow = cowOf(t);
-                    const acts = t.method === 'model' ? chatActions({ question: t.asked ?? '', answer: t.text, health: !!t.triage, callVet: t.triage?.level ?? null, animal: cow ? { id: cow.id, name: animalName(cow) } : null }) : (t.actions ?? []);
-                    const dos = chatDoActions({ animal: cow ? { id: cow.id, name: animalName(cow) } : null, triage: t.triage ?? null, day });
-                    return acts.length + dos.length > 0 ? (
-                      <div className="chat-actions">
-                        {[...dos, ...acts].map((a) => {
-                          const pop = popupOf(a.href);
-                          const tel = a.href.startsWith('/contacts') && vetPhone ? `tel:${vetPhone.replace(/[^\d+]/g, '')}` : null;
-                          if (tel)
-                            return (
-                              <a key={a.href} className="btn sm ghost" href={tel}>
-                                {vet?.body.name ? `Call ${vet.body.name}` : a.label} <Icon name="chevron" />
-                              </a>
-                            );
-                          return pop ? (
-                            <button key={a.href} className="btn sm ghost" onClick={() => setPopup(pop)}>
-                              {a.label} <Icon name="chevron" />
-                            </button>
-                          ) : (
-                            <Link key={a.href} className="btn sm ghost" href={a.href}>
-                              {a.label} <Icon name="chevron" />
-                            </Link>
+                  {acts.length + dos.length > 0 && (
+                    <div className="ct-acts">
+                      {[...dos, ...acts].map((a) => {
+                        const pop = popupOf(a.href);
+                        const tel = a.href.startsWith('/contacts') && vetPhone ? `tel:${vetPhone.replace(/[^\d+]/g, '')}` : null;
+                        if (tel)
+                          return (
+                            <a key={a.href} className="ct-btn" href={tel}>
+                              <Icon name="phone" /> {vet?.body.name ? `Call ${vet.body.name}` : a.label}
+                            </a>
                           );
-                        })}
-                      </div>
-                    ) : null;
-                  })()}
-                  {t === lastAi && t.triage && !busy && <CaseCard answers={caseInfo} animalKnown={!!t.animalId} onAnswer={answerCase} busy={busy} onSend={() => send(`More details about this animal. ${caseText(caseInfo)}.`)} />}
-                  {t.grounding && t.grounding.sources.length > 0 && (
-                    <div className="chat-sources">
-                      <span className="small muted" title={t.grounding.queries.length > 0 ? `Searched: ${t.grounding.queries.join(', ')}` : undefined}>
-                        Sources from Google
-                      </span>
-                      <div className="chips">
-                        {t.grounding.sources.map((s) => (
-                          <a key={s.uri} className="chip" href={s.uri} target="_blank" rel="noopener noreferrer">
-                            <Icon name="link" /> {s.title}
-                          </a>
-                        ))}
-                      </div>
+                        return pop ? (
+                          <button key={a.href} className="ct-btn" onClick={() => setPopup(pop)}>
+                            {a.label} <Icon name="chevron" />
+                          </button>
+                        ) : (
+                          <Link key={a.href} className="ct-btn" href={a.href}>
+                            {a.label} <Icon name="chevron" />
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
-                  {t.grounding?.suggestionsHtml && <iframe className="chat-suggest" title="Google Search suggestions" sandbox="allow-popups allow-popups-to-escape-sandbox" srcDoc={t.grounding.suggestionsHtml} />}
+                  {t === lastAi && t.triage && !busy && <CaseCard answers={caseInfo} animalKnown={!!t.animalId} onAnswer={answerCase} busy={busy} onSend={() => send(`More details about this animal. ${caseText(caseInfo)}.`)} />}
+                  {t.grounding && <Sources g={t.grounding} />}
                   {t.method === 'model' && t.asked && <ChatRefs question={t.asked} answer={t.text} cowNamed={!!t.animalId} general={!!t.grounding} />}
                   {(t.saved || t.note) && (
-                    <div className="chat-meta">
+                    <div className="ct-saved">
                       {t.saved && (
-                        <span className="chip ok">
+                        <span className="ct-chip ok">
                           <Icon name="check" /> Saved to {t.aboutAnimal ?? 'the animal'}’s history
                         </span>
                       )}
                       {t.note && <span className="small muted">{t.note}</span>}
+                      {t.errorKind && t.errorKind !== 'limit' && t.errorKind !== 'disabled' && t.errorKind !== 'invalid' && t.asked && (
+                        <button className="ct-btn sm" disabled={busy} onClick={() => again(t)}>
+                          <Icon name="refresh" /> Try again
+                        </button>
+                      )}
                     </div>
                   )}
-                  <div className="chat-bar">
-                    <button className="icon-btn" aria-label="Copy answer" title="Copy" onClick={() => void copy(t.text)}>
-                      <Icon name="copy" />
-                    </button>
-                    {t.method === 'model' && (
-                      <>
-                        <button className={`icon-btn${t.vote === 'up' ? ' on' : ''}`} aria-label="Good answer" aria-pressed={t.vote === 'up'} title="Good answer" onClick={() => vote(t, 'up')}>
-                          <Icon name="thumbUp" />
-                        </button>
-                        <button className={`icon-btn${t.vote === 'down' ? ' on' : ''}`} aria-label="Bad answer" aria-pressed={t.vote === 'down'} title="Bad answer" onClick={() => vote(t, 'down')}>
-                          <Icon name="thumbDown" />
-                        </button>
-                      </>
-                    )}
-                    {canSpeak && (
-                      <button className={`icon-btn${speaking === t.id ? ' on' : ''}`} aria-label={speaking === t.id ? 'Stop reading aloud' : 'Read aloud'} title={speaking === t.id ? 'Stop reading' : 'Read aloud'} onClick={() => speak(t)}>
-                        <Icon name={speaking === t.id ? 'stop' : 'volume'} />
-                      </button>
-                    )}
-                    {t.asked && (
-                      <button className="icon-btn" aria-label="Ask again" title="Ask again" disabled={busy} onClick={() => again(t)}>
-                        <Icon name="refresh" />
-                      </button>
-                    )}
-                    {t.method && <MethodBadge method={t.method} detail={t.layer ? layerLabel(t.layer) : undefined} />}
-                    {t.layer && <span className="small muted chat-layer">{layerLabel(t.layer)}</span>}
-                  </div>
+                  <ReplyBar t={t} speaking={speaking === t.id} canSpeak={canSpeak} busy={busy} onCopy={() => void copy(t.text)} onVote={(v) => vote(t, v)} onSpeak={() => speak(t)} onAgain={() => again(t)} onTranslate={(l) => send(`Please say your last answer again in ${l}.`)} onShare={() => void share(t.text)} />
                   {t === lastAi && !busy && t.followUps && t.followUps.length > 0 && (
-                    <div className="chips chat-follow">
+                    <div className="ct-follow">
                       {t.followUps.map((f) => (
-                        <button key={f} className="chip brand chip-btn" onClick={() => send(f)}>
+                        <button key={f} className="ct-chip line" onClick={() => send(f)}>
                           {f}
                         </button>
                       ))}
@@ -700,14 +725,12 @@ export default function FarmTapChat() {
                   )}
                 </div>
               </div>
-            ),
-          )}
+            );
+          })}
           {busy && (
-            <div className="chat-ai">
-              <span className="chat-avatar working" aria-hidden>
-                <Icon name="spark" />
-              </span>
-              <div className="chat-answer">
+            <div className="ct-ai">
+              <span className="ct-av working" aria-hidden><Icon name="spark" /></span>
+              <div className="ct-body">
                 {live && <ChatText text={live} streaming />}
                 <ChatThinking status={status} hasText={!!live} />
               </div>
@@ -716,7 +739,7 @@ export default function FarmTapChat() {
           <div ref={end} />
         </div>
       </AiState>
-      <div className="chat-composer">
+      <div className="ct-col">
         {usage && usage.level !== 'ok' && (
           <div className={`banner small ${usage.level === 'out' ? 'bad' : 'warn'}`} role="status">
             <Icon name={usage.level === 'out' ? 'alert' : 'flag'} />
@@ -725,114 +748,44 @@ export default function FarmTapChat() {
             </span>
           </div>
         )}
-        {about && (
-          <span className="chip brand chat-about">
-            About {animalName(about)}
-            <button className="icon-btn" aria-label="Stop talking about this animal" onClick={() => setAnimalId(null)}>
-              <Icon name="close" />
-            </button>
-          </span>
-        )}
-        {problem && (
-          <div className="banner warn small" role="alert">
-            {problem}
-          </div>
-        )}
-        <div className="chat-box" onPaste={onPaste}>
-          {files.length > 0 && (
-            <div className="chat-files">
-              {files.map((f, i) => (
-                <span key={i} className="chat-file">
-                  {f.thumb ? <img src={f.thumb} alt="" /> : <Icon name={ICON[f.kind]} />}
-                  <span className="small">{f.name}</span>
-                  <button className="icon-btn" aria-label={`Remove ${f.name}`} onClick={() => setFiles(files.filter((_, j) => j !== i))}>
-                    <Icon name="close" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-          <textarea
-            value={text}
-            rows={Math.min(6, Math.max(1, text.split('\n').length))}
-            maxLength={2000}
-            placeholder="Ask anything…"
-            aria-label="Your message"
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={onKey}
-          />
-          <div className="chat-tools">
-            <input ref={pick} hidden multiple type="file" accept="image/*,video/*,audio/*,application/pdf,text/plain,text/csv,text/markdown,application/json,.csv,.txt,.md,.json,.pdf" onChange={(e) => { void add([...(e.target.files ?? [])]); e.target.value = ''; }} />
-            <button className="icon-btn" aria-label="Attach photos, PDFs, files or video" title="Attach photos, PDFs, files or video" disabled={busy} onClick={() => pick.current?.click()}>
-              <Icon name="plus" />
-            </button>
-            <select
-              className="chat-lang"
-              aria-label="Reply language"
-              title="Reply language"
-              value={lang}
-              onChange={(e) => {
-                setLang(e.target.value);
-                try {
-                  window.localStorage.setItem('farmtap.ai.lang', e.target.value);
-                } catch {
-                  /* not kept */
-                }
-              }}
-            >
-              {CHAT_LANGUAGES.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.id === 'auto' ? 'Language: auto' : l.label}
-                </option>
-              ))}
-            </select>
-            <span className="grow" />
-            {busy ? (
-              <button className="btn sm" aria-label="Stop" onClick={() => stop.current?.abort()}>
-                <Icon name="stop" />
-              </button>
-            ) : (
-              <button className="btn sm" aria-label="Send" disabled={ai.loading || (!text.trim() && !files.length)} onClick={() => send()}>
-                <Icon name="up" />
-              </button>
-            )}
-          </div>
-        </div>
-        <p className="small muted">FarmTap AI can make mistakes and never replaces your vet. Answers can use Google Search.</p>
+        <Composer
+          text={text}
+          setText={setText}
+          files={files}
+          removeFile={(i) => setFiles(files.filter((_, j) => j !== i))}
+          openFile={openDraftPhoto}
+          onFiles={(l) => void add(l)}
+          busy={busy}
+          canSend={canSend}
+          send={() => send()}
+          stop={() => stop.current?.abort()}
+          problem={problem}
+          about={about ? animalName(about) : null}
+          clearAbout={() => setAnimalId(null)}
+          search={searchOn}
+          setSearch={(v) => { setSearchOn(v); spoken('search', v ? 'on' : 'off'); }}
+          fast={fast}
+          setFast={(v) => { setFast(v); spoken('fast', v ? 'on' : 'off'); }}
+          lang={lang}
+          setLang={(v) => { setLang(v); spoken('lang', v); }}
+          context={context}
+          toggleContext={(k) => setContext((c) => (c.includes(k) ? c.filter((x) => x !== k) : [...c, k]))}
+          voice={{ supported: rec.supported, recording: rec.recording, seconds: rec.seconds, levels: rec.levels, error: rec.error, start: () => void rec.start(), cancel: rec.cancel, sendNow: () => void sendVoice() }}
+          left={usage ? Math.max(0, usage.limit - usage.used) : null}
+          leftPct={usage && usage.limit > 0 ? (Math.max(0, usage.limit - usage.used) / usage.limit) * 100 : 0}
+          offline={!online}
+        />
       </div>
-      {popup && <ChatPopup popup={popup} onOpen={setPopup} onClose={() => setPopup(null)} />}
-      {showChats && (
-        <Dialog title="Your chats" subtitle="Kept on this phone or computer only." onClose={() => setShowChats(false)}>
-          <div className="stack">
-            <button className="btn" onClick={newChat}>
-              <Icon name="edit" /> New chat
-            </button>
-            <input className="input" type="search" placeholder="Search your chats" aria-label="Search your chats" value={find} onChange={(e) => setFind(e.target.value)} />
-            {groupChats(shownChats, Date.now()).map((g) => (
-              <div key={g.label} className="stack chat-group">
-                <span className="small muted">{g.label}</span>
-                {g.chats.map((c) => (
-                  <div key={c.id} className={`chat-row${c.id === chatId ? ' on' : ''}`}>
-                    <button className="chat-row-open" onClick={() => openChat(c)}>
-                      {c.title}
-                    </button>
-                    <button className="icon-btn" aria-label={`Delete ${c.title}`} onClick={() => removeChat(c.id)}>
-                      <Icon name="trash" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ))}
-            {!shownChats.length && <p className="small muted">{chats.length ? 'No chat matches that.' : 'Your chats will show here.'}</p>}
-          </div>
-        </Dialog>
-      )}
       {showUsage && usage && (
         <Dialog title="AI assistant usage" subtitle="For your whole farm, today." onClose={() => setShowUsage(false)}>
           <AiUsageMeter view={usage} trusted={assistant.route === 'server'} />
           <p className="small muted">Questions about your records, milk, breeding, feed and money are answered by FarmTap’s built-in intelligence. They are free and never count here.</p>
         </Dialog>
       )}
+      {popup && <ChatPopup popup={popup} onOpen={setPopup} onClose={() => setPopup(null)} />}
+      {light && <Lightbox photos={light.photos} start={light.start} pins={lightPins} onClose={() => setLight(null)} />}
+      {showChats && <History chats={chats} openId={chatId} onOpen={openChat} onNew={newChat} onPin={pinChat} onDelete={removeChat} onClose={() => setShowChats(false)} />}
     </div>
   );
 }
+

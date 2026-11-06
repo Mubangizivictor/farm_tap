@@ -56,6 +56,13 @@
   --z-asset: 160px; --z-stamp: 120px; --z-signature: 64px; --z-feature-icon: 44px; --z-avatar-xl: 96px; --z-toc: 240px;
   /* AI Intelligence (decision 0025): symptom tick-box width, photo preview height. */
   --z-sign: 220px; --z-photo: 320px;
+  /* AI chat (decision 0027): column, pop-up, drawer and picture sizes, and the few extra colours. */
+  --z-chat-col: 780px; --z-chat-pop: 620px; --z-chat-drawer: 392px; --z-chat-panel: 360px; --z-chat-annot: 560px; --z-chat-tip: 290px;
+  --z-thumb: 78px; --z-thumb-sm: 58px; --z-orb: 54px; --z-pin: 28px; --z-pic: 96px; --z-file-chip: 190px; --z-wave: 34px; --z-sheet-handle: 40px;
+  --fs-chat: 16px; --fs-chat-lead: 19px; --fs-chat-hero: 30px; --fs-chat-hero-sm: 24px; --fs-tiny: 11px;
+  --r-composer: 28px; --r-sheet: 28px;
+  --c-whatsapp: #25D366; --c-on-whatsapp: #06240F;
+  --c-photo-scrim: rgba(0, 0, 0, 0.6); --c-photo-scrim-soft: rgba(0, 0, 0, 0.45); --c-on-photo: #FFFFFF; --c-pin-ring: #FFFFFF; --c-on-gold-pin: #2A1C00;
 
   /* ---- Breakpoints are in app.css media queries: 600px (medium) and 1024px (wide), decision 0012 ---- */
 

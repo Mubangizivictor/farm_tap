@@ -2,7 +2,7 @@
 // the browser only, per farm, never sent anywhere. Pure helpers first so they
 // can be tested; the load/save at the bottom never throws.
 
-import type { ChatAction, ChatGrounding, Triage } from '../shared/aiChat.ts';
+import type { ChatAction, ChatCategory, ChatGrounding, ChatPin, Triage } from '../shared/aiChat.ts';
 import type { Method } from '../shared/aiCore.ts';
 
 export interface SavedTurn {
@@ -35,6 +35,14 @@ export interface SavedTurn {
   errorKind?: 'limit' | 'unavailable' | 'network' | 'timeout' | 'disabled' | 'invalid' | 'capacity' | 'tooFast';
   /** The farmer's thumbs up or down on this answer. */
   vote?: 'up' | 'down';
+  /** "I heard: ..." for an answer to a voice note. */
+  heard?: string;
+  /** Points on the first photo (percent from left and top). */
+  pins?: ChatPin[];
+  /** A voice note was sent with this question, in seconds. */
+  voice?: number;
+  /** The online answer failed, so Try again makes sense. */
+  failed?: boolean;
 }
 
 export interface SavedChat {
@@ -42,6 +50,13 @@ export interface SavedChat {
   title: string;
   updatedAt: number;
   turns: SavedTurn[];
+  pinned?: boolean;
+  /** What the chat is about, for the coloured icon and the history filters. */
+  cat?: ChatCategory;
+  /** Worst urgency seen in the chat. */
+  urg?: 'now' | 'today' | 'soon';
+  /** The animal the chat is about, by name. */
+  cow?: string;
 }
 
 export const MAX_CHATS = 40;
@@ -49,8 +64,11 @@ export const MAX_TURNS = 60;
 
 /** Newest first, the open chat added or replaced, oldest dropped past the limit. */
 export function upsertChat(list: SavedChat[], chat: SavedChat): SavedChat[] {
+  const old = list.find((c) => c.id === chat.id);
   const rest = list.filter((c) => c.id !== chat.id);
-  return [{ ...chat, turns: chat.turns.slice(-MAX_TURNS) }, ...rest].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, MAX_CHATS);
+  const next = { ...chat, pinned: chat.pinned ?? old?.pinned, turns: chat.turns.slice(-MAX_TURNS) };
+  // Pinned chats are never the ones dropped.
+  return [next, ...rest].sort((a, b) => b.updatedAt - a.updatedAt).filter((c, i) => i < MAX_CHATS || c.pinned);
 }
 
 /** Chats whose title or any message contains every word typed. */
@@ -75,8 +93,9 @@ export function chatGroup(updatedAt: number, now: number): string {
 }
 
 export function groupChats(list: SavedChat[], now: number): { label: string; chats: SavedChat[] }[] {
-  const order = ['Today', 'Yesterday', 'Last 7 days', 'Older'];
-  return order.map((label) => ({ label, chats: list.filter((c) => chatGroup(c.updatedAt, now) === label) })).filter((g) => g.chats.length);
+  const order = ['Pinned', 'Today', 'Yesterday', 'Last 7 days', 'Older'];
+  const label = (c: SavedChat) => (c.pinned ? 'Pinned' : chatGroup(c.updatedAt, now));
+  return order.map((l) => ({ label: l, chats: list.filter((c) => label(c) === l) })).filter((g) => g.chats.length);
 }
 
 const key = (farmId: string) => `farmtap.ai.chats.${farmId}`;

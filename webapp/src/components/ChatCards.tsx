@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { Icon } from '@/components/Icon';
-import { wikiRef, type Ref } from '@/lib/aiRefs';
+import { wikiPics, wikiRef, type Pic, type Ref } from '@/lib/aiRefs';
 import { chatTopics, cleanTemp, googleLinks, openCaseQuestions, type CaseAnswers, type CaseId, type Triage } from '@/shared/aiChat';
 
 const toBlob = (b64: string, mime: string) => {
@@ -234,9 +234,11 @@ export function ChatRefs({ question, answer, cowNamed, general }: { question: st
   const topics = chatTopics(question, answer);
   const key = topics.map((t) => t.wiki).join('|');
   const [refs, setRefs] = useState<Ref[]>([]);
+  const [pics, setPics] = useState<Pic[]>([]);
   useEffect(() => {
     let live = true;
     void Promise.all(topics.map((t) => wikiRef(t.wiki))).then((r) => live && setRefs(r.filter((x): x is Ref => !!x)));
+    if (topics[0]) void wikiPics(topics[0].wiki).then((p) => live && setPics(p));
     return () => {
       live = false;
     };
@@ -244,20 +246,30 @@ export function ChatRefs({ question, answer, cowNamed, general }: { question: st
   }, [key]);
   // A named cow's name is never put in a Google link: use the topic, or nothing.
   const query = topics[0]?.q ?? (general && !cowNamed ? question : '');
-  if (!refs.length && !query) return null;
+  if (!refs.length && !pics.length && !query) return null;
   const links = query ? googleLinks(query) : null;
   return (
     <section className="refs" aria-label="Learn more">
       {refs.length > 0 && (
-        <div className="ref-cards">
+        <div className="ct-wikis">
           {refs.map((r) => (
-            <a key={r.url} className="ref" href={r.url} target="_blank" rel="noopener noreferrer">
+            <a key={r.url} className="ct-wiki" href={r.url} target="_blank" rel="noopener noreferrer">
               {r.thumb && <img src={r.thumb} alt="" loading="lazy" />}
-              <span className="ref-text">
+              <span className="txt">
                 <strong>{r.title}</strong>
                 <span className="small muted">{r.extract.length > 150 ? `${r.extract.slice(0, 147)}…` : r.extract}</span>
                 <span className="small muted">Wikipedia</span>
               </span>
+            </a>
+          ))}
+        </div>
+      )}
+      {pics.length > 0 && (
+        <div className="ct-pics">
+          {pics.map((p) => (
+            <a key={p.src} className="p" href={p.page} target="_blank" rel="noopener noreferrer" title={p.title}>
+              <img src={p.src} alt={p.title} loading="lazy" />
+              <span className="cap">{p.title}</span>
             </a>
           ))}
         </div>

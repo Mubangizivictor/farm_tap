@@ -142,7 +142,10 @@ class _CaseCardState extends State<CaseCard> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(l10n.aiChatVetHelp, style: context.text.titleSmall),
-          Text(l10n.aiChatVetHelpHint, style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant)),
+          Text(
+            l10n.aiChatVetHelpHint,
+            style: context.text.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+          ),
           for (final q in open) ...[
             context.space.gapSm,
             Text(q.label, style: context.text.bodyMedium),

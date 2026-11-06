@@ -806,8 +806,7 @@ class _AiChatPageState extends State<AiChatPage> {
             for (final a in animals)
               (
                 id: a.id,
-                label:
-                    '${animalName(a)}${a.str('name') != null && a.str('tagNumber') != null ? ' (${a.str('tagNumber')})' : ''}',
+                label: '${animalName(a)}${a.str('name') != null && a.str('tagNumber') != null ? ' (${a.str('tagNumber')})' : ''}',
               ),
           ],
           onPick: (id) => unawaited(_pickCow(t, id, animals, l10n)),
@@ -858,9 +857,7 @@ class _AiChatPageState extends State<AiChatPage> {
             text: t.text,
             removed: 0,
             health: tr != null,
-            risk: tr?.level == 'now'
-                ? Severity.critical
-                : (tr?.level == 'today' ? Severity.high : (tr != null ? Severity.medium : Severity.low)),
+            risk: tr?.level == 'now' ? Severity.critical : (tr?.level == 'today' ? Severity.high : (tr != null ? Severity.medium : Severity.low)),
             callVet: tr?.level,
             report: tr?.report ?? false,
           ),

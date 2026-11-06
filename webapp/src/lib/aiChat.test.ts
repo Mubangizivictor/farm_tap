@@ -3,9 +3,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { animalHealth } from '../shared/aiHerd.ts';
 import type { FarmData, MilkIn } from '../shared/aiData.ts';
+import { contextFacts, cowSpark, farmToday } from '../shared/aiToday.ts';
 import type { Rec } from '../shared/aiCore.ts';
 import { addDays } from '../shared/aiCore.ts';
-import { animalFacts, chatTopics, googleLinks, buildChatPrompt, chatActions, caseText, chatAssessmentBody, chatDoActions, chatFailureOf, chatModels, cleanTemp, filterChatText, languageLine, needsSearch, nextDay, openCaseQuestions, partialChatText, triageOf, vetSummary, whatsappLink, chatFileKind, chatFollowUps, chatHistory, chatTitle, cleanSources, findAnimalMention, readChatReply } from '../shared/aiChat.ts';
+import { readPins, readHeard, chatCategory, animalFacts, buildChatPrompt, chatTopics, googleLinks, CHAT_SIGNS, questionKind, chatActions, caseText, chatAssessmentBody, chatDoActions, chatFailureOf, chatModels, cleanTemp, filterChatText, languageLine, needsSearch, nextDay, openCaseQuestions, partialChatText, triageOf, vetSummary, whatsappLink, chatFileKind, chatFollowUps, chatHistory, chatTitle, cleanSources, findAnimalMention, readChatReply } from '../shared/aiChat.ts';
 
 const TODAY = '2026-11-06';
 const NOW = `${TODAY}T09:00:00`;
@@ -237,9 +238,80 @@ test('record treatment and reminder buttons', () => {
   assert.deepEqual(chatDoActions({ animal: null, triage: null, day: TODAY }), []);
 });
 
+test('"is sick" with no signs asks what the signs are, and shows no emergency card', () => {
+  assert.equal(questionKind('Bihogo is sick, what do you know about bihogo'), 'signs');
+  assert.equal(questionKind('what do you know about Bella'), 'records');
+  assert.equal(questionKind('Bella is sick and has a swollen udder'), 'normal');
+  assert.equal(questionKind('How do I stop mastitis?'), 'normal');
+  const reply = readChatReply('She is a female, 22 months. Call your vet today. What signs do you see?', 'Bihogo is sick');
+  assert.equal(triageOf(reply, 'Bihogo is sick'), null);
+  assert.ok(triageOf(reply, 'Bihogo is sick and has a swollen udder'));
+  assert.deepEqual(chatFollowUps({ question: 'Bihogo is sick', answer: '', health: true }), CHAT_SIGNS);
+  assert.match(buildChatPrompt({ message: 'Bihogo is sick', facts: [], calculated: null, files: [], search: false, language: 'auto' }), /what signs do they see/);
+});
+
 test('free topics and Google links', () => {
   assert.deepEqual(chatTopics('How do I stop mastitis?').map((t) => t.wiki), ['Mastitis']);
   assert.deepEqual(chatTopics('my cow has lumpy skin and ticks').map((t) => t.wiki), ['Lumpy_skin_disease', 'Tick']);
+  assert.deepEqual(chatTopics('hello', 'Check for ticks.').map((t) => t.wiki), ['Tick']);
   assert.equal(chatTopics('How much milk today?').length, 0);
   assert.match(googleLinks('mastitis in dairy cows').images, /tbm=isch&q=mastitis%20in%20dairy%20cows/);
+});
+
+test('pins: read, clamp, drop the unsafe and remove the line', () => {
+  const t = 'Thin calf with lumps.\nPINS: [{"n":1,"x":42,"y":65,"label":"Raised lumps on the skin","tone":"red","sure":"likely"},{"n":2,"x":150,"y":-3,"label":"Ribs showing"},{"n":3,"x":50,"y":50,"label":"Give 5 ml of penicillin"},{"x":"a"}]';
+  const r = readPins(t);
+  assert.equal(r.text, 'Thin calf with lumps.');
+  assert.equal(r.pins.length, 2);
+  assert.deepEqual(r.pins[0], { n: 1, x: 42, y: 65, label: 'Raised lumps on the skin', tone: 'red', sure: 'likely' });
+  assert.equal(r.pins[1].x, 96);
+  assert.equal(r.pins[1].y, 4);
+  assert.equal(r.pins[1].tone, 'gold');
+  assert.deepEqual(readPins('No pins here.'), { text: 'No pins here.', pins: [] });
+  assert.equal(readPins('Text\nPINS: [broken').pins.length, 0);
+  assert.equal(readPins('Text\nPINS: [broken').text, 'Text');
+});
+
+test('the PINS line never shows while the answer streams in', () => {
+  assert.equal(partialChatText('Thin calf. Lumps on skin.\nPINS: [{"n":1,"x":4'), 'Thin calf. Lumps on skin.');
+});
+
+test('"I heard:" is split from a voice-note answer', () => {
+  assert.deepEqual(readHeard('I heard: "my cow is not eating"\nShe may be unwell.'), { heard: 'my cow is not eating', text: 'She may be unwell.' });
+  assert.deepEqual(readHeard('Plain answer.'), { heard: null, text: 'Plain answer.' });
+});
+
+test('chats are sorted into categories for the history filters', () => {
+  assert.equal(chatCategory({ question: 'what is this', hadMedia: true }), 'photos');
+  assert.equal(chatCategory({ question: 'cow has fever' }), 'health');
+  assert.equal(chatCategory({ question: 'litres of milk this week' }), 'milk');
+  assert.equal(chatCategory({ question: 'what is my profit' }), 'money');
+  assert.equal(chatCategory({ question: 'is she in heat' }), 'breeding');
+  assert.equal(chatCategory({ question: 'best napier feed' }), 'feed');
+  assert.equal(chatCategory({ question: 'hello' }), 'other');
+});
+
+test('today on the farm and the records a farmer can attach', () => {
+  const d = { now: `${TODAY}T09:00:00`, milk: [r({ litres: 100 }, at(addDays(TODAY, -2))), r({ litres: 120 }, at(TODAY))], treatments: [r({ animalId: 'bella', condition: 'mastitis', given: at(addDays(TODAY, -1)), withdrawalDays: 4 }, at(TODAY))], vaccinations: [r({ vaccine: 'FMD', nextDue: addDays(TODAY, 3) }, at(addDays(TODAY, -100)))], income: [r({ source: 'milk', amount: 5000, at: at(TODAY) }, at(TODAY))], expenses: [r({ category: 'feed', amount: 2000, at: at(TODAY) }, at(TODAY))] } as never;
+  const t = farmToday(d);
+  assert.equal(t.milk?.litres, 120);
+  assert.equal(t.milk?.day, 'today');
+  assert.equal(t.withdrawal, 1);
+  assert.deepEqual(t.vaccine, { name: 'FMD', days: 3 });
+  assert.ok(contextFacts('milk', d)[0].includes('220'));
+  assert.ok(contextFacts('money', d).some((l) => l.includes('3000')));
+  assert.ok(contextFacts('health', d).some((l) => l.includes('mastitis')));
+  assert.equal(cowSpark(d, 'nobody').length, 7);
+});
+
+import { groupChats, upsertChat, type SavedChat } from './aiChatStore.ts';
+
+test('chat history: a pinned chat stays pinned when saved again, sits first and is never dropped', () => {
+  const mk = (id: string, at: number, pinned?: boolean): SavedChat => ({ id, title: id, updatedAt: at, turns: [], pinned });
+  let list: SavedChat[] = [mk('keep', 1, true)];
+  for (let i = 2; i < 60; i++) list = upsertChat(list, mk(String(i), i));
+  assert.ok(list.some((c) => c.id === 'keep'));
+  list = upsertChat(list, mk('keep', 100));
+  assert.equal(list.find((c) => c.id === 'keep')?.pinned, true);
+  assert.equal(groupChats(list, Date.now())[0].label, 'Pinned');
 });

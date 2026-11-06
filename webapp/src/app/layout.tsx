@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { SessionProvider, themeBootScript } from '@/lib/session';
 import '@/theme/tokens.css';
 import '@/styles/app.css';
+import '@/styles/chat.css';
 import '@/styles/public.css';
 
 export const metadata: Metadata = {
