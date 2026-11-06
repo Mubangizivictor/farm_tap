@@ -62,7 +62,11 @@ class _AnimalDetailPageState extends State<AnimalDetailPage> {
   }
 
   void _reload() {
-    if (mounted) setState(() => _detail = widget.repo.detail(widget.animalId).then((r) => r.data));
+    if (!mounted) return;
+    final next = widget.repo.detail(widget.animalId).then((r) => r.data);
+    setState(() {
+      _detail = next;
+    });
   }
 
   Future<void> _sell(Animal animal) async {
