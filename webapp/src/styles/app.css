@@ -791,3 +791,18 @@ ol.chat-points > li::before { content: counter(pt); position: absolute; left: va
 .ref img { width: var(--z-avatar-lg); height: var(--z-avatar-lg); object-fit: cover; border-radius: var(--r-md); flex: none; }
 .ref-text { display: flex; flex-direction: column; gap: var(--s-xxs); min-width: 0; }
 .refs .chip { text-decoration: none; }
+
+/* AI allowance meter and AI error card (decision 0028) */
+.ai-usage { display: flex; flex-direction: column; gap: var(--s-sm); padding: var(--s-md); border-radius: var(--r-md); background: var(--c-container-low); border: var(--z-border) solid var(--c-outline-variant); }
+.ai-usage-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s-sm); }
+.ai-usage-title { font-size: var(--fs-label-sm); font-weight: var(--fw-bold); text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-on-surface-variant); }
+.ai-usage-bar { height: var(--s-sm); border-radius: var(--r-pill); background: var(--c-container-highest); overflow: hidden; }
+.ai-usage-bar span { display: block; height: 100%; border-radius: inherit; background: var(--c-primary); transition: width var(--d-normal) var(--ease); }
+.ai-usage-bar.warn span { background: var(--c-warning); }
+.ai-usage-bar.out span { background: var(--c-danger); }
+.ai-usage-nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-sm); margin: 0; }
+.ai-usage-nums dt { color: var(--c-on-surface-variant); }
+.ai-usage-nums dd { margin: 0; font-weight: var(--fw-semibold); font-size: var(--fs-title-sm); }
+.ai-usage .banner, .ai-error { align-items: flex-start; }
+.chat-usage { width: 100%; }
+.chat-layer { display: inline-flex; align-items: center; gap: var(--s-xs); }

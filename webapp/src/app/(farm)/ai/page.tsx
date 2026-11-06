@@ -19,14 +19,11 @@ import { AiOff, AiState } from '@/components/ai';
 import { useAiPage } from '@/components/aiPage';
 import { alive, kampalaNow, type Method } from '@/shared/aiCore';
 import { animalName, isActive } from '@/shared/aiData';
-import { ask } from '@/shared/aiAssistant';
 import { animalHealth } from '@/shared/aiHerd';
 import { nameLabels, redact, restore } from '@/shared/aiPrivacy';
-import { photoAllowed } from '@/shared/aiPhoto';
 import {
   animalFacts,
   buildChatPrompt,
-  CHAT_FAIL,
   CHAT_LANGUAGES,
   caseText,
   chatActions,
@@ -54,6 +51,11 @@ import {
 } from '@/shared/aiChat';
 import { farmAiOn, logAi } from '@/lib/ai';
 import { askGemini, ChatError } from '@/lib/aiChatClient';
+import { askServer, AiRequestError, serverUsage as fetchServerUsage } from '@/lib/aiServerClient';
+import { AiErrorCard, AiUsageMeter } from '@/components/AiUsage';
+import { classify, layerLabel, workingText } from '@/shared/aiRoute';
+import { chatFailureKind, usageView, usageWarning, type AiErrorKind, type UsageView } from '@/shared/aiQuota';
+import type { ChatGrounding } from '@/shared/aiChat';
 import { groupChats, loadChats, searchChats, storeChats, upsertChat, type SavedChat, type SavedTurn } from '@/lib/aiChatStore';
 import { addRecord, useRecords } from '@/lib/data';
 import { alive as aliveRec, type ContactBody } from '@/lib/domain';
@@ -123,7 +125,21 @@ export default function FarmTapChat() {
   const day = kampalaNow(new Date()).iso.slice(0, 10);
   const logs = useRecords<{ feature?: string; ok?: boolean }>(farm.id, 'aiLog', day);
   const usedToday = logs.data.filter((l) => l.body.feature === 'chat' && l.body.ok).length;
-  const limit = photoAllowed(usedToday, cfg.ai.photo);
+  const assistant = cfg.ai.assistant;
+  /** Server route: the server's own count (aiUsageNow and every answer). Client route: counted from this farm's AI log. */
+  const [serverUsage, setServerUsage] = useState<UsageView | null>(null);
+  const [showUsage, setShowUsage] = useState(false);
+  useEffect(() => {
+    if (assistant.route !== 'server' || !assistant.enabled) return;
+    let live = true;
+    void fetchServerUsage(farm.id).then((u) => {
+      if (live && u) setServerUsage(u);
+    });
+    return () => {
+      live = false;
+    };
+  }, [farm.id, assistant.route, assistant.enabled]);
+  const usage: UsageView | null = !assistant.enabled ? null : assistant.route === 'server' ? serverUsage : usageView(usedToday, assistant.dailyLimit, assistant.warnPct, 0);
   const animals = useMemo(() => alive(ai.data.animals).filter(isActive), [ai.data.animals]);
   const about = animals.find((a) => a.id === animalId);
 
@@ -253,46 +269,77 @@ export default function FarmTapChat() {
     if (e.dataTransfer.files.length) void add([...e.dataTransfer.files]);
   };
 
-  /** Answers one question. `before` is every turn that came before it. */
+  /**
+   * Answers one question. `before` is every turn that came before it.
+   * Decision 0028: the question is classified first. Records and built-in
+   * insights answer at once (no AI, no allowance used); only questions that
+   * need reasoning, or carry a file, go to the AI.
+   */
   const answer = async (question: string, sent: Attached[], before: Turn[], meId: number) => {
     if (!user) return;
     const t0 = performance.now();
-    setBusy(true);
-    setStatus('');
-    liveRef.current = '';
     const aiId = meId + 1;
     const cows = animals.map((a) => ({ id: a.id, name: a.body.name ?? null, tag: a.body.tagNumber ?? null }));
     const named = findAnimalMention(question, cows) ?? animalId;
     if (named !== animalId) setAnimalId(named);
     const cow = animals.find((a) => a.id === named);
     const cowRef = cow ? { id: cow.id, name: animalName(cow) } : null;
-    const names = nameLabels({ animals: animals.map((a) => a.body), people: [user.displayName ?? ''], places: [farm.name] });
-    const calc = ask(question, ai.data, { role: farm.role, cfg: cfg.ai, farmAiOn: true });
-    const calcText = calc.ok ? [calc.text, ...calc.bullets.map((b) => `- ${b}`)].join('\n') : null;
+    const route = classify(question, ai.data, { role: farm.role, cfg: cfg.ai, farmAiOn: true, files: sent.length, maxChars: assistant.maxChars });
+    const calc = route.answer;
+    const calcText = calc?.ok ? [calc.text, ...calc.bullets.map((b) => `- ${b}`)].join('\n') : null;
     const finish = (t: Omit<Turn, 'id' | 'who'>) => setTurns((ts) => [...ts, { id: aiId, who: 'ai', asked: question, ...t }]);
-    const offlineAnswer = (note: string, detail?: string) => {
-      logAi(farm.id, 'assistant', calc.ok, performance.now() - t0, calc.method);
-      const shown = calc.ok ? calcText! : `${note}\n\nI can answer simple questions about your milk, animals, feed and money from your records, even without internet.`;
+    /** The built-in answer (layers 1 and 2), with the reason the AI did not answer when it was asked. */
+    const builtIn = (errorKind?: AiErrorKind, note?: string) => {
+      logAi(farm.id, 'assistant', !!calc?.ok, performance.now() - t0, calc?.method ?? 'calculated');
+      const shown = calc
+        ? [calc.text, ...calc.bullets.map((b) => `- ${b}`)].join('\n')
+        : 'I can answer questions about your milk, animals, breeding, feed and money from your records at any time. Try "How much milk did we produce today?" or "Which cows have reduced production?"';
       const actions = chatActions({ question, answer: shown, health: false, callVet: null, animal: cowRef });
-      if (!actions.length && calc.links[0]) actions.push({ label: `Go to ${calc.links[0].label}`, href: calc.links[0].href });
-      finish({ text: shown, method: calc.method, aboutAnimal: cow ? animalName(cow) : undefined, note: calc.ok ? note : undefined, detail, actions });
+      if (!actions.length && calc?.links[0]) actions.push({ label: `Go to ${calc.links[0].label}`, href: calc.links[0].href });
+      finish({ text: shown, method: calc?.method ?? 'calculated', layer: route.layer === 'records' ? 'records' : 'insight', errorKind, aboutAnimal: cow ? animalName(cow) : undefined, note, actions });
     };
-    const online = cfg.ai.photo.enabled && limit.ok && typeof navigator !== 'undefined' && navigator.onLine;
-    if (!online) {
-      const why = !cfg.ai.photo.enabled ? 'Online AI is not switched on for FarmTap yet.' : !limit.ok ? 'Your farm has used all online AI answers for today.' : 'There is no internet.';
-      offlineAnswer(sent.length ? `${why} Files and photos could not be read.` : why);
-      setBusy(false);
+    if (route.reason === 'tooLong') {
+      finish({ text: `Keep your question under ${assistant.maxChars.toLocaleString('en-US')} characters.`, method: 'calculated', layer: 'insight', errorKind: 'invalid' });
       return;
     }
+    // Layers 1 and 2: straight away, no spinner, unlimited.
+    if (route.layer !== 'ai') {
+      builtIn();
+      return;
+    }
+    const lost = sent.length ? 'Files and photos could not be read.' : undefined;
+    const blocked: AiErrorKind | null = !assistant.enabled ? 'disabled' : usage && usage.level === 'out' ? 'limit' : typeof navigator !== 'undefined' && !navigator.onLine ? 'network' : null;
+    if (blocked) {
+      builtIn(blocked, lost);
+      return;
+    }
+    setBusy(true);
+    setStatus(workingText('ai', 'model'));
+    liveRef.current = '';
     const ctl = new AbortController();
     stop.current = ctl;
+    const names = nameLabels({ animals: animals.map((a) => a.body), people: [user.displayName ?? ''], places: [farm.name] });
+    const onText = (t: string) => {
+      liveRef.current = partialChatText(t);
+      setLive(liveRef.current);
+    };
     try {
       const facts = cow ? animalFacts(animalHealth(ai.data, cow.id), cow.body, day) : [];
       const media = sent.some((f) => f.kind === 'photo' || f.kind === 'video');
-      const search = needsSearch(question, { calculated: calc.ok, animal: !!cow });
-      const prompt = buildChatPrompt({ message: redact(question, names), facts, calculated: calcText ? redact(calcText, names) : null, files: sent.map((f) => ({ kind: f.kind })), search, language: lang });
-      const history = chatHistory(before.filter((t) => t.text).map((t) => ({ role: t.who === 'me' ? ('user' as const) : ('model' as const), text: redact(t.text, names) })));
-      const got = await askGemini({ system: CHAT_SYSTEM, history, prompt, files: sent.map((f) => ({ mime: f.mime, base64: f.base64 })), models: chatModels(cfg.ai.photo.model, media), search, signal: ctl.signal, onStatus: setStatus, onText: (t) => { liveRef.current = partialChatText(t); setLive(liveRef.current); } });
+      const search = needsSearch(question, { calculated: !!calc?.ok, animal: !!cow });
+      const message = redact(question, names);
+      const calculated = calcText ? redact(calcText, names) : null;
+      const history = chatHistory(before.filter((t) => t.text && !t.errorKind).map((t) => ({ role: t.who === 'me' ? ('user' as const) : ('model' as const), text: redact(t.text, names) })));
+      const parts = sent.map((f) => ({ mime: f.mime, base64: f.base64 }));
+      let got: { text: string; grounding: ChatGrounding | null; model: string };
+      if (assistant.route === 'server') {
+        const r = await askServer({ tenantId: farm.id, message, facts, calculated, history, files: parts, language: lang === 'auto' ? null : lang, search }, { signal: ctl.signal, timeoutMs: assistant.timeoutMs, onText });
+        setServerUsage(r.usage);
+        got = r;
+      } else {
+        const prompt = buildChatPrompt({ message, facts, calculated, files: sent.map((f) => ({ kind: f.kind })), search, language: lang });
+        got = await askGemini({ system: CHAT_SYSTEM, history, prompt, files: parts, models: chatModels(assistant.model, media), search, signal: ctl.signal, onStatus: setStatus, onText });
+      }
       const reply = readChatReply(got.text, question);
       const shown = restore(reply.text, names);
       logAi(farm.id, 'chat', true, performance.now() - t0, 'model');
@@ -310,6 +357,7 @@ export default function FarmTapChat() {
       finish({
         text: shown,
         method: 'model',
+        layer: 'ai',
         aboutAnimal: cow ? animalName(cow) : undefined,
         saved,
         note: reply.removed ? 'Some details about medicines were left out. Ask your vet.' : undefined,
@@ -328,8 +376,16 @@ export default function FarmTapChat() {
         return;
       }
       logAi(farm.id, 'chat', false, performance.now() - t0, 'model');
-      const err = e instanceof ChatError ? e : new ChatError('unreadable', String((e as Error)?.message ?? e));
-      offlineAnswer(`${CHAT_FAIL[err.failure]}${sent.length ? ' Files and photos could not be read.' : ''}`, err.detail);
+      let kind: AiErrorKind = 'unavailable';
+      if (e instanceof AiRequestError) {
+        kind = e.kind;
+        if (e.usage) setServerUsage(e.usage);
+      } else if (e instanceof ChatError) {
+        kind = chatFailureKind(e.failure, e.detail);
+        // For the FarmTap owner in the browser console only; farmers see the plain card.
+        console.warn('[FarmTap AI]', e.failure, e.detail);
+      }
+      builtIn(kind, lost);
     } finally {
       stop.current = null;
       setLive('');
@@ -468,6 +524,11 @@ export default function FarmTapChat() {
         </button>
         <h1 className="chat-title">{title ?? 'FarmTap AI'}</h1>
         <div className="row">
+          {usage && (
+            <button className={`chip chip-btn${usage.level === 'out' ? ' bad' : usage.level === 'warn' ? ' warn' : ''}`} onClick={() => setShowUsage(true)} aria-label={`AI requests used: ${usage.used} of ${usage.limit}. Open AI usage`} title="AI assistant usage">
+              <Icon name="spark" /> {usage.used}/{usage.limit}
+            </button>
+          )}
           <button className="icon-btn" aria-label="New chat" title="New chat" onClick={newChat}>
             <Icon name="edit" />
           </button>
@@ -485,6 +546,11 @@ export default function FarmTapChat() {
               </span>
               <h2>How can I help on your farm today?</h2>
               <p className="muted">Ask about a sick animal, milk, feed or money. Add a photo and I will look at it.</p>
+              {usage && (
+                <div className="chat-usage">
+                  <AiUsageMeter view={usage} trusted={assistant.route === 'server'} />
+                </div>
+              )}
               <div className="chips chat-ideas">
                 {IDEAS.map((q) => (
                   <button key={q} className="chip chip-btn" onClick={() => send(q)}>
@@ -526,6 +592,7 @@ export default function FarmTapChat() {
                   <Icon name="spark" />
                 </span>
                 <div className="chat-answer">
+                  {t.errorKind && <AiErrorCard kind={t.errorKind} limit={usage?.limit ?? assistant.dailyLimit} />}
                   <ChatText text={t.text} />
                   {t.triage && (
                     <TriageCard
@@ -595,12 +662,6 @@ export default function FarmTapChat() {
                       {t.note && <span className="small muted">{t.note}</span>}
                     </div>
                   )}
-                  {t.detail && (
-                    <details className="chat-detail small muted">
-                      <summary>Details for the FarmTap owner</summary>
-                      <code>{t.detail}</code>
-                    </details>
-                  )}
                   <div className="chat-bar">
                     <button className="icon-btn" aria-label="Copy answer" title="Copy" onClick={() => void copy(t.text)}>
                       <Icon name="copy" />
@@ -625,7 +686,8 @@ export default function FarmTapChat() {
                         <Icon name="refresh" />
                       </button>
                     )}
-                    {t.method && <MethodBadge method={t.method} />}
+                    {t.method && <MethodBadge method={t.method} detail={t.layer ? layerLabel(t.layer) : undefined} />}
+                    {t.layer && <span className="small muted chat-layer">{layerLabel(t.layer)}</span>}
                   </div>
                   {t === lastAi && !busy && t.followUps && t.followUps.length > 0 && (
                     <div className="chips chat-follow">
@@ -655,6 +717,14 @@ export default function FarmTapChat() {
         </div>
       </AiState>
       <div className="chat-composer">
+        {usage && usage.level !== 'ok' && (
+          <div className={`banner small ${usage.level === 'out' ? 'bad' : 'warn'}`} role="status">
+            <Icon name={usage.level === 'out' ? 'alert' : 'flag'} />
+            <span className="grow">
+              <strong>{usageWarning(usage)!.title}</strong> {usageWarning(usage)!.message}
+            </span>
+          </div>
+        )}
         {about && (
           <span className="chip brand chat-about">
             About {animalName(about)}
@@ -755,6 +825,12 @@ export default function FarmTapChat() {
             ))}
             {!shownChats.length && <p className="small muted">{chats.length ? 'No chat matches that.' : 'Your chats will show here.'}</p>}
           </div>
+        </Dialog>
+      )}
+      {showUsage && usage && (
+        <Dialog title="AI assistant usage" subtitle="For your whole farm, today." onClose={() => setShowUsage(false)}>
+          <AiUsageMeter view={usage} trusted={assistant.route === 'server'} />
+          <p className="small muted">Questions about your records, milk, breeding, feed and money are answered by FarmTap’s built-in intelligence. They are free and never count here.</p>
         </Dialog>
       )}
     </div>

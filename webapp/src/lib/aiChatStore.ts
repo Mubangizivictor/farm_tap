@@ -29,6 +29,10 @@ export interface SavedTurn {
   hadMedia?: boolean;
   /** Which model answered. */
   model?: string;
+  /** Which layer answered (decision 0028): records and insight are calculated, ai is a model. */
+  layer?: 'records' | 'insight' | 'ai';
+  /** Why the AI did not answer (shown as a card above the built-in answer). */
+  errorKind?: 'limit' | 'unavailable' | 'network' | 'timeout' | 'disabled' | 'invalid' | 'capacity' | 'tooFast';
   /** The farmer's thumbs up or down on this answer. */
   vote?: 'up' | 'down';
 }
