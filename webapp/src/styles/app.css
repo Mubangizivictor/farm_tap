@@ -871,3 +871,14 @@ html, body { overscroll-behavior-y: contain; }
   a { color: inherit !important; text-decoration: none !important; }
   .card.stat { box-shadow: none; }
 }
+
+/* Farm page actions (admin): four grouped cards that share one row on wide screens. */
+.section-title { font-size: var(--fs-title); margin: var(--s-md) 0 0; }
+.act-card { gap: var(--s-md); border-top: var(--s-xxs) solid var(--c-primary); }
+.act-card .card-head { margin-bottom: 0; }
+.act-card h3 { display: flex; align-items: center; gap: var(--s-xs); font-size: var(--fs-title-sm); }
+.act-card h3 .icon { width: var(--z-icon-sm); height: var(--z-icon-sm); color: var(--c-primary); }
+.act-list { display: flex; flex-wrap: wrap; gap: var(--s-sm); margin-top: auto; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--z-stat-min), 1fr)); gap: var(--s-md); margin: var(--s-md) 0; }
+.btn.xs { min-height: 0; padding: var(--s-xxs) var(--s-xs); }
+.btn.xs .icon { width: var(--z-icon-sm); height: var(--z-icon-sm); }
