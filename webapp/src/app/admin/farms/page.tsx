@@ -18,6 +18,7 @@ const filters = [
   ['grace', 'Due soon'],
   ['readOnly', 'Lapsed'],
   ['suspended', 'Suspended'],
+  ['closed', 'Removed'],
 ] as const;
 
 export default function AdminFarms() {
@@ -41,10 +42,13 @@ export default function AdminFarms() {
     const t = q.trim().toLowerCase();
     return (farms.data ?? []).filter((f) => {
       if (sector !== 'all' && f.sector !== sector) return false;
+      // Removed farms (demo, fake or deleted accounts) only show under "Removed".
+      if (filter === 'closed') return f.closed;
+      if (f.closed) return false;
       const kind = farmPlan(f, now).kind;
       if (filter === 'pending' && f.review !== 'pending') return false;
       if (filter === 'suspended' && f.status !== 'suspended') return false;
-      if (!['all', 'pending', 'suspended'].includes(filter) && (kind !== filter || f.status === 'suspended')) return false;
+      if (!['all', 'pending', 'suspended', 'closed'].includes(filter) && (kind !== filter || f.status === 'suspended')) return false;
       if (!t) return true;
       return [f.name, f.owner.name, f.owner.email, f.district, f.village, f.whatsapp, f.sms, f.id].some((v) => v.toLowerCase().includes(t));
     });
@@ -78,7 +82,7 @@ export default function AdminFarms() {
 
   return (
     <Need perm={['farms', 'support', 'finance', 'users']}>
-      <PageHead title="Farms" subtitle={`${list.length} of ${farms.data?.length ?? 0} farms and centres`}>
+      <PageHead title="Farms" subtitle={`${list.length} of ${(farms.data ?? []).filter((f) => !f.closed).length} farms and centres`}>
         <SearchBox value={q} onChange={setQ} placeholder="Name, owner, phone, district" />
         <button className="btn outline sm" onClick={csv}>
           <Icon name="download" /> CSV

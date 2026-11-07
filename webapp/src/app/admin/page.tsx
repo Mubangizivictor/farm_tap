@@ -30,7 +30,8 @@ export default function Overview() {
   }, [me?.role]);
 
   const now = new Date();
-  const list = farms.data ?? [];
+  // Removed farms (demo, fake, deleted accounts) do not count.
+  const list = (farms.data ?? []).filter((f) => !f.closed);
   const allPlans = plans.data ?? [];
   const states = list.map((f) => ({ f, s: farmPlan(f, now) }));
   const live = list.filter((f) => f.status !== 'suspended');
@@ -75,7 +76,7 @@ export default function Overview() {
       <PageHead title={`Hello${me?.name ? `, ${me.name.split(' ')[0]}` : ''}`} subtitle="How FarmTap is doing today.">
         <PrintButton />
       </PageHead>
-      {sheets.data && sheetsUrlOk(sheets.data.sheets.url) && <SheetsSendButton settings={sheets.data.sheets} auto />}
+      {sheets.data && sheetsUrlOk(sheets.data.sheets.url) && <SheetsSendButton settings={sheets.data.sheets} />}
 
       {seeFarms && (
         <Fit kind="stats">

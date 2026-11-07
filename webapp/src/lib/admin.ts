@@ -46,6 +46,8 @@ export async function adminChange(me: { uid: string; name: string }, info: Audit
   });
   for (const op of ops) op(b, audit.id);
   await b.commit();
+  // Lets the Google Sheets copy update right after a change (components/SheetsSend.tsx).
+  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('farmtap:admin-change', { detail: info.action }));
   return audit.id;
 }
 
@@ -159,6 +161,9 @@ export interface AdminFarm {
   autoSend: boolean;
   createdAt: Date | null;
   lastSeenAt: Date | null;
+  /** Removed (closed): by the owner deleting the account, or by the panel (demo or fake farms). Hidden from lists and Google Sheets. */
+  closed: boolean;
+  closedAt: Date | null;
 }
 
 export function adminFarmFromDoc(id: string, t: Record<string, unknown>): AdminFarm {
@@ -191,6 +196,8 @@ export function adminFarmFromDoc(id: string, t: Record<string, unknown>): AdminF
     autoSend: messaging.autoSend === true,
     createdAt: parseDate(t.createdAt),
     lastSeenAt: parseDate(t.lastSeenAt),
+    closed: t.closure != null,
+    closedAt: parseDate((t.closure as Record<string, unknown> | undefined)?.at),
   };
 }
 

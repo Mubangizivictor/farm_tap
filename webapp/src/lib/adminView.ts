@@ -13,6 +13,7 @@ export function farmPlan(f: AdminFarm, now: Date): AdminPlan {
 }
 
 export function farmStatus(f: AdminFarm, now: Date): { text: string; tone: 'ok' | 'warn' | 'bad' | 'brand' } {
+  if (f.closed) return { text: 'Removed', tone: 'bad' };
   if (f.status === 'suspended') return { text: 'Suspended', tone: 'bad' };
   if (f.review === 'rejected') return { text: 'Rejected', tone: 'bad' };
   const p = farmPlan(f, now);

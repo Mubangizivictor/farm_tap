@@ -1,6 +1,6 @@
 'use client';
 
-import { Timestamp, collection, deleteField, doc, getDocs, query, where } from 'firebase/firestore';
+import { Timestamp, collection, deleteField, doc, getDocs, query, serverTimestamp, where } from 'firebase/firestore';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
@@ -48,7 +48,7 @@ function Summary({ f, reload }: { f: AdminFarm; reload: () => void }) {
     return s?.data() ?? null;
   }, [f.owner.uid]);
   const act = useAction();
-  const [ask, setAsk] = useState<null | 'suspend' | 'reject'>(null);
+  const [ask, setAsk] = useState<null | 'suspend' | 'reject' | 'remove'>(null);
   const [reason, setReason] = useState('');
   const [extend, setExtend] = useState(7);
   const [pay, setPay] = useState(false);
@@ -172,6 +172,16 @@ function Summary({ f, reload }: { f: AdminFarm; reload: () => void }) {
                 <Icon name="pause" /> Suspend
               </button>
             ))}
+          {can('farms') &&
+            (f.closed ? (
+              <button className="btn outline" disabled={act.busy} onClick={() => void change('farm.restore', { closure: deleteField() }, {}, 'Farm brought back. It shows in the lists and Google Sheets again.')}>
+                <Icon name="refresh" /> Bring back
+              </button>
+            ) : (
+              <button className="btn danger outline" disabled={act.busy} onClick={() => setAsk('remove')}>
+                <Icon name="trash" /> Remove farm
+              </button>
+            ))}
         </div>
 
         {(can('farms') || can('finance')) && (
@@ -210,25 +220,38 @@ function Summary({ f, reload }: { f: AdminFarm; reload: () => void }) {
           </div>
         )}
         {f.status === 'suspended' && f.suspendedReason && <p className="small muted">Suspended because: {f.suspendedReason}</p>}
+        {f.closed && (
+          <div className="banner bad small">
+            <Icon name="trash" />
+            <span className="grow">
+              Removed{f.closedAt ? ` on ${date(f.closedAt)}` : ''}. It no longer shows in the farm lists, the Overview or Google Sheets, and nobody can record on it. Its records are
+              kept for 90 days in case it was a mistake, then erased for good.
+            </span>
+          </div>
+        )}
         </section>
       </Fit>
 
       {ask && (
         <Confirm
-          title={ask === 'suspend' ? `Suspend ${f.name}?` : `Reject ${f.name}?`}
-          confirm={ask === 'suspend' ? 'Suspend' : 'Reject'}
+          title={ask === 'suspend' ? `Suspend ${f.name}?` : ask === 'remove' ? `Remove ${f.name}?` : `Reject ${f.name}?`}
+          confirm={ask === 'suspend' ? 'Suspend' : ask === 'remove' ? 'Remove farm' : 'Reject'}
           danger
           busy={act.busy}
           onClose={() => setAsk(null)}
           onConfirm={() =>
-            void (ask === 'suspend'
+            void (ask === 'remove'
+              ? change('farm.remove', { closure: { at: serverTimestamp(), by: actor.uid, requestId: 'admin', reason: reason.trim() } }, { reason }, 'Farm removed. It is gone from the lists and from Google Sheets.')
+              : ask === 'suspend'
               ? change('farm.suspend', { status: 'suspended', suspendedReason: reason.trim() }, { reason }, 'Farm suspended. It can see its records but not save new ones.')
               : change('farm.reject', { review: { status: 'rejected', note: reason.trim(), at: Timestamp.now(), by: actor.name } }, { reason }, 'Farm marked rejected.')
             ).then(() => setAsk(null))
           }
         >
           <p className="muted">
-            {ask === 'suspend'
+            {ask === 'remove'
+              ? 'Use this for demo or fake farms, or a farm that asked to leave. It disappears at once from the farm lists, the Overview and Google Sheets, and its people can no longer record on it. You can bring it back for 90 days.'
+              : ask === 'suspend'
               ? 'The farm keeps every record and can still look at them, but nothing new saves until you reactivate it.'
               : 'Rejecting marks the review. Suspend as well if the farm should stop recording.'}
           </p>
