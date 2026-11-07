@@ -83,6 +83,8 @@ export interface Integrations {
   maps: { provider: string };
   /** WhatsApp Business API (decision 0024): the sending number's id and the approved template. */
   whatsapp: { phoneNumberId: string; template: string; language: string };
+  /** Google Sheets copy of the panel's lists (lib/sheets.ts, docs/GOOGLE_SHEETS.md). */
+  sheets: { url: string; secret: string; auto: boolean };
   secrets: Record<string, SecretInfo>;
 }
 
@@ -111,6 +113,11 @@ export async function loadIntegrations(): Promise<Integrations> {
       phoneNumberId: String((d.whatsapp as Record<string, unknown> | undefined)?.phoneNumberId ?? ''),
       template: String((d.whatsapp as Record<string, unknown> | undefined)?.template ?? ''),
       language: String((d.whatsapp as Record<string, unknown> | undefined)?.language ?? 'en'),
+    },
+    sheets: {
+      url: String((d.sheets as Record<string, unknown> | undefined)?.url ?? ''),
+      secret: String((d.sheets as Record<string, unknown> | undefined)?.secret ?? ''),
+      auto: (d.sheets as Record<string, unknown> | undefined)?.auto === true,
     },
     secrets,
   };
