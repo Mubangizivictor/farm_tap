@@ -4,7 +4,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import Link from 'next/link';
 import { Fit, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
-import { Empty, PageHead, Stat } from '@/components/ui';
+import { Empty, PageHead, PrintButton, Stat } from '@/components/ui';
 import { loadAllFarms, loadPayments, loadPlans, type AdminFarm } from '@/lib/admin';
 import { useAdmin } from '@/lib/adminSession';
 import { addDays } from '@/lib/dates';
@@ -69,7 +69,9 @@ export default function Overview() {
 
   return (
     <>
-      <PageHead title={`Hello${me?.name ? `, ${me.name.split(' ')[0]}` : ''}`} subtitle="How FarmTap is doing today." />
+      <PageHead title={`Hello${me?.name ? `, ${me.name.split(' ')[0]}` : ''}`} subtitle="How FarmTap is doing today.">
+        <PrintButton />
+      </PageHead>
 
       {seeFarms && (
         <Fit kind="stats">

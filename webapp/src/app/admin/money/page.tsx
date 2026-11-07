@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { Confirm, Fit, MsgBanner, Need, useAction, useLoad } from '@/components/admin';
 import { RecordPayment } from '@/components/adminPayment';
 import { Icon } from '@/components/Icon';
-import { Empty, LoadError, PageHead, SearchBox, Stat } from '@/components/ui';
+import { Empty, LoadError, PageHead, PrintButton, SearchBox, Stat } from '@/components/ui';
 import { adminChange, downloadCsv, loadAllFarms, loadPayments, loadPlans, loadSmsPackages, paymentMethods, updateOp, type PlatformPayment } from '@/lib/admin';
 import { useAdmin } from '@/lib/adminSession';
 import { farmPlan, planOf } from '@/lib/adminView';
@@ -65,6 +65,7 @@ export default function Money() {
         <button className="btn sm" onClick={() => setOpen(true)}>
           <Icon name="plus" /> Record payment
         </button>
+        <PrintButton />
       </PageHead>
 
       <MsgBanner msg={act.msg} />

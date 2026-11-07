@@ -4,7 +4,7 @@ import { doc } from 'firebase/firestore';
 import { useState, type FormEvent } from 'react';
 import { MsgBanner, Need, useAction, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
-import { Dialog, Empty, PageHead } from '@/components/ui';
+import { Dialog, Empty, PageHead, PrintButton } from '@/components/ui';
 import { adminChange, loadInvites, loadStaff, setOp, updateOp, type AdminStaff } from '@/lib/admin';
 import { useAdmin } from '@/lib/adminSession';
 import { firebase } from '@/lib/firebase';
@@ -132,6 +132,7 @@ export default function Staff() {
         <button className="btn sm" onClick={() => setInviting(true)}>
           <Icon name="plus" /> Invite staff
         </button>
+        <PrintButton />
       </PageHead>
       <MsgBanner msg={act.msg} />
       <div className="table-wrap">

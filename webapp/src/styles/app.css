@@ -856,3 +856,18 @@ html, body { overscroll-behavior-y: contain; }
 .pull-refresh .logo-mark { width: var(--z-avatar); height: var(--z-avatar); }
 @keyframes veil-in { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .spin-logo, .icon.spin, svg.spin { animation: none; } }
+
+/* ---- Printing from the control panel (Print buttons on each page) ---- */
+.print-only { display: none; }
+@media print {
+  .print-only { display: block; }
+  .print-head { display: flex; justify-content: space-between; gap: var(--s-lg); padding-bottom: var(--s-md); margin-bottom: var(--s-md); border-bottom: var(--z-focus) solid var(--p-ink); font-size: var(--fs-label-sm); color: var(--p-ink); }
+  .print-head strong { font-size: var(--fs-title-sm); }
+  .search, .jump, .tabs.sticky, .admin .seg, .icon-btn, .refresh-veil, .pull-refresh { display: none !important; }
+  .admin .content { gap: var(--s-lg); }
+  .table-wrap { overflow: visible !important; }
+  .table { font-size: var(--fs-label-sm); }
+  .table tr { break-inside: avoid; }
+  a { color: inherit !important; text-decoration: none !important; }
+  .card.stat { box-shadow: none; }
+}

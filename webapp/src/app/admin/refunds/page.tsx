@@ -9,7 +9,7 @@
 import { useMemo, useState } from 'react';
 import { MsgBanner, Need, useAction, useLoad, Fit } from '@/components/admin';
 import { Icon } from '@/components/Icon';
-import { Dialog, Empty, Field, LoadError, PageHead, SearchBox, SkelRows, Stat, Tabs } from '@/components/ui';
+import { Dialog, Empty, Field, LoadError, PageHead, PrintButton, SearchBox, SkelRows, Stat, Tabs } from '@/components/ui';
 import { loadPayments, paymentMethods, type PlatformPayment } from '@/lib/admin';
 import { completeRefund, decideRefund, issueBillingDoc, loadAllBillingDocs, loadRefunds, requestRefund, type Refund } from '@/lib/adminLaunch';
 import { useAdmin } from '@/lib/adminSession';
@@ -78,6 +78,7 @@ export default function Refunds() {
         <button className="btn sm" onClick={() => setPicking(true)}>
           <Icon name="plus" /> Record refund
         </button>
+        <PrintButton />
       </PageHead>
       <MsgBanner msg={act.msg} />
       <LoadError code={refunds.error || docs.error} />

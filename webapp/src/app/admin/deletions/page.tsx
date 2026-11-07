@@ -8,7 +8,7 @@
 import { useMemo, useState } from 'react';
 import { MsgBanner, Need, useAction, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
-import { Dialog, Empty, Field, LoadError, PageHead, SearchBox, SkelRows, Tabs } from '@/components/ui';
+import { Dialog, Empty, Field, LoadError, PageHead, PrintButton, SearchBox, SkelRows, Tabs } from '@/components/ui';
 import { HOLD_DAYS, loadDeletions, markDeletion, restoreAccount, type Deletion } from '@/lib/adminLaunch';
 import { useAdmin } from '@/lib/adminSession';
 import { date } from '@/lib/format';
@@ -74,6 +74,7 @@ export default function Deletions() {
     <Need perm={['users', 'support']}>
       <PageHead title="Deleted accounts" subtitle={`Closed accounts are kept ${HOLD_DAYS} days, then erased for good`}>
         <SearchBox value={q} onChange={setQ} placeholder="Name, email, phone, farm" />
+        <PrintButton />
       </PageHead>
       <MsgBanner msg={act.msg} />
       <LoadError code={list.error} />
