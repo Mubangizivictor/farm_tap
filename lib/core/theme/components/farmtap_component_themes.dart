@@ -246,7 +246,9 @@ abstract final class FarmTapComponentThemes {
     indicatorSize: TabBarIndicatorSize.tab,
     indicator: BoxDecoration(
       color: t.colors.primaryContainer,
-      border: Border(bottom: BorderSide(color: t.colors.primary, width: t.sizes.borderThick)),
+      border: Border(
+        bottom: BorderSide(color: t.colors.primary, width: t.sizes.borderThick),
+      ),
     ),
     dividerColor: t.colors.outlineVariant,
   );
