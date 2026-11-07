@@ -85,4 +85,14 @@ export const eraseClosedAccounts = onSchedule({ schedule: '30 2 * * *', timeZone
       logger.error('erase failed', { uid, error: String(e) });
     }
   }
+  // Farms removed from the panel (demo, fake or test farms): erased 90 days after removal.
+  const removed = await db().collection('tenants').where('closure.requestId', '==', 'admin').where('closure.at', '<=', cutoff).limit(50).get();
+  for (const t of removed.docs) {
+    try {
+      await db().recursiveDelete(t.ref);
+      await getStorage().bucket().deleteFiles({ prefix: `tenants/${t.id}/` }).catch(() => undefined);
+    } catch (e) {
+      logger.error('farm erase failed', { t: t.id, error: String(e) });
+    }
+  }
 });

@@ -263,7 +263,7 @@ export default function IntegrationsPage() {
           </Fit>
           <label className="row">
             <input type="checkbox" checked={i.sheets.auto} onChange={(e) => setI({ ...i, sheets: { ...i.sheets, auto: e.target.checked } })} />
-            <span>Send by itself when an admin opens the Overview (at most once an hour)</span>
+            <span>Keep it up to date by itself: right after every change made in this panel (like removing a farm), and when the panel is opened (at most every 10 minutes)</span>
           </label>
           <SheetsSendButton settings={i.sheets} disabled={intChanged} />
           {intChanged && <small className="muted">Save changes first, then send.</small>}

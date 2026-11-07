@@ -15,7 +15,9 @@ The control panel can copy **Farms, Payments, Users and the Audit log** into you
 
 - `webapp/src/lib/sheets.ts` builds the lists in the admin's browser from what that admin may already see (a finance-only admin sends no Users tab, and so on) and posts them to the web app with the secret word.
 - The script checks the word, replaces each tab's rows, and writes "Last updated" on the **About** tab.
-- "Send by itself": when an admin opens the Overview, at most once an hour per browser.
+- "Keep it up to date by itself": a few seconds after every change made in the panel (removing a farm, recording a payment…), and when the panel is opened if the last send is over 10 minutes old. It needs an admin to have the panel open; with the server (Blaze) it can run with nobody signed in.
+- Removed farms (Farms → a farm → **Remove farm**: demo, fake or test farms, or deleted accounts) are left out of every tab at once, and their people are left out of Users. "Bring back" undoes it within 90 days; after 90 days the server erases them (once Blaze is on).
+- Version 2 of the script styles every tab: FarmTap green header, stripes, money as UGX, real dates, coloured Status, filters, frozen first row and column, and an About tab with the headline numbers.
 - The sheet holds owners' names, emails and phone numbers. Share it only with people who may see them.
 
 ## Changing the script later

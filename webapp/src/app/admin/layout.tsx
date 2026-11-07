@@ -11,6 +11,7 @@ import type { Permission } from '@/lib/platform';
 import { useSession } from '@/lib/session';
 import { Avatar } from '@/components/Avatar';
 import { RefreshButton } from '@/components/RefreshButton';
+import { SheetsAutoSync } from '@/components/SheetsSend';
 
 interface NavItem {
   href: string;
@@ -227,6 +228,7 @@ function Shell({ children }: { children: ReactNode }) {
             )}
           </div>
         </header>
+        <SheetsAutoSync />
         <div className="content">
           <div className="print-only print-head">
             <strong>FarmTap control panel{here ? ` · ${here.label}` : ''}</strong>
