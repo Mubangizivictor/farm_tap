@@ -228,6 +228,12 @@ function Shell({ children }: { children: ReactNode }) {
           </div>
         </header>
         <div className="content">
+          <div className="print-only print-head">
+            <strong>FarmTap control panel{here ? ` · ${here.label}` : ''}</strong>
+            <span>
+              FarmTap platform · Victorbee Technologies · printed {new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })} by {me.name || user?.email}
+            </span>
+          </div>
           {!online && (
             <div className="banner bad" role="status">
               <Icon name="offline" />

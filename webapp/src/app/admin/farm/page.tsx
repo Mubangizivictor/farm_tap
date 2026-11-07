@@ -8,7 +8,7 @@ import { Confirm, Fit, MsgBanner, Need, Tri, useAction, useLoad } from '@/compon
 import { RecordPayment } from '@/components/adminPayment';
 import { Icon } from '@/components/Icon';
 import { Loading } from '@/components/Loading';
-import { Empty, PageHead, Stat } from '@/components/ui';
+import { Empty, PageHead, PrintButton, Stat } from '@/components/ui';
 import {
   adminChange,
   farmCollection,
@@ -669,6 +669,7 @@ function FarmView() {
         <Link className="btn outline sm" href="/admin/farms/">
           All farms
         </Link>
+        <PrintButton />
       </PageHead>
       <div className="tabs sticky" role="tablist">
         {tabs.map((t) => (

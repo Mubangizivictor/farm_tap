@@ -4,7 +4,7 @@ import { collection, doc } from 'firebase/firestore';
 import { useState, type FormEvent } from 'react';
 import { Anchor, Fit, MsgBanner, Need, Toggle, Tri, adminError, useAction, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
-import { Dialog, Empty, PageHead } from '@/components/ui';
+import { Dialog, Empty, PageHead, PrintButton } from '@/components/ui';
 import { adminChange, loadConfig, loadPlans, loadSmsPackages, setOp } from '@/lib/admin';
 import { useAdmin } from '@/lib/adminSession';
 import { firebase } from '@/lib/firebase';
@@ -215,6 +215,7 @@ export default function Plans() {
         <button className="btn sm" onClick={() => setEdit('new')}>
           <Icon name="plus" /> New plan
         </button>
+        <PrintButton />
       </PageHead>
 
       {plans.data && plans.data.length === 0 && (

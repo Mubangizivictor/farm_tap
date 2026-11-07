@@ -12,7 +12,7 @@ import { Fit } from '@/components/fit';
 import { Icon } from '@/components/Icon';
 import { AiTable } from '@/components/ai';
 import { Anchor, JumpNav, MsgBanner, Need, Toggle, useAction, useLoad } from '@/components/admin';
-import { PageHead, Stat } from '@/components/ui';
+import { PageHead, PrintButton, Stat } from '@/components/ui';
 import { aiModules, methodLabel, type Method } from '@/shared/aiCore';
 import { defaultAiConfig, experimentalModules, type AiConfig } from '@/shared/aiAccess';
 import { screeningTargets, SCREENING_ENGINE } from '@/shared/aiScreening';
@@ -239,6 +239,7 @@ export default function AiControlCentre() {
             <Icon name="check" /> Save changes
           </button>
         )}
+        <PrintButton />
       </PageHead>
       <MsgBanner msg={act.msg} />
       <div className="banner info small">

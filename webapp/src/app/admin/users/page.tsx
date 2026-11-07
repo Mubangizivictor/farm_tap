@@ -7,7 +7,7 @@ import { Suspense, useMemo, useState } from 'react';
 import { Confirm, MsgBanner, Need, useAction, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
 import { Loading } from '@/components/Loading';
-import { Empty, PageHead, SearchBox } from '@/components/ui';
+import { Empty, PageHead, PrintButton, SearchBox } from '@/components/ui';
 import { adminChange, downloadCsv, loadAllFarms, updateOp } from '@/lib/admin';
 import { useAdmin } from '@/lib/adminSession';
 import { parseDate } from '@/lib/dates';
@@ -211,7 +211,9 @@ function UsersView() {
   const [tab, setTab] = useState(params.get('tab') === 'waitlist' ? 'waitlist' : 'accounts');
   return (
     <>
-      <PageHead title="Users" subtitle="Everyone with a FarmTap account, and the waiting list" />
+      <PageHead title="Users" subtitle="Everyone with a FarmTap account, and the waiting list">
+        <PrintButton />
+      </PageHead>
       <div className="tabs" role="tablist">
         <button role="tab" aria-selected={tab === 'accounts'} onClick={() => setTab('accounts')}>
           Accounts

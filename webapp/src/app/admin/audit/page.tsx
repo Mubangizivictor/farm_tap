@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Need, useLoad } from '@/components/admin';
-import { Empty, PageHead } from '@/components/ui';
+import { Empty, PageHead, PrintButton } from '@/components/ui';
 import { loadAudit, type AuditEntry } from '@/lib/admin';
 import { date } from '@/lib/format';
 import { downloadCsv } from '@/lib/csv';
@@ -90,6 +90,7 @@ export default function AuditPage() {
         <button className="btn sm outline" onClick={exportCsv} disabled={!rows.length}>
           <Icon name="export" /> Export CSV
         </button>
+        <PrintButton />
       </PageHead>
       <div className="row wrap">
         <input

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Need, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
-import { Empty, LoadError, PageHead, SearchBox } from '@/components/ui';
+import { Empty, LoadError, PageHead, PrintButton, SearchBox } from '@/components/ui';
 import { downloadCsv, loadAllFarms, loadPlans } from '@/lib/admin';
 import { farmPlan, farmStatus, planOf } from '@/lib/adminView';
 import { date, shortDate } from '@/lib/format';
@@ -86,6 +86,7 @@ export default function AdminFarms() {
         <button className="btn outline sm" onClick={farms.reload}>
           <Icon name="refresh" /> Refresh
         </button>
+        <PrintButton />
       </PageHead>
 
       <div className="row wrap">

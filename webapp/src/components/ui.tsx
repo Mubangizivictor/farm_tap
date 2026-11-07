@@ -154,6 +154,15 @@ export function SearchBox({ value, onChange, placeholder = 'Search' }: { value: 
   );
 }
 
+/** Print the page (A4). Menus, buttons and the sidebar are left out of the print. */
+export function PrintButton() {
+  return (
+    <button className="btn outline sm print-btn" onClick={() => window.print()} title="Print this page">
+      <Icon name="print" /> <span className="btn-text">Print</span>
+    </button>
+  );
+}
+
 export function ExportButtons({ onCsv, print = true }: { onCsv?: () => void; print?: boolean }) {
   return (
     <>
