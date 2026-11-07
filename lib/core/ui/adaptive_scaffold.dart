@@ -309,6 +309,8 @@ class _Content extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!padBody) return child;
+    // Every padded page can be pulled to refresh: its own refresh, or the app-wide one (sync).
+    final refresh = onRefresh ?? FarmTapRefresh.of(context);
     final padding = context.space.content(form);
     // Leave room under the last item for the FAB.
     final bottom = padding.bottom + context.sizes.fab + context.space.lg;
@@ -322,8 +324,10 @@ class _Content extends StatelessWidget {
         ),
       ),
     );
-    if (!scrollable) return framed;
-    final refresh = onRefresh;
+    if (!scrollable) {
+      // The page scrolls its own list: refresh when that list is pulled down at the top.
+      return refresh == null ? framed : _LogoRefresh(onRefresh: refresh, anyDepth: true, child: framed);
+    }
     if (refresh == null) return SingleChildScrollView(child: framed);
     return _LogoRefresh(
       onRefresh: refresh,
@@ -332,13 +336,33 @@ class _Content extends StatelessWidget {
   }
 }
 
+/// The app-wide refresh (a sync with the server), provided once above every
+/// screen (app.dart). Pages without their own refresh use it for pull-to-refresh.
+class FarmTapRefresh extends InheritedWidget {
+  const new({required this.onRefresh, required super.child, super.key});
+
+  final RefreshCallback onRefresh;
+
+  static RefreshCallback? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<FarmTapRefresh>()?.onRefresh;
+
+  @override
+  bool updateShouldNotify(FarmTapRefresh oldWidget) => oldWidget.onRefresh != onRefresh;
+}
+
+/// Shortest time the refresh logo shows, so a quick refresh is still seen (1.5 s).
+const _refreshMin = Duration(milliseconds: 1500); // theme-guard: ignore
+
 /// Pull to refresh with the FarmTap loader at the top instead of the
-/// Material spinner.
+/// Material spinner. The logo stays at least 1.5 seconds.
 class _LogoRefresh extends StatefulWidget {
-  const new({required this.onRefresh, required this.child});
+  const new({required this.onRefresh, required this.child, this.anyDepth = false});
 
   final RefreshCallback onRefresh;
   final Widget child;
+
+  /// Listen to a scrolling list anywhere inside (pages that scroll their own list).
+  final bool anyDepth;
 
   @override
   State<_LogoRefresh> createState() => _LogoRefreshState();
@@ -356,7 +380,12 @@ class _LogoRefreshState extends State<_LogoRefresh> {
     return Stack(
       children: [
         RefreshIndicator.noSpinner(
-          onRefresh: widget.onRefresh,
+          onRefresh: () async {
+            await Future.wait<void>([widget.onRefresh(), Future<void>.delayed(_refreshMin)]);
+          },
+          notificationPredicate: widget.anyDepth
+              ? (n) => n.metrics.axis == Axis.vertical
+              : defaultScrollNotificationPredicate,
           onStatusChange: (s) {
             if (mounted && s != _status) setState(() => _status = s);
           },

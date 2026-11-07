@@ -7,6 +7,7 @@ import 'package:farm_tap/app/router/app_router.dart';
 import 'package:farm_tap/core/l10n/generated/app_localizations.dart';
 import 'package:farm_tap/core/settings/app_settings_cubit.dart';
 import 'package:farm_tap/core/theme/farmtap_theme.dart';
+import 'package:farm_tap/core/ui/ui.dart';
 import 'package:farm_tap/core/utils/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,7 +24,8 @@ class FarmTapApp extends StatefulWidget {
 }
 
 class _FarmTapAppState extends State<FarmTapApp> {
-  late final GoRouter _router = buildRouter(AppDependencies.fromGetIt());
+  late final AppDependencies _deps = AppDependencies.fromGetIt();
+  late final GoRouter _router = buildRouter(_deps);
 
   @override
   void dispose() {
@@ -65,6 +67,8 @@ class _FarmTapAppState extends State<FarmTapApp> {
       ],
       supportedLocales: const [Locale('en')],
       debugShowCheckedModeBanner: false,
+      // Pull down on any page to sync with the server (FarmTap logo, at least 1.5 s).
+      builder: (context, child) => FarmTapRefresh(onRefresh: _deps.sync.sync, child: child ?? const SizedBox.shrink()),
     );
   }
 }

@@ -48,16 +48,17 @@ abstract final class FarmTapComponentThemes {
   static NavigationBarThemeData navigationBar(FarmTapTokens t) => NavigationBarThemeData(
     height: t.sizes.navBarHeight,
     backgroundColor: t.colors.surfaceContainer,
-    indicatorColor: t.colors.primaryContainer,
+    // The open tab: filled brand colour behind its icon (strong contrast with the others).
+    indicatorColor: t.colors.primary,
     labelTextStyle: WidgetStateProperty.resolveWith(
       (states) => states.contains(WidgetState.selected)
-          ? t.text.labelSmall?.copyWith(color: t.colors.onSurface, fontWeight: FarmTapWeights.semiBold)
+          ? t.text.labelSmall?.copyWith(color: t.colors.onSurface, fontWeight: FarmTapWeights.bold)
           : t.text.labelSmall?.copyWith(color: t.colors.onSurfaceVariant),
     ),
     iconTheme: WidgetStateProperty.resolveWith(
       (states) => IconThemeData(
         size: t.sizes.iconLg,
-        color: states.contains(WidgetState.selected) ? t.colors.onPrimaryContainer : t.colors.onSurfaceVariant,
+        color: states.contains(WidgetState.selected) ? t.colors.onPrimary : t.colors.onSurfaceVariant,
       ),
     ),
   );
@@ -212,11 +213,42 @@ abstract final class FarmTapComponentThemes {
     labelStyle: t.text.labelMedium,
     padding: EdgeInsets.symmetric(horizontal: t.space.sm),
     backgroundColor: t.colors.surfaceContainerLowest,
-    selectedColor: t.colors.secondaryContainer,
-    checkmarkColor: t.colors.onSecondaryContainer,
+    selectedColor: t.colors.primaryContainer,
+    checkmarkColor: t.colors.onPrimaryContainer,
+    secondarySelectedColor: t.colors.primaryContainer,
     shape: RoundedRectangleBorder(borderRadius: t.radii.chip),
     side: BorderSide(color: t.colors.outlineVariant, width: t.sizes.borderThin),
     iconTheme: IconThemeData(size: t.sizes.iconSm, color: t.colors.onSurfaceVariant),
+  );
+
+  /// SegmentedButton (scan station, ID card): selected part filled with the brand colour.
+  static SegmentedButtonThemeData segmentedButton(FarmTapTokens t) => SegmentedButtonThemeData(
+    style: ButtonStyle(
+      backgroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected) ? t.colors.primary : t.colors.surfaceContainerHigh,
+      ),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected) ? t.colors.onPrimary : t.colors.onSurfaceVariant,
+      ),
+      iconColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected) ? t.colors.onPrimary : t.colors.onSurfaceVariant,
+      ),
+      side: WidgetStatePropertyAll(BorderSide(color: t.colors.outlineVariant, width: t.sizes.borderThin)),
+    ),
+  );
+
+  /// TabBar: the open tab gets a tinted background and a thick brand underline.
+  static TabBarThemeData tabBar(FarmTapTokens t) => TabBarThemeData(
+    labelColor: t.colors.onPrimaryContainer,
+    unselectedLabelColor: t.colors.onSurfaceVariant,
+    labelStyle: t.text.labelLarge?.copyWith(fontWeight: FarmTapWeights.bold),
+    unselectedLabelStyle: t.text.labelLarge,
+    indicatorSize: TabBarIndicatorSize.tab,
+    indicator: BoxDecoration(
+      color: t.colors.primaryContainer,
+      border: Border(bottom: BorderSide(color: t.colors.primary, width: t.sizes.borderThick)),
+    ),
+    dividerColor: t.colors.outlineVariant,
   );
 
   static TooltipThemeData tooltip(FarmTapTokens t) => TooltipThemeData(

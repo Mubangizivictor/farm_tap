@@ -83,6 +83,8 @@ abstract final class FarmTapTheme {
       bottomSheetTheme: FarmTapComponentThemes.bottomSheet(t),
       snackBarTheme: FarmTapComponentThemes.snackBar(t),
       chipTheme: FarmTapComponentThemes.chip(t),
+      segmentedButtonTheme: FarmTapComponentThemes.segmentedButton(t),
+      tabBarTheme: FarmTapComponentThemes.tabBar(t),
       tooltipTheme: FarmTapComponentThemes.tooltip(t),
       dividerTheme: FarmTapComponentThemes.divider(t),
       progressIndicatorTheme: FarmTapComponentThemes.progress(t),

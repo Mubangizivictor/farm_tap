@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useAdmin } from '@/lib/adminSession';
+import { useRefreshTick } from '@/lib/refresh';
 import type { Permission } from '@/lib/platform';
 import { Icon } from './Icon';
 
@@ -10,6 +11,7 @@ export function useLoad<T>(load: () => Promise<T>, deps: unknown[] = []) {
   const [data, setData] = useState<T | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [n, setN] = useState(0);
+  const tick = useRefreshTick();
   useEffect(() => {
     let live = true;
     setError(null);
@@ -20,7 +22,7 @@ export function useLoad<T>(load: () => Promise<T>, deps: unknown[] = []) {
       live = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [n, ...deps]);
+  }, [n, tick, ...deps]);
   const reload = useCallback(() => setN((x) => x + 1), []);
   return { data, error, reload };
 }

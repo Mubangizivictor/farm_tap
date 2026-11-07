@@ -131,7 +131,11 @@ class SegmentedTabs<T> extends StatelessWidget {
     final c = context.colors;
     return Container(
       height: context.sizes.segmentedHeight,
-      decoration: BoxDecoration(color: c.surfaceContainer, borderRadius: context.radii.badge),
+      decoration: BoxDecoration(
+        color: c.surfaceContainerHigh,
+        borderRadius: context.radii.badge,
+        border: Border.all(color: c.outlineVariant, width: context.sizes.borderThin),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -151,11 +155,9 @@ class SegmentedTabs<T> extends StatelessWidget {
                     padding: EdgeInsets.all(context.space.xs),
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: o.value == selected ? c.surfaceContainerLowest : Colors.transparent,
+                        // Selected: filled brand colour, so it stands out clearly from the rest.
+                        color: o.value == selected ? c.primary : Colors.transparent,
                         borderRadius: context.radii.segmentedThumb,
-                        border: o.value == selected
-                            ? Border.all(color: c.outlineVariant, width: context.sizes.borderThin)
-                            : null,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -165,7 +167,7 @@ class SegmentedTabs<T> extends StatelessWidget {
                               o.icon,
                               fill: o.value == selected ? 1 : 0,
                               size: context.sizes.iconSm,
-                              color: o.value == selected ? c.onSurface : c.onSurfaceVariant,
+                              color: o.value == selected ? c.onPrimary : c.onSurfaceVariant,
                             ),
                             context.space.gapXs,
                           ],
@@ -174,8 +176,8 @@ class SegmentedTabs<T> extends StatelessWidget {
                               o.label,
                               overflow: TextOverflow.ellipsis,
                               style: context.text.labelMedium?.copyWith(
-                                color: o.value == selected ? c.onSurface : c.onSurfaceVariant,
-                                fontWeight: o.value == selected ? FarmTapWeights.semiBold : null,
+                                color: o.value == selected ? c.onPrimary : c.onSurfaceVariant,
+                                fontWeight: o.value == selected ? FarmTapWeights.bold : null,
                               ),
                             ),
                           ),
