@@ -27,21 +27,34 @@ class PlanOption extends Equatable {
     this.highlights = const [],
     this.badge = '',
     this.sort = 0,
+    this.features = const {},
   });
 
-  factory fromDoc(String id, Map<String, Object?> d) => PlanOption(
-    id: id,
-    name: _s(d['name'], 'Plan'),
-    priceUgx: _i(d['priceUgx']),
-    months: _i(d['months'], 1).clamp(1, 36),
-    description: _s(d['description']),
-    highlights: [
-      for (final h in (d['highlights'] as List?) ?? const [])
-        if (h is String && h.trim().isNotEmpty) h,
-    ],
-    badge: _s(d['badge']),
-    sort: _i(d['sort']),
-  );
+  factory fromDoc(String id, Map<String, Object?> d) {
+    final rawFeatures = d['features'];
+    final Map<String, bool> featureMap = {};
+    if (rawFeatures is Map) {
+      for (final entry in rawFeatures.entries) {
+        if (entry.key is String && entry.value is bool) {
+          featureMap[entry.key as String] = entry.value as bool;
+        }
+      }
+    }
+    return PlanOption(
+      id: id,
+      name: _s(d['name'], 'Plan'),
+      priceUgx: _i(d['priceUgx']),
+      months: _i(d['months'], 1).clamp(1, 36),
+      description: _s(d['description']),
+      highlights: [
+        for (final h in (d['highlights'] as List?) ?? const [])
+          if (h is String && h.trim().isNotEmpty) h,
+      ],
+      badge: _s(d['badge']),
+      sort: _i(d['sort']),
+      features: featureMap,
+    );
+  }
 
   final String id;
   final String name;
@@ -51,11 +64,14 @@ class PlanOption extends Equatable {
   final List<String> highlights;
   final String badge;
   final int sort;
+  /// Feature switches from the plan (key = feature key, value = on/off).
+  /// Empty map = all features default to the platform config defaults.
+  final Map<String, bool> features;
 
   int get perMonth => (priceUgx / months).round();
 
   @override
-  List<Object?> get props => [id, name, priceUgx, months, description, highlights, badge, sort];
+  List<Object?> get props => [id, name, priceUgx, months, description, highlights, badge, sort, features];
 }
 
 /// The same sample plans as the web, until the control panel has its own.

@@ -9,13 +9,15 @@
 import { collection, getDocs, onSnapshot, type Unsubscribe } from 'firebase/firestore';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { firebase } from './firebase.ts';
-import { announcementFor, configFromDoc, defaultConfig, type Announcement, type PlatformConfig } from './platform.ts';
+import { announcementFor, configFromDoc, defaultConfig, planFromDoc, type Announcement, type Plan, type PlatformConfig } from './platform.ts';
 import type { Farm } from './domain.ts';
 import { doc } from 'firebase/firestore';
 
 interface PlatformCtx {
   config: PlatformConfig;
   announcements: Announcement[];
+  /** All active plans (loaded live). */
+  plans: Plan[];
   /** Announcements relevant to this farm, filtered and live. */
   farmAnnouncements: (farm: Farm) => Announcement[];
 }
@@ -23,18 +25,24 @@ interface PlatformCtx {
 const Ctx = createContext<PlatformCtx>({
   config: defaultConfig,
   announcements: [],
+  plans: [],
   farmAnnouncements: () => [],
 });
 
 export function PlatformProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<PlatformConfig>(defaultConfig);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
     const { db } = firebase();
     // Live-subscribe to platform/config
     const unsub: Unsubscribe = onSnapshot(doc(db, 'platform', 'config'), (snap) => {
       if (snap.exists()) setConfig(configFromDoc(snap.data() as Record<string, unknown>));
+    });
+    // Live-subscribe to plans so feature gates update without a reload
+    const unsubPlans: Unsubscribe = onSnapshot(collection(db, 'plans'), (snap) => {
+      setPlans(snap.docs.map((d) => planFromDoc(d.id, d.data())));
     });
 
     // Load announcements once (they rarely change mid-session)
@@ -67,7 +75,7 @@ export function PlatformProvider({ children }: { children: ReactNode }) {
     }
     void loadAnnouncements();
 
-    return () => unsub();
+    return () => { unsub(); unsubPlans(); };
   }, []);
 
   const farmAnnouncements = (farm: Farm) => {
@@ -75,7 +83,7 @@ export function PlatformProvider({ children }: { children: ReactNode }) {
     return announcements.filter((a) => announcementFor(a, farm, now));
   };
 
-  return <Ctx.Provider value={{ config, announcements, farmAnnouncements }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ config, announcements, plans, farmAnnouncements }}>{children}</Ctx.Provider>;
 }
 
 export function usePlatform() {

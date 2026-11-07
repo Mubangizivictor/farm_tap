@@ -11,7 +11,7 @@ import { ToastProvider } from '@/components/ui';
 import { hasHerd, isCentre, manages, planState, type Farm } from '@/lib/domain';
 import { date } from '@/lib/format';
 import { farmKind, planText } from '@/lib/labels';
-import { featureOn, WEB_BUILD, type FeatureKey, type PlatformConfig } from '@/lib/platform';
+import { featureOn, starterPlan, WEB_BUILD, type FeatureKey, type PlatformConfig, type Plan } from '@/lib/platform';
 import { useSession, useTheme, type ThemeChoice } from '@/lib/session';
 import { supportWhatsAppLink } from '@/lib/support';
 import { markFarmSeen, useIsPlatformAdmin } from '@/lib/adminSession';
@@ -23,30 +23,83 @@ interface NavItem {
   href: string;
   label: string;
   icon: IconName;
-  feature?: FeatureKey;
+  /** True when the farm's plan blocks this feature. Shows dimmed with lock icon + upgrade prompt. */
+  locked?: boolean;
 }
 
-/** The menu fits the farm: a centre sees suppliers, a farm sees its herd. */
-function navFor(f: Farm, cfg: PlatformConfig): NavItem[] {
-  const feat = (k: FeatureKey) => featureOn(k, cfg.features, null, f.features as Record<FeatureKey, boolean | undefined>);
+/**
+ * The menu for the current farm. Items that the plan has switched off are
+ * included but marked locked=true so they show dimmed with an upgrade prompt
+ * instead of disappearing entirely (the farmer can see what they are missing).
+ */
+function navFor(f: Farm, cfg: PlatformConfig, plan: Plan | null): NavItem[] {
+  // featureOn: farm override → plan → app default
+  const planFeatures = plan?.features ?? null;
+  const farmFeatures = f.features as Record<FeatureKey, boolean | undefined>;
+  const feat = (k: FeatureKey) => featureOn(k, cfg.features, planFeatures, farmFeatures);
+  const locked = (k: FeatureKey) => !feat(k);
+
   return [
     { href: '/home/', label: 'Home', icon: 'home' as const },
     // AI Intelligence (decision 0025): second, so it is on the phone's bottom bar too.
-    ...(feat('ai') && cfg.ai.enabled ? [{ href: '/ai/', label: 'AI Intelligence', icon: 'spark' as const }] : []),
-    ...(hasHerd(f) && feat('milk') ? [{ href: '/milk/', label: 'Milk', icon: 'drop' as const }] : []),
-    ...(hasHerd(f) && feat('herd') ? [{ href: '/herd/', label: 'Herd', icon: 'tag' as const }] : []),
-    ...(hasHerd(f) && feat('health') ? [{ href: '/health/', label: 'Health', icon: 'health' as const }] : []),
-    ...(hasHerd(f) && feat('breeding') ? [{ href: '/breeding/', label: 'Breeding', icon: 'cow' as const }] : []),
-    ...(hasHerd(f) && feat('feeding') ? [{ href: '/feeds/', label: 'Feeds', icon: 'feed' as const }] : []),
+    ...(cfg.ai.enabled ? [{ href: '/ai/', label: 'AI Intelligence', icon: 'spark' as const, locked: locked('ai') }] : []),
+    ...(hasHerd(f) ? [{ href: '/milk/', label: 'Milk', icon: 'drop' as const, locked: locked('milk') }] : []),
+    ...(hasHerd(f) ? [{ href: '/herd/', label: 'Herd', icon: 'tag' as const, locked: locked('herd') }] : []),
+    ...(hasHerd(f) ? [{ href: '/health/', label: 'Health', icon: 'health' as const, locked: locked('health') }] : []),
+    ...(hasHerd(f) ? [{ href: '/breeding/', label: 'Breeding', icon: 'cow' as const, locked: locked('breeding') }] : []),
+    ...(hasHerd(f) ? [{ href: '/feeds/', label: 'Feeds', icon: 'feed' as const, locked: locked('feeding') }] : []),
     ...(isCentre(f) ? [{ href: '/farmers/', label: 'Milk suppliers', icon: 'truck' as const }] : []),
-    ...(feat('workers') ? [{ href: '/workers/', label: 'Workers', icon: 'workers' as const }] : []),
-    { href: '/roster/', label: 'Duty roster', icon: 'calendar' as const },
-    { href: '/tasks/', label: 'Tasks', icon: 'check' as const },
+    { href: '/workers/', label: 'Workers', icon: 'workers' as const, locked: locked('workers') },
+    { href: '/roster/', label: 'Duty roster', icon: 'calendar' as const, locked: locked('roster') },
+    { href: '/tasks/', label: 'Tasks', icon: 'check' as const, locked: locked('tasks') },
     { href: '/contacts/', label: 'Contacts', icon: 'phone' as const },
-    ...(manages(f) && feat('money') ? [{ href: '/money/', label: 'Money', icon: 'money' as const }] : []),
-    ...(manages(f) && feat('money') ? [{ href: '/reports/', label: 'Reports', icon: 'chart' as const }] : []),
+    ...(manages(f) ? [{ href: '/money/', label: 'Money', icon: 'money' as const, locked: locked('money') }] : []),
+    ...(manages(f) ? [{ href: '/reports/', label: 'Reports', icon: 'chart' as const, locked: locked('reports') }] : []),
     { href: '/settings/', label: 'Settings', icon: 'settings' as const },
   ];
+}
+
+/** Shown when the farmer taps a nav item their plan does not include. */
+function UpgradePrompt({ feature, planName, onClose }: { feature: string; planName: string; onClose: () => void }) {
+  return (
+    <div className="scrim" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="dialog md" role="dialog" aria-modal="true" aria-label="Upgrade your plan">
+        <div className="dialog-head">
+          <div className="stack grow head-text">
+            <h2>Upgrade your plan</h2>
+            <p className="small muted">This feature is not included in your current plan</p>
+          </div>
+          <button className="icon-btn" aria-label="Close" onClick={onClose}><Icon name="close" /></button>
+        </div>
+        <div className="stack" style={{ padding: 'var(--s-lg)', gap: 'var(--s-md)' }}>
+          <div className="banner warn" role="status" style={{ borderRadius: 'var(--r-md)' }}>
+            <Icon name="lock" />
+            <span>
+              <strong>{feature}</strong> is not available on the <strong>{planName}</strong> plan.
+            </span>
+          </div>
+          <p className="muted">
+            To unlock this feature, upgrade to a higher plan. Contact FarmTap support
+            on WhatsApp and we will help you switch.
+          </p>
+          <div className="row wrap" style={{ gap: 'var(--s-sm)' }}>
+            <a
+              href={`https://wa.me/256793128137?text=${encodeURIComponent('Hello FarmTap, I want to upgrade my plan to get access to ' + feature + '.')}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn"
+              onClick={onClose}
+            >
+              <Icon name="whatsapp" /> WhatsApp support
+            </a>
+            <Link href="/settings/#plan" className="btn outline" onClick={onClose}>
+              <Icon name="money" /> See plans
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function ThemeSwitch() {
@@ -266,7 +319,7 @@ function LockScreen({ farm, onView }: { farm: Farm; onView: () => void }) {
 
 function FarmShell({ children }: { children: ReactNode }) {
   const { user, farms, farm, online, closed } = useSession();
-  const { config } = usePlatform();
+  const { config, plans } = usePlatform();
   const router = useRouter();
   const path = usePathname();
   const [more, setMore] = useState(false);
@@ -274,6 +327,8 @@ function FarmShell({ children }: { children: ReactNode }) {
   const seenRef = useRef(false);
   const side = useSidebar();
   const [viewing, setViewing] = useState(false);
+  /** Feature name the farmer just tapped while locked, or null = no dialog. */
+  const [upgradeFor, setUpgradeFor] = useState<{ feature: string; planName: string } | null>(null);
 
   useEffect(() => {
     if (user === null) router.replace('/sign-in/');
@@ -281,6 +336,7 @@ function FarmShell({ children }: { children: ReactNode }) {
   }, [user, farms, farm, router]);
 
   useEffect(() => setMore(false), [path]);
+  useEffect(() => setUpgradeFor(null), [path]);
 
   // Mark this farm as seen by the current user (admin analytics)
   useEffect(() => {
@@ -304,25 +360,45 @@ function FarmShell({ children }: { children: ReactNode }) {
     return <DisabledScreen />;
   }
 
-  const nav = navFor(farm, config);
+  const activePlan: Plan = plans.find((p) => p.id === farm.planId) ?? plans.find((p) => p.active) ?? starterPlan;
+  const nav = navFor(farm, config, activePlan);
   const state = planState(farm.subscription, new Date());
-  const plan = planText(state);
-  const locked = state.kind === 'readOnly' && !path.startsWith('/settings') && !(viewing && manages(farm));
+  const planChip = planText(state);
+  const subscriptionLocked = state.kind === 'readOnly' && !path.startsWith('/settings') && !(viewing && manages(farm));
   const current = (href: string) => (path === href || path === href.slice(0, -1) || (href === '/ai/' && path.startsWith('/ai/')) ? 'page' : undefined);
   const phoneMain = nav.slice(0, 4);
   const phoneMore = nav.slice(4);
+
+  /** Called when the user taps a locked nav item. */
+  function handleLockedTap(item: NavItem) {
+    setUpgradeFor({ feature: item.label, planName: activePlan.name });
+    setMore(false);
+  }
 
   return (
     <div className={`shell farm ${side.closed ? 'side-closed' : ''}`}>
       <aside className="sidebar">
         <SideHead home="/home/" closed={side.closed} onToggle={side.toggle} />
         <nav className="nav" aria-label="Main">
-          {nav.map((n) => (
-            <Link key={n.href} href={n.href} aria-current={current(n.href)} title={n.label}>
-              <Icon name={n.icon} />
-              <span>{n.label}</span>
-            </Link>
-          ))}
+          {nav.map((n) =>
+            n.locked ? (
+              <button
+                key={n.href}
+                className="nav-locked"
+                title={`${n.label} — not on your plan`}
+                onClick={() => handleLockedTap(n)}
+              >
+                <Icon name={n.icon} />
+                <span>{n.label}</span>
+                <Icon name="lock" className="lock-badge" />
+              </button>
+            ) : (
+              <Link key={n.href} href={n.href} aria-current={current(n.href)} title={n.label}>
+                <Icon name={n.icon} />
+                <span>{n.label}</span>
+              </Link>
+            )
+          )}
         </nav>
         <div className="grow" />
         <div className="side-foot card flat small">
@@ -344,37 +420,63 @@ function FarmShell({ children }: { children: ReactNode }) {
           <span className={`sync-dot hide-sm ${online ? '' : 'off'}`} title={online ? 'Changes from the farm phones show here as they sync' : 'No internet'}>
             {online ? 'Live' : 'Offline'}
           </span>
-          <Link href="/settings/#plan" className={`chip plan-chip ${plan.tone}`} title="See plans and pay">
+          <Link href="/settings/#plan" className={`chip plan-chip ${planChip.tone}`} title="See plans and pay">
             <Icon name={state.kind === 'readOnly' ? 'lock' : 'clock'} />
-            <span>{plan.text}</span>
+            <span>{planChip.text}</span>
           </Link>
           <RefreshButton />
           <UserMenu />
         </header>
         <div className="content">
           <Banners farm={farm} />
-          {locked ? <LockScreen farm={farm} onView={() => setViewing(true)} /> : children}
+          {subscriptionLocked ? <LockScreen farm={farm} onView={() => setViewing(true)} /> : children}
         </div>
       </div>
 
+      {upgradeFor && (
+        <UpgradePrompt
+          feature={upgradeFor.feature}
+          planName={upgradeFor.planName}
+          onClose={() => setUpgradeFor(null)}
+        />
+      )}
       {more && <div className="drawer-scrim more-scrim" onClick={() => setMore(false)} aria-hidden />}
       {more && (
         <div className="more-sheet nav" role="menu">
-          {phoneMore.map((n) => (
-            <Link key={n.href} href={n.href} aria-current={current(n.href)}>
-              <Icon name={n.icon} />
-              <span>{n.label}</span>
-            </Link>
-          ))}
+          {phoneMore.map((n) =>
+            n.locked ? (
+              <button
+                key={n.href}
+                className="nav-locked"
+                onClick={() => handleLockedTap(n)}
+              >
+                <Icon name={n.icon} />
+                <span>{n.label}</span>
+                <Icon name="lock" className="lock-badge" />
+              </button>
+            ) : (
+              <Link key={n.href} href={n.href} aria-current={current(n.href)}>
+                <Icon name={n.icon} />
+                <span>{n.label}</span>
+              </Link>
+            )
+          )}
         </div>
       )}
       <nav className="bottomnav" aria-label="Main">
-        {phoneMain.map((n) => (
-          <Link key={n.href} href={n.href} aria-current={current(n.href)}>
-            <Icon name={n.icon} />
-            {n.label}
-          </Link>
-        ))}
+        {phoneMain.map((n) =>
+          n.locked ? (
+            <button key={n.href} className="nav-locked" onClick={() => handleLockedTap(n)}>
+              <Icon name={n.icon} />
+              {n.label}
+            </button>
+          ) : (
+            <Link key={n.href} href={n.href} aria-current={current(n.href)}>
+              <Icon name={n.icon} />
+              {n.label}
+            </Link>
+          )
+        )}
         <button onClick={() => setMore(!more)} aria-expanded={more}>
           <Icon name="more" />
           More

@@ -21,6 +21,9 @@ export const featureList = [
   { key: 'exports', label: 'PDF and Excel exports', hint: 'Download and print reports' },
   { key: 'webApp', label: 'Web app', hint: 'Use FarmTap in Chrome' },
   { key: 'smsAutoSend', label: 'Automatic SMS', hint: 'Sent by the server, uses SMS credits' },
+  { key: 'reports', label: 'Reports', hint: 'Monthly and custom reports' },
+  { key: 'tasks', label: 'Tasks', hint: 'Farm task list and reminders' },
+  { key: 'roster', label: 'Duty roster', hint: 'Staff duty schedule and calendar' },
   { key: 'ai', label: 'AI Intelligence', hint: 'Assistant, alerts, predictions (decision 0025)' },
 ] as const;
 
@@ -40,6 +43,9 @@ export const defaultFeatures: Record<FeatureKey, boolean> = {
   exports: true,
   webApp: true,
   smsAutoSend: false,
+  reports: true,
+  tasks: true,
+  roster: true,
   ai: true,
 };
 

@@ -1,0 +1,26 @@
+@@ -196,6 +196,25 @@
+ }
+ .nav a:hover { background: var(--c-container); }
+ .nav a[aria-current='page'] { background: var(--c-primary-container); color: var(--c-on-primary-container); font-weight: var(--fw-semibold); }
++/* Plan-locked nav item: looks like a nav link but dimmed, with a lock badge */
++.nav-locked {
++  display: flex; align-items: center; gap: var(--s-lg); min-height: var(--z-btn); padding: 0 var(--s-lg);
++  border-radius: var(--r-btn); color: var(--c-on-surface-variant); font-weight: var(--fw-medium);
++  border: 0; background: none; cursor: pointer; width: 100%; text-align: left;
++  opacity: 0.45; position: relative;
++}
++.nav-locked:hover { background: var(--c-container); opacity: 0.6; }
++.nav-locked .lock-badge { margin-left: auto; font-size: var(--fs-label-sm); flex-shrink: 0; }
++/* Bottomnav locked item */
++.bottomnav .nav-locked {
++  flex-direction: column; justify-content: center; gap: var(--s-xxs);
++  font-size: var(--fs-label-sm); min-height: unset; padding: 0;
++}
++.bottomnav .nav-locked .lock-badge { margin-left: 0; font-size: var(--fs-label-sm); position: absolute; top: var(--s-xs); right: 50%; transform: translateX(var(--s-lg)); }
++/* Side-closed mode: hide text, center icon */
++.shell.side-closed .sidebar .nav-locked { justify-content: center; padding: 0; }
++.shell.side-closed .sidebar .nav-locked span { display: none; }
++.shell.side-closed .sidebar .nav-locked .lock-badge { margin-left: 0; position: absolute; top: var(--s-xxs); right: var(--s-xxs); font-size: var(--fs-label-sm); }
+ .more-sheet { position: fixed; inset: auto 0 var(--z-bottomnav) 0; z-index: 30; background: var(--c-card); border-top: var(--z-border) solid var(--c-outline-variant); padding: var(--s-md) var(--s-lg); border-radius: var(--r-xl) var(--r-xl) 0 0; }
+ .menu { position: absolute; right: 0; top: 100%; margin-top: var(--s-xs); min-width: var(--z-menu); background: var(--c-card); border: var(--z-border) solid var(--c-outline-variant); border-radius: var(--r-md); padding: var(--s-xs); z-index: 40; box-shadow: 0 var(--z-shadow-y) var(--z-shadow-blur) var(--c-shadow); }
+ .menu a, .menu button { display: flex; width: 100%; align-items: center; gap: var(--s-md); padding: var(--s-md) var(--s-lg); border: 0; background: none; border-radius: var(--r-sm); cursor: pointer; text-align: left; color: var(--c-on-surface); text-decoration: none; }
