@@ -45,6 +45,7 @@ import {
 } from '@/lib/domain';
 import { count, firstName, greeting, litres, longDate, shortDate, time, ugx, words } from '@/lib/format';
 import { useFarm, useSession } from '@/lib/session';
+import { Avatar } from '@/components/Avatar';
 
 export default function Home() {
   const farm = useFarm();
@@ -343,7 +344,7 @@ export default function Home() {
             const inAt = a ? (parseDate(a.body.inAt ?? a.body.at) ?? recordDate(a)) : null;
             return (
               <div key={s.id} className="list-row">
-                <span className="avatar">{personPhotoSrc(s.body) ? <img src={personPhotoSrc(s.body)!} alt="" /> : s.body.name.slice(0, 1).toUpperCase()}</span>
+                <Avatar photo={personPhotoSrc(s.body)} name={s.body.name} />
                 <div className="grow">
                   <div>{s.body.name}</div>
                   <div className="small muted">{s.body.title || words(s.body.role)}</div>
@@ -373,7 +374,7 @@ export default function Home() {
               .slice(0, 6)
               .map((d) => (
                 <div key={d.id} className="list-row">
-                  <span className="avatar">{farmerName(d.body.farmerId).slice(0, 1)}</span>
+                  <Avatar name={farmerName(d.body.farmerId)} />
                   <div className="grow">
                     <div>{farmerName(d.body.farmerId)}</div>
                     <div className="small muted">

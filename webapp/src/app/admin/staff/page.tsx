@@ -8,8 +8,8 @@ import { Dialog, Empty, PageHead } from '@/components/ui';
 import { adminChange, loadInvites, loadStaff, setOp, updateOp, type AdminStaff } from '@/lib/admin';
 import { useAdmin } from '@/lib/adminSession';
 import { firebase } from '@/lib/firebase';
-import { initials } from '@/lib/format';
 import { permissionList, rolePresets, type Permission } from '@/lib/platform';
+import { Avatar } from '@/components/Avatar';
 
 function PermPicker({ role, perms, onChange }: { role: string; perms: Permission[]; onChange: (role: string, perms: Permission[]) => void }) {
   return (
@@ -150,7 +150,7 @@ export default function Staff() {
               <tr key={s.uid}>
                 <td className="lead">
                   <div className="row">
-                    <span className="avatar">{initials(s.name || s.email)}</span>
+                    <Avatar name={s.name || s.email} />
                     <div className="stack" style={{ gap: 0 }}>
                       <strong>{s.name || 'No name'}</strong>
                       <span className="small muted">{s.email}</span>

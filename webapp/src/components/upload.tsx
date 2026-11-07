@@ -5,8 +5,8 @@
 
 import { useRef, useState } from 'react';
 import { Icon } from '@/components/Icon';
-import { initials } from '@/lib/format';
 import { shrinkImage, type Shrunk } from '@/lib/images';
+import { Avatar } from '@/components/Avatar';
 
 /** A round photo with Change and Remove. `onPick` gets a small square JPEG. */
 export function PhotoPicker({
@@ -40,9 +40,7 @@ export function PhotoPicker({
   };
   return (
     <div className="photo-picker">
-      <span className="avatar-xl" aria-hidden>
-        {photo ? <img src={photo} alt="" referrerPolicy="no-referrer" /> : initials(name || '?')}
-      </span>
+      <Avatar size="xl" photo={photo} name={name} />
       <div className="stack">
         <div className="row wrap">
           <button type="button" className="btn outline sm" disabled={disabled || busy} onClick={() => input.current?.click()}>

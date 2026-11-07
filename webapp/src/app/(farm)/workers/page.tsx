@@ -35,7 +35,7 @@ import {
   type StaffBody,
   type WageBody,
 } from '@/lib/domain';
-import { count, date, initials, shortDate, time, ugx, words } from '@/lib/format';
+import { count, date, shortDate, time, ugx, words } from '@/lib/format';
 import { firebase } from '@/lib/firebase';
 import { base64Of, personPhotoSrc, storeImage } from '@/lib/images';
 import { PhotoPicker } from '@/components/upload';
@@ -50,6 +50,7 @@ const payText = (b: StaffBody) => {
   return t.rate ? `${ugx(t.rate)} ${payTypeUnit[t.type].per}` : '';
 };
 import { useOpenFromUrl } from '@/lib/useOpen';
+import { Avatar } from '@/components/Avatar';
 
 const inTime = (a: FarmRecord<AttendanceBody>) => parseDate(a.body.inAt ?? a.body.at) ?? recordDate(a);
 const phoneOk = (p: string) => !p.trim() || /^\+?[\d\s-]{9,16}$/.test(p.trim());
@@ -464,7 +465,7 @@ function Profile({
             }}
           />
         ) : (
-          <span className="avatar lg">{personPhotoSrc(s.body) ? <img src={personPhotoSrc(s.body)!} alt="" /> : initials(s.body.name)}</span>
+          <Avatar size="lg" photo={personPhotoSrc(s.body)} name={s.body.name} />
         )}
         <div className="stack grow" style={{ gap: 'var(--s-xxs)' }}>
           <span className="small muted">
@@ -688,7 +689,7 @@ export default function Workers() {
                 <tr key={s.id} className="clickable" tabIndex={0} onClick={() => setOpenId(s.id)} onKeyDown={(e) => e.key === 'Enter' && setOpenId(s.id)}>
                   <td data-label="Name" className="lead">
                     <span className="row">
-                      <span className="avatar">{personPhotoSrc(s.body) ? <img src={personPhotoSrc(s.body)!} alt="" /> : initials(s.body.name)}</span>
+                      <Avatar photo={personPhotoSrc(s.body)} name={s.body.name} />
                       <strong>{s.body.name}</strong>
                     </span>
                   </td>

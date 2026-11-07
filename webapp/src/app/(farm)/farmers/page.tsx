@@ -25,11 +25,12 @@ import { downloadCsv } from '@/lib/csv';
 import { dayKey, localIso, sameDay, startOfMonth } from '@/lib/dates';
 import { addRecord, mergeBody, putRecord, removeRecord, upsertRecord, useRecords } from '@/lib/data';
 import { manages, recordDate, type DeliveryBody, type FarmRecord, type FarmerBody, type NfcCardBody, type StaffBody } from '@/lib/domain';
-import { count, date, initials, litres, num1, shortDate, time, words } from '@/lib/format';
+import { count, date, litres, num1, shortDate, time, words } from '@/lib/format';
 import { firebase } from '@/lib/firebase';
 import { personPhotoSrc } from '@/lib/images';
 import { useFarm, useSession } from '@/lib/session';
 import { useOpenFromUrl } from '@/lib/useOpen';
+import { Avatar } from '@/components/Avatar';
 
 const rejectReasons = ['sour', 'addedWater', 'dirty', 'treatedCow', 'other'] as const;
 const reasonText = (r: string | null | undefined) => (r === 'treatedCow' ? 'From a treated animal' : words(r) || 'Rejected');
@@ -429,7 +430,7 @@ function SupplierDetail({
   return (
     <Dialog title={f.body.name} subtitle={f.body.village || 'Village not set'} onClose={onClose} size="lg">
       <div className="row wrap">
-        <span className="avatar lg">{personPhotoSrc(f.body) ? <img src={personPhotoSrc(f.body)!} alt="" /> : initials(f.body.name)}</span>
+        <Avatar size="lg" photo={personPhotoSrc(f.body)} name={f.body.name} />
         <div className="stack grow" style={{ gap: 'var(--s-xxs)' }}>
           <span>{f.body.phone}</span>
           <div className="chips">
