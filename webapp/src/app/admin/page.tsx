@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { Fit, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
 import { Empty, PageHead, PrintButton, Stat } from '@/components/ui';
-import { loadAllFarms, loadPayments, loadPlans, type AdminFarm } from '@/lib/admin';
+import { loadAllFarms, loadIntegrations, loadPayments, loadPlans, type AdminFarm } from '@/lib/admin';
+import { SheetsSendButton } from '@/components/SheetsSend';
+import { sheetsUrlOk } from '@/lib/sheets';
 import { useAdmin } from '@/lib/adminSession';
 import { addDays } from '@/lib/dates';
 import { firebase } from '@/lib/firebase';
@@ -20,6 +22,7 @@ export default function Overview() {
   const farms = useLoad(() => (seeFarms ? loadAllFarms() : Promise.resolve([])), [seeFarms]);
   const pays = useLoad(() => (can('finance') ? loadPayments() : Promise.resolve([])), [me?.role]);
   const plans = useLoad(loadPlans);
+  const sheets = useLoad(loadIntegrations);
   const waitlist = useLoad(async () => {
     if (!can('farms')) return [];
     const s = await getDocs(collection(firebase().db, 'waitlist'));
@@ -72,6 +75,7 @@ export default function Overview() {
       <PageHead title={`Hello${me?.name ? `, ${me.name.split(' ')[0]}` : ''}`} subtitle="How FarmTap is doing today.">
         <PrintButton />
       </PageHead>
+      {sheets.data && sheetsUrlOk(sheets.data.sheets.url) && <SheetsSendButton settings={sheets.data.sheets} auto />}
 
       {seeFarms && (
         <Fit kind="stats">

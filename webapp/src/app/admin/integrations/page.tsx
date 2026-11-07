@@ -10,6 +10,8 @@ import { useAdmin } from '@/lib/adminSession';
 import { firebase } from '@/lib/firebase';
 import { date } from '@/lib/format';
 import { defaultConfig, maskSecret, secretList, secretNameOk, serverSwitchList, type Gateway, type PlatformConfig } from '@/lib/platform';
+import { SheetsSendButton } from '@/components/SheetsSend';
+import { sheetsUrlOk } from '@/lib/sheets';
 
 /** Keys each in-app gateway needs (names in platformSecrets, read only by functions/). */
 const gatewayKeys: Record<string, string[]> = {
@@ -24,6 +26,7 @@ const sections = [
   ['server-jobs', 'Server jobs'],
   ['sms-provider', 'SMS'],
   ['whatsapp', 'WhatsApp'],
+  ['google-sheets', 'Google Sheets'],
   ['payments', 'Payments'],
   ['payment-keys', 'Payment keys'],
   ['maps', 'Maps'],
@@ -132,13 +135,13 @@ export default function IntegrationsPage() {
   useEffect(() => integ.data && setI(integ.data), [integ.data]);
 
   const cfgChanged = !!cfg.data && JSON.stringify({ p: c.payments, m: c.maps, s: c.server }) !== JSON.stringify({ p: cfg.data.config.payments, m: cfg.data.config.maps, s: cfg.data.config.server });
-  const intChanged = !!integ.data && !!i && JSON.stringify({ s: i.sms, p: i.payments, m: i.maps, w: i.whatsapp }) !== JSON.stringify({ s: integ.data.sms, p: integ.data.payments, m: integ.data.maps, w: integ.data.whatsapp });
+  const intChanged = !!integ.data && !!i && JSON.stringify({ s: i.sms, p: i.payments, m: i.maps, w: i.whatsapp, g: i.sheets }) !== JSON.stringify({ s: integ.data.sms, p: integ.data.payments, m: integ.data.maps, w: integ.data.whatsapp, g: integ.data.sheets });
 
   function save() {
     const { db } = firebase();
     const ops: Op[] = [];
     if (cfgChanged && can('settings')) ops.push(setOp(doc(db, 'platform', 'config'), c as unknown as Record<string, unknown>, false));
-    if (intChanged && i) ops.push(setOp(doc(db, 'platform', 'integrations'), { sms: i.sms, payments: i.payments, maps: i.maps, whatsapp: i.whatsapp }, true));
+    if (intChanged && i) ops.push(setOp(doc(db, 'platform', 'integrations'), { sms: i.sms, payments: i.payments, maps: i.maps, whatsapp: i.whatsapp, sheets: { url: i.sheets.url.trim(), secret: i.sheets.secret.trim(), auto: i.sheets.auto } }, true));
     if (!ops.length) return;
     void act
       .run(() => adminChange(actor, { action: 'integrations.edit', target: 'platform/integrations', details: { server: c.server, sms: i?.sms.provider, gateways: c.payments.gateways.filter((g) => g.enabled).map((g) => g.id), maps: c.maps.provider } }, ops))
@@ -234,6 +237,36 @@ export default function IntegrationsPage() {
             </label>
           </Fit>
           <div className="list">{keyRows('WhatsApp')}</div>
+        </section>
+      )}
+
+      {i && (
+        <section id="google-sheets" className="card stack anchor">
+          <div className="card-head">
+            <h2>Google Sheets</h2>
+            <span className={`chip ${sheetsUrlOk(i.sheets.url) && i.sheets.secret ? 'ok' : ''}`}>{sheetsUrlOk(i.sheets.url) && i.sheets.secret ? 'Ready' : 'Not set up'}</span>
+          </div>
+          <p className="small muted">
+            A copy of Farms, Payments, Users and the Audit log in your own Google Sheet, one tab each. Free: it uses a small Apps Script in the sheet (steps in
+            docs/GOOGLE_SHEETS.md). Each send replaces the old rows.
+          </p>
+          <Fit cols={[1, 2, 2, 2]}>
+            <label className="field">
+              <span>Web app link</span>
+              <input className="input" value={i.sheets.url} onChange={(e) => setI({ ...i, sheets: { ...i.sheets, url: e.target.value } })} placeholder="https://script.google.com/macros/s/…/exec" />
+              {i.sheets.url && !sheetsUrlOk(i.sheets.url) && <small className="error-text">Use the Web app URL from Deploy, ending in /exec.</small>}
+            </label>
+            <label className="field">
+              <span>Secret word (the SECRET line in the script)</span>
+              <input className="input" value={i.sheets.secret} onChange={(e) => setI({ ...i, sheets: { ...i.sheets, secret: e.target.value } })} />
+            </label>
+          </Fit>
+          <label className="row">
+            <input type="checkbox" checked={i.sheets.auto} onChange={(e) => setI({ ...i, sheets: { ...i.sheets, auto: e.target.checked } })} />
+            <span>Send by itself when an admin opens the Overview (at most once an hour)</span>
+          </label>
+          <SheetsSendButton settings={i.sheets} disabled={intChanged} />
+          {intChanged && <small className="muted">Save changes first, then send.</small>}
         </section>
       )}
 
