@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { SessionProvider, themeBootScript } from '@/lib/session';
+import { RefreshProvider } from '@/lib/refresh';
 import '@/theme/tokens.css';
 import '@/styles/app.css';
 import '@/styles/public.css';
@@ -20,7 +21,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <RefreshProvider>{children}</RefreshProvider>
+        </SessionProvider>
       </body>
     </html>
   );

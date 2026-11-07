@@ -10,6 +10,7 @@ import { AdminProvider, useAdmin } from '@/lib/adminSession';
 import type { Permission } from '@/lib/platform';
 import { useSession } from '@/lib/session';
 import { Avatar } from '@/components/Avatar';
+import { RefreshButton } from '@/components/RefreshButton';
 
 interface NavItem {
   href: string;
@@ -199,6 +200,7 @@ function Shell({ children }: { children: ReactNode }) {
           <span className="admin-badge">
             <Icon name="shield" className="icon" /> Admin
           </span>
+          <RefreshButton />
           <Link href="/start/" className="btn sm outline hide-sm" title="Open my farm">
             My farm
           </Link>

@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { localIso } from './dates.ts';
 import { farmFromDoc, type Farm, type FarmRecord } from './domain.ts';
 import { firebase } from './firebase.ts';
+import { useRefreshTick } from './refresh.tsx';
 
 /** The account's farms: users/{uid}.memberships, role from tenants/{t}/members/{uid}. */
 export async function loadFarms(uid: string): Promise<Farm[]> {
@@ -48,6 +49,8 @@ export interface Live<T> {
  * limits it to records made on or after that local ISO day, by createdAt.
  */
 export function useRecords<B>(tenantId: string | null, name: string, since?: string): Live<FarmRecord<B>> {
+  // A refresh (button or pull) re-opens the live list.
+  const tick = useRefreshTick();
   const [state, setState] = useState<Live<FarmRecord<B>>>({ data: [], loading: true, error: null });
   useEffect(() => {
     if (!tenantId) return;
@@ -65,7 +68,7 @@ export function useRecords<B>(tenantId: string | null, name: string, since?: str
         }),
       (e) => setState({ data: [], loading: false, error: e.code ?? e.message }),
     );
-  }, [tenantId, name, since]);
+  }, [tenantId, name, since, tick]);
   return state;
 }
 

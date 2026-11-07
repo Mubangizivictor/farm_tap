@@ -17,6 +17,7 @@ import { supportWhatsAppLink } from '@/lib/support';
 import { markFarmSeen, useIsPlatformAdmin } from '@/lib/adminSession';
 import { usePlatform, PlatformProvider } from '@/lib/usePlatform';
 import { Avatar } from '@/components/Avatar';
+import { RefreshButton } from '@/components/RefreshButton';
 
 interface NavItem {
   href: string;
@@ -347,6 +348,7 @@ function FarmShell({ children }: { children: ReactNode }) {
             <Icon name={state.kind === 'readOnly' ? 'lock' : 'clock'} />
             <span>{plan.text}</span>
           </Link>
+          <RefreshButton />
           <UserMenu />
         </header>
         <div className="content">

@@ -814,3 +814,45 @@ ol.chat-points > li::before { content: counter(pt); position: absolute; left: va
 .topbar .farm-name { display: block; }
 .side-who { display: flex; flex-direction: column; gap: var(--s-sm); }
 .side-platform { font-size: var(--fs-label-sm); padding-top: var(--s-sm); border-top: var(--z-border) solid var(--c-outline-variant); }
+
+/* ---- Selected tabs and options: clearly different from the others (Victor, 7 Nov 2026) ----
+   Selected = filled brand colour with white text; the rest stay quiet. Hover shows a light tint. */
+.seg { background: var(--c-container-high); border: var(--z-border) solid var(--c-outline-variant); }
+.seg button:hover:not([aria-pressed='true']):not(:disabled),
+.tri button:hover:not([aria-pressed='true']):not(:disabled) { background: var(--c-container-highest); color: var(--c-on-surface); }
+.seg button[aria-pressed='true'],
+.tri button[aria-pressed='true']:not(.on):not(.off) {
+  background: var(--c-primary); color: var(--c-on-primary); font-weight: var(--fw-semibold);
+  box-shadow: 0 var(--z-shadow-y) var(--z-shadow-blur) var(--c-shadow);
+}
+.tri button.on[aria-pressed='true'] { background: var(--c-success); color: var(--c-on-primary); }
+.tri button.off[aria-pressed='true'] { background: var(--c-danger); color: var(--c-on-primary); }
+
+.tabs button { border-radius: var(--r-sm) var(--r-sm) 0 0; transition: background var(--d-fast) var(--ease), color var(--d-fast) var(--ease); }
+.tabs button:hover:not([aria-selected='true']) { background: var(--c-container); color: var(--c-on-surface); }
+.tabs button[aria-selected='true'] {
+  background: var(--c-primary-container); color: var(--c-on-primary-container);
+  border-bottom-color: var(--c-primary); font-weight: var(--fw-bold);
+}
+.tabs button[aria-selected='true'] .tab-count { background: var(--c-primary); color: var(--c-on-primary); }
+
+.chips button[aria-pressed='true'], .chip-btn[aria-pressed='true'], .chip[aria-pressed='true'] {
+  background: var(--c-primary); color: var(--c-on-primary); font-weight: var(--fw-semibold);
+}
+
+/* Bottom bar on phones: the open tab gets a filled pill behind its icon. */
+.bottomnav a svg, .bottomnav button svg { padding: var(--s-xxs) var(--s-lg); border-radius: var(--r-pill); box-sizing: content-box; transition: background var(--d-fast) var(--ease); }
+.bottomnav a[aria-current='page'] svg { background: var(--c-primary); color: var(--c-on-primary); }
+.bottomnav a[aria-current='page'] { color: var(--c-on-surface); font-weight: var(--fw-bold); }
+.nav a[aria-current='page'] { box-shadow: inset var(--z-focus) 0 0 var(--c-primary); }
+
+/* ---- Refresh (button and pull-to-refresh), lib/refresh.tsx ---- */
+html, body { overscroll-behavior-y: contain; }
+.icon.spin, svg.spin { animation: spin var(--d-spin) linear infinite; }
+.refresh-veil { position: fixed; inset: 0; z-index: 90; display: grid; place-items: start center; padding-top: calc(var(--z-topbar) + var(--s-xl)); background: color-mix(in srgb, var(--c-surface) 55%, transparent); animation: veil-in var(--d-fast) var(--ease); }
+.refresh-card { display: flex; align-items: center; gap: var(--s-md); padding: var(--s-md) var(--s-xl); border-radius: var(--r-pill); background: var(--c-card); border: var(--z-border) solid var(--c-outline-variant); box-shadow: 0 var(--z-shadow-y) var(--z-shadow-blur) var(--c-shadow); font-weight: var(--fw-semibold); }
+.refresh-card .logo-mark { width: var(--z-avatar); height: var(--z-avatar); }
+.pull-refresh { position: fixed; top: 0; left: 50%; z-index: 90; display: flex; flex-direction: column; align-items: center; gap: var(--s-xxs); padding: var(--s-sm) var(--s-lg); margin-top: calc(-1 * var(--s-xxl)); border-radius: var(--r-xl); background: var(--c-card); border: var(--z-border) solid var(--c-outline-variant); box-shadow: 0 var(--z-shadow-y) var(--z-shadow-blur) var(--c-shadow); pointer-events: none; }
+.pull-refresh .logo-mark { width: var(--z-avatar); height: var(--z-avatar); }
+@keyframes veil-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .spin-logo, .icon.spin, svg.spin { animation: none; } }
