@@ -26,9 +26,11 @@ import {
   type StaffBody,
 } from '@/lib/domain';
 import { firebase } from '@/lib/firebase';
+import { personPhotoSrc } from '@/lib/images';
 import { shortDate, weekday } from '@/lib/format';
 import { useFarm, useSession } from '@/lib/session';
 import { useOpenFromUrl } from '@/lib/useOpen';
+import { Avatar } from '@/components/Avatar';
 
 const shifts = ['morning', 'afternoon', 'evening', 'night', 'allDay'] as const;
 /** The contact a job usually needs: the vet for health, the feed supplier for feeding. */
@@ -346,7 +348,7 @@ export default function Roster() {
                     <span className="chip">{shiftName[d.body.shift]}</span>
                   </div>
                   <div className="row">
-                    <span className="avatar">{(p?.body.name ?? '?').slice(0, 1)}</span>
+                    <Avatar photo={p ? personPhotoSrc(p.body) : null} name={p?.body.name} />
                     <div className="grow stack" style={{ gap: 0 }}>
                       <strong>{p?.body.name ?? 'Nobody'}</strong>
                       <span className="small muted">

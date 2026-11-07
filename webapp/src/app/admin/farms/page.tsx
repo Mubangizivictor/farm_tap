@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Need, useLoad } from '@/components/admin';
 import { Icon } from '@/components/Icon';
 import { Empty, LoadError, PageHead, SearchBox } from '@/components/ui';
@@ -27,6 +27,14 @@ export default function AdminFarms() {
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState<(typeof filters)[number][0]>('all');
   const [sector, setSector] = useState('all');
+  // Opened from a card on the Overview: /admin/farms/?filter=trial or ?sector=dairy.
+  useEffect(() => {
+    const p = new URL(window.location.href).searchParams;
+    const f = p.get('filter');
+    if (f && filters.some(([k]) => k === f)) setFilter(f as (typeof filters)[number][0]);
+    const sec = p.get('sector');
+    if (sec) setSector(sec);
+  }, []);
   const now = new Date();
 
   const list = useMemo(() => {

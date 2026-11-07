@@ -7,9 +7,9 @@ import { Icon, type IconName } from '@/components/Icon';
 import { SideHead, useSidebar } from '@/components/side';
 import { Loading } from '@/components/Loading';
 import { AdminProvider, useAdmin } from '@/lib/adminSession';
-import { initials } from '@/lib/format';
 import type { Permission } from '@/lib/platform';
 import { useSession } from '@/lib/session';
+import { Avatar } from '@/components/Avatar';
 
 interface NavItem {
   href: string;
@@ -105,6 +105,22 @@ function NotStaff() {
   );
 }
 
+/** Bottom of the sidebar: who is signed in, and whose platform this is (one place, not the top bar). */
+function SideFoot({ name, access, photo, drawer }: { name: string; access: string; photo: string | null; drawer?: boolean }) {
+  return (
+    <div className={`${drawer ? '' : 'side-foot '}card flat small side-who`}>
+      <div className="row" style={{ gap: 'var(--s-md)', minWidth: 0 }}>
+        <Avatar photo={photo} name={name} />
+        <div className="stack" style={{ gap: 0, minWidth: 0 }}>
+          <strong className="ellipsis">{name}</strong>
+          <span className="muted ellipsis">{access}</span>
+        </div>
+      </div>
+      <div className="muted side-platform">FarmTap platform · Victorbee Technologies</div>
+    </div>
+  );
+}
+
 function NavLinks({ items, current }: { items: NavItem[]; current: (href: string) => 'page' | undefined }) {
   const groups = [...new Set(items.map((i) => i.group))];
   return (
@@ -127,7 +143,7 @@ function NavLinks({ items, current }: { items: NavItem[]; current: (href: string
 }
 
 function Shell({ children }: { children: ReactNode }) {
-  const { user, signOut, online } = useSession();
+  const { user, signOut, online, photo } = useSession();
   const { me } = useAdmin();
   const path = usePathname();
   const router = useRouter();
@@ -167,10 +183,7 @@ function Shell({ children }: { children: ReactNode }) {
         <SideHead home="/admin/" closed={side.closed} onToggle={side.toggle} />
         <NavLinks items={items} current={current} />
         <div className="grow" />
-        <div className="side-foot card flat small">
-          <strong>{me.name || user?.email}</strong>
-          <div className="muted">{me.role === 'owner' ? 'Owner, full access' : `${me.role}: ${me.perms.length} areas`}</div>
-        </div>
+        <SideFoot name={me.name || user?.email || ''} access={me.role === 'owner' ? 'Owner, full access' : `${me.role}: ${me.perms.length} areas`} photo={photo} />
       </aside>
 
       <div className="main">
@@ -178,11 +191,10 @@ function Shell({ children }: { children: ReactNode }) {
           <button className="icon-btn menu-btn" aria-label="Open menu" aria-expanded={drawer} onClick={() => setDrawer(true)}>
             <Icon name="menu" />
           </button>
-          <div className="stack grow" style={{ gap: 0, minWidth: 0 }}>
+          <div className="grow" style={{ minWidth: 0 }}>
             <span className="farm-name">
               Control panel<span className="show-sm-only">{here && here.href !== '/admin/' ? ` · ${here.label}` : ''}</span>
             </span>
-            <span className="small muted hide-sm">FarmTap platform, Victorbee Technologies</span>
           </div>
           <span className="admin-badge">
             <Icon name="shield" className="icon" /> Admin
@@ -192,7 +204,7 @@ function Shell({ children }: { children: ReactNode }) {
           </Link>
           <div className="rel">
             <button className="icon-btn" aria-label="Account menu" aria-expanded={userMenu} title={me.name || user?.email || ''} onClick={() => setUserMenu((v) => !v)}>
-              <span className="avatar">{initials(me.name || user?.email || '')}</span>
+              <Avatar photo={photo} name={me.name || user?.email || ''} />
             </button>
             {userMenu && (
               <>
@@ -239,10 +251,7 @@ function Shell({ children }: { children: ReactNode }) {
             </div>
             <NavLinks items={items} current={current} />
             <div className="grow" />
-            <div className="card flat small">
-              <strong>{me.name || user?.email}</strong>
-              <div className="muted">{me.role === 'owner' ? 'Owner, full access' : `${me.role}: ${me.perms.length} areas`}</div>
-            </div>
+            <SideFoot name={me.name || user?.email || ''} access={me.role === 'owner' ? 'Owner, full access' : `${me.role}: ${me.perms.length} areas`} photo={photo} drawer />
           </aside>
         </>
       )}

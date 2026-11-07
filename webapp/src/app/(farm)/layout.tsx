@@ -9,13 +9,14 @@ import { Loading } from '@/components/Loading';
 import { ClosedAccountScreen } from '@/components/account';
 import { ToastProvider } from '@/components/ui';
 import { hasHerd, isCentre, manages, planState, type Farm } from '@/lib/domain';
-import { date, initials } from '@/lib/format';
+import { date } from '@/lib/format';
 import { farmKind, planText } from '@/lib/labels';
 import { featureOn, WEB_BUILD, type FeatureKey, type PlatformConfig } from '@/lib/platform';
 import { useSession, useTheme, type ThemeChoice } from '@/lib/session';
 import { supportWhatsAppLink } from '@/lib/support';
 import { markFarmSeen, useIsPlatformAdmin } from '@/lib/adminSession';
 import { usePlatform, PlatformProvider } from '@/lib/usePlatform';
+import { Avatar } from '@/components/Avatar';
 
 interface NavItem {
   href: string;
@@ -73,7 +74,7 @@ function UserMenu() {
   return (
     <div className="rel">
       <button className="icon-btn" aria-label="Account" aria-expanded={open} onClick={() => setOpen(!open)}>
-        <span className="avatar">{photo ? <img src={photo} alt="" referrerPolicy="no-referrer" /> : initials(name)}</span>
+        <Avatar photo={photo} name={name} />
       </button>
       {open && (
         <div className="menu" role="menu" onMouseLeave={() => setOpen(false)}>

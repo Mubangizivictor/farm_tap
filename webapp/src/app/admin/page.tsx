@@ -73,12 +73,12 @@ export default function Overview() {
 
       {seeFarms && (
         <Fit kind="stats">
-          <Stat icon="home" label="Farms" value={count(live.length)} hint={`${newThisWeek} new this week · ${activeWeek} active`} />
-          <Stat icon="check" label="Paying" value={count(paid.length)} hint={overdue.length ? `${overdue.length} overdue` : 'None overdue'} tone={overdue.length ? 'warn' : undefined} />
-          <Stat icon="clock" label="On trial" value={count(trials.length)} hint={`${endingSoon.length} end in 3 days`} tone="info" />
-          {can('finance') && <Stat icon="money" label="MRR" value={ugx(mrr)} hint="Monthly value of paying farms" tone="gold" />}
-          {can('finance') && <Stat icon="receipt" label="This month" value={ugx(thisMonth)} hint={`${count(smsSold)} SMS credits sold in total`} tone="gold" />}
-          <Stat icon="shield" label="To review" value={count(pending.length)} hint="New farms waiting" tone={pending.length ? 'warn' : undefined} />
+          <Stat href="/admin/farms/" icon="home" label="Farms" value={count(live.length)} hint={`${newThisWeek} new this week · ${activeWeek} active`} />
+          <Stat href={overdue.length ? "/admin/farms/?filter=grace" : "/admin/farms/?filter=paid"} icon="check" label="Paying" value={count(paid.length)} hint={overdue.length ? `${overdue.length} overdue` : 'None overdue'} tone={overdue.length ? 'warn' : undefined} />
+          <Stat href="/admin/farms/?filter=trial" icon="clock" label="On trial" value={count(trials.length)} hint={`${endingSoon.length} end in 3 days`} tone="info" />
+          {can('finance') && <Stat href="/admin/money/" icon="money" label="MRR" value={ugx(mrr)} hint="Monthly value of paying farms" tone="gold" />}
+          {can('finance') && <Stat href="/admin/money/" icon="receipt" label="This month" value={ugx(thisMonth)} hint={`${count(smsSold)} SMS credits sold in total`} tone="gold" />}
+          <Stat href="/admin/farms/?filter=pending" icon="shield" label="To review" value={count(pending.length)} hint="New farms waiting" tone={pending.length ? 'warn' : undefined} />
         </Fit>
       )}
 
@@ -106,6 +106,9 @@ export default function Overview() {
           <section className="card">
             <div className="card-head">
               <h2>Needs you</h2>
+              <Link href="/admin/farms/" className="small">
+                All farms
+              </Link>
             </div>
             <div className="list">
               {pending.slice(0, 4).map((f) => (
@@ -141,10 +144,11 @@ export default function Overview() {
             </div>
             <div className="list">
               {bySector.map(([s, n]) => (
-                <div key={s} className="list-row">
+                <Link key={s} href={`/admin/farms/?sector=${encodeURIComponent(s)}`} className="list-row" style={{ color: 'inherit', textDecoration: 'none' }}>
                   <span className="grow">{sectorName[s] ?? s}</span>
                   <strong className="num">{n}</strong>
-                </div>
+                  <Icon name="chevron" className="icon muted" />
+                </Link>
               ))}
               {!bySector.length && <Empty>No farms yet.</Empty>}
             </div>
