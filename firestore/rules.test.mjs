@@ -374,6 +374,15 @@ describe('platform control panel (decision 0020)', () => {
     await assertFails(setDoc(doc(as('worker'), `tenants/${T}/milkRecords/m9`), rec('milkRecords', 'm9')));
   });
 
+  test('farms staff correct farm details and set the trial length; finance cannot edit details', async () => {
+    const v = adminDb('victor');
+    await assertSucceeds(audited(v, doc(v, `tenants/${T}`), { name: 'Rwemera Dairy', district: 'Mbarara', contacts: { whatsapp: '0772000000' } }));
+    await assertSucceeds(audited(v, doc(v, `tenants/${T}`), { subscription: { trialStartedAt: days(-5), trialEndsAt: days(-3) } }));
+    await assertFails(audited(v, doc(v, `tenants/${T}`), { ownerUid: 'victor' }));
+    const f = adminDb('fin');
+    await assertFails(audited(f, doc(f, `tenants/${T}`), { name: 'Changed by finance' }));
+  });
+
   test('a farm cannot set panel fields on itself', async () => {
     await assertFails(updateDoc(doc(as('owner'), `tenants/${T}`), { status: 'active', features: { exports: true } }));
     await assertFails(updateDoc(doc(as('owner'), `tenants/${T}`), { smsCredits: 1000 }));

@@ -1,5 +1,6 @@
 // Shared look-ups for the control panel pages (decision 0020).
 import type { AdminFarm } from './admin.ts';
+import { daysBetween } from './dates.ts';
 import { planState } from './domain.ts';
 import { starterPlan, type Plan } from './platform.ts';
 
@@ -33,3 +34,8 @@ export function planOf(f: AdminFarm, plans: Plan[]): Plan {
   return plans.find((p) => p.id === f.planId) ?? plans.find((p) => p.active) ?? starterPlan;
 }
 
+/** Days of free trial this farm has in total, counted from the day it signed up. */
+export function trialLength(f: Pick<AdminFarm, 'trialStartedAt' | 'trialEndsAt' | 'createdAt'>, fallback: number): number {
+  const start = f.trialStartedAt ?? f.createdAt;
+  return start && f.trialEndsAt ? Math.max(0, daysBetween(start, f.trialEndsAt)) : fallback;
+}

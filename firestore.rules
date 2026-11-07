@@ -43,6 +43,10 @@ service cloud.firestore {
       return ['subscription', 'review', 'status', 'planId', 'features', 'smsCredits',
         'messaging', 'billing', 'lastAudit', 'suspendedReason', 'closure'];
     }
+    // Farm details the panel may correct (Farms permission only).
+    function adminFarmDetailKeys() {
+      return ['name', 'district', 'place', 'village', 'type', 'cows', 'contacts'];
+    }
     function platformConfig() {
       return /databases/$(database)/documents/platform/config;
     }
@@ -261,10 +265,10 @@ service cloud.firestore {
     match /tenants/{t} {
       allow read: if member(t);
       allow read: if can('farms') || can('finance') || can('support') || can('users');
-      // The panel: review, suspend, plan, flags (farms); subscription and
-      // billing (finance). Never the owner or the farm's own profile.
+      // The panel: review, suspend, plan, flags and farm details (farms);
+      // subscription and billing (finance). Never the owner.
       allow update: if audited()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(adminFarmKeys())
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(adminFarmKeys().concat(adminFarmDetailKeys()))
         && (can('farms') || (can('finance')
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['subscription', 'planId', 'billing', 'smsCredits', 'lastAudit']))
           // Restoring a deleted account (Users access) reopens its farms.
